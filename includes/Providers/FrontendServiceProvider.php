@@ -1,4 +1,12 @@
 <?php
+/**
+ * Frontend service provider for registering frontend services.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Providers
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Providers;
 

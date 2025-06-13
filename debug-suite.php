@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The plugin bootstrap file
  *
@@ -35,12 +34,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Include Composer autoloader
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
-}else {
-    // Plugin won't work - show admin notice
-    add_action( 'admin_notices', function() {
-        echo '<div class="notice notice-error"><p>Debug Suite: Please run composer install</p></div>';
-    });
-    return;
+} else {
+	// Plugin won't work - show admin notice.
+	add_action(
+		'admin_notices',
+		function() {
+			echo '<div class="notice notice-error"><p>Debug Suite: Please run composer install</p></div>';
+		}
+	);
+	return;
 }
 
 use DebugSuite\Core\Activator;
@@ -55,11 +57,11 @@ use DebugSuite\Providers\ManagerServiceProvider;
 final class DebugSuite {
 
 	/**
-     * Instance of self
-     *
-     * @var DebugSuite
-     */
-    private static $instance = null;
+	 * Instance of self
+	 *
+	 * @var DebugSuite
+	 */
+	private static $instance = null;
 
 	/**
 	 * Service Manager instance.

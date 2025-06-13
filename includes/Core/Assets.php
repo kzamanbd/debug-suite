@@ -1,4 +1,12 @@
 <?php
+/**
+ * Assets management for the plugin.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Core
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Core;
 

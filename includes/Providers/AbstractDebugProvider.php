@@ -1,4 +1,12 @@
 <?php
+/**
+ * Abstract base class for debug providers.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Providers
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Providers;
 

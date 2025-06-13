@@ -1,4 +1,12 @@
 <?php
+/**
+ * Debug helper utilities.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Helpers
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Helpers;
 

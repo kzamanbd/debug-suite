@@ -1,4 +1,12 @@
 <?php
+/**
+ * Manager for debug providers.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Managers
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Managers;
 

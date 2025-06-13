@@ -1,4 +1,12 @@
 <?php
+/**
+ * The frontend-specific functionality of the plugin.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Frontend
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Frontend;
 

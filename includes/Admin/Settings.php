@@ -1,4 +1,12 @@
 <?php
+/**
+ * Settings class for admin configuration.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Admin
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Admin;
 

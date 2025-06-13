@@ -1,7 +1,14 @@
 <?php
+/**
+ * The admin-specific functionality of the plugin.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Admin
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Admin;
-
 
 /**
  * The admin-specific functionality of the plugin.
@@ -61,6 +68,6 @@ class Admin {
 	 */
 	public function admin_enqueue_scripts() {
 		wp_enqueue_script( 'debug-suite-admin' );
-        wp_enqueue_style( 'debug-suite-admin' );
+		wp_enqueue_style( 'debug-suite-admin' );
 	}
 }

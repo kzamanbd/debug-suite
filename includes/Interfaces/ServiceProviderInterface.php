@@ -1,4 +1,12 @@
 <?php
+/**
+ * Interface for service providers.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Interfaces
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Interfaces;
 

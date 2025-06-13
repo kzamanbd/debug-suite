@@ -29,11 +29,12 @@
         }
     ],
     "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpcompatibility/php-compatibility": "^9.3",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.5",
         "squizlabs/php_codesniffer": "^3.6",
-        "wp-coding-standards/wpcs": "^2.3",
-        "phpcompatibility/php-compatibility": "^9.3",
-        "phpstan/phpstan": "^1.10"
+        "wp-coding-standards/wpcs": "^2.3"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
@@ -53,6 +54,21 @@
     },
     "scripts": {
         "phpcs": "vendor/bin/phpcs --standard=phpcs.xml",
-        "phpcbf": "vendor/bin/phpcbf --standard=phpcs.xml"
+        "phpcs:check": "vendor/bin/phpcs --standard=phpcs.xml --report=summary",
+        "phpcs:full": "vendor/bin/phpcs --standard=phpcs.xml --report=full",
+        "phpcs:fix": "vendor/bin/phpcbf --standard=phpcs.xml",
+        "phpcs:dry-run": "vendor/bin/phpcbf --standard=phpcs.xml --dry-run --diff",
+        "phpcbf": "vendor/bin/phpcbf --standard=phpcs.xml",
+        "phpstan": "vendor/bin/phpstan analyse --level=5 --memory-limit=1G",
+        "test": "vendor/bin/phpunit",
+        "qa": [
+            "@phpcs:check",
+            "@phpstan"
+        ],
+        "fix": "@phpcs:fix",
+        "fix-all": [
+            "@phpcs:fix",
+            "@phpcs:check"
+        ]
     }
 }

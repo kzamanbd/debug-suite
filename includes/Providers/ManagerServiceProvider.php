@@ -1,4 +1,12 @@
 <?php
+/**
+ * Manager service provider for registering manager services.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Providers
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Providers;
 

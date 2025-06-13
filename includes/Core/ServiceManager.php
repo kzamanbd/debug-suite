@@ -1,4 +1,12 @@
 <?php
+/**
+ * Service manager for handling service providers.
+ *
+ * @since      1.0.0
+ * @package    DebugSuite
+ * @subpackage DebugSuite/Core
+ * @author     Kamruzzaman <kzamanbn@gmail.com>
+ */
 
 namespace DebugSuite\Core;
 
