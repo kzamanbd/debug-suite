@@ -63,9 +63,37 @@ const FileLogs: React.FC = () => {
     };
 
     return (
-        <div className="p-6">
+        <div className="wrap">
+            <h1>File Logs Overview</h1>
+            <p>Welcome to the File Logs section. Choose an option below to get started.</p>
+            
+            <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
+                <a 
+                    href="#/file-logs/view" 
+                    className="button button-primary button-large"
+                    style={{ textDecoration: 'none', padding: '10px 20px' }}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        window.location.hash = '#/file-logs/view';
+                    }}
+                >
+                    📄 View Logs
+                </a>
+                <a 
+                    href="#/file-logs/manage" 
+                    className="button button-secondary button-large"
+                    style={{ textDecoration: 'none', padding: '10px 20px' }}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        window.location.hash = '#/file-logs/manage';
+                    }}
+                >
+                    ⚙️ Manage Logs
+                </a>
+            </div>
+
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">File Logs</h1>
+                <h2>Recent Log Entries</h2>
                 <div className="flex space-x-4">
                     <select 
                         value={selectedLevel} 
@@ -78,63 +106,62 @@ const FileLogs: React.FC = () => {
                         <option value="info">Info</option>
                         <option value="debug">Debug</option>
                     </select>
-                    <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    <button className="button">
                         Clear Logs
                     </button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Timestamp
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Level
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Message
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    File
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredLogs.map((log) => (
-                                <tr key={log.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {log.timestamp}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getLevelColor(log.level)}`}>
-                                            {log.level.toUpperCase()}
+            <div className="wp-list-table widefat fixed striped" style={{ marginTop: '20px' }}>
+                <table className="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th style={{ width: '140px' }}>Timestamp</th>
+                            <th style={{ width: '80px' }}>Level</th>
+                            <th>Message</th>
+                            <th style={{ width: '200px' }}>File</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredLogs.map((log) => (
+                            <tr key={log.id}>
+                                <td>{log.timestamp}</td>
+                                <td>
+                                    <span 
+                                        className={`notice inline`}
+                                        style={{ 
+                                            padding: '2px 8px', 
+                                            fontSize: '11px',
+                                            backgroundColor: log.level === 'error' ? '#dc3545' : 
+                                                           log.level === 'warning' ? '#ffc107' :
+                                                           log.level === 'info' ? '#17a2b8' : '#6c757d',
+                                            color: 'white',
+                                            borderRadius: '3px'
+                                        }}
+                                    >
+                                        {log.level.toUpperCase()}
+                                    </span>
+                                </td>
+                                <td>{log.message}</td>
+                                <td>
+                                    {log.file && (
+                                        <span>
+                                            <code>{log.file}</code>
+                                            {log.line && <span style={{ color: '#666' }}>:{log.line}</span>}
                                         </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">
-                                        {log.message}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {log.file && (
-                                            <span>
-                                                {log.file}
-                                                {log.line && <span className="text-gray-400">:{log.line}</span>}
-                                            </span>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {filteredLogs.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                            No logs found for the selected level.
-                        </div>
-                    )}
-                </div>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                        {filteredLogs.length === 0 && (
+                            <tr>
+                                <td colSpan={4} style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                                    No logs found for the selected level.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
