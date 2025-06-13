@@ -33,6 +33,11 @@ class Settings {
 	 * Render the admin page.
 	 */
 	public function admin_page() {
+		// Check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'debug-suite' ) );
+		}
+
 		?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
