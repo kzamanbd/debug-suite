@@ -32,26 +32,30 @@ class CoreServiceProvider extends AbstractServiceProvider {
 	public function register( Container $container ): void {
 		// Register Assets service
 		$container->singleton(
-			'assets', function ( Container $container ) {
+			'assets',
+			function ( Container $container ) {
 				return new Assets();
 			}
 		);
 
 		$container->singleton(
-			Assets::class, function ( Container $container ) {
+			Assets::class,
+			function ( Container $container ) {
 				return $container->resolve( 'assets' );
 			}
 		);
 
 		// Register I18n service
 		$container->singleton(
-			'i18n', function ( Container $container ) {
+			'i18n',
+			function ( Container $container ) {
 				return new I18n();
 			}
 		);
 
 		$container->singleton(
-			I18n::class, function ( Container $container ) {
+			I18n::class,
+			function ( Container $container ) {
 				return $container->resolve( 'i18n' );
 			}
 		);

@@ -31,26 +31,30 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	public function register( Container $container ): void {
 		// Register Settings service
 		$container->singleton(
-			'settings', function ( Container $container ) {
+			'settings',
+			function ( Container $container ) {
 				return new Settings();
 			}
 		);
 
 		$container->singleton(
-			Settings::class, function ( Container $container ) {
+			Settings::class,
+			function ( Container $container ) {
 				return $container->resolve( 'settings' );
 			}
 		);
 
 		// Register Admin service
 		$container->singleton(
-			'admin', function ( Container $container ) {
+			'admin',
+			function ( Container $container ) {
 				return new Admin( $container->resolve( 'settings' ) );
 			}
 		);
 
 		$container->singleton(
-			Admin::class, function ( Container $container ) {
+			Admin::class,
+			function ( Container $container ) {
 				return $container->resolve( 'admin' );
 			}
 		);

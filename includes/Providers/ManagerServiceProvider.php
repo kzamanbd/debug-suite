@@ -28,13 +28,15 @@ class ManagerServiceProvider extends AbstractServiceProvider {
 	public function register( Container $container ): void {
 		// Register Debug Provider Manager
 		$container->singleton(
-			'debug_provider_manager', function ( Container $container ) {
+			'debug_provider_manager',
+			function ( Container $container ) {
 				return DebugProviderManager::get_instance();
 			}
 		);
 
 		$container->singleton(
-			DebugProviderManager::class, function ( Container $container ) {
+			DebugProviderManager::class,
+			function ( Container $container ) {
 				return $container->resolve( 'debug_provider_manager' );
 			}
 		);

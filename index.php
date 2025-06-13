@@ -1,6 +1,1 @@
-<?php
-/**
- * Silence is golden
- *
- * @package    DebugSuite
- */
+<?php // Silence is golden

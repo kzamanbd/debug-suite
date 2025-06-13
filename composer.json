@@ -62,6 +62,13 @@
         "phpcbf": "vendor/bin/phpcbf --standard=phpcs.xml",
         "phpstan": "vendor/bin/phpstan analyse --level=5 --memory-limit=1G",
         "test": "vendor/bin/phpunit",
+        "security:check": "vendor/bin/phpcs --standard=phpcs.xml --sniffs=WordPress.Security",
+        "wp-org:check": [
+            "@phpcs:check",
+            "@security:check",
+            "@phpstan",
+            "echo 'WordPress.org compliance check completed!'"
+        ],
         "qa": [
             "@phpcs:check",
             "@phpstan"
