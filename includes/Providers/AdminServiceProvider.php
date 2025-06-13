@@ -18,7 +18,6 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	 * Services provided by this provider.
 	 */
 	protected $provides = array(
-		'admin',
 		Admin::class,
 	);
 
@@ -28,16 +27,9 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	public function register( Container $container ): void {
 		// Register Admin service
 		$container->singleton(
-			'admin',
-			function ( Container $container ) {
-				return new Admin();
-			}
-		);
-
-		$container->singleton(
 			Admin::class,
 			function ( Container $container ) {
-				return $container->resolve( 'admin' );
+				return new Admin();
 			}
 		);
 

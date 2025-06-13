@@ -38,10 +38,12 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	wp_die( esc_html__( 'Missing Dependencies Detected [Debug Suite Plugin]', 'debug-suite' ) );
 }
 
+use DebugSuite\Admin\Admin;
 use DebugSuite\Core\Activator;
 use DebugSuite\Core\Deactivator;
 use DebugSuite\Core\Container;
 use DebugSuite\Core\ServiceManager;
+use DebugSuite\Frontend\Frontend;
 use DebugSuite\Providers\CoreServiceProvider;
 use DebugSuite\Providers\AdminServiceProvider;
 use DebugSuite\Providers\FrontendServiceProvider;
@@ -142,11 +144,11 @@ final class DebugSuite {
 
 		// Initialize admin functionality if in admin area
 		if ( is_admin() ) {
-			$this->container->resolve( 'admin' );
+			$this->container->resolve( Admin::class );
 		}
 
 		// Initialize frontend functionality
-		$this->container->resolve( 'frontend' );
+		$this->container->resolve( Frontend::class );
 	}
 
 	/**

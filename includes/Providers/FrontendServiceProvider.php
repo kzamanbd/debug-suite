@@ -18,7 +18,6 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 	 * Services provided by this provider.
 	 */
 	protected $provides = array(
-		'frontend',
 		Frontend::class,
 	);
 
@@ -28,16 +27,9 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 	public function register( Container $container ): void {
 		// Register Frontend service
 		$container->singleton(
-			'frontend',
-			function ( Container $container ) {
-				return new Frontend();
-			}
-		);
-
-		$container->singleton(
 			Frontend::class,
 			function ( Container $container ) {
-				return $container->resolve( 'frontend' );
+				return new Frontend();
 			}
 		);
 
