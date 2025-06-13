@@ -4,7 +4,6 @@
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Interfaces
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
@@ -17,7 +16,6 @@ use DebugSuite\Core\Container;
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Interfaces
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 interface ServiceProviderInterface {

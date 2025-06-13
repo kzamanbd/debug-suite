@@ -4,7 +4,6 @@
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Providers
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
@@ -19,7 +18,6 @@ use DebugSuite\Managers\DebugProviderManager;
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Providers
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class ManagerServiceProvider extends AbstractServiceProvider {

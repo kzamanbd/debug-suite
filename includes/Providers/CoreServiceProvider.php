@@ -4,7 +4,6 @@
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Providers
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
@@ -20,7 +19,6 @@ use DebugSuite\Core\I18n;
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Providers
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class CoreServiceProvider extends AbstractServiceProvider {

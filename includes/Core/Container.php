@@ -4,7 +4,6 @@
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Core
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
@@ -14,8 +13,7 @@ namespace DebugSuite\Core;
  * Dependency Injection Container for managing class dependencies.
  *
  * @since      1.0.0
- * @package    DebugSuite
- * @subpackage DebugSuite/Core
+ * @package    DebugSuite 
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class Container {

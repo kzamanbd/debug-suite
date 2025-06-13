@@ -3,7 +3,7 @@
  * Global helper functions for the Debug Suite plugin.
  *
  * @since      1.0.0
- * @package    DebugSuite
+ * @package    DebugSuite 
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 

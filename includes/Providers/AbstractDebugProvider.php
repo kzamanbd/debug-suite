@@ -4,7 +4,6 @@
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Providers
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
@@ -17,7 +16,6 @@ use DebugSuite\Interfaces\DebugProviderInterface;
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Providers
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 abstract class AbstractDebugProvider implements DebugProviderInterface {

@@ -14,6 +14,7 @@
     <exclude-pattern type="relative">^/lib/*</exclude-pattern>
     <exclude-pattern type="relative">^/dist/*</exclude-pattern>
     <exclude-pattern type="relative">^/build/*</exclude-pattern>
+    <exclude-pattern type="relative">node_modules/*</exclude-pattern>
     <exclude-pattern type="relative">^/node_modules/*</exclude-pattern>
     <!-- Exclude vendor directory and all subdirectories -->
     <exclude-pattern type="relative">^/vendor/*</exclude-pattern>
@@ -55,6 +56,8 @@
         <exclude name="WordPress.WP.I18n"/>
         <!-- Exclude inline comment punctuation rule -->
         <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar"/>
+        <!-- Exclude missing @package tag in file comment -->
+        <exclude name="WordPress.Commenting.FileComment.MissingPackageTag"/>
     </rule>
     
     <!-- Separate I18n rule with additional safety checks -->

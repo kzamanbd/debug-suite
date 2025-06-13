@@ -4,7 +4,6 @@
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Frontend
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
@@ -15,7 +14,6 @@ namespace DebugSuite\Frontend;
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Frontend
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class Frontend {}

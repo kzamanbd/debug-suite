@@ -4,7 +4,6 @@
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Admin
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
@@ -15,7 +14,6 @@ namespace DebugSuite\Admin;
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Admin
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class Settings {

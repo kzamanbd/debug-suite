@@ -4,7 +4,6 @@
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Core
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
@@ -17,7 +16,6 @@ use DebugSuite\Interfaces\ServiceProviderInterface;
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Core
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 abstract class AbstractServiceProvider implements ServiceProviderInterface {

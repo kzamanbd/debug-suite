@@ -4,7 +4,6 @@
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Interfaces
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
@@ -15,7 +14,6 @@ namespace DebugSuite\Interfaces;
  *
  * @since      1.0.0
  * @package    DebugSuite
- * @subpackage DebugSuite/Interfaces
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 interface DebugProviderInterface {
