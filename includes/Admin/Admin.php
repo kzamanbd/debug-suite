@@ -10,20 +10,50 @@ namespace DebugSuite\Admin;
  */
 class Admin {
 
-	private Settings $settings;
-
 	public function __construct() {
-		$this->settings = new Settings();
-
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 	}
 
 	/**
 	 * Add admin menu and initialize settings.
 	 */
 	public function add_admin_menu() {
-		$this->settings->add_admin_menu();
+		global $submenu;
+
+		$capability     = 'manage_options';
+		$slug           = 'debug-suite';
+		$position       = 80; // Position in the admin menu
+		$menu_icon      = 'dashicons-admin-tools';
+
+		$dashboard = add_menu_page(
+			__( 'Debug Suite', 'debug-suite' ),
+			__( 'Debug Suite', 'debug-suite' ),
+			$capability,
+			$slug,
+			[ $this, 'admin_page' ],
+			$menu_icon,
+			$position
+		);
+
+		$submenu[ $slug ][] = [ __( 'Dashboard', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#/' ];
+		$submenu[ $slug ][] = [ __( 'File Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#/file-logs/view' ];
+		$submenu[ $slug ][] = [ __( 'Manage Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#/file-logs/manage' ];
+
+		add_action( $dashboard, [ $this, 'admin_enqueue_scripts' ] );
+	}
+
+	/**
+	 * Render the admin page.
+	 */
+	public function admin_page() {
+		// Check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'debug-suite' ) );
+		}
+
+		ob_start();
+		echo '<div class="wrap"><div id="debug-suite-admin-app"></div></div>';
+		echo ob_get_clean(); // phpcs:ignore
 	}
 
 	/**
