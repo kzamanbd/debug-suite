@@ -19,7 +19,7 @@ class Container {
 	 *
 	 * @var Container|null
 	 */
-	private static ?Container $instance;
+	private static ?Container $instance = null;
 
 	/**
 	 * Registered services.

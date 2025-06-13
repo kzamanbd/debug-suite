@@ -35,15 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 } else {
-	// Plugin won't work - show admin notice.
-	add_action(
-		'admin_notices',
-		function () {
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'Debug Suite: Please run composer install', 'debug-suite' ) . '</p></div>';
-		}
-	);
-
-	return;
+	wp_die( esc_html__( 'Missing Dependencies Detected [Debug Suite Plugin]', 'debug-suite' ) );
 }
 
 use DebugSuite\Core\Activator;
