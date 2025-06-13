@@ -12,6 +12,8 @@ trait Singleton {
 
 	/**
 	 * Instance of the class.
+	 *
+	 * @var static|null
 	 */
 	private static $instance;
 
@@ -24,6 +26,8 @@ trait Singleton {
 
 	/**
 	 * Prevent object cloning.
+	 *
+	 * @return void
 	 */
 	final protected function __clone() {
 		// Prevent cloning
@@ -31,13 +35,18 @@ trait Singleton {
 
 	/**
 	 * Prevent unserializing.
+	 *
+	 * @return void
+	 * @throws \Exception
 	 */
-	final public function __wakeup() {
+	final public function __wakeup(): void {
 		throw new \Exception( 'Cannot unserialize singleton' );
 	}
 
 	/**
 	 * Initialize the singleton instance.
+	 *
+	 * @return static
 	 */
 	final public static function get_instance() {
 		if ( ! isset( static::$instance ) ) {
@@ -50,8 +59,10 @@ trait Singleton {
 	/**
 	 * Initialize the class.
 	 * Override this method in child classes to perform initialization.
+	 *
+	 * @return void
 	 */
-	protected function init() {
+	protected function init(): void {
 		// Override in child classes
 	}
 }

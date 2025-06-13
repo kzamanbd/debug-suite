@@ -12,8 +12,10 @@ class I18n {
 
 	/**
 	 * Load the plugin text domain for translation.
+	 *
+	 * @return void
 	 */
-	public static function load_plugin_textdomain() {
+	public static function load_plugin_textdomain(): void {
 		load_plugin_textdomain(
 			'debug-suite',
 			false,

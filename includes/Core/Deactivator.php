@@ -12,8 +12,10 @@ class Deactivator {
 
 	/**
 	 * Plugin deactivation logic.
+	 *
+	 * @return void
 	 */
-	public static function deactivate() {
+	public static function deactivate(): void {
 		// Add deactivation logic here
 	}
 }

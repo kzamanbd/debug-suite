@@ -60,9 +60,9 @@
         "phpcs:fix": "vendor/bin/phpcbf --standard=phpcs.xml",
         "phpcs:dry-run": "vendor/bin/phpcbf --standard=phpcs.xml --dry-run --diff",
         "phpcbf": "vendor/bin/phpcbf --standard=phpcs.xml",
-        "phpstan": "vendor/bin/phpstan analyse --level=5 --memory-limit=1G",
+        "phpstan": "php -d xdebug.mode=off -d display_errors=0 vendor/bin/phpstan analyse --level=5 --memory-limit=1G",
         "test": "vendor/bin/phpunit",
-        "security:check": "vendor/bin/phpcs --standard=phpcs.xml --sniffs=WordPress.Security",
+        "security:check": "vendor/bin/phpcs --standard=phpcs.xml --sniffs=WordPress.Security.EscapeOutput,WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput,WordPress.Security.PluginMenuSlug,WordPress.Security.SafeRedirect --report=summary",
         "wp-org:check": [
             "@phpcs:check",
             "@security:check",

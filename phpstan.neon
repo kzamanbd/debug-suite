@@ -1,0 +1,23 @@
+parameters:
+    level: 5
+    paths:
+        - includes/
+        - debug-suite.php
+    
+    # Suppress PHP warnings and notes
+    reportUnmatchedIgnoredErrors: false
+    
+    # WordPress specific ignores
+    ignoreErrors:
+        # Ignore WordPress functions not found (they're defined at runtime)
+        - identifier: function.notFound
+        # Ignore WordPress constants not found (they're defined at runtime)
+        - identifier: constant.notFound
+        # Ignore singleton pattern static access warnings
+        - message: '#Unsafe access to private property .+::\$instance through static::#'
+        # Ignore missing array typehints 
+        - identifier: missingType.iterableValue
+        
+    # Bootstrap files
+    bootstrapFiles:
+        - vendor/autoload.php

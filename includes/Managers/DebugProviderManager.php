@@ -6,7 +6,6 @@
 namespace DebugSuite\Managers;
 
 use DebugSuite\Core\Singleton;
-use DebugSuite\Providers\AbstractDebugProvider;
 use DebugSuite\Interfaces\DebugProviderInterface;
 
 /**
@@ -20,14 +19,14 @@ class DebugProviderManager {
 	 *
 	 * @var DebugProviderInterface[]
 	 */
-	private $providers = array();
+	private array $providers = array();
 
 	/**
 	 * Active debug providers.
 	 *
 	 * @var DebugProviderInterface[]
 	 */
-	private $active_providers = array();
+	private array $active_providers = array();
 
 	/**
 	 * Initialize the manager.
@@ -139,13 +138,12 @@ class DebugProviderManager {
 	 * @return array
 	 */
 	public function get_debug_data(): array {
-		$debug_data = array();
-
-		foreach ( $this->active_providers as $name => $provider ) {
-			$debug_data[ $name ] = $provider->get_debug_data();
-		}
-
-		return $debug_data;
+		return array_map(
+			function ( $provider ) {
+				return $provider->get_debug_data();
+			},
+			$this->active_providers
+		);
 	}
 
 	/**

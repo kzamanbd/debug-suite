@@ -48,8 +48,10 @@ class Settings {
 
 	/**
 	 * Register settings.
+	 *
+	 * @return void
 	 */
-	public function register_settings() {
+	public function register_settings(): void {
 		register_setting(
 			'debug_suite_settings',
 			'debug_suite_options',
@@ -61,8 +63,11 @@ class Settings {
 
 	/**
 	 * Sanitize settings input.
+	 *
+	 * @param array $input Raw input data.
+	 * @return array Sanitized input data.
 	 */
-	public function sanitize_settings( $input ) {
+	public function sanitize_settings( $input ): array {
 		$sanitized = array();
 
 		if ( isset( $input['enable_debug_bar'] ) ) {
@@ -82,6 +87,10 @@ class Settings {
 
 	/**
 	 * Get plugin option.
+	 *
+	 * @param string $option Option name.
+	 * @param mixed $default Default value.
+	 * @return mixed Option value or default.
 	 */
 	public function get_option( $option, $default = null ) {
 		$options = get_option( 'debug_suite_options', array() );
@@ -91,8 +100,12 @@ class Settings {
 
 	/**
 	 * Update plugin option.
+	 *
+	 * @param string $option Option name.
+	 * @param mixed $value Option value.
+	 * @return bool True if option was updated, false on failure.
 	 */
-	public function update_option( $option, $value ) {
+	public function update_option( $option, $value ): bool {
 		$options = get_option( 'debug_suite_options', array() );
 		$options[ $option ] = $value;
 

@@ -12,8 +12,10 @@ class Activator {
 
 	/**
 	 * Plugin activation logic.
+	 *
+	 * @return void
 	 */
-	public static function activate() {
+	public static function activate(): void {
 		// Add activation logic here
 	}
 }

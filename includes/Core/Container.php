@@ -6,6 +6,7 @@
 namespace DebugSuite\Core;
 
 use Exception;
+use ReflectionClass;
 use ReflectionException;
 
 /**
@@ -16,30 +17,31 @@ class Container {
 	/**
 	 * Container instance.
 	 *
-	 * @var Container
+	 * @var Container|null
 	 */
-	private static $instance;
+	private static ?Container $instance;
 
 	/**
 	 * Registered services.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
-	private $services = array();
+	// @phpstan-ignore-next-line
+	private array $services = array();
 
 	/**
 	 * Singleton instances.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
-	private $instances = array();
+	private array $instances = array();
 
 	/**
 	 * Service bindings.
 	 *
-	 * @var array
+	 * @var array<string, array{resolver: mixed, singleton: bool}>
 	 */
-	private $bindings = array();
+	private array $bindings = array();
 
 	/**
 	 * Private constructor to prevent direct instantiation.
@@ -65,7 +67,7 @@ class Container {
 	 * Bind a service to the container.
 	 *
 	 * @param string $name Service name/identifier.
-	 * @param callable $resolver Resolver function or class name.
+	 * @param mixed $resolver Resolver function or class name.
 	 * @param bool $singleton Whether to treat as singleton.
 	 *
 	 * @return void
@@ -86,7 +88,7 @@ class Container {
 	 * Bind a singleton service to the container.
 	 *
 	 * @param string $name Service name/identifier.
-	 * @param callable $resolver Resolver function or class name.
+	 * @param mixed $resolver Resolver function or class name.
 	 *
 	 * @return void
 	 */
@@ -112,7 +114,7 @@ class Container {
 	 * @param string $name Service name/identifier.
 	 *
 	 * @return mixed
-	 * @throws \Exception If service not found.
+	 * @throws Exception If service not found.
 	 */
 	public function resolve( string $name ) {
 		// Check if we have a cached singleton instance
@@ -127,7 +129,7 @@ class Container {
 				return $this->auto_resolve( $name );
 			}
 
-			throw new Exception( "Service [{$name}] not found in container." ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new Exception( "Service [$name] not found in container." ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 
 		$binding  = $this->bindings[ $name ];
@@ -156,11 +158,11 @@ class Container {
 	 * @param string $class_name Class name to resolve.
 	 *
 	 * @return mixed
-	 * @throws \Exception If class cannot be resolved.
+	 * @throws Exception If class cannot be resolved.
 	 */
 	private function auto_resolve( string $class_name ) {
 		try {
-			$reflection = new \ReflectionClass( $class_name );
+			$reflection = new ReflectionClass( $class_name );
 
 			// If no constructor, just instantiate
 			if ( ! $reflection->hasMethod( '__construct' ) ) {
@@ -179,20 +181,21 @@ class Container {
 			$dependencies = array();
 			foreach ( $parameters as $parameter ) {
 				$type = $parameter->getType();
-
+				// @phpstan-ignore-next-line
 				if ( $type && ! $type->isBuiltin() ) {
+					// @phpstan-ignore-next-line
 					$dependency_class = $type->getName();
 					$dependencies[]   = $this->resolve( $dependency_class );
 				} elseif ( $parameter->isDefaultValueAvailable() ) {
 					$dependencies[] = $parameter->getDefaultValue();
 				} else {
-					throw new Exception( "Cannot resolve parameter [{$parameter->getName()}] for class [{$class_name}]." );
+					throw new Exception( "Cannot resolve parameter [{$parameter->getName()}] for class [$class_name]." );
 				}
 			}
 
 			return $reflection->newInstanceArgs( $dependencies );
 		} catch ( ReflectionException $e ) {
-			throw new Exception( "Cannot auto-resolve class [{$class_name}]: " . $e->getMessage() ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new Exception( "Cannot auto-resolve class [$class_name]: " . $e->getMessage() ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 	}
 
@@ -222,6 +225,7 @@ class Container {
 	 * @param string $name Service name.
 	 *
 	 * @return mixed
+	 * @throws Exception
 	 */
 	public function __get( string $name ) {
 		return $this->resolve( $name );

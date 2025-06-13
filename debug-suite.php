@@ -39,7 +39,7 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	add_action(
 		'admin_notices',
 		function () {
-			echo '<div class="notice notice-error"><p>Debug Suite: Please run composer install</p></div>';
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'Debug Suite: Please run composer install', 'debug-suite' ) . '</p></div>';
 		}
 	);
 
@@ -106,8 +106,9 @@ final class DebugSuite {
 	 *
 	 * @since    1.0.0
 	 * @access   private
+	 * @return void
 	 */
-	private function init_container() {
+	private function init_container(): void {
 		$this->container       = Container::get_instance();
 		$this->service_manager = new ServiceManager( $this->container );
 
@@ -123,8 +124,9 @@ final class DebugSuite {
 	 *
 	 * @since    1.0.0
 	 * @access   private
+	 * @return void
 	 */
-	private function register_providers() {
+	private function register_providers(): void {
 		$providers = [
 			CoreServiceProvider::class,
 			AdminServiceProvider::class,
@@ -141,8 +143,9 @@ final class DebugSuite {
 	 * @throws Exception If a service cannot be resolved.
 	 * @since    1.0.0
 	 * @access   private
+	 * @return void
 	 */
-	private function boot_services() {
+	private function boot_services(): void {
 		$this->service_manager->boot();
 
 		// Initialize admin functionality if in admin area
@@ -159,7 +162,7 @@ final class DebugSuite {
 	 *
 	 * @return void
 	 */
-	public function define_constants() {
+	public function define_constants(): void {
 		define( 'DEBUG_SUITE_VERSION', '1.0.0' );
 		define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 		define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
