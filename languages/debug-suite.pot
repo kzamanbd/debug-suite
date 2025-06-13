@@ -1,0 +1,61 @@
+# Copyright (c) 2025 Kamruzzaman. All Rights Reserved.
+msgid ""
+msgstr ""
+"Project-Id-Version: Debug Suite 1.0.0\n"
+"Report-Msgid-Bugs-To: https://kzaman.me/contact/\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-06-13T22:47:11+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: debug-suite\n"
+
+#. Plugin Name of the plugin
+#: debug-suite.php
+#: includes/Admin/Admin.php:29
+#: includes/Admin/Admin.php:30
+msgid "Debug Suite"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: debug-suite.php
+msgid "https://kzaman.me/plugins/debug-suite"
+msgstr ""
+
+#. Description of the plugin
+#: debug-suite.php
+msgid "WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place."
+msgstr ""
+
+#. Author of the plugin
+#: debug-suite.php
+msgid "Kamruzzaman"
+msgstr ""
+
+#. Author URI of the plugin
+#: debug-suite.php
+msgid "https://kzaman.me/plugins/debug-suite/"
+msgstr ""
+
+#: debug-suite.php:38
+msgid "Missing Dependencies Detected [Debug Suite Plugin]"
+msgstr ""
+
+#: includes/Admin/Admin.php:38
+msgid "Dashboard"
+msgstr ""
+
+#: includes/Admin/Admin.php:39
+msgid "File Logs"
+msgstr ""
+
+#: includes/Admin/Admin.php:40
+msgid "Manage Logs"
+msgstr ""
+
+#: includes/Admin/Admin.php:51
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""

@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "wp-scripts start --progress",
         "build": "wp-scripts build",
-        "type-check": "tsc --noEmit"
+        "type-check": "tsc --noEmit",
+        "makepot": "wp i18n make-pot --domain='debug-suite' --include='assets/js,includes,templates,debug-suite.php' . --headers='{\"Report-Msgid-Bugs-To\":\"https://kzaman.me/contact/\"}' --file-comment=\"Copyright (c) $(date +'%Y') Kamruzzaman. All Rights Reserved.\" languages/debug-suite.pot"
     },
     "author": "kamruzzaman",
     "license": "MIT",
