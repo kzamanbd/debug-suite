@@ -17,7 +17,7 @@ class Admin {
 	/**
 	 * Add admin menu and initialize settings.
 	 */
-	public function add_admin_menu() {
+	public function add_admin_menu(): void {
 		global $submenu;
 
 		$capability     = 'manage_options';
