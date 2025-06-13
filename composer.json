@@ -1,0 +1,55 @@
+{
+    "name": "draftscripts/debug-suite",
+    "description": "WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.",
+    "license": "GPL-2.0-or-later",
+    "type": "wordpress-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "wordpress",
+        "debugging",
+        "development",
+        "tools",
+        "debug-suite"
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "DebugSuite\\": "includes/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kamruzzaman",
+            "email": "kzamanbn@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "squizlabs/php_codesniffer": "^3.6",
+        "wp-coding-standards/wpcs": "^2.3",
+        "phpcompatibility/php-compatibility": "^9.3",
+        "phpstan/phpstan": "^1.10"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "extra": {
+        "wordpress-plugin": {
+            "plugin_slug": "debug-suite",
+            "requires_php": "7.4",
+            "requires_wp": "5.7"
+        }
+    },
+    "scripts": {
+        "phpcs": "vendor/bin/phpcs --standard=phpcs.xml",
+        "phpcbf": "vendor/bin/phpcbf --standard=phpcs.xml"
+    }
+}
