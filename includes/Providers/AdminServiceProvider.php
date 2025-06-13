@@ -1,10 +1,6 @@
 <?php
 /**
  * Admin service provider for registering admin services.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
 namespace DebugSuite\Providers;
@@ -16,17 +12,11 @@ use DebugSuite\Admin\Settings;
 
 /**
  * Admin Service Provider for registering admin services.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class AdminServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Services provided by this provider.
-	 *
-	 * @var array
 	 */
 	protected $provides = array(
 		'admin',
@@ -37,9 +27,6 @@ class AdminServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Register services with the container.
-	 *
-	 * @param Container $container The container instance.
-	 * @return void
 	 */
 	public function register( Container $container ): void {
 		// Register Settings service
@@ -65,9 +52,6 @@ class AdminServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Boot services after all providers have been registered.
-	 *
-	 * @param Container $container The container instance.
-	 * @return void
 	 */
 	public function boot( Container $container ): void {
 		// Admin services are automatically initialized when resolved

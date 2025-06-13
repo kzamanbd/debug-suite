@@ -1,10 +1,6 @@
 <?php
 /**
  * Manager service provider for registering manager services.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
 namespace DebugSuite\Providers;
@@ -15,17 +11,11 @@ use DebugSuite\Managers\DebugProviderManager;
 
 /**
  * Manager Service Provider for registering manager classes.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class ManagerServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Services provided by this provider.
-	 *
-	 * @var array
 	 */
 	protected $provides = array(
 		'debug_provider_manager',
@@ -34,9 +24,6 @@ class ManagerServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Register services with the container.
-	 *
-	 * @param Container $container The container instance.
-	 * @return void
 	 */
 	public function register( Container $container ): void {
 		// Register Debug Provider Manager
@@ -53,9 +40,6 @@ class ManagerServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Boot services after all providers have been registered.
-	 *
-	 * @param Container $container The container instance.
-	 * @return void
 	 */
 	public function boot( Container $container ): void {
 		// Managers are automatically initialized when resolved

@@ -1,27 +1,17 @@
 <?php
 /**
  * Singleton trait for ensuring only one instance of a class.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
 namespace DebugSuite\Core;
 
 /**
  * Singleton trait for ensuring single instance of classes.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 trait Singleton {
 
 	/**
 	 * Instance of the class.
-	 *
-	 * @var static
 	 */
 	private static $instance;
 
@@ -48,8 +38,6 @@ trait Singleton {
 
 	/**
 	 * Initialize the singleton instance.
-	 *
-	 * @return static
 	 */
 	final public static function get_instance() {
 		if ( ! isset( static::$instance ) ) {
@@ -62,8 +50,6 @@ trait Singleton {
 	/**
 	 * Initialize the class.
 	 * Override this method in child classes to perform initialization.
-	 *
-	 * @return void
 	 */
 	protected function init() {
 		// Override in child classes

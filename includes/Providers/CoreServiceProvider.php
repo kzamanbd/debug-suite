@@ -1,10 +1,6 @@
 <?php
 /**
  * Core service provider for registering core services.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
 namespace DebugSuite\Providers;
@@ -13,20 +9,15 @@ use DebugSuite\Core\AbstractServiceProvider;
 use DebugSuite\Core\Container;
 use DebugSuite\Core\Assets;
 use DebugSuite\Core\I18n;
+use Exception;
 
 /**
  * Core Service Provider for registering core services.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class CoreServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Services provided by this provider.
-	 *
-	 * @var array
 	 */
 	protected $provides = array(
 		'assets',
@@ -37,10 +28,6 @@ class CoreServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Register services with the container.
-	 *
-	 * @param Container $container The container instance.
-	 *
-	 * @return void
 	 */
 	public function register( Container $container ): void {
 		// Register Assets service
@@ -67,9 +54,9 @@ class CoreServiceProvider extends AbstractServiceProvider {
 	/**
 	 * Boot services after all providers have been registered.
 	 *
-	 * @param Container $container The container instance.
+	 * @param Container $container The dependency injection container.
 	 *
-	 * @return void
+	 * @throws Exception If a service cannot be resolved.
 	 */
 	public function boot( Container $container ): void {
 		// Initialize Assets (this will run the init method and register WordPress hooks)

@@ -2,8 +2,8 @@
 /**
  * The plugin bootstrap file
  *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
+ * WordPress reads this file to generate the plugin information in the plugin
+ * admin area. This file also includes all the dependencies used by the plugin,
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
@@ -12,10 +12,10 @@
  * @package           Debug_Suite
  *
  * @wordpress-plugin
- * Plugin Name:       Debug Suite
- * Plugin Slug:       debug-suite
- * Plugin URI:        https://kzaman.me/plugins/debug-suite
- * Description:       WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.
+ * Plugin Name: Debug Suite
+ * Plugin Slug: debug-suite
+ * Plugin URI: https://kzaman.me/plugins/debug-suite
+ * Description: WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.
  * Version:           1.0.0
  * Author:            Kamruzzaman
  * Author URI:        https://kzaman.me/plugins/debug-suite/
@@ -55,14 +55,19 @@ use DebugSuite\Providers\AdminServiceProvider;
 use DebugSuite\Providers\FrontendServiceProvider;
 use DebugSuite\Providers\ManagerServiceProvider;
 
+/**
+ * Main class for the Debug Suite plugin.
+ *
+ * @since    1.0.0
+ */
 final class DebugSuite {
 
 	/**
 	 * Instance of self
 	 *
-	 * @var DebugSuite
+	 * @var DebugSuite|null
 	 */
-	private static $instance = null;
+	private static ?DebugSuite $instance = null;
 
 	/**
 	 * Service Manager instance.
@@ -81,6 +86,7 @@ final class DebugSuite {
 	/**
 	 * Define the core functionality of the plugin.
 	 *
+	 * @throws Exception If a service cannot be resolved.
 	 * @since    1.0.0
 	 */
 	public function __construct() {
@@ -119,12 +125,12 @@ final class DebugSuite {
 	 * @access   private
 	 */
 	private function register_providers() {
-		$providers = array(
+		$providers = [
 			CoreServiceProvider::class,
 			AdminServiceProvider::class,
 			FrontendServiceProvider::class,
 			ManagerServiceProvider::class,
-		);
+		];
 
 		$this->service_manager->register_providers( $providers );
 	}
@@ -132,6 +138,7 @@ final class DebugSuite {
 	/**
 	 * Boot all registered services.
 	 *
+	 * @throws Exception If a service cannot be resolved.
 	 * @since    1.0.0
 	 * @access   private
 	 */
@@ -147,6 +154,11 @@ final class DebugSuite {
 		$this->container->resolve( 'frontend' );
 	}
 
+	/**
+	 * Define the constants used by the plugin.
+	 *
+	 * @return void
+	 */
 	public function define_constants() {
 		define( 'DEBUG_SUITE_VERSION', '1.0.0' );
 		define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -193,6 +205,7 @@ final class DebugSuite {
 	 * @param string $service Service name.
 	 *
 	 * @return   mixed
+	 * @throws   Exception If the service cannot be resolved.
 	 * @since    1.0.0
 	 */
 	public function resolve( string $service ) {

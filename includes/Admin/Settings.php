@@ -1,36 +1,21 @@
 <?php
 /**
  * Settings class for admin configuration.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
 namespace DebugSuite\Admin;
 
 /**
  * Settings class for admin configuration.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class Settings {
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    1.0.0
-	 */
 	public function __construct() {
 		// Constructor logic can be added here if needed
 	}
 
 	/**
 	 * Add admin menu pages.
-	 *
-	 * @since    1.0.0
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
@@ -46,8 +31,6 @@ class Settings {
 
 	/**
 	 * Render the admin page.
-	 *
-	 * @since    1.0.0
 	 */
 	public function admin_page() {
 		?>
@@ -60,8 +43,6 @@ class Settings {
 
 	/**
 	 * Register settings.
-	 *
-	 * @since    1.0.0
 	 */
 	public function register_settings() {
 		register_setting(
@@ -75,10 +56,6 @@ class Settings {
 
 	/**
 	 * Sanitize settings input.
-	 *
-	 * @since    1.0.0
-	 * @param    array $input The input array to sanitize.
-	 * @return   array The sanitized input.
 	 */
 	public function sanitize_settings( $input ) {
 		$sanitized = array();
@@ -100,11 +77,6 @@ class Settings {
 
 	/**
 	 * Get plugin option.
-	 *
-	 * @since    1.0.0
-	 * @param    string $option  The option name.
-	 * @param    mixed  $default The default value.
-	 * @return   mixed The option value.
 	 */
 	public function get_option( $option, $default = null ) {
 		$options = get_option( 'debug_suite_options', array() );
@@ -114,11 +86,6 @@ class Settings {
 
 	/**
 	 * Update plugin option.
-	 *
-	 * @since    1.0.0
-	 * @param    string $option The option name.
-	 * @param    mixed  $value  The option value.
-	 * @return   bool True if option was updated, false otherwise.
 	 */
 	public function update_option( $option, $value ) {
 		$options = get_option( 'debug_suite_options', array() );

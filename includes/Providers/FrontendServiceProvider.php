@@ -1,10 +1,6 @@
 <?php
 /**
  * Frontend service provider for registering frontend services.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
 namespace DebugSuite\Providers;
@@ -15,17 +11,11 @@ use DebugSuite\Frontend\Frontend;
 
 /**
  * Frontend Service Provider for registering frontend services.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class FrontendServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Services provided by this provider.
-	 *
-	 * @var array
 	 */
 	protected $provides = array(
 		'frontend',
@@ -34,9 +24,6 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Register services with the container.
-	 *
-	 * @param Container $container The container instance.
-	 * @return void
 	 */
 	public function register( Container $container ): void {
 		// Register Frontend service
@@ -53,9 +40,6 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Boot services after all providers have been registered.
-	 *
-	 * @param Container $container The container instance.
-	 * @return void
 	 */
 	public function boot( Container $container ): void {
 		// Frontend services are automatically initialized when resolved

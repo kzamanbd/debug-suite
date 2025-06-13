@@ -1,10 +1,6 @@
 <?php
 /**
  * Assets management for the plugin.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
 namespace DebugSuite\Core;
@@ -12,19 +8,10 @@ namespace DebugSuite\Core;
 /**
  * The assets-specific functionality of the plugin.
  *
- * Defines the plugin name, version, and handles the enqueuing of all
- * stylesheets and JavaScript files.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
+ * Handles the enqueuing of stylesheets and JavaScript files.
  */
 class Assets {
-	/**
-	 * Class constructor
-	 *
-	 * @return void
-	 */
+	
 	public function __construct() {
 		// Constructor now only sets up the instance
 		// Initialization happens in init() method
@@ -32,8 +19,6 @@ class Assets {
 
 	/**
 	 * Initialize the Assets class
-	 *
-	 * @return void
 	 */
 	public function init(): void {
 		add_action( 'init', [ $this, 'register_all_scripts' ] );
@@ -41,8 +26,6 @@ class Assets {
 
 	/**
 	 * All available scripts
-	 *
-	 * @return array
 	 */
 	public function scripts(): array {
 		$scripts = [];
@@ -63,8 +46,6 @@ class Assets {
 
 	/**
 	 * All available styles
-	 *
-	 * @return array
 	 */
 	public function styles(): array {
 		$styles = [];
@@ -85,8 +66,6 @@ class Assets {
 
 	/**
 	 * Register scripts and styles
-	 *
-	 * @return void
 	 */
 	public function register_all_scripts(): void {
 		$scripts = $this->scripts();

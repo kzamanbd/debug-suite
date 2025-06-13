@@ -1,10 +1,6 @@
 <?php
 /**
  * Manager for debug providers.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
 namespace DebugSuite\Managers;
@@ -15,10 +11,6 @@ use DebugSuite\Interfaces\DebugProviderInterface;
 
 /**
  * Debug Provider Manager for managing debug providers.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class DebugProviderManager {
 	use Singleton;

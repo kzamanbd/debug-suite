@@ -1,10 +1,6 @@
 <?php
 /**
  * Service manager for handling service providers.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
 namespace DebugSuite\Core;
@@ -13,10 +9,6 @@ use DebugSuite\Interfaces\ServiceProviderInterface;
 
 /**
  * Service Manager for managing service providers and the container.
- *
- * @since      1.0.0
- * @package    DebugSuite
- * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 class ServiceManager {
 
