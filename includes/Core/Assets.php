@@ -11,7 +11,7 @@ namespace DebugSuite\Core;
  * Handles the enqueuing of stylesheets and JavaScript files.
  */
 class Assets {
-	
+
 	public function __construct() {
 		// Constructor now only sets up the instance
 		// Initialization happens in init() method

@@ -80,7 +80,7 @@ class Settings {
 	 */
 	public function get_option( $option, $default = null ) {
 		$options = get_option( 'debug_suite_options', array() );
-		
+
 		return isset( $options[ $option ] ) ? $options[ $option ] : $default;
 	}
 
@@ -90,7 +90,7 @@ class Settings {
 	public function update_option( $option, $value ) {
 		$options = get_option( 'debug_suite_options', array() );
 		$options[ $option ] = $value;
-		
+
 		return update_option( 'debug_suite_options', $options );
 	}
 }

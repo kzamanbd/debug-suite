@@ -13,8 +13,8 @@ class Admin {
 	private Settings $settings;
 
 	public function __construct( Settings $settings = null ) {
-		$this->settings = $settings ?: new Settings();
-		
+		$this->settings = $settings ? $settings : new Settings();
+
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );

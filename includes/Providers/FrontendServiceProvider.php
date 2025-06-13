@@ -27,13 +27,17 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 	 */
 	public function register( Container $container ): void {
 		// Register Frontend service
-		$container->singleton( 'frontend', function( Container $container ) {
-			return new Frontend();
-		});
+		$container->singleton(
+			'frontend', function ( Container $container ) {
+				return new Frontend();
+			}
+		);
 
-		$container->singleton( Frontend::class, function( Container $container ) {
-			return $container->resolve( 'frontend' );
-		});
+		$container->singleton(
+			Frontend::class, function ( Container $container ) {
+				return $container->resolve( 'frontend' );
+			}
+		);
 
 		$this->mark_registered();
 	}
@@ -44,7 +48,7 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 	public function boot( Container $container ): void {
 		// Frontend services are automatically initialized when resolved
 		// No additional booting required for frontend services
-		
+
 		$this->mark_booted();
 	}
 }

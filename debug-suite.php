@@ -218,7 +218,7 @@ final class DebugSuite {
  *
  * @since    1.0.0
  */
-function run_debug_suite(): void {
+function run_debug_suite(): void { // phpcs:ignore Universal.Files.SeparateFunctionsFromOO.Mixed
 	DebugSuite::init();
 }
 

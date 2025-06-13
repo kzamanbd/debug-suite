@@ -30,22 +30,30 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	 */
 	public function register( Container $container ): void {
 		// Register Settings service
-		$container->singleton( 'settings', function( Container $container ) {
-			return new Settings();
-		});
+		$container->singleton(
+			'settings', function ( Container $container ) {
+				return new Settings();
+			}
+		);
 
-		$container->singleton( Settings::class, function( Container $container ) {
-			return $container->resolve( 'settings' );
-		});
+		$container->singleton(
+			Settings::class, function ( Container $container ) {
+				return $container->resolve( 'settings' );
+			}
+		);
 
 		// Register Admin service
-		$container->singleton( 'admin', function( Container $container ) {
-			return new Admin( $container->resolve( 'settings' ) );
-		});
+		$container->singleton(
+			'admin', function ( Container $container ) {
+				return new Admin( $container->resolve( 'settings' ) );
+			}
+		);
 
-		$container->singleton( Admin::class, function( Container $container ) {
-			return $container->resolve( 'admin' );
-		});
+		$container->singleton(
+			Admin::class, function ( Container $container ) {
+				return $container->resolve( 'admin' );
+			}
+		);
 
 		$this->mark_registered();
 	}
@@ -56,7 +64,7 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	public function boot( Container $container ): void {
 		// Admin services are automatically initialized when resolved
 		// No additional booting required for admin services
-		
+
 		$this->mark_booted();
 	}
 }

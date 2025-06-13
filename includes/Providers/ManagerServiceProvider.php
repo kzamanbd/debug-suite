@@ -27,13 +27,17 @@ class ManagerServiceProvider extends AbstractServiceProvider {
 	 */
 	public function register( Container $container ): void {
 		// Register Debug Provider Manager
-		$container->singleton( 'debug_provider_manager', function( Container $container ) {
-			return DebugProviderManager::get_instance();
-		});
+		$container->singleton(
+			'debug_provider_manager', function ( Container $container ) {
+				return DebugProviderManager::get_instance();
+			}
+		);
 
-		$container->singleton( DebugProviderManager::class, function( Container $container ) {
-			return $container->resolve( 'debug_provider_manager' );
-		});
+		$container->singleton(
+			DebugProviderManager::class, function ( Container $container ) {
+				return $container->resolve( 'debug_provider_manager' );
+			}
+		);
 
 		$this->mark_registered();
 	}
@@ -44,7 +48,7 @@ class ManagerServiceProvider extends AbstractServiceProvider {
 	public function boot( Container $container ): void {
 		// Managers are automatically initialized when resolved
 		// No additional booting required for manager services
-		
+
 		$this->mark_booted();
 	}
 }

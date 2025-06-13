@@ -61,7 +61,7 @@ class ServiceManager {
 		// If provider is a string, instantiate it
 		if ( is_string( $provider ) ) {
 			if ( ! class_exists( $provider ) ) {
-				throw new \Exception( "Provider class [{$provider}] does not exist." );
+				throw new \Exception( "Provider class [{$provider}] does not exist." ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			}
 
 			$provider = new $provider();

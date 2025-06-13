@@ -5,6 +5,9 @@
 
 namespace DebugSuite\Core;
 
+use Exception;
+use ReflectionException;
+
 /**
  * Dependency Injection Container for managing class dependencies.
  */
@@ -124,7 +127,7 @@ class Container {
 				return $this->auto_resolve( $name );
 			}
 
-			throw new \Exception( "Service [{$name}] not found in container." );
+			throw new Exception( "Service [{$name}] not found in container." ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 
 		$binding  = $this->bindings[ $name ];
@@ -183,13 +186,13 @@ class Container {
 				} elseif ( $parameter->isDefaultValueAvailable() ) {
 					$dependencies[] = $parameter->getDefaultValue();
 				} else {
-					throw new \Exception( "Cannot resolve parameter [{$parameter->getName()}] for class [{$class_name}]." );
+					throw new Exception( "Cannot resolve parameter [{$parameter->getName()}] for class [{$class_name}]." );
 				}
 			}
 
 			return $reflection->newInstanceArgs( $dependencies );
-		} catch ( \ReflectionException $e ) {
-			throw new \Exception( "Cannot auto-resolve class [{$class_name}]: " . $e->getMessage() );
+		} catch ( ReflectionException $e ) {
+			throw new Exception( "Cannot auto-resolve class [{$class_name}]: " . $e->getMessage() ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 	}
 
