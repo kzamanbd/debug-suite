@@ -63,6 +63,7 @@ class ServiceManager {
 	 * Register a service provider.
 	 *
 	 * @param ServiceProviderInterface|string $provider Provider instance or class name.
+	 *
 	 * @return ServiceProviderInterface
 	 * @throws \Exception If provider is invalid.
 	 */
@@ -95,7 +96,7 @@ class ServiceManager {
 		// Store the provider
 		$this->providers[ $provider_class ] = $provider;
 
-		// If we've already booted, boot this provider immediately
+		// If we've already booted, boot this provider immediately.
 		if ( $this->booted ) {
 			$this->boot_provider( $provider );
 		}
@@ -107,6 +108,7 @@ class ServiceManager {
 	 * Register multiple service providers.
 	 *
 	 * @param array $providers Array of provider instances or class names.
+	 *
 	 * @return void
 	 */
 	public function register_providers( array $providers ): void {
@@ -136,6 +138,7 @@ class ServiceManager {
 	 * Boot a specific service provider.
 	 *
 	 * @param ServiceProviderInterface $provider Provider to boot.
+	 *
 	 * @return void
 	 */
 	private function boot_provider( ServiceProviderInterface $provider ): void {
@@ -175,6 +178,7 @@ class ServiceManager {
 	 * Check if a provider is registered.
 	 *
 	 * @param string $provider_class Provider class name.
+	 *
 	 * @return bool
 	 */
 	public function has_provider( string $provider_class ): bool {
@@ -185,6 +189,7 @@ class ServiceManager {
 	 * Get a specific provider.
 	 *
 	 * @param string $provider_class Provider class name.
+	 *
 	 * @return ServiceProviderInterface|null
 	 */
 	public function get_provider( string $provider_class ): ?ServiceProviderInterface {
@@ -204,6 +209,7 @@ class ServiceManager {
 	 * Resolve a service from the container.
 	 *
 	 * @param string $name Service name.
+	 *
 	 * @return mixed
 	 */
 	public function resolve( string $name ) {
@@ -214,6 +220,7 @@ class ServiceManager {
 	 * Magic method to resolve services.
 	 *
 	 * @param string $name Service name.
+	 *
 	 * @return mixed
 	 */
 	public function __get( string $name ) {
@@ -224,6 +231,7 @@ class ServiceManager {
 	 * Magic method to check if service exists.
 	 *
 	 * @param string $name Service name.
+	 *
 	 * @return bool
 	 */
 	public function __isset( string $name ): bool {

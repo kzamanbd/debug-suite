@@ -47,6 +47,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	 * Register services with the container.
 	 *
 	 * @param Container $container The container instance.
+	 *
 	 * @return void
 	 */
 	abstract public function register( Container $container ): void;
@@ -56,6 +57,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	 * Override this method in child classes if needed.
 	 *
 	 * @param Container $container The container instance.
+	 *
 	 * @return void
 	 */
 	public function boot( Container $container ): void {

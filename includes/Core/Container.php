@@ -71,9 +71,10 @@ class Container {
 	/**
 	 * Bind a service to the container.
 	 *
-	 * @param string   $name     Service name/identifier.
+	 * @param string $name Service name/identifier.
 	 * @param callable $resolver Resolver function or class name.
-	 * @param bool     $singleton Whether to treat as singleton.
+	 * @param bool $singleton Whether to treat as singleton.
+	 *
 	 * @return void
 	 */
 	public function bind( string $name, $resolver, bool $singleton = false ): void {
@@ -91,8 +92,9 @@ class Container {
 	/**
 	 * Bind a singleton service to the container.
 	 *
-	 * @param string   $name     Service name/identifier.
+	 * @param string $name Service name/identifier.
 	 * @param callable $resolver Resolver function or class name.
+	 *
 	 * @return void
 	 */
 	public function singleton( string $name, $resolver ): void {
@@ -102,8 +104,9 @@ class Container {
 	/**
 	 * Register an existing instance as a singleton.
 	 *
-	 * @param string $name     Service name/identifier.
-	 * @param mixed  $instance Service instance.
+	 * @param string $name Service name/identifier.
+	 * @param mixed $instance Service instance.
+	 *
 	 * @return void
 	 */
 	public function instance( string $name, $instance ): void {
@@ -114,6 +117,7 @@ class Container {
 	 * Resolve a service from the container.
 	 *
 	 * @param string $name Service name/identifier.
+	 *
 	 * @return mixed
 	 * @throws \Exception If service not found.
 	 */
@@ -157,6 +161,7 @@ class Container {
 	 * Auto-resolve a class using reflection.
 	 *
 	 * @param string $class_name Class name to resolve.
+	 *
 	 * @return mixed
 	 * @throws \Exception If class cannot be resolved.
 	 */
@@ -202,6 +207,7 @@ class Container {
 	 * Check if a service is bound.
 	 *
 	 * @param string $name Service name/identifier.
+	 *
 	 * @return bool
 	 */
 	public function has( string $name ): bool {
@@ -221,6 +227,7 @@ class Container {
 	 * Magic method to resolve services using property syntax.
 	 *
 	 * @param string $name Service name.
+	 *
 	 * @return mixed
 	 */
 	public function __get( string $name ) {
@@ -231,6 +238,7 @@ class Container {
 	 * Magic method to check if service exists.
 	 *
 	 * @param string $name Service name.
+	 *
 	 * @return bool
 	 */
 	public function __isset( string $name ): bool {

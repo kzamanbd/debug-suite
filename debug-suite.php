@@ -38,10 +38,11 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	// Plugin won't work - show admin notice.
 	add_action(
 		'admin_notices',
-		function() {
+		function () {
 			echo '<div class="notice notice-error"><p>Debug Suite: Please run composer install</p></div>';
 		}
 	);
+
 	return;
 }
 
@@ -101,7 +102,7 @@ final class DebugSuite {
 	 * @access   private
 	 */
 	private function init_container() {
-		$this->container = Container::get_instance();
+		$this->container       = Container::get_instance();
 		$this->service_manager = new ServiceManager( $this->container );
 
 		// Register the container and service manager as singletons
@@ -153,24 +154,24 @@ final class DebugSuite {
 	}
 
 	/**
-     * Initializes the DebugSuite class
-     *
-     * Checks for an existing DebugSuite instance
-     * and if it doesn't find one, create it.
-     */
-    public static function init(): ?DebugSuite {
-        if ( self::$instance === null ) {
-            self::$instance = new self();
-        }
+	 * Initializes the DebugSuite class
+	 *
+	 * Checks for an existing DebugSuite instance
+	 * and if it doesn't find one, create it.
+	 */
+	public static function init(): ?DebugSuite {
+		if ( self::$instance === null ) {
+			self::$instance = new self();
+		}
 
-        return self::$instance;
-    }
+		return self::$instance;
+	}
 
 	/**
 	 * Get the container instance.
 	 *
-	 * @since    1.0.0
 	 * @return   Container
+	 * @since    1.0.0
 	 */
 	public function get_container(): Container {
 		return $this->container;
@@ -179,8 +180,8 @@ final class DebugSuite {
 	/**
 	 * Get the service manager instance.
 	 *
-	 * @since    1.0.0
 	 * @return   ServiceManager
+	 * @since    1.0.0
 	 */
 	public function get_service_manager(): ServiceManager {
 		return $this->service_manager;
@@ -189,9 +190,10 @@ final class DebugSuite {
 	/**
 	 * Resolve a service from the container.
 	 *
-	 * @since    1.0.0
-	 * @param    string $service Service name.
+	 * @param string $service Service name.
+	 *
 	 * @return   mixed
+	 * @since    1.0.0
 	 */
 	public function resolve( string $service ) {
 		return $this->container->resolve( $service );

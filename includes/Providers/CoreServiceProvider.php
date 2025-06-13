@@ -41,26 +41,27 @@ class CoreServiceProvider extends AbstractServiceProvider {
 	 * Register services with the container.
 	 *
 	 * @param Container $container The container instance.
+	 *
 	 * @return void
 	 */
 	public function register( Container $container ): void {
 		// Register Assets service
-		$container->singleton( 'assets', function( Container $container ) {
+		$container->singleton( 'assets', function ( Container $container ) {
 			return new Assets();
-		});
+		} );
 
-		$container->singleton( Assets::class, function( Container $container ) {
+		$container->singleton( Assets::class, function ( Container $container ) {
 			return $container->resolve( 'assets' );
-		});
+		} );
 
 		// Register I18n service
-		$container->singleton( 'i18n', function( Container $container ) {
+		$container->singleton( 'i18n', function ( Container $container ) {
 			return new I18n();
-		});
+		} );
 
-		$container->singleton( I18n::class, function( Container $container ) {
+		$container->singleton( I18n::class, function ( Container $container ) {
 			return $container->resolve( 'i18n' );
-		});
+		} );
 
 		$this->mark_registered();
 	}
@@ -69,6 +70,7 @@ class CoreServiceProvider extends AbstractServiceProvider {
 	 * Boot services after all providers have been registered.
 	 *
 	 * @param Container $container The container instance.
+	 *
 	 * @return void
 	 */
 	public function boot( Container $container ): void {
