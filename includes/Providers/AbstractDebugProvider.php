@@ -99,4 +99,25 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	public function disable() {
 		$this->enabled = false;
 	}
+
+	/**
+	 * Activate the debug provider.
+	 *
+	 * @since    1.0.0
+	 * @return   void
+	 */
+	public function activate() {
+		$this->enable();
+		$this->init();
+	}
+
+	/**
+	 * Deactivate the debug provider.
+	 *
+	 * @since    1.0.0
+	 * @return   void
+	 */
+	public function deactivate() {
+		$this->disable();
+	}
 }

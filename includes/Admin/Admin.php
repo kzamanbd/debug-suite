@@ -26,12 +26,14 @@ class Admin {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
+	 * @param    Settings $settings Optional settings instance.
 	 */
-	public function __construct() {
+	public function __construct( Settings $settings = null ) {
+		$this->settings = $settings ?: new Settings();
+		
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
-		$this->settings = new Settings();
 	}
 
 	/**

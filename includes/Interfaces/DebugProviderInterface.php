@@ -51,4 +51,20 @@ interface DebugProviderInterface {
 	 * @return   array
 	 */
 	public function get_debug_data();
+
+	/**
+	 * Activate the debug provider.
+	 *
+	 * @since    1.0.0
+	 * @return   void
+	 */
+	public function activate();
+
+	/**
+	 * Deactivate the debug provider.
+	 *
+	 * @since    1.0.0
+	 * @return   void
+	 */
+	public function deactivate();
 }

@@ -43,20 +43,37 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
     return;
 }
 
-use DebugSuite\Admin\Admin;
-use DebugSuite\Core\Assets;
-use DebugSuite\Core\I18n;
 use DebugSuite\Core\Activator;
 use DebugSuite\Core\Deactivator;
+use DebugSuite\Core\Container;
+use DebugSuite\Core\ServiceManager;
+use DebugSuite\Providers\CoreServiceProvider;
+use DebugSuite\Providers\AdminServiceProvider;
+use DebugSuite\Providers\FrontendServiceProvider;
+use DebugSuite\Providers\ManagerServiceProvider;
 
 final class DebugSuite {
 
 	/**
      * Instance of self
      *
-     * @var $this
+     * @var DebugSuite
      */
     private static $instance = null;
+
+	/**
+	 * Service Manager instance.
+	 *
+	 * @var ServiceManager
+	 */
+	private ServiceManager $service_manager;
+
+	/**
+	 * Container instance.
+	 *
+	 * @var Container
+	 */
+	private Container $container;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -65,14 +82,66 @@ final class DebugSuite {
 	 */
 	public function __construct() {
 		$this->define_constants();
-		$this->set_locale();
-		$this->define_admin_hooks();
+		$this->init_container();
+		$this->register_providers();
+		$this->boot_services();
 
 		// Activation hook
 		register_activation_hook( __FILE__, [ Activator::class, 'activate' ] );
 		// Deactivation hook
 		register_deactivation_hook( __FILE__, [ Deactivator::class, 'deactivate' ] );
-		new Assets();
+	}
+
+	/**
+	 * Initialize the dependency injection container.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function init_container() {
+		$this->container = Container::get_instance();
+		$this->service_manager = new ServiceManager( $this->container );
+
+		// Register the container and service manager as singletons
+		$this->container->instance( 'container', $this->container );
+		$this->container->instance( 'service_manager', $this->service_manager );
+		$this->container->instance( ServiceManager::class, $this->service_manager );
+		$this->container->instance( Container::class, $this->container );
+	}
+
+	/**
+	 * Register all service providers.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function register_providers() {
+		$providers = array(
+			CoreServiceProvider::class,
+			AdminServiceProvider::class,
+			FrontendServiceProvider::class,
+			ManagerServiceProvider::class,
+		);
+
+		$this->service_manager->register_providers( $providers );
+	}
+
+	/**
+	 * Boot all registered services.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function boot_services() {
+		$this->service_manager->boot();
+
+		// Initialize admin functionality if in admin area
+		if ( is_admin() ) {
+			$this->container->resolve( 'admin' );
+		}
+
+		// Initialize frontend functionality
+		$this->container->resolve( 'frontend' );
 	}
 
 	public function define_constants() {
@@ -82,9 +151,9 @@ final class DebugSuite {
 	}
 
 	/**
-     * Initializes the WeDevs_Dokan() class
+     * Initializes the DebugSuite class
      *
-     * Checks for an existing WeDevs_WeDevs_Dokan() instance
+     * Checks for an existing DebugSuite instance
      * and if it doesn't find one, create it.
      */
     public static function init(): ?DebugSuite {
@@ -96,23 +165,34 @@ final class DebugSuite {
     }
 
 	/**
-	 * Define the locale for this plugin for internationalization.
+	 * Get the container instance.
 	 *
 	 * @since    1.0.0
-	 * @access   private
+	 * @return   Container
 	 */
-	private function set_locale() {
-		add_action( 'plugins_loaded', array( I18n::class, 'load_plugin_textdomain' ) );
+	public function get_container(): Container {
+		return $this->container;
 	}
 
 	/**
-	 * Register all of the hooks related to the admin area functionality.
+	 * Get the service manager instance.
 	 *
 	 * @since    1.0.0
-	 * @access   private
+	 * @return   ServiceManager
 	 */
-	private function define_admin_hooks() {
-		$plugin_admin = new Admin();
+	public function get_service_manager(): ServiceManager {
+		return $this->service_manager;
+	}
+
+	/**
+	 * Resolve a service from the container.
+	 *
+	 * @since    1.0.0
+	 * @param    string $service Service name.
+	 * @return   mixed
+	 */
+	public function resolve( string $service ) {
+		return $this->container->resolve( $service );
 	}
 }
 

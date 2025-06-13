@@ -21,7 +21,17 @@ class Assets
      *
      * @return void
      */
-    function __construct() {
+    public function __construct() {
+        // Constructor now only sets up the instance
+        // Initialization happens in init() method
+    }
+
+    /**
+     * Initialize the Assets class
+     *
+     * @return void
+     */
+    public function init(): void {
         add_action( 'init', [ $this, 'register_all_scripts' ] );
     }
 
