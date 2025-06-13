@@ -140,6 +140,11 @@
         <severity>0</severity>
     </rule>
     
+    <!-- Prevent overriding WordPress global variables -->
+    <rule ref="WordPress.WP.GlobalVariablesOverride">
+        <severity>0</severity>
+    </rule>
+
     <rule ref="WordPress.PHP.YodaConditions.NotYoda">
         <severity>0</severity>
     </rule>
