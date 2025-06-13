@@ -1,7 +1,7 @@
-import Settings from '../components/Settings';
-import FileLogs from '../components/FileLogs';
-import ViewLogs from '../components/ViewLogs';
-import ManageLogs from '../components/ManageLogs';
+import Settings from '../pages/Settings';
+import FileLogs from '../pages/FileLogs';
+import ViewLogs from '../pages/ViewLogs';
+import ManageLogs from '../pages/ManageLogs';
 
 export default [
     { id: 'settings', path: '/', element: <Settings /> },
