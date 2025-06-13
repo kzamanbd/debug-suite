@@ -2,7 +2,7 @@ const defaults = require('@wordpress/scripts/config/webpack.config');
 const path = require('path');
 
 const entries = {
-    'debug-suite-admin': './admin/debug-suite-admin.tsx',
+    'debug-suite-admin': './admin/index.tsx',
 }
 
 module.exports = {

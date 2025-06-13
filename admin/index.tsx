@@ -3,9 +3,9 @@ import { createRoot } from '@wordpress/element';
 import './main.css';
 
 const container = document.getElementById('debug-suite-admin-app');
-console.log('Hello world from TypeScript!', container);
+console.dir('Hello world from TypeScript!', container);
 
 if (container) {
-    const root = createRoot(container); // createRoot(container!) if you use TypeScript
+    const root = createRoot(container);
     root.render(<App />);
 }
