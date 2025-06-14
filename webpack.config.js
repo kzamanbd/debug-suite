@@ -2,7 +2,7 @@ const defaults = require('@wordpress/scripts/config/webpack.config');
 const path = require('path');
 
 const entries = {
-    'debug-suite-admin': './admin/index.tsx'
+    'debug-suite-admin': './src/index.tsx'
 };
 
 module.exports = {
@@ -17,7 +17,7 @@ module.exports = {
         ...defaults.resolve,
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         alias: {
-            admin: path.resolve('./admin/')
+            '@': path.resolve(__dirname, 'src')
         }
     },
     externals: {

@@ -1,6 +1,6 @@
+import CustomSwitch from '@/components/CustomSwitch';
+import { cn } from '@/utils/cn';
 import { useState } from '@wordpress/element';
-import CustomSwitch from '../components/CustomSwitch';
-import { cn } from '../utils/cn';
 
 interface SettingsState {
     fileManagerAccess: string;
