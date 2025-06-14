@@ -15,7 +15,10 @@ module.exports = {
     },
     resolve: {
         ...defaults.resolve,
-        extensions: ['.tsx', '.ts', '.js', '.jsx']
+        extensions: ['.tsx', '.ts', '.js', '.jsx'],
+        alias: {
+            admin: path.resolve('./admin/')
+        }
     },
     externals: {
         react: 'React',

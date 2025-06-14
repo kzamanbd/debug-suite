@@ -1,4 +1,6 @@
 import { useState } from '@wordpress/element';
+import CustomSwitch from '../components/CustomSwitch';
+import { cn } from '../utils/cn';
 
 interface SettingsState {
     fileManagerAccess: string;
@@ -27,8 +29,12 @@ const Settings = () => {
 
     const [hasChanges, setHasChanges] = useState(false);
 
+    // Accepts: (field: keyof SettingsState, value: string | boolean)
     const handleInputChange = (field: keyof SettingsState, value: string | boolean) => {
-        setSettings((prev) => ({ ...prev, [field]: value }));
+        setSettings((prevSettings) => ({
+            ...prevSettings,
+            [field]: value
+        }));
         setHasChanges(true);
     };
 
@@ -209,11 +215,12 @@ const Settings = () => {
                                                 className="sr-only"
                                             />
                                             <div
-                                                className={`flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all ${
+                                                className={cn(
+                                                    'flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all',
                                                     settings.defaultViewType === 'grid'
                                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                                                         : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                                                }`}
+                                                )}
                                             >
                                                 <svg
                                                     className="w-5 h-5 mr-2"
@@ -241,11 +248,12 @@ const Settings = () => {
                                                 className="sr-only"
                                             />
                                             <div
-                                                className={`flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all ${
+                                                className={cn(
+                                                    'flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all',
                                                     settings.defaultViewType === 'list'
                                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                                                         : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                                                }`}
+                                                )}
                                             >
                                                 <svg
                                                     className="w-5 h-5 mr-2"
@@ -280,23 +288,13 @@ const Settings = () => {
                                             </p>
                                         </div>
                                         <div className="relative">
-                                            <input
-                                                type="checkbox"
+                                            <CustomSwitch
                                                 checked={settings.enableTrash}
-                                                onChange={(e) => handleInputChange('enableTrash', e.target.checked)}
-                                                className="sr-only"
+                                                onChange={(e) =>
+                                                    handleInputChange('enableTrash', e.currentTarget.checked)
+                                                }
+                                                id="custom_switch_checkbox_enableTrash"
                                             />
-                                            <div
-                                                className={`w-12 h-6 rounded-full transition-colors ${
-                                                    settings.enableTrash ? 'bg-blue-600' : 'bg-gray-300'
-                                                }`}
-                                            >
-                                                <div
-                                                    className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
-                                                        settings.enableTrash ? 'translate-x-6' : 'translate-x-0.5'
-                                                    } mt-0.5`}
-                                                />
-                                            </div>
                                         </div>
                                     </label>
 
@@ -310,23 +308,13 @@ const Settings = () => {
                                             </p>
                                         </div>
                                         <div className="relative">
-                                            <input
-                                                type="checkbox"
+                                            <CustomSwitch
                                                 checked={settings.hideHtaccess}
-                                                onChange={(e) => handleInputChange('hideHtaccess', e.target.checked)}
-                                                className="sr-only"
+                                                onChange={(e) =>
+                                                    handleInputChange('hideHtaccess', e.currentTarget.checked)
+                                                }
+                                                id="custom_switch_checkbox_hideHtaccess"
                                             />
-                                            <div
-                                                className={`w-12 h-6 rounded-full transition-colors ${
-                                                    settings.hideHtaccess ? 'bg-blue-600' : 'bg-gray-300'
-                                                }`}
-                                            >
-                                                <div
-                                                    className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
-                                                        settings.hideHtaccess ? 'translate-x-6' : 'translate-x-0.5'
-                                                    } mt-0.5`}
-                                                />
-                                            </div>
                                         </div>
                                     </label>
                                 </div>
@@ -363,23 +351,11 @@ const Settings = () => {
                                     <p className="text-xs text-gray-500">Enable WordPress debug mode</p>
                                 </div>
                                 <div className="relative">
-                                    <input
-                                        type="checkbox"
+                                    <CustomSwitch
                                         checked={settings.enableDebug}
-                                        onChange={(e) => handleInputChange('enableDebug', e.target.checked)}
-                                        className="sr-only"
+                                        onChange={(e) => handleInputChange('enableDebug', e.currentTarget.checked)}
+                                        id="custom_switch_checkbox_enableDebug"
                                     />
-                                    <div
-                                        className={`w-12 h-6 rounded-full transition-colors ${
-                                            settings.enableDebug ? 'bg-green-600' : 'bg-gray-300'
-                                        }`}
-                                    >
-                                        <div
-                                            className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
-                                                settings.enableDebug ? 'translate-x-6' : 'translate-x-0.5'
-                                            } mt-0.5`}
-                                        />
-                                    </div>
                                 </div>
                             </label>
 
@@ -389,23 +365,11 @@ const Settings = () => {
                                     <p className="text-xs text-gray-500">Record all database queries for analysis</p>
                                 </div>
                                 <div className="relative">
-                                    <input
-                                        type="checkbox"
+                                    <CustomSwitch
                                         checked={settings.logQueries}
-                                        onChange={(e) => handleInputChange('logQueries', e.target.checked)}
-                                        className="sr-only"
+                                        onChange={(e) => handleInputChange('logQueries', e.currentTarget.checked)}
+                                        id="custom_switch_checkbox_logQueries"
                                     />
-                                    <div
-                                        className={`w-12 h-6 rounded-full transition-colors ${
-                                            settings.logQueries ? 'bg-green-600' : 'bg-gray-300'
-                                        }`}
-                                    >
-                                        <div
-                                            className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
-                                                settings.logQueries ? 'translate-x-6' : 'translate-x-0.5'
-                                            } mt-0.5`}
-                                        />
-                                    </div>
                                 </div>
                             </label>
 
@@ -415,23 +379,11 @@ const Settings = () => {
                                     <p className="text-xs text-gray-500">Capture and log PHP errors and warnings</p>
                                 </div>
                                 <div className="relative">
-                                    <input
-                                        type="checkbox"
+                                    <CustomSwitch
                                         checked={settings.logErrors}
-                                        onChange={(e) => handleInputChange('logErrors', e.target.checked)}
-                                        className="sr-only"
+                                        onChange={(e) => handleInputChange('logErrors', e.currentTarget.checked)}
+                                        id="custom_switch_checkbox_logErrors"
                                     />
-                                    <div
-                                        className={`w-12 h-6 rounded-full transition-colors ${
-                                            settings.logErrors ? 'bg-green-600' : 'bg-gray-300'
-                                        }`}
-                                    >
-                                        <div
-                                            className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
-                                                settings.logErrors ? 'translate-x-6' : 'translate-x-0.5'
-                                            } mt-0.5`}
-                                        />
-                                    </div>
                                 </div>
                             </label>
                         </div>
@@ -470,11 +422,12 @@ const Settings = () => {
                                 <button
                                     onClick={handleSave}
                                     disabled={!hasChanges}
-                                    className={`px-4 py-2 sm:px-8 sm:py-3 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                                    className={cn(
+                                        'px-4 py-2 sm:px-8 sm:py-3 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2',
                                         hasChanges
                                             ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg shadow-blue-500/25'
                                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    }`}
+                                    )}
                                 >
                                     Save Changes
                                 </button>

@@ -26,6 +26,7 @@
         "@wordpress/dom-ready": "^4.25.0",
         "@wordpress/element": "^6.25.0",
         "@wordpress/plugins": "^7.25.0",
+        "clsx": "^2.1.1",
         "react-router-dom": "^7.6.2",
         "tailwind-merge": "^3.3.1"
     },

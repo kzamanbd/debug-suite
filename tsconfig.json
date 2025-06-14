@@ -14,7 +14,11 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": true,
-        "jsx": "react-jsx"
+        "jsx": "react-jsx",
+        "baseUrl": ".",
+        "paths": {
+            "@admin/*": ["admin/*"]
+        }
     },
     "include": ["admin/**/*", "includes/**/*", "src/**/*"],
     "exclude": ["node_modules", "build", "assets", "vendor", "**/*.test.ts", "**/*.test.tsx"]
