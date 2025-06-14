@@ -15,7 +15,6 @@ use DebugSuite\Frontend\Frontend;
  */
 class FrontendServiceProvider extends AbstractServiceProvider {
 
-
 	/**
 	 * Services provided by this provider.
 	 */

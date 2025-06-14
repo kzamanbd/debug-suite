@@ -16,8 +16,6 @@ use DebugSuite\Interfaces\Hookable;
  */
 class AdminServiceProvider extends AbstractServiceProvider {
 
-
-
 	/**
 	 * Services provided by this provider.
 	 */

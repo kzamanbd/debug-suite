@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Abstract base class for service providers.
  */
@@ -7,14 +6,11 @@
 namespace DebugSuite\Core;
 
 use DebugSuite\Interfaces\ServiceProviderInterface;
-use DebugSuite\Interfaces\Hookable;
 
 /**
  * Abstract Service Provider class.
  */
 abstract class AbstractServiceProvider implements ServiceProviderInterface {
-
-
 
 	/**
 	 * Services provided by this provider.

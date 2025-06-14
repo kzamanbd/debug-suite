@@ -47,7 +47,6 @@ use DebugSuite\Frontend\Frontend;
 use DebugSuite\Providers\CoreServiceProvider;
 use DebugSuite\Providers\AdminServiceProvider;
 use DebugSuite\Providers\FrontendServiceProvider;
-use DebugSuite\Providers\ManagerServiceProvider;
 
 /**
  * Main class for the Debug Suite plugin.
@@ -125,7 +124,6 @@ final class DebugSuite {
 			CoreServiceProvider::class,
 			AdminServiceProvider::class,
 			FrontendServiceProvider::class,
-			ManagerServiceProvider::class,
 		];
 
 		$this->service_manager->register_providers( $providers );

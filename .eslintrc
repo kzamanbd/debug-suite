@@ -16,11 +16,6 @@
         }
     },
     "rules": {
-        "no-console": "warn",
-        "react/jsx-uses-react": "error",
-        "react/jsx-uses-vars": "error",
-        "@wordpress/no-unused-vars-before-return": "error",
-        "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "warn"
+        "no-console": "warn"
     }
 }

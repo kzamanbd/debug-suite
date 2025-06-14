@@ -17,8 +17,6 @@ use Exception;
  */
 class CoreServiceProvider extends AbstractServiceProvider {
 
-
-
 	/**
 	 * Services provided by this provider.
 	 */
