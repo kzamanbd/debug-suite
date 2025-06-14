@@ -6,6 +6,7 @@
 
 namespace DebugSuite\Admin;
 
+use DebugSuite\API\SettingsController;
 use DebugSuite\Interfaces\Hookable;
 
 /**
@@ -21,6 +22,30 @@ class Admin implements Hookable {
 	public function register_hooks(): void {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+		add_action( 'rest_api_init', [ $this, 'register_api_routes' ] );
+	}
+
+
+	/**
+	 * Register all API controller routes using the DI container.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	public function register_api_routes(): void {
+		$controllers = [
+			SettingsController::class,
+			// Add more API controllers here as needed.
+		];
+		$controllers = apply_filters( 'debug_suite_api_controllers', $controllers );
+
+		foreach ( $controllers as $controller_class ) {
+			$controller = new $controller_class();
+			if ( method_exists( $controller, 'register_routes' ) ) {
+				$controller->register_routes();
+			}
+		}
 	}
 
 	/**
