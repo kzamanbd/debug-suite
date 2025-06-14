@@ -17,6 +17,7 @@ use DebugSuite\Interfaces\Hookable;
 class AdminServiceProvider extends AbstractServiceProvider {
 
 
+
 	/**
 	 * Services provided by this provider.
 	 */
@@ -43,9 +44,7 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	 * Boot services after all providers have been registered.
 	 */
 	public function boot( Container $container ): void {
-		// Auto-register hooks for services that implement Hookable interface
-		$this->register_hookable_services( $container );
-
-		$this->mark_booted();
+		// Hook registration is now handled centrally by ServiceManager
+		// Nothing special needed here for admin services
 	}
 }

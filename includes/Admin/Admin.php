@@ -13,11 +13,6 @@ use DebugSuite\Interfaces\Hookable;
  */
 class Admin implements Hookable {
 
-	public function __construct() {
-		// Constructor now only sets up the instance
-		// Hook registration happens in register_hooks() method
-	}
-
 	/**
 	 * Register hooks for WordPress.
 	 * This method will be called automatically to register the hooks.

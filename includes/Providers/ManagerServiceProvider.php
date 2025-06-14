@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Manager service provider for registering manager services.
  */
@@ -13,6 +14,7 @@ use DebugSuite\Managers\DebugProviderManager;
  * Manager Service Provider for registering manager classes.
  */
 class ManagerServiceProvider extends AbstractServiceProvider {
+
 
 	/**
 	 * Services provided by this provider.
@@ -40,9 +42,7 @@ class ManagerServiceProvider extends AbstractServiceProvider {
 	 * Boot services after all providers have been registered.
 	 */
 	public function boot( Container $container ): void {
-		// Managers are automatically initialized when resolved
-		// No additional booting required for manager services
-
-		$this->mark_booted();
+		// Hook registration is now handled centrally by ServiceManager
+		// Nothing special needed here for manager services
 	}
 }

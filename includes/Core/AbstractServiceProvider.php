@@ -15,6 +15,7 @@ use DebugSuite\Interfaces\Hookable;
 abstract class AbstractServiceProvider implements ServiceProviderInterface {
 
 
+
 	/**
 	 * Services provided by this provider.
 	 */
@@ -24,11 +25,6 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	 * Whether the provider has been registered.
 	 */
 	protected $registered = false;
-
-	/**
-	 * Whether the provider has been booted.
-	 */
-	protected $booted = false;
 
 	/**
 	 * Register services with the container.
@@ -41,7 +37,6 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	 */
 	public function boot( Container $container ): void {
 		// Default implementation - override in child classes
-		$this->booted = true;
 	}
 
 	/**
@@ -59,45 +54,9 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	}
 
 	/**
-	 * Check if the provider has been booted.
-	 */
-	public function is_booted(): bool {
-		return $this->booted;
-	}
-
-	/**
 	 * Mark the provider as registered.
 	 */
 	protected function mark_registered(): void {
 		$this->registered = true;
-	}
-
-	/**
-	 * Mark the provider as booted.
-	 */
-	protected function mark_booted(): void {
-		$this->booted = true;
-	}
-
-	/**
-	 * Automatically register hooks for the provider.
-	 */
-	protected function register_hooks( Hookable $hookable ): void {
-		// Default implementation - override in child classes
-	}
-
-	/**
-	 * Automatically register hooks for services that implement Hookable interface.
-	 *
-	 * @param Container $container The dependency injection container.
-	 */
-	protected function register_hookable_services( Container $container ): void {
-		foreach ( $this->provides as $service ) {
-			$instance = $container->resolve( $service );
-
-			if ( $instance instanceof Hookable ) {
-				$instance->register_hooks();
-			}
-		}
 	}
 }

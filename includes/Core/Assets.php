@@ -15,11 +15,6 @@ use DebugSuite\Interfaces\Hookable;
  */
 class Assets implements Hookable {
 
-	public function __construct() {
-		// Constructor now only sets up the instance
-		// Initialization happens in init() method
-	}
-
 	/**
 	 * Register hooks for WordPress.
 	 * This method will be called automatically to register the hooks.
