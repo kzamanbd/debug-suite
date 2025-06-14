@@ -35,9 +35,9 @@ class Admin {
 			$position
 		);
 
-		$submenu[ $slug ][] = [ __( 'Dashboard', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#/' ];
-		$submenu[ $slug ][] = [ __( 'File Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#/file-logs/view' ];
-		$submenu[ $slug ][] = [ __( 'Manage Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#/file-logs/manage' ];
+		$submenu[ $slug ][] = [ __( 'Dashboard', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#' ];
+		$submenu[ $slug ][] = [ __( 'File Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#file-logs/view' ];
+		$submenu[ $slug ][] = [ __( 'Manage Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#file-logs/manage' ];
 
 		add_action( $dashboard, [ $this, 'admin_enqueue_scripts' ] );
 	}
@@ -59,7 +59,7 @@ class Admin {
 	/**
 	 * Enqueue admin scripts and styles.
 	 */
-	public function admin_enqueue_scripts() {
+	public function admin_enqueue_scripts(): void {
 		wp_enqueue_script( 'debug-suite-admin' );
 		wp_enqueue_style( 'debug-suite-admin' );
 	}
