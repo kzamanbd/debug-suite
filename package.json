@@ -7,14 +7,22 @@
         "dev": "wp-scripts start --progress",
         "build": "wp-scripts build",
         "type-check": "tsc --noEmit",
-        "makepot": "wp i18n make-pot --domain='debug-suite' --include='assets/js,includes,templates,debug-suite.php' . --headers='{\"Report-Msgid-Bugs-To\":\"https://kzaman.me/contact/\"}' --file-comment=\"Copyright (c) $(date +'%Y') Kamruzzaman. All Rights Reserved.\" languages/debug-suite.pot"
+        "makepot": "wp i18n make-pot --domain='debug-suite' --include='assets/js,includes,templates,debug-suite.php' . --headers='{\"Report-Msgid-Bugs-To\":\"https://kzaman.me/contact/\"}' --file-comment=\"Copyright (c) $(date +'%Y') Kamruzzaman. All Rights Reserved.\" languages/debug-suite.pot",
+        "lint": "wp-scripts lint-js",
+        "format": "wp-scripts format",
+        "lint:css": "wp-scripts lint-style"
     },
     "author": "kamruzzaman",
     "license": "MIT",
     "dependencies": {
+        "@headlessui/react": "^2.2.4",
+        "@wordpress/api-fetch": "^7.25.0",
+        "@wordpress/data": "^10.25.0",
         "@wordpress/dom-ready": "^4.25.0",
         "@wordpress/element": "^6.25.0",
-        "react-router-dom": "^7.6.2"
+        "@wordpress/plugins": "^7.25.0",
+        "react-router-dom": "^7.6.2",
+        "tailwind-merge": "^3.3.1"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4.1.10",
@@ -22,7 +30,9 @@
         "@types/react-dom": "^19.1.6",
         "@types/react-router-dom": "^5.3.3",
         "@wordpress/scripts": "^30.18.0",
+        "eslint-config-prettier": "^10.1.5",
         "postcss": "^8.5.5",
+        "prettier": "^3.5.3",
         "tailwindcss": "^4.1.10",
         "typescript": "^5.8.3"
     }

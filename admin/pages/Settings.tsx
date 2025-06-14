@@ -8,9 +8,9 @@ const Settings: React.FC = () => {
                 <h2 className="text-lg font-semibold mb-4">General Settings</h2>
                 <div className="space-y-4">
                     <div className="flex items-center">
-                        <input 
-                            type="checkbox" 
-                            id="enable-debug" 
+                        <input
+                            type="checkbox"
+                            id="enable-debug"
                             className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                         <label htmlFor="enable-debug" className="text-sm font-medium text-gray-700">
@@ -18,9 +18,9 @@ const Settings: React.FC = () => {
                         </label>
                     </div>
                     <div className="flex items-center">
-                        <input 
-                            type="checkbox" 
-                            id="log-queries" 
+                        <input
+                            type="checkbox"
+                            id="log-queries"
                             className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                         <label htmlFor="log-queries" className="text-sm font-medium text-gray-700">
@@ -28,9 +28,9 @@ const Settings: React.FC = () => {
                         </label>
                     </div>
                     <div className="flex items-center">
-                        <input 
-                            type="checkbox" 
-                            id="log-errors" 
+                        <input
+                            type="checkbox"
+                            id="log-errors"
                             className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                         <label htmlFor="log-errors" className="text-sm font-medium text-gray-700">

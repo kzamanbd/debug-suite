@@ -12,7 +12,7 @@ interface LogEntry {
 const ViewLogs: React.FC = () => {
     const [selectedLevel, setSelectedLevel] = useState<string>('all');
     const [searchTerm, setSearchTerm] = useState<string>('');
-    
+
     // Sample log data - in a real app, this would come from your backend
     const [logs] = useState<LogEntry[]>([
         {
@@ -49,9 +49,10 @@ const ViewLogs: React.FC = () => {
         }
     ]);
 
-    const filteredLogs = logs.filter(log => {
+    const filteredLogs = logs.filter((log) => {
         const matchesLevel = selectedLevel === 'all' || log.level === selectedLevel;
-        const matchesSearch = searchTerm === '' || 
+        const matchesSearch =
+            searchTerm === '' ||
             log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
             log.file?.toLowerCase().includes(searchTerm.toLowerCase());
         return matchesLevel && matchesSearch;
@@ -76,11 +77,11 @@ const ViewLogs: React.FC = () => {
         <div className="wrap">
             <h1>View File Logs</h1>
             <p>View and search through your application's log files.</p>
-            
+
             <div style={{ marginBottom: '20px' }}>
-                <a 
-                    href="#/file-logs" 
-                    className="button" 
+                <a
+                    href="#/file-logs"
+                    className="button"
                     style={{ marginRight: '10px' }}
                     onClick={(e) => {
                         e.preventDefault();
@@ -89,8 +90,8 @@ const ViewLogs: React.FC = () => {
                 >
                     ← Back to Overview
                 </a>
-                <a 
-                    href="#/file-logs/manage" 
+                <a
+                    href="#/file-logs/manage"
                     className="button button-secondary"
                     onClick={(e) => {
                         e.preventDefault();
@@ -100,13 +101,15 @@ const ViewLogs: React.FC = () => {
                     ⚙️ Manage Logs
                 </a>
             </div>
-            
+
             <div style={{ display: 'flex', gap: '15px', marginBottom: '20px', alignItems: 'center' }}>
                 <div>
-                    <label htmlFor="log-level-filter" style={{ marginRight: '8px' }}>Filter by Level:</label>
-                    <select 
+                    <label htmlFor="log-level-filter" style={{ marginRight: '8px' }}>
+                        Filter by Level:
+                    </label>
+                    <select
                         id="log-level-filter"
-                        value={selectedLevel} 
+                        value={selectedLevel}
                         onChange={(e) => setSelectedLevel(e.target.value)}
                         style={{ padding: '5px' }}
                     >
@@ -117,9 +120,11 @@ const ViewLogs: React.FC = () => {
                         <option value="debug">Debug</option>
                     </select>
                 </div>
-                
+
                 <div>
-                    <label htmlFor="search-logs" style={{ marginRight: '8px' }}>Search:</label>
+                    <label htmlFor="search-logs" style={{ marginRight: '8px' }}>
+                        Search:
+                    </label>
                     <input
                         id="search-logs"
                         type="text"
@@ -154,7 +159,10 @@ const ViewLogs: React.FC = () => {
                                 <tr key={log.id}>
                                     <td>{log.timestamp}</td>
                                     <td>
-                                        <span className={getLevelBadgeClass(log.level)} style={{ padding: '2px 8px', fontSize: '11px' }}>
+                                        <span
+                                            className={getLevelBadgeClass(log.level)}
+                                            style={{ padding: '2px 8px', fontSize: '11px' }}
+                                        >
                                             {log.level.toUpperCase()}
                                         </span>
                                     </td>
@@ -169,7 +177,9 @@ const ViewLogs: React.FC = () => {
             </div>
 
             <div style={{ marginTop: '20px' }}>
-                <p><strong>Total logs:</strong> {filteredLogs.length} of {logs.length}</p>
+                <p>
+                    <strong>Total logs:</strong> {filteredLogs.length} of {logs.length}
+                </p>
             </div>
         </div>
     );

@@ -1,0 +1,41 @@
+{
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[typescript]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "always",
+            "source.fixAll.eslint": "always",
+            "source.organizeImports": "always"
+        }
+    },
+    "[javascript]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "always",
+            "source.fixAll.eslint": "always",
+            "source.organizeImports": "always"
+        }
+    },
+    "[typescriptreact]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "always",
+            "source.fixAll.eslint": "always",
+            "source.organizeImports": "always"
+        }
+    },
+    "[javascriptreact]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "always",
+            "source.fixAll.eslint": "always",
+            "source.organizeImports": "always"
+        }
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always"
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ]
+}

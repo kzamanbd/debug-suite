@@ -1,0 +1,26 @@
+{
+    "extends": ["plugin:@wordpress/eslint-plugin/recommended", "prettier"],
+    "plugins": ["@wordpress", "react"],
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "paths": ["src", "admin"],
+                "extensions": [".js", ".jsx", ".ts", ".tsx"]
+            },
+            "typescript": {
+                "project": "./tsconfig.json"
+            }
+        },
+        "react": {
+            "version": "detect"
+        }
+    },
+    "rules": {
+        "no-console": "warn",
+        "react/jsx-uses-react": "error",
+        "react/jsx-uses-vars": "error",
+        "@wordpress/no-unused-vars-before-return": "error",
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
+    }
+}

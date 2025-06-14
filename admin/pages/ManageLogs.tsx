@@ -44,13 +44,13 @@ const ManageLogs: React.FC = () => {
         if (checked) {
             setSelectedFiles([...selectedFiles, fileId]);
         } else {
-            setSelectedFiles(selectedFiles.filter(id => id !== fileId));
+            setSelectedFiles(selectedFiles.filter((id) => id !== fileId));
         }
     };
 
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
-            setSelectedFiles(logFiles.map(file => file.id));
+            setSelectedFiles(logFiles.map((file) => file.id));
         } else {
             setSelectedFiles([]);
         }
@@ -62,7 +62,11 @@ const ManageLogs: React.FC = () => {
             return;
         }
 
-        if (!confirm(`Are you sure you want to clear ${selectedFiles.length} log file(s)? This action cannot be undone.`)) {
+        if (
+            !confirm(
+                `Are you sure you want to clear ${selectedFiles.length} log file(s)? This action cannot be undone.`
+            )
+        ) {
             return;
         }
 
@@ -108,11 +112,11 @@ const ManageLogs: React.FC = () => {
         <div className="wrap">
             <h1>Manage Log Files</h1>
             <p>Manage your application's log files - clear, download, or archive them.</p>
-            
+
             <div style={{ marginBottom: '20px' }}>
-                <a 
-                    href="#/file-logs" 
-                    className="button" 
+                <a
+                    href="#/file-logs"
+                    className="button"
                     style={{ marginRight: '10px' }}
                     onClick={(e) => {
                         e.preventDefault();
@@ -121,8 +125,8 @@ const ManageLogs: React.FC = () => {
                 >
                     ← Back to Overview
                 </a>
-                <a 
-                    href="#/file-logs/view" 
+                <a
+                    href="#/file-logs/view"
                     className="button button-secondary"
                     onClick={(e) => {
                         e.preventDefault();
@@ -132,24 +136,30 @@ const ManageLogs: React.FC = () => {
                     📄 View Logs
                 </a>
             </div>
-            
+
             <div style={{ marginBottom: '20px' }}>
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                    <button 
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: '10px',
+                        marginBottom: '15px'
+                    }}
+                >
+                    <button
                         className="button button-primary"
                         onClick={handleClearLogs}
                         disabled={isProcessing || selectedFiles.length === 0}
                     >
                         {isProcessing ? 'Processing...' : 'Clear Selected'}
                     </button>
-                    <button 
+                    <button
                         className="button"
                         onClick={handleDownloadLogs}
                         disabled={isProcessing || selectedFiles.length === 0}
                     >
                         Download Selected
                     </button>
-                    <button 
+                    <button
                         className="button"
                         onClick={handleArchiveLogs}
                         disabled={isProcessing || selectedFiles.length === 0}
@@ -157,7 +167,7 @@ const ManageLogs: React.FC = () => {
                         Archive Selected
                     </button>
                 </div>
-                
+
                 <p style={{ fontSize: '13px', color: '#666' }}>
                     Selected: {selectedFiles.length} of {logFiles.length} files
                 </p>
@@ -192,20 +202,24 @@ const ManageLogs: React.FC = () => {
                                         onChange={(e) => handleSelectFile(file.id, e.target.checked)}
                                     />
                                 </th>
-                                <td><strong>{file.name}</strong></td>
-                                <td><code>{file.path}</code></td>
+                                <td>
+                                    <strong>{file.name}</strong>
+                                </td>
+                                <td>
+                                    <code>{file.path}</code>
+                                </td>
                                 <td>{file.size}</td>
                                 <td>{file.lastModified}</td>
                                 <td>{file.entries.toLocaleString()}</td>
                                 <td>
                                     <div style={{ display: 'flex', gap: '5px' }}>
-                                        <button 
+                                        <button
                                             className="button button-small"
                                             onClick={() => alert(`Viewing ${file.name}...`)}
                                         >
                                             View
                                         </button>
-                                        <button 
+                                        <button
                                             className="button button-small"
                                             onClick={() => alert(`Downloading ${file.name}...`)}
                                         >
@@ -219,7 +233,14 @@ const ManageLogs: React.FC = () => {
                 </table>
             </div>
 
-            <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f9f9f9', border: '1px solid #ddd' }}>
+            <div
+                style={{
+                    marginTop: '20px',
+                    padding: '15px',
+                    backgroundColor: '#f9f9f9',
+                    border: '1px solid #ddd'
+                }}
+            >
                 <h3>Log Management Settings</h3>
                 <form>
                     <table className="form-table">
@@ -230,7 +251,7 @@ const ManageLogs: React.FC = () => {
                                     <fieldset>
                                         <legend className="screen-reader-text">Auto-Archive Options</legend>
                                         <label>
-                                            <input type="checkbox" /> Archive logs older than 
+                                            <input type="checkbox" /> Archive logs older than
                                             <select style={{ margin: '0 5px' }}>
                                                 <option value="7">7 days</option>
                                                 <option value="30">30 days</option>
@@ -262,9 +283,11 @@ const ManageLogs: React.FC = () => {
                             </tr>
                         </tbody>
                     </table>
-                    
+
                     <p className="submit">
-                        <button type="submit" className="button button-primary">Save Settings</button>
+                        <button type="submit" className="button button-primary">
+                            Save Settings
+                        </button>
                     </p>
                 </form>
             </div>

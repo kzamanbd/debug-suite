@@ -11,7 +11,7 @@ interface LogEntry {
 
 const FileLogs: React.FC = () => {
     const [selectedLevel, setSelectedLevel] = useState<string>('all');
-    
+
     // Sample log data - in a real app, this would come from your backend
     const [logs] = useState<LogEntry[]>([
         {
@@ -48,17 +48,20 @@ const FileLogs: React.FC = () => {
         }
     ]);
 
-    const filteredLogs = selectedLevel === 'all' 
-        ? logs 
-        : logs.filter(log => log.level === selectedLevel);
+    const filteredLogs = selectedLevel === 'all' ? logs : logs.filter((log) => log.level === selectedLevel);
 
     const getLevelColor = (level: string) => {
         switch (level) {
-            case 'error': return 'text-red-600 bg-red-50';
-            case 'warning': return 'text-yellow-600 bg-yellow-50';
-            case 'info': return 'text-blue-600 bg-blue-50';
-            case 'debug': return 'text-gray-600 bg-gray-50';
-            default: return 'text-gray-600 bg-gray-50';
+            case 'error':
+                return 'text-red-600 bg-red-50';
+            case 'warning':
+                return 'text-yellow-600 bg-yellow-50';
+            case 'info':
+                return 'text-blue-600 bg-blue-50';
+            case 'debug':
+                return 'text-gray-600 bg-gray-50';
+            default:
+                return 'text-gray-600 bg-gray-50';
         }
     };
 
@@ -66,10 +69,10 @@ const FileLogs: React.FC = () => {
         <div className="wrap">
             <h1>File Logs Overview</h1>
             <p>Welcome to the File Logs section. Choose an option below to get started.</p>
-            
+
             <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
-                <a 
-                    href="#/file-logs/view" 
+                <a
+                    href="#/file-logs/view"
                     className="button button-primary button-large"
                     style={{ textDecoration: 'none', padding: '10px 20px' }}
                     onClick={(e) => {
@@ -79,8 +82,8 @@ const FileLogs: React.FC = () => {
                 >
                     📄 View Logs
                 </a>
-                <a 
-                    href="#/file-logs/manage" 
+                <a
+                    href="#/file-logs/manage"
                     className="button button-secondary button-large"
                     style={{ textDecoration: 'none', padding: '10px 20px' }}
                     onClick={(e) => {
@@ -95,8 +98,8 @@ const FileLogs: React.FC = () => {
             <div className="flex justify-between items-center mb-6">
                 <h2>Recent Log Entries</h2>
                 <div className="flex space-x-4">
-                    <select 
-                        value={selectedLevel} 
+                    <select
+                        value={selectedLevel}
                         onChange={(e) => setSelectedLevel(e.target.value)}
                         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
@@ -106,9 +109,7 @@ const FileLogs: React.FC = () => {
                         <option value="info">Info</option>
                         <option value="debug">Debug</option>
                     </select>
-                    <button className="button">
-                        Clear Logs
-                    </button>
+                    <button className="button">Clear Logs</button>
                 </div>
             </div>
 
@@ -127,14 +128,19 @@ const FileLogs: React.FC = () => {
                             <tr key={log.id}>
                                 <td>{log.timestamp}</td>
                                 <td>
-                                    <span 
+                                    <span
                                         className={`notice inline`}
-                                        style={{ 
-                                            padding: '2px 8px', 
+                                        style={{
+                                            padding: '2px 8px',
                                             fontSize: '11px',
-                                            backgroundColor: log.level === 'error' ? '#dc3545' : 
-                                                           log.level === 'warning' ? '#ffc107' :
-                                                           log.level === 'info' ? '#17a2b8' : '#6c757d',
+                                            backgroundColor:
+                                                log.level === 'error'
+                                                    ? '#dc3545'
+                                                    : log.level === 'warning'
+                                                      ? '#ffc107'
+                                                      : log.level === 'info'
+                                                        ? '#17a2b8'
+                                                        : '#6c757d',
                                             color: 'white',
                                             borderRadius: '3px'
                                         }}
@@ -155,7 +161,14 @@ const FileLogs: React.FC = () => {
                         ))}
                         {filteredLogs.length === 0 && (
                             <tr>
-                                <td colSpan={4} style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                                <td
+                                    colSpan={4}
+                                    style={{
+                                        textAlign: 'center',
+                                        padding: '20px',
+                                        color: '#666'
+                                    }}
+                                >
                                     No logs found for the selected level.
                                 </td>
                             </tr>

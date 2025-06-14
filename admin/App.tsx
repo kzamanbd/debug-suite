@@ -1,6 +1,6 @@
 import { RouterProvider, createHashRouter } from 'react-router-dom';
-import routes from './routing/routes';
 import { withRouter } from './routing';
+import routes from './routing/routes';
 
 const App = () => {
     // Map the routes to include withRouter for each route element
