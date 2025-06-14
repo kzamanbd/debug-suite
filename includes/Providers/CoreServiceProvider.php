@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Core service provider for registering core services.
  */
@@ -15,6 +16,7 @@ use Exception;
  * Core Service Provider for registering core services.
  */
 class CoreServiceProvider extends AbstractServiceProvider {
+
 
 	/**
 	 * Services provided by this provider.
@@ -55,13 +57,8 @@ class CoreServiceProvider extends AbstractServiceProvider {
 	 * @throws Exception If a service cannot be resolved.
 	 */
 	public function boot( Container $container ): void {
-		// Initialize Assets (this will run the init method and register WordPress hooks)
-		$assets = $container->resolve( Assets::class );
-		$assets->init();
-
-		// Initialize I18n
-		$i18n = $container->resolve( I18n::class );
-		add_action( 'plugins_loaded', array( $i18n, 'load_plugin_textdomain' ) );
+		// Auto-register hooks for services that implement Hookable interface
+		$this->register_hookable_services( $container );
 
 		$this->mark_booted();
 	}

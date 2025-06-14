@@ -6,21 +6,25 @@
 
 namespace DebugSuite\Core;
 
+use DebugSuite\Interfaces\Hookable;
+
 /**
  * The assets-specific functionality of the plugin.
  *
  * Handles the enqueuing of stylesheets and JavaScript files.
  */
-class Assets {
+class Assets implements Hookable {
+
 	public function __construct() {
 		// Constructor now only sets up the instance
 		// Initialization happens in init() method
 	}
 
 	/**
-	 * Initialize the Assets class
+	 * Register hooks for WordPress.
+	 * This method will be called automatically to register the hooks.
 	 */
-	public function init(): void {
+	public function register_hooks(): void {
 		add_action( 'init', [ $this, 'register_all_scripts' ] );
 	}
 

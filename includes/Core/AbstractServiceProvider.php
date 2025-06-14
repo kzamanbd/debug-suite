@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract base class for service providers.
  */
@@ -6,11 +7,13 @@
 namespace DebugSuite\Core;
 
 use DebugSuite\Interfaces\ServiceProviderInterface;
+use DebugSuite\Interfaces\Hookable;
 
 /**
  * Abstract Service Provider class.
  */
 abstract class AbstractServiceProvider implements ServiceProviderInterface {
+
 
 	/**
 	 * Services provided by this provider.
@@ -74,5 +77,27 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	 */
 	protected function mark_booted(): void {
 		$this->booted = true;
+	}
+
+	/**
+	 * Automatically register hooks for the provider.
+	 */
+	protected function register_hooks( Hookable $hookable ): void {
+		// Default implementation - override in child classes
+	}
+
+	/**
+	 * Automatically register hooks for services that implement Hookable interface.
+	 *
+	 * @param Container $container The dependency injection container.
+	 */
+	protected function register_hookable_services( Container $container ): void {
+		foreach ( $this->provides as $service ) {
+			$instance = $container->resolve( $service );
+
+			if ( $instance instanceof Hookable ) {
+				$instance->register_hooks();
+			}
+		}
 	}
 }

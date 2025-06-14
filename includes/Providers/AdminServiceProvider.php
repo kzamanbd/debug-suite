@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin service provider for registering admin services.
  */
@@ -8,11 +9,13 @@ namespace DebugSuite\Providers;
 use DebugSuite\Core\AbstractServiceProvider;
 use DebugSuite\Core\Container;
 use DebugSuite\Admin\Admin;
+use DebugSuite\Interfaces\Hookable;
 
 /**
  * Admin Service Provider for registering admin services.
  */
 class AdminServiceProvider extends AbstractServiceProvider {
+
 
 	/**
 	 * Services provided by this provider.
@@ -40,8 +43,8 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	 * Boot services after all providers have been registered.
 	 */
 	public function boot( Container $container ): void {
-		// Admin services are automatically initialized when resolved
-		// No additional booting required for admin services
+		// Auto-register hooks for services that implement Hookable interface
+		$this->register_hookable_services( $container );
 
 		$this->mark_booted();
 	}

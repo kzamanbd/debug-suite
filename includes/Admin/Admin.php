@@ -6,11 +6,23 @@
 
 namespace DebugSuite\Admin;
 
+use DebugSuite\Interfaces\Hookable;
+
 /**
  * The admin-specific functionality of the plugin.
  */
-class Admin {
+class Admin implements Hookable {
+
 	public function __construct() {
+		// Constructor now only sets up the instance
+		// Hook registration happens in register_hooks() method
+	}
+
+	/**
+	 * Register hooks for WordPress.
+	 * This method will be called automatically to register the hooks.
+	 */
+	public function register_hooks(): void {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 	}

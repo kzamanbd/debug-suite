@@ -25,7 +25,7 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Whether the provider is enabled.
 	 */
-	protected $enabled;
+	protected bool $enabled;
 
 	public function __construct() {
 		$this->enabled = true;
