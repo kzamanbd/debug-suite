@@ -62,7 +62,7 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
     - Use Tailwind CSS v4 with the Oxide engine for styling
     - Follow utility-first CSS approach with Tailwind classes
     - Use `@tailwindcss/postcss` for PostCSS integration
-    - Use `tailwind-merge` for conditional class merging
+    - Use `cn` utils for conditional class merging from `@/utils/cn`
     - Maintain consistent spacing and sizing using Tailwind's design system
     - Utilize Tailwind v4's CSS variables system for theme customization
     - Apply responsive design using Tailwind's breakpoint utilities
