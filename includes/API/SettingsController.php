@@ -95,7 +95,7 @@ class SettingsController extends RestController {
 		$settings  = get_option( 'debug_suite_settings', [] );
 		$settings  = array_merge( $constants, $settings );
 
-		return new WP_REST_Response( $settings, 200 );
+		return rest_ensure_response( $settings, 200 );
 	}
 
 	/**
@@ -109,12 +109,12 @@ class SettingsController extends RestController {
 	public function update_settings( $request ): WP_REST_Response {
 		$params = $request->get_json_params();
 		if ( ! is_array( $params ) ) {
-			return new WP_REST_Response( [ 'error' => __( 'Invalid settings data.', 'debug-suite' ) ], 400 );
+			return rest_ensure_response( [ 'error' => __( 'Invalid settings data.', 'debug-suite' ) ], 400 );
 		}
 		$file_path = ABSPATH . 'wp-config.php';
 		// Sanitize and validate settings here as needed.
 		if ( ! file_exists( $file_path ) || ! is_writable( $file_path ) ) {
-			return new WP_REST_Response( [ 'error' => __( 'Cannot write to wp-config.php file.', 'debug-suite' ) ], 500 );
+			return rest_ensure_response( [ 'error' => __( 'Cannot write to wp-config.php file.', 'debug-suite' ) ], 500 );
 		}
 
 		$is_debug         = $params['debug'] ?? 'false';

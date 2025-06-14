@@ -6,6 +6,7 @@
 
 namespace DebugSuite\Admin;
 
+use DebugSuite\API\FileLogsController;
 use DebugSuite\API\SettingsController;
 use DebugSuite\Interfaces\Hookable;
 
@@ -36,6 +37,7 @@ class Admin implements Hookable {
 	public function register_api_routes(): void {
 		$controllers = [
 			SettingsController::class,
+			FileLogsController::class,
 			// Add more API controllers here as needed.
 		];
 		$controllers = apply_filters( 'debug_suite_api_controllers', $controllers );

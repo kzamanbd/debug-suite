@@ -1,6 +1,7 @@
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Link } from 'react-router-dom';
+import apiFetch from '@wordpress/api-fetch';
 
 interface LogEntry {
     id: number;
@@ -9,6 +10,7 @@ interface LogEntry {
     message: string;
     file?: string;
     line?: number;
+    trace?: string;
 }
 
 const levelColors: Record<string, string> = {
@@ -21,41 +23,28 @@ const levelColors: Record<string, string> = {
 const FileLogs = () => {
     const [selectedLevel, setSelectedLevel] = useState<string>('all');
 
-    // Sample log data - in a real app, this would come from your backend
-    const [logs] = useState<LogEntry[]>([
-        {
-            id: 1,
-            timestamp: '2025-06-14 10:30:15',
-            level: 'error',
-            message: 'Database connection failed',
-            file: 'wp-config.php',
-            line: 45
-        },
-        {
-            id: 2,
-            timestamp: '2025-06-14 10:25:32',
-            level: 'warning',
-            message: 'Plugin compatibility issue detected',
-            file: 'debug-suite.php',
-            line: 120
-        },
-        {
-            id: 3,
-            timestamp: '2025-06-14 10:20:18',
-            level: 'info',
-            message: 'Debug suite activated successfully',
-            file: 'includes/Core/Activator.php',
-            line: 25
-        },
-        {
-            id: 4,
-            timestamp: '2025-06-14 10:15:45',
-            level: 'debug',
-            message: 'Query execution time: 0.045s',
-            file: 'includes/Providers/AbstractDebugProvider.php',
-            line: 78
+    const [logs, setLogs] = useState<LogEntry[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchLogs = async () => {
+        try {
+            setLoading(true);
+            const response = await apiFetch<{
+                entries: LogEntry[];
+            }>({
+                path: '/debug-suite/v1/logs'
+            });
+            setLogs(response.entries);
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+        } finally {
+            setLoading(false);
         }
-    ]);
+    };
+
+    useEffect(() => {
+        fetchLogs();
+    }, []);
 
     const filteredLogs = selectedLevel === 'all' ? logs : logs.filter((log) => log.level === selectedLevel);
 
