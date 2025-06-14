@@ -32,7 +32,7 @@ const Alert = ({ children, variant = 'primary', className = '', dismissible = fa
     return (
         <div
             className={cn(
-                'relative rounded-lg border px-4 py-3 flex items-start gap-2',
+                'relative flex items-start gap-2 rounded-lg border px-4 py-3',
                 variantClasses[variant],
                 className
             )}

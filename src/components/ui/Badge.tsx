@@ -24,7 +24,7 @@ const variantClasses: Record<BadgeVariant, string> = {
 };
 
 const Badge = ({ children, variant = 'primary', className = '' }: BadgeProps) => (
-    <span className={cn('inline-block px-2 py-0.5 rounded text-xs font-semibold', variantClasses[variant], className)}>
+    <span className={cn('inline-block rounded px-2 py-0.5 text-xs font-semibold', variantClasses[variant], className)}>
         {children}
     </span>
 );

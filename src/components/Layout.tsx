@@ -26,8 +26,8 @@ interface LayoutProps {
  */
 const Layout = ({ title, children, className = '' }: LayoutProps): JSX.Element => {
     return (
-        <div className={cn('max-w-5xl mx-auto px-4 py-8', className)}>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{title}</h1>
+        <div className={cn(className, 'mt-5 rounded-lg bg-white p-6 shadow-md')}>
+            <h2>{title}</h2>
             <div>{children}</div>
         </div>
     );

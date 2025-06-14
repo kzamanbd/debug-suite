@@ -14,24 +14,29 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
     className?: string;
 }
 
-const InputField = ({ label, error, className = '', id, ...props }: InputFieldProps) => (
-    <div className="space-y-1">
-        {label && (
-            <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-                {label}
-            </label>
-        )}
-        <input
-            id={id}
-            className={cn(
-                'block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm',
-                error ? 'border-red-500' : 'border-gray-300',
-                className
+const randomId = () => `input-${Math.random().toString(36).slice(2, 9)}`;
+
+const InputField = ({ label, error, className = '', ...props }: InputFieldProps) => {
+    const id = props.id || randomId();
+    return (
+        <div className="space-y-1">
+            {label && (
+                <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+                    {label}
+                </label>
             )}
-            {...props}
-        />
-        {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
-    </div>
-);
+            <input
+                id={id}
+                className={cn(
+                    'block w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none',
+                    error ? 'border-red-500' : 'border-gray-300',
+                    className
+                )}
+                {...props}
+            />
+            {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        </div>
+    );
+};
 
 export default InputField;

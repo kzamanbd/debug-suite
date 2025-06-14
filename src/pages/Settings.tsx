@@ -4,6 +4,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import InputField from '@/components/ui/InputField';
 import RadioButton from '@/components/ui/RadioButton';
+import SearchableSelect from '@/components/ui/SearchableSelect';
 import { cn } from '@/utils/cn';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
@@ -37,6 +38,14 @@ const defaultSettings: SettingsState = {
     wpDebugLog: false,
     wpDebugDisplay: false
 };
+
+const fileManagerAccessOptions = [
+    { value: 'administrator', label: __('Administrator Only', 'debug-suite') },
+    { value: 'editor', label: __('Editor and Above', 'debug-suite') },
+    { value: 'author', label: __('Author and Above', 'debug-suite') },
+    { value: 'contributor', label: __('Contributor and Above', 'debug-suite') },
+    { value: 'subscriber', label: __('All Users', 'debug-suite') }
+];
 
 const Settings = () => {
     const [settings, setSettings] = useState<SettingsState>(defaultSettings);
@@ -112,10 +121,10 @@ const Settings = () => {
     }
 
     return (
-        <>
+        <div>
             {/* Header */}
             <div className="mb-6 sm:mb-8">
-                <p className="text-gray-600 mt-2 text-sm sm:text-base">
+                <p className="mt-2 text-sm text-gray-600 sm:text-base">
                     {__('Configure your debug suite and file manager preferences', 'debug-suite')}
                 </p>
             </div>
@@ -124,10 +133,10 @@ const Settings = () => {
             <div className="space-y-4 sm:space-y-6">
                 {/* File Manager Settings */}
                 <Card>
-                    <div className="border-l-4 border-l-blue-500 px-4 sm:px-6 py-3 sm:py-4 bg-blue-50">
-                        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                    <div className="border-l-4 border-l-blue-500 bg-blue-50 px-4 py-3 sm:px-6 sm:py-4">
+                        <h2 className="flex items-center text-xl font-semibold text-gray-900">
                             <svg
-                                className="w-6 h-6 mr-3 text-blue-600"
+                                className="mr-3 h-6 w-6 text-blue-600"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -147,16 +156,16 @@ const Settings = () => {
                             </svg>
                             {__('File Manager Configuration', 'debug-suite')}
                         </h2>
-                        <p className="text-sm text-blue-700 mt-1">
+                        <p className="mt-1 text-sm text-blue-700">
                             {__('Control access and behavior of the file manager', 'debug-suite')}
                         </p>
                     </div>
 
-                    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                    <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
                         {/* File Manager Access */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-1">
+                                <label className="mb-1 block text-sm font-medium text-gray-900">
                                     {__('Who can access File Manager?', 'debug-suite')}
                                 </label>
                                 <p className="text-xs text-gray-500">
@@ -164,24 +173,24 @@ const Settings = () => {
                                 </p>
                             </div>
                             <div className="md:col-span-2">
-                                <select
-                                    value={settings.fileManagerAccess}
-                                    onChange={(e) => handleInputChange('fileManagerAccess', e.target.value)}
-                                    className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                >
-                                    <option value="administrator">{__('Administrator Only', 'debug-suite')}</option>
-                                    <option value="editor">{__('Editor and Above', 'debug-suite')}</option>
-                                    <option value="author">{__('Author and Above', 'debug-suite')}</option>
-                                    <option value="contributor">{__('Contributor and Above', 'debug-suite')}</option>
-                                    <option value="subscriber">{__('All Users', 'debug-suite')}</option>
-                                </select>
+                                <SearchableSelect
+                                    options={fileManagerAccessOptions}
+                                    value={
+                                        fileManagerAccessOptions.find(
+                                            (opt) => opt.value === settings.fileManagerAccess
+                                        ) || fileManagerAccessOptions[0]
+                                    }
+                                    onChange={(option) =>
+                                        handleInputChange('fileManagerAccess', option?.value || 'administrator')
+                                    }
+                                />
                             </div>
                         </div>
 
                         {/* Public Root Path */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-1">
+                                <label className="mb-1 block text-sm font-medium text-gray-900">
                                     {__('Public Root Path', 'debug-suite')}
                                 </label>
                                 <p className="text-xs text-gray-500">
@@ -193,16 +202,15 @@ const Settings = () => {
                                     type="text"
                                     value={settings.publicRootPath}
                                     onChange={(e) => handleInputChange('publicRootPath', e.target.value)}
-                                    className="w-full px-4 py-2 sm:py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                     placeholder={__('/wp-content/uploads/', 'debug-suite')}
                                 />
                             </div>
                         </div>
 
                         {/* Files URL */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-1">
+                                <label className="mb-1 block text-sm font-medium text-gray-900">
                                     {__('Files URL', 'debug-suite')}
                                 </label>
                                 <p className="text-xs text-gray-500">
@@ -214,23 +222,22 @@ const Settings = () => {
                                     type="url"
                                     value={settings.filesUrl}
                                     onChange={(e) => handleInputChange('filesUrl', e.target.value)}
-                                    className="w-full px-4 py-2 sm:py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                     placeholder={__('https://example.com/wp-content/uploads/', 'debug-suite')}
                                 />
                             </div>
                         </div>
 
                         {/* Default View Type */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-900 mb-1">
+                                <label className="mb-1 block text-sm font-medium text-gray-900">
                                     {__('Default View Type', 'debug-suite')}
                                 </label>
                                 <p className="text-xs text-gray-500">
                                     {__('How files are displayed by default', 'debug-suite')}
                                 </p>
                             </div>
-                            <div className="md:col-span-2 flex gap-4">
+                            <div className="flex gap-4 md:col-span-2">
                                 <RadioButton
                                     label={__('Grid View', 'debug-suite')}
                                     name="viewType"
@@ -249,11 +256,11 @@ const Settings = () => {
                         </div>
 
                         {/* Toggle Options */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
                             <div className="space-y-4">
                                 <h4 className="font-medium text-gray-900">{__('File Operations', 'debug-suite')}</h4>
 
-                                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                <label className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100">
                                     <div>
                                         <span className="text-sm font-medium text-gray-900">
                                             {__('Enable Trash', 'debug-suite')}
@@ -274,7 +281,7 @@ const Settings = () => {
                                     </div>
                                 </label>
 
-                                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                <label className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100">
                                     <div>
                                         <span className="text-sm font-medium text-gray-900">
                                             {__('Hide .htaccess Files', 'debug-suite')}
@@ -297,11 +304,11 @@ const Settings = () => {
                 </Card>
 
                 {/* Debug Settings */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="border-l-4 border-l-green-500 px-4 sm:px-6 py-3 sm:py-4 bg-green-50">
-                        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <div className="border-l-4 border-l-green-500 bg-green-50 px-4 py-3 sm:px-6 sm:py-4">
+                        <h2 className="flex items-center text-xl font-semibold text-gray-900">
                             <svg
-                                className="w-6 h-6 mr-3 text-green-600"
+                                className="mr-3 h-6 w-6 text-green-600"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -315,13 +322,13 @@ const Settings = () => {
                             </svg>
                             {__('Debug Configuration', 'debug-suite')}
                         </h2>
-                        <p className="text-sm text-green-700 mt-1">
+                        <p className="mt-1 text-sm text-green-700">
                             {__('Configure debugging and logging options', 'debug-suite')}
                         </p>
                     </div>
 
-                    <div className="p-4 sm:p-6 space-y-4">
-                        <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                    <div className="space-y-4 p-4 sm:p-6">
+                        <label className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100">
                             <div>
                                 <span className="text-sm font-medium text-gray-900">
                                     {__('Enable WP Debug', 'debug-suite')}
@@ -339,7 +346,7 @@ const Settings = () => {
                             </div>
                         </label>
 
-                        <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                        <label className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100">
                             <div>
                                 <span className="text-sm font-medium text-gray-900">
                                     {__('Enable WP Debug Log', 'debug-suite')}
@@ -357,7 +364,7 @@ const Settings = () => {
                             </div>
                         </label>
 
-                        <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                        <label className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100">
                             <div>
                                 <span className="text-sm font-medium text-gray-900">
                                     {__('Enable WP Debug Display', 'debug-suite')}
@@ -375,7 +382,7 @@ const Settings = () => {
                             </div>
                         </label>
 
-                        <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                        <label className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100">
                             <div>
                                 <span className="text-sm font-medium text-gray-900">
                                     {__('Log Database Queries', 'debug-suite')}
@@ -393,7 +400,7 @@ const Settings = () => {
                             </div>
                         </label>
 
-                        <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                        <label className="flex cursor-pointer items-center justify-between rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100">
                             <div>
                                 <span className="text-sm font-medium text-gray-900">
                                     {__('Log PHP Errors', 'debug-suite')}
@@ -414,12 +421,12 @@ const Settings = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
+                <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+                    <div className="flex flex-col items-start justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
                         <div>
                             {hasChanges && (
-                                <p className="text-sm text-amber-600 flex items-center">
-                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <p className="flex items-center text-sm text-amber-600">
+                                    <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
@@ -439,10 +446,10 @@ const Settings = () => {
                                 onClick={handleSave}
                                 disabled={!hasChanges || isSaving}
                                 className={cn(
-                                    'px-4 py-2 sm:px-8 sm:py-3 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2',
+                                    'rounded-lg px-4 py-2 font-medium transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none sm:px-8 sm:py-3',
                                     hasChanges
-                                        ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg shadow-blue-500/25'
-                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700 focus:ring-blue-500'
+                                        : 'cursor-not-allowed bg-gray-300 text-gray-500'
                                 )}
                             >
                                 {__('Save Changes', 'debug-suite')}
@@ -451,7 +458,7 @@ const Settings = () => {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

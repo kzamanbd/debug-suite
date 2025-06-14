@@ -8,6 +8,8 @@ export type DebugSuiteRoute = {
     title: string;
     path: string;
     element: JSX.Element;
+    className?: string;
+    icon?: string;
 };
 const routes: DebugSuiteRoute[] = [
     {

@@ -17,22 +17,22 @@ const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Elemen
     return (
         <div className={cn('space-y-6', className)}>
             {/* Header skeleton */}
-            <div className={skeleton('h-5 w-80 mb-4')}></div>
+            <div className={skeleton('mb-4 h-5 w-80')}></div>
             {/* Action buttons skeleton */}
-            <div className="flex flex-wrap gap-4 mb-8">
+            <div className="mb-8 flex flex-wrap gap-4">
                 <div className={skeleton('h-10 w-32')}></div>
                 <div className={skeleton('h-10 w-36')}></div>
             </div>
             {/* Filter and controls skeleton */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+            <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div className={skeleton('h-6 w-48')}></div>
-                <div className="flex gap-3 items-center">
+                <div className="flex items-center gap-3">
                     <div className={skeleton('h-10 w-32')}></div>
                     <div className={skeleton('h-10 w-24')}></div>
                 </div>
             </div>
             {/* Table skeleton */}
-            <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+            <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                     <thead className="bg-gray-50 dark:bg-gray-900">
                         <tr>
