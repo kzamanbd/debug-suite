@@ -198,8 +198,6 @@ class ExampleClass {
  * @package DebugSuite
  */
 
-declare(strict_types=1);
-
 namespace DebugSuite\Interfaces;
 
 /**
