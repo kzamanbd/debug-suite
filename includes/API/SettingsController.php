@@ -86,12 +86,15 @@ class SettingsController extends RestController {
 	 */
 	public function get_settings( $request ): WP_REST_Response {
 		$constants = [
-			'wpDebug' => WP_DEBUG,
-			'wpDebugLog' => WP_DEBUG_LOG,
+			'wpDebug'        => WP_DEBUG,
+			'wpDebugLog'     => WP_DEBUG_LOG,
 			'wpDebugDisplay' => WP_DEBUG_DISPLAY,
+			'publicRootPath' => ABSPATH,
+			'filesUrl'       => content_url(),
 		];
-		$settings = get_option( 'debug_suite_settings', [] );
-		$settings = array_merge( $constants, $settings );
+		$settings  = get_option( 'debug_suite_settings', [] );
+		$settings  = array_merge( $constants, $settings );
+
 		return new WP_REST_Response( $settings, 200 );
 	}
 
@@ -108,29 +111,25 @@ class SettingsController extends RestController {
 		if ( ! is_array( $params ) ) {
 			return new WP_REST_Response( [ 'error' => __( 'Invalid settings data.', 'debug-suite' ) ], 400 );
 		}
-		$settings  = [];
 		$file_path = ABSPATH . 'wp-config.php';
 		// Sanitize and validate settings here as needed.
 		if ( ! file_exists( $file_path ) || ! is_writable( $file_path ) ) {
 			return new WP_REST_Response( [ 'error' => __( 'Cannot write to wp-config.php file.', 'debug-suite' ) ], 500 );
 		}
 
-		$is_debug         = $params['debug'] ?? 'true';
-		$wp_debug_log     = $params['wp_debug_log'] ?? 'true';
+		$is_debug         = $params['debug'] ?? 'false';
+		$wp_debug_log     = $params['wp_debug_log'] ?? 'false';
 		$wp_debug_display = $params['wp_debug_display'] ?? 'true';
 
 		// Default debug settings
-		$defaults = [
+		$constants = [
 			'WP_DEBUG'         => $is_debug,
 			'WP_DEBUG_LOG'     => $wp_debug_log,
 			'WP_DEBUG_DISPLAY' => $wp_debug_display,
 		];
 
-		$settings = array_merge( $defaults, $settings );
-
 		$contents = file_get_contents( $file_path );
-
-		foreach ( $settings as $constant => $value ) {
+		foreach ( $constants as $constant => $value ) {
 			// Regex to match existing define statements
 			$pattern     = "/define\s*\(\s*['\"]{$constant}['\"]\s*,\s*.*?\);/";
 			$replacement = "define('{$constant}', {$value});";
