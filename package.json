@@ -4,18 +4,23 @@
     "description": "WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.",
     "main": "index.js",
     "scripts": {
-        "dev": "wp-scripts start --progress",
-        "build": "wp-scripts build",
+        "dev": "concurrently \"npm run tailwind:watch\" \"npm run wp:dev\"",
+        "wp:dev": "wp-scripts start --progress",
+        "wp:build": "wp-scripts build --progress",
+        "build": "npm run wp:build && npm run tailwind:build",
+        "tailwind:watch": "tailwindcss -i ./admin/main.css -o ./assets/css/debug-suite-admin.css --watch --minify",
+        "tailwind:build": "tailwindcss -i ./admin/main.css -o ./assets/css/debug-suite-admin.css --minify",
         "type-check": "tsc --noEmit",
-        "makepot": "wp i18n make-pot --domain='debug-suite' --include='assets/js,includes,templates,debug-suite.php' . --headers='{\"Report-Msgid-Bugs-To\":\"https://kzaman.me/contact/\"}' --file-comment=\"Copyright (c) $(date +'%Y') Kamruzzaman. All Rights Reserved.\" languages/debug-suite.pot",
         "lint": "wp-scripts lint-js",
         "format": "wp-scripts format",
-        "lint:css": "wp-scripts lint-style"
+        "lint:css": "wp-scripts lint-style",
+        "makepot": "wp i18n make-pot --domain='debug-suite' --include='assets/js,includes,templates,debug-suite.php' . --headers='{\"Report-Msgid-Bugs-To\":\"https://kzaman.me/contact/\"}' --file-comment=\"Copyright (c) $(date +'%Y') Kamruzzaman. All Rights Reserved.\" languages/debug-suite.pot"
     },
     "author": "kamruzzaman",
     "license": "MIT",
     "dependencies": {
         "@headlessui/react": "^2.2.4",
+        "@tailwindcss/forms": "^0.5.10",
         "@wordpress/api-fetch": "^7.25.0",
         "@wordpress/data": "^10.25.0",
         "@wordpress/dom-ready": "^4.25.0",
@@ -25,13 +30,13 @@
         "tailwind-merge": "^3.3.1"
     },
     "devDependencies": {
-        "@tailwindcss/postcss": "^4.1.10",
-        "@types/react": "^19.1.8",
-        "@types/react-dom": "^19.1.6",
+        "@tailwindcss/cli": "^4.1.10",
+        "@types/react": "^18.3.23",
+        "@types/react-dom": "^18.3.7",
         "@types/react-router-dom": "^5.3.3",
         "@wordpress/scripts": "^30.18.0",
+        "concurrently": "^9.1.2",
         "eslint-config-prettier": "^10.1.5",
-        "postcss": "^8.5.5",
         "prettier": "^3.5.3",
         "tailwindcss": "^4.1.10",
         "typescript": "^5.8.3"

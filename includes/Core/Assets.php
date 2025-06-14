@@ -54,7 +54,7 @@ class Assets implements Hookable {
 			$admin_assets = require $admin_assets;
 
 			$styles['debug-suite-admin'] = [
-				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/js/debug-suite-admin.css',
+				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/css/debug-suite-admin.css',
 				'version' => $admin_assets['version'],
 				'deps'    => [], // CSS files typically don't need JavaScript dependencies
 			];
