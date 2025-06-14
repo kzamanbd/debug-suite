@@ -30,9 +30,6 @@ Every PHP file should start with a file header DocBlock:
 
 ```php
 <?php
-
-declare(strict_types=1);
-
 /**
  * Short description of this file.
  *
@@ -53,7 +50,7 @@ Classes should have a DocBlock with at least a short description and `@since` ta
  * @since 1.0.0
  */
 class ExampleClass {
-    // Class implementation
+    // ...
 }
 ```
 
@@ -66,7 +63,6 @@ Properties should have a DocBlock with at least a short description, `@since` ta
  * Property description.
  *
  * @since 1.0.0
- *
  * @var string
  */
 private string $property;
@@ -81,16 +77,11 @@ Methods should have a DocBlock with at least a short description, `@since` tag, 
  * Method description.
  *
  * @since 1.0.0
- *
  * @param string $param1 Description of the first parameter.
- * @param int    $param2 Description of the second parameter.
- *
  * @return string|null Description of the return value.
- *
- * @throws \Exception When something goes wrong.
  */
-public function exampleMethod(string $param1, int $param2): ?string {
-    // Method implementation
+public function exampleMethod(string $param1): ?string {
+    // ...
 }
 ```
 
@@ -102,12 +93,10 @@ Interfaces should have a DocBlock with at least a short description and `@since`
 /**
  * Interface description.
  *
- * More detailed description if needed.
- *
  * @since 1.0.0
  */
 interface ExampleInterface {
-    // Interface methods
+    // ...
 }
 ```
 
@@ -136,7 +125,6 @@ For multiple `@param` tags, align the variable names and descriptions:
 /**
  * @param string $param1   Description of the first parameter.
  * @param int    $param2   Description of the second parameter.
- * @param bool   $isActive Description of the third parameter.
  */
 ```
 
