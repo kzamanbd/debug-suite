@@ -1,7 +1,7 @@
 import domReady from '@wordpress/dom-ready';
 import { createRoot } from '@wordpress/element';
 import App from './App';
-import activeMenu from './utils/menu';
+import activeMenuLink from './utils/menu';
 
 domReady(() => {
     const container = document.getElementById('debug-suite-admin-app');
@@ -11,4 +11,4 @@ domReady(() => {
     }
 });
 
-activeMenu('debug-suite');
+activeMenuLink('debug-suite');

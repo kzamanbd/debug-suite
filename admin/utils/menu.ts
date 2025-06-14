@@ -1,4 +1,4 @@
-function menuFix(slug: string): void {
+function activeMenuLink(slug: string): void {
     const menuRoot = document.querySelector(`#toplevel_page_${slug}`) as HTMLElement | null;
     if (!menuRoot) return;
 
@@ -28,11 +28,15 @@ function menuFix(slug: string): void {
     // Highlight current submenu item on page load
     const submenuLinks = menuRoot.querySelectorAll<HTMLAnchorElement>('ul.wp-submenu a');
     submenuLinks.forEach((link) => {
-        if (link.getAttribute('href') === currentPath) {
+        let href = link.getAttribute('href');
+        if (href?.endsWith('#')) {
+            href = href.substring(0, href.length - 1);
+        }
+        if (href === currentPath) {
             const parentLi = link.closest('li');
             if (parentLi) parentLi.classList.add('current');
         }
     });
 }
 
-export default menuFix;
+export default activeMenuLink;
