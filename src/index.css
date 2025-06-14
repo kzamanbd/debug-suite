@@ -1,0 +1,50 @@
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme) important;
+
+#debug-suite-admin-app {
+    @import 'tailwindcss/preflight.css' layer(base) important;
+    @import 'tailwindcss/utilities.css' layer(utilities) important;
+    @layer base {
+        *,
+        ::after,
+        ::before,
+        ::backdrop,
+        ::file-selector-button {
+            border-color: var(--color-gray-200, currentColor);
+        }
+        .dark *,
+        .dark ::after,
+        .dark ::before,
+        .dark ::backdrop,
+        .dark ::file-selector-button {
+            border-color: var(--color-gray-600, currentColor);
+        }
+        button:not(:disabled),
+        [role='button']:not(:disabled) {
+            @apply cursor-pointer;
+        }
+        h1 {
+            @apply text-4xl font-semibold;
+        }
+        h2 {
+            @apply text-3xl font-semibold;
+        }
+        h3 {
+            @apply text-2xl font-semibold;
+        }
+        h4 {
+            @apply text-xl font-semibold;
+        }
+        h5 {
+            @apply text-lg font-semibold;
+        }
+        h6 {
+            @apply text-base font-semibold;
+        }
+    }
+}
+
+@plugin '@tailwindcss/forms';
+
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant hover (&:hover);

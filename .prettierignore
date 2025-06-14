@@ -1,0 +1,14 @@
+# Dependencies
+/node_modules
+
+# Build files
+/build
+/assets/js
+
+# Vendor
+/vendor
+
+# Other generated files
+*.min.js
+*.min.css
+*.asset.php

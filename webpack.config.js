@@ -2,8 +2,8 @@ const defaults = require('@wordpress/scripts/config/webpack.config');
 const path = require('path');
 
 const entries = {
-    'debug-suite-admin': './admin/debug-suite-admin.tsx',
-}
+    'debug-suite-admin': './src/index.tsx'
+};
 
 module.exports = {
     ...defaults,
@@ -11,11 +11,14 @@ module.exports = {
     output: {
         ...defaults.output,
         path: path.resolve(__dirname, 'assets/js'),
-        filename: '[name].js',
+        filename: '[name].js'
     },
     resolve: {
         ...defaults.resolve,
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
+        alias: {
+            '@': path.resolve(__dirname, 'src')
+        }
     },
     externals: {
         react: 'React',
@@ -25,13 +28,13 @@ module.exports = {
         type: 'filesystem',
         allowCollectingMemory: true,
         buildDependencies: {
-            config: [__filename],
-        },
+            config: [__filename]
+        }
     },
     optimization: {
         ...defaults.optimization,
         moduleIds: 'deterministic',
         chunkIds: 'deterministic',
-        emitOnErrors: false,
-    },
+        emitOnErrors: false
+    }
 };

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Frontend service provider for registering frontend services.
  */
@@ -18,7 +19,6 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 	 * Services provided by this provider.
 	 */
 	protected $provides = array(
-		'frontend',
 		Frontend::class,
 	);
 
@@ -28,16 +28,9 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 	public function register( Container $container ): void {
 		// Register Frontend service
 		$container->singleton(
-			'frontend',
-			function ( Container $container ) {
-				return new Frontend();
-			}
-		);
-
-		$container->singleton(
 			Frontend::class,
 			function ( Container $container ) {
-				return $container->resolve( 'frontend' );
+				return new Frontend();
 			}
 		);
 
@@ -48,9 +41,7 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 	 * Boot services after all providers have been registered.
 	 */
 	public function boot( Container $container ): void {
-		// Frontend services are automatically initialized when resolved
-		// No additional booting required for frontend services
-
-		$this->mark_booted();
+		// Hook registration is now handled centrally by ServiceManager
+		// Nothing special needed here for frontend services
 	}
 }

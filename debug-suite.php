@@ -38,14 +38,15 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	wp_die( esc_html__( 'Missing Dependencies Detected [Debug Suite Plugin]', 'debug-suite' ) );
 }
 
+use DebugSuite\Admin\Admin;
 use DebugSuite\Core\Activator;
 use DebugSuite\Core\Deactivator;
 use DebugSuite\Core\Container;
 use DebugSuite\Core\ServiceManager;
+use DebugSuite\Frontend\Frontend;
 use DebugSuite\Providers\CoreServiceProvider;
 use DebugSuite\Providers\AdminServiceProvider;
 use DebugSuite\Providers\FrontendServiceProvider;
-use DebugSuite\Providers\ManagerServiceProvider;
 
 /**
  * Main class for the Debug Suite plugin.
@@ -123,7 +124,6 @@ final class DebugSuite {
 			CoreServiceProvider::class,
 			AdminServiceProvider::class,
 			FrontendServiceProvider::class,
-			ManagerServiceProvider::class,
 		];
 
 		$this->service_manager->register_providers( $providers );
@@ -142,11 +142,11 @@ final class DebugSuite {
 
 		// Initialize admin functionality if in admin area
 		if ( is_admin() ) {
-			$this->container->resolve( 'admin' );
+			$this->container->resolve( Admin::class );
 		}
 
 		// Initialize frontend functionality
-		$this->container->resolve( 'frontend' );
+		$this->container->resolve( Frontend::class );
 	}
 
 	/**

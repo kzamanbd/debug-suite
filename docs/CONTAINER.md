@@ -90,8 +90,8 @@ $debug_suite = debug_suite();
 $container = debug_suite_container();
 
 // Resolve a service
-$admin = debug_suite_resolve('admin');
-$settings = debug_suite_resolve(DebugSuite\Admin\Settings::class);
+$admin = debug_suite_resolve(\DebugSuite\Admin\Admin::class);
+$assets = debug_suite_resolve(\DebugSuite\Core\Assets::class);
 ```
 
 ### Creating a Manager Class
@@ -172,17 +172,12 @@ use DebugSuite\Core\Container;
 class MyServiceProvider extends AbstractServiceProvider {
     
     protected $provides = array(
-        'my_service',
         MyService::class,
     );
     
     public function register(Container $container): void {
-        $container->singleton('my_service', function($container) {
-            return new MyService();
-        });
-        
         $container->singleton(MyService::class, function($container) {
-            return $container->resolve('my_service');
+            return new MyService();
         });
         
         $this->mark_registered();
@@ -190,7 +185,7 @@ class MyServiceProvider extends AbstractServiceProvider {
     
     public function boot(Container $container): void {
         // Initialize the service properly
-        $service = $container->resolve('my_service');
+        $service = $container->resolve(MyService::class);
         $service->init(); // This adds WordPress hooks at the right time
         
         $this->mark_booted();
@@ -202,15 +197,16 @@ class MyServiceProvider extends AbstractServiceProvider {
 
 ```php
 // In a service provider's register method
-$container->bind('service_name', function($container) {
-    return new ServiceClass($container->resolve('dependency'));
+// Binding with dependencies
+$container->bind(ServiceClass::class, function($container) {
+    return new ServiceClass($container->resolve(DependencyClass::class));
 });
 
 // Singleton binding
-$container->singleton('singleton_service', ServiceClass::class);
+$container->singleton(ServiceClass::class, ServiceClass::class);
 
 // Instance binding
-$container->instance('existing_instance', $existing_object);
+$container->instance(ServiceClass::class, $existing_object);
 ```
 
 ### Auto-Resolution
@@ -281,7 +277,7 @@ class DebugProviderManager {
 }
 
 // Usage through container
-$manager = debug_suite_resolve('debug_provider_manager');
+$manager = debug_suite_resolve(DebugProviderManager::class);
 $manager->register_provider('my_provider', $provider);
 ```
 
@@ -299,12 +295,8 @@ use DebugSuite\Managers\DebugProviderManager;
 class ManagerServiceProvider extends AbstractServiceProvider {
     
     public function register(Container $container): void {
-        $container->singleton('debug_provider_manager', function() {
+        $container->singleton(DebugProviderManager::class, function() {
             return DebugProviderManager::get_instance();
-        });
-        
-        $container->singleton(DebugProviderManager::class, function($container) {
-            return $container->resolve('debug_provider_manager');
         });
         
         $this->mark_registered();
@@ -345,52 +337,125 @@ class ManagerServiceProvider extends AbstractServiceProvider {
 6. **Separate Construction from Initialization**: Keep constructors side-effect free
 7. **Initialize in Service Providers**: Use the `boot()` method to call `init()` on services
 8. **Trust the Container**: Don't add unnecessary initialization checks for singleton services
-9. **Register Both Ways**: Register services by both name and class for flexibility
+9. **Use Class Names for Registration**: Register services using class names instead of string aliases for better type safety and IDE support
+10. **Avoid Dual Registration**: Register each service only once using its class name to eliminate redundancy
 
-## Common Patterns
+### Simplified Service Registration Pattern
 
-### Service with Dependencies
+The Debug Suite uses a simplified approach where each service is registered once using its class name:
 
 ```php
-class MyComplexService {
-    private $settings;
-    private $assets;
+// ✅ Good - Single registration per service
+protected $provides = array(
+    Assets::class,
+    I18n::class,
+);
+
+public function register(Container $container): void {
+    $container->singleton(Assets::class, function() {
+        return new Assets();
+    });
     
-    public function __construct(Settings $settings, Assets $assets) {
-        $this->settings = $settings;
-        $this->assets = $assets;
-    }
-    
-    public function init(): void {
-        // Use dependencies to set up WordPress hooks
-        add_action('init', [$this, 'on_init']);
-    }
+    $container->singleton(I18n::class, function() {
+        return new I18n();
+    });
 }
 
-// In service provider
-$container->singleton('complex_service', function($container) {
-    return new MyComplexService(
-        $container->resolve('settings'),
-        $container->resolve('assets')
-    );
-});
+// ✅ Resolve using class names
+$assets = $container->resolve(Assets::class);
+$i18n = $container->resolve(I18n::class);
 ```
 
-### Manager with Container Access
+**Avoid dual registration patterns:**
 
 ```php
-class DatabaseManager {
-    use Singleton;
+// ❌ Avoid - Redundant dual registration
+protected $provides = array(
+    'assets',        // String alias
+    Assets::class,   // Class name
+);
+
+public function register(Container $container): void {
+    // Unnecessary - creates two bindings for same service
+    $container->singleton('assets', function() {
+        return new Assets();
+    });
     
-    protected function init(): void {
-        // Access other services through the container
-        $this->logger = debug_suite_resolve('logger');
-        $this->settings = debug_suite_resolve('settings');
+    $container->singleton(Assets::class, function($container) {
+        return $container->resolve('assets'); // Redundant indirection
+    });
+}
+```
+
+### Benefits of Simplified Registration
+
+The simplified service registration pattern provides several advantages:
+
+1. **Reduced Code Duplication**: Eliminates 50% of container registrations by removing redundant string aliases
+2. **Better Type Safety**: Using class names provides IDE autocomplete, type checking, and refactoring support
+3. **Cleaner Architecture**: One canonical way to register and resolve each service
+4. **Easier Maintenance**: Only one binding to maintain per service, reducing complexity
+5. **Consistent Patterns**: All services follow the same registration and resolution pattern
+6. **Performance**: Slight performance improvement by eliminating unnecessary resolver indirection
+7. **Less Error-Prone**: Reduces risk of typos in string identifiers and inconsistent aliases
+
+### Migration from Dual Registration
+
+If you have existing service providers using the dual registration pattern, here's how to migrate:
+
+**Before (Dual Registration):**
+
+```php
+class OldServiceProvider extends AbstractServiceProvider {
+    protected $provides = array(
+        'my_service',
+        MyService::class,
+    );
+    
+    public function register(Container $container): void {
+        $container->singleton('my_service', function() {
+            return new MyService();
+        });
+        
+        $container->singleton(MyService::class, function($container) {
+            return $container->resolve('my_service');
+        });
     }
     
-    public function get_connection() {
-        $host = $this->settings->get('db_host');
-        // ... connection logic
+    public function boot(Container $container): void {
+        $service = $container->resolve('my_service');
+        $service->init();
     }
 }
+```
+
+**After (Simplified Registration):**
+
+```php
+class NewServiceProvider extends AbstractServiceProvider {
+    protected $provides = array(
+        MyService::class,
+    );
+    
+    public function register(Container $container): void {
+        $container->singleton(MyService::class, function() {
+            return new MyService();
+        });
+    }
+    
+    public function boot(Container $container): void {
+        $service = $container->resolve(MyService::class);
+        $service->init();
+    }
+}
+```
+
+**Update your resolution calls:**
+
+```php
+// Before
+$service = debug_suite_resolve('my_service');
+
+// After  
+$service = debug_suite_resolve(MyService::class);
 ```

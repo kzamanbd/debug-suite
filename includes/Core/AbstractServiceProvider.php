@@ -23,11 +23,6 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	protected $registered = false;
 
 	/**
-	 * Whether the provider has been booted.
-	 */
-	protected $booted = false;
-
-	/**
 	 * Register services with the container.
 	 */
 	abstract public function register( Container $container ): void;
@@ -38,7 +33,6 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	 */
 	public function boot( Container $container ): void {
 		// Default implementation - override in child classes
-		$this->booted = true;
 	}
 
 	/**
@@ -56,23 +50,9 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	}
 
 	/**
-	 * Check if the provider has been booted.
-	 */
-	public function is_booted(): bool {
-		return $this->booted;
-	}
-
-	/**
 	 * Mark the provider as registered.
 	 */
 	protected function mark_registered(): void {
 		$this->registered = true;
-	}
-
-	/**
-	 * Mark the provider as booted.
-	 */
-	protected function mark_booted(): void {
-		$this->booted = true;
 	}
 }

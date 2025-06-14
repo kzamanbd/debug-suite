@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Service manager for handling service providers.
  */
@@ -6,11 +7,13 @@
 namespace DebugSuite\Core;
 
 use DebugSuite\Interfaces\ServiceProviderInterface;
+use DebugSuite\Interfaces\Hookable;
 
 /**
  * Service Manager for managing service providers and the container.
  */
 class ServiceManager {
+
 
 	/**
 	 * Container instance.
@@ -25,13 +28,6 @@ class ServiceManager {
 	 * @var ServiceProviderInterface[]
 	 */
 	private $providers = array();
-
-	/**
-	 * Booted service providers.
-	 *
-	 * @var ServiceProviderInterface[]
-	 */
-	private $booted_providers = array();
 
 	/**
 	 * Whether all providers have been booted.
@@ -86,11 +82,6 @@ class ServiceManager {
 		// Store the provider
 		$this->providers[ $provider_class ] = $provider;
 
-		// If we've already booted, boot this provider immediately.
-		if ( $this->booted ) {
-			$this->boot_provider( $provider );
-		}
-
 		return $provider;
 	}
 
@@ -117,9 +108,13 @@ class ServiceManager {
 			return;
 		}
 
+		// First, boot all providers (register their services)
 		foreach ( $this->providers as $provider ) {
 			$this->boot_provider( $provider );
 		}
+
+		// Then, centrally register hooks for all Hookable services
+		$this->register_all_hooks();
 
 		$this->booted = true;
 	}
@@ -132,18 +127,28 @@ class ServiceManager {
 	 * @return void
 	 */
 	private function boot_provider( ServiceProviderInterface $provider ): void {
-		$provider_class = get_class( $provider );
-
-		// Skip if already booted
-		if ( isset( $this->booted_providers[ $provider_class ] ) ) {
-			return;
-		}
-
-		// Boot the provider
+		// Simply boot the provider - no need for complex tracking
 		$provider->boot( $this->container );
+	}
 
-		// Mark as booted
-		$this->booted_providers[ $provider_class ] = $provider;
+	/**
+	 * Register hooks for all services that implement Hookable interface.
+	 *
+	 * @return void
+	 */
+	private function register_all_hooks(): void {
+		// Get all services from all providers
+		foreach ( $this->providers as $provider ) {
+			foreach ( $provider->provides() as $service_class ) {
+				if ( $this->container->has( $service_class ) ) {
+					$instance = $this->container->resolve( $service_class );
+
+					if ( $instance instanceof Hookable ) {
+						$instance->register_hooks();
+					}
+				}
+			}
+		}
 	}
 
 	/**
