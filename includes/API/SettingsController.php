@@ -34,9 +34,8 @@ class SettingsController extends RestController {
 	/**
 	 * Register the routes for settings.
 	 *
-	 * @since 1.0.0
-	 *
 	 * @return void
+	 * @since 1.0.0
 	 */
 	public function register_routes(): void {
 		register_rest_route(
@@ -52,6 +51,26 @@ class SettingsController extends RestController {
 					'methods'             => 'POST',
 					'callback'            => [ $this, 'update_settings' ],
 					'permission_callback' => [ $this, 'permissions_check' ],
+					'args'                => [
+						'debug'            => [
+							'type'        => 'string',
+							'default'     => 'false',
+							'description' => __( 'Enable or disable debugging mode.', 'debug-suite' ),
+							'enum'        => [ 'true', 'false' ],
+						],
+						'wp_debug_log'     => [
+							'type'        => 'string',
+							'default'     => 'false',
+							'description' => __( 'Enable or disable WP_DEBUG_LOG.', 'debug-suite' ),
+							'enum'        => [ 'true', 'false' ],
+						],
+						'wp_debug_display' => [
+							'type'        => 'string',
+							'default'     => 'false',
+							'description' => __( 'Enable or disable WP_DEBUG_DISPLAY.', 'debug-suite' ),
+							'enum'        => [ 'true', 'false' ],
+						],
+					],
 				],
 			]
 		);
@@ -66,7 +85,13 @@ class SettingsController extends RestController {
 	 * @since 1.0.0
 	 */
 	public function get_settings( $request ): WP_REST_Response {
+		$constants = [
+			'wpDebug' => WP_DEBUG,
+			'wpDebugLog' => WP_DEBUG_LOG,
+			'wpDebugDisplay' => WP_DEBUG_DISPLAY,
+		];
 		$settings = get_option( 'debug_suite_settings', [] );
+		$settings = array_merge( $constants, $settings );
 		return new WP_REST_Response( $settings, 200 );
 	}
 
@@ -83,8 +108,46 @@ class SettingsController extends RestController {
 		if ( ! is_array( $params ) ) {
 			return new WP_REST_Response( [ 'error' => __( 'Invalid settings data.', 'debug-suite' ) ], 400 );
 		}
+		$settings  = [];
+		$file_path = ABSPATH . 'wp-config.php';
 		// Sanitize and validate settings here as needed.
-		update_option( 'debug_suite_settings', $params );
-		return new WP_REST_Response( [ 'success' => true ], 200 );
+		if ( ! file_exists( $file_path ) || ! is_writable( $file_path ) ) {
+			return new WP_REST_Response( [ 'error' => __( 'Cannot write to wp-config.php file.', 'debug-suite' ) ], 500 );
+		}
+
+		$is_debug         = $params['debug'] ?? 'true';
+		$wp_debug_log     = $params['wp_debug_log'] ?? 'true';
+		$wp_debug_display = $params['wp_debug_display'] ?? 'true';
+
+		// Default debug settings
+		$defaults = [
+			'WP_DEBUG'         => $is_debug,
+			'WP_DEBUG_LOG'     => $wp_debug_log,
+			'WP_DEBUG_DISPLAY' => $wp_debug_display,
+		];
+
+		$settings = array_merge( $defaults, $settings );
+
+		$contents = file_get_contents( $file_path );
+
+		foreach ( $settings as $constant => $value ) {
+			// Regex to match existing define statements
+			$pattern     = "/define\s*\(\s*['\"]{$constant}['\"]\s*,\s*.*?\);/";
+			$replacement = "define('{$constant}', {$value});";
+
+			if ( preg_match( $pattern, $contents ) ) {
+				$contents = preg_replace( $pattern, $replacement, $contents );
+			} else {
+				// If not found, add it before the "stop editing" line
+				$insertion_point = strpos( $contents, '/* That\'s all, stop editing!' );
+				if ( $insertion_point !== false ) {
+					$contents = substr_replace( $contents, $replacement . "\n", $insertion_point, 0 );
+				}
+			}
+		}
+		// Write the updated contents back to the file
+		$is_update = file_put_contents( $file_path, $contents ) !== false;
+
+		return rest_ensure_response( [ 'success' => $is_update ] );
 	}
 }

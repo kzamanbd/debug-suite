@@ -1,6 +1,10 @@
 import CustomSwitch from '@/components/CustomSwitch';
+import SettingsSkeleton from '@/components/SettingsSkeleton';
 import { cn } from '@/utils/cn';
-import { useState } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
+import { useEffect, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { toast } from 'react-toastify';
 
 interface SettingsState {
     fileManagerAccess: string;
@@ -9,25 +13,54 @@ interface SettingsState {
     defaultViewType: string;
     enableTrash: boolean;
     hideHtaccess: boolean;
-    enableDebug: boolean;
     logQueries: boolean;
     logErrors: boolean;
+    wpDebug: boolean;
+    wpDebugLog: boolean;
+    wpDebugDisplay: boolean;
 }
 
-const Settings = () => {
-    const [settings, setSettings] = useState<SettingsState>({
-        fileManagerAccess: 'administrator',
-        publicRootPath: '/wp-content/uploads/',
-        filesUrl: 'https://example.com/wp-content/uploads/',
-        defaultViewType: 'grid',
-        enableTrash: true,
-        hideHtaccess: true,
-        enableDebug: false,
-        logQueries: false,
-        logErrors: true
-    });
+const defaultSettings: SettingsState = {
+    fileManagerAccess: 'administrator',
+    publicRootPath: '/wp-content/uploads/',
+    filesUrl: 'https://example.com/wp-content/uploads/',
+    defaultViewType: 'grid',
+    enableTrash: true,
+    hideHtaccess: true,
+    logQueries: false,
+    logErrors: true,
+    wpDebug: false,
+    wpDebugLog: false,
+    wpDebugDisplay: false
+};
 
+const Settings = () => {
+    const [settings, setSettings] = useState<SettingsState>(defaultSettings);
     const [hasChanges, setHasChanges] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchSettings = async () => {
+        try {
+            setIsLoading(true);
+            const fetched = await apiFetch({ path: '/debug-suite/v1/settings' });
+            if (fetched) {
+                setSettings((prev) => ({
+                    ...prev,
+                    ...fetched
+                }));
+            }
+        } catch (error) {
+            toast.error(__('Failed to fetch settings.', 'debug-suite'));
+        } finally {
+            setIsLoading(false)
+        }
+    };
+
+    // Fetch settings on component mount
+    useEffect(() => {
+        fetchSettings();
+    }, []);
 
     // Accepts: (field: keyof SettingsState, value: string | boolean)
     const handleInputChange = (field: keyof SettingsState, value: string | boolean) => {
@@ -38,404 +71,498 @@ const Settings = () => {
         setHasChanges(true);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         // Save logic here
-        console.log('Saving settings:', settings);
-        setHasChanges(false);
+        if (!hasChanges) {
+            toast.info(__('No changes to save.', 'debug-suite'));
+            return;
+        }
+        try {
+            setIsSaving(true);
+            await apiFetch({
+                path: '/debug-suite/v1/settings',
+                method: 'POST',
+                data: {
+                    debug: settings.wpDebug.toString(),
+                    debug_log: settings.wpDebugLog.toString(),
+                    debug_display: settings.wpDebugDisplay.toString()
+                }
+            });
+            toast.success(__('Settings saved successfully!'));
+        } catch (error) {
+            toast.error(__('Failed to save settings. Please try again.', 'debug-suite'));
+        } finally {
+            setHasChanges(false);
+            setIsSaving(false);
+        }
     };
 
     const handleReset = () => {
         // Reset to default values
-        setSettings({
-            fileManagerAccess: 'administrator',
-            publicRootPath: '/wp-content/uploads/',
-            filesUrl: 'https://example.com/wp-content/uploads/',
-            defaultViewType: 'grid',
-            enableTrash: true,
-            hideHtaccess: true,
-            enableDebug: false,
-            logQueries: false,
-            logErrors: true
-        });
+        setSettings(defaultSettings);
         setHasChanges(false);
     };
 
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
-            <div className="max-w-4xl mx-auto">
-                {/* Header */}
-                <div className="mb-6 sm:mb-8">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Settings</h1>
-                    <p className="text-gray-600 mt-2 text-sm sm:text-base">
-                        Configure your debug suite and file manager preferences
-                    </p>
-                </div>
+            {isLoading ? (
+                <SettingsSkeleton />
+            ) : (
+                <div className="max-w-4xl mx-auto">
+                    {/* Header */}
+                    <div className="mb-6 sm:mb-8">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                            {__('Settings', 'debug-suite')}
+                        </h1>
+                        <p className="text-gray-600 mt-2 text-sm sm:text-base">
+                            {__('Configure your debug suite and file manager preferences', 'debug-suite')}
+                        </p>
+                    </div>
 
-                {/* Settings Form */}
-                <div className="space-y-4 sm:space-y-6">
-                    {/* File Manager Settings */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="border-l-4 border-l-blue-500 px-4 sm:px-6 py-3 sm:py-4 bg-blue-50">
-                            <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                                <svg
-                                    className="w-6 h-6 mr-3 text-blue-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-                                    />
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M8 5a2 2 0 012-2h4a2 2 0 012 2v1H8V5z"
-                                    />
-                                </svg>
-                                File Manager Configuration
-                            </h2>
-                            <p className="text-sm text-blue-700 mt-1">
-                                Control access and behavior of the file manager
-                            </p>
-                        </div>
-
-                        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-                            {/* File Manager Access */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                                        Who can access File Manager?
-                                    </label>
-                                    <p className="text-xs text-gray-500">
-                                        Select user roles that can access the file manager
-                                    </p>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <select
-                                        value={settings.fileManagerAccess}
-                                        onChange={(e) => handleInputChange('fileManagerAccess', e.target.value)}
-                                        className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    {/* Settings Form */}
+                    <div className="space-y-4 sm:space-y-6">
+                        {/* File Manager Settings */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                            <div className="border-l-4 border-l-blue-500 px-4 sm:px-6 py-3 sm:py-4 bg-blue-50">
+                                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                                    <svg
+                                        className="w-6 h-6 mr-3 text-blue-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
                                     >
-                                        <option value="administrator">Administrator Only</option>
-                                        <option value="editor">Editor and Above</option>
-                                        <option value="author">Author and Above</option>
-                                        <option value="contributor">Contributor and Above</option>
-                                        <option value="subscriber">All Users</option>
-                                    </select>
-                                </div>
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+                                        />
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M8 5a2 2 0 012-2h4a2 2 0 012 2v1H8V5z"
+                                        />
+                                    </svg>
+                                    {__('File Manager Configuration', 'debug-suite')}
+                                </h2>
+                                <p className="text-sm text-blue-700 mt-1">
+                                    {__('Control access and behavior of the file manager', 'debug-suite')}
+                                </p>
                             </div>
 
-                            {/* Public Root Path */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                                        Public Root Path
-                                    </label>
-                                    <p className="text-xs text-gray-500">The root directory for file operations</p>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            value={settings.publicRootPath}
-                                            onChange={(e) => handleInputChange('publicRootPath', e.target.value)}
-                                            className="w-full px-4 py-2 sm:py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                            placeholder="/wp-content/uploads/"
-                                        />
-                                        <svg
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
+                            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                                {/* File Manager Access */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-900 mb-1">
+                                            {__('Who can access File Manager?', 'debug-suite')}
+                                        </label>
+                                        <p className="text-xs text-gray-500">
+                                            {__('Select user roles that can access the file manager', 'debug-suite')}
+                                        </p>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <select
+                                            value={settings.fileManagerAccess}
+                                            onChange={(e) => handleInputChange('fileManagerAccess', e.target.value)}
+                                            className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                         >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-                                            />
-                                        </svg>
+                                            <option value="administrator">
+                                                {__('Administrator Only', 'debug-suite')}
+                                            </option>
+                                            <option value="editor">{__('Editor and Above', 'debug-suite')}</option>
+                                            <option value="author">{__('Author and Above', 'debug-suite')}</option>
+                                            <option value="contributor">
+                                                {__('Contributor and Above', 'debug-suite')}
+                                            </option>
+                                            <option value="subscriber">{__('All Users', 'debug-suite')}</option>
+                                        </select>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Files URL */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-900 mb-1">Files URL</label>
-                                    <p className="text-xs text-gray-500">Base URL for accessing uploaded files</p>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <div className="relative">
-                                        <input
-                                            type="url"
-                                            value={settings.filesUrl}
-                                            onChange={(e) => handleInputChange('filesUrl', e.target.value)}
-                                            className="w-full px-4 py-2 sm:py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                            placeholder="https://example.com/wp-content/uploads/"
-                                        />
-                                        <svg
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                                            />
-                                        </svg>
+                                {/* Public Root Path */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-900 mb-1">
+                                            {__('Public Root Path', 'debug-suite')}
+                                        </label>
+                                        <p className="text-xs text-gray-500">
+                                            {__('The root directory for file operations', 'debug-suite')}
+                                        </p>
                                     </div>
-                                </div>
-                            </div>
-
-                            {/* Default View Type */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                                        Default View Type
-                                    </label>
-                                    <p className="text-xs text-gray-500">How files are displayed by default</p>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <div className="flex space-x-4">
-                                        <label className="flex items-center cursor-pointer">
+                                    <div className="md:col-span-2">
+                                        <div className="relative">
                                             <input
-                                                type="radio"
-                                                name="viewType"
-                                                value="grid"
-                                                checked={settings.defaultViewType === 'grid'}
-                                                onChange={(e) => handleInputChange('defaultViewType', e.target.value)}
-                                                className="sr-only"
+                                                type="text"
+                                                value={settings.publicRootPath}
+                                                onChange={(e) => handleInputChange('publicRootPath', e.target.value)}
+                                                className="w-full px-4 py-2 sm:py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                placeholder={__('/wp-content/uploads/', 'debug-suite')}
                                             />
-                                            <div
-                                                className={cn(
-                                                    'flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all',
-                                                    settings.defaultViewType === 'grid'
-                                                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                                                )}
+                                            <svg
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
                                             >
-                                                <svg
-                                                    className="w-5 h-5 mr-2"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Files URL */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-900 mb-1">
+                                            {__('Files URL', 'debug-suite')}
+                                        </label>
+                                        <p className="text-xs text-gray-500">
+                                            {__('Base URL for accessing uploaded files', 'debug-suite')}
+                                        </p>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <div className="relative">
+                                            <input
+                                                type="url"
+                                                value={settings.filesUrl}
+                                                onChange={(e) => handleInputChange('filesUrl', e.target.value)}
+                                                className="w-full px-4 py-2 sm:py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                placeholder={__(
+                                                    'https://example.com/wp-content/uploads/',
+                                                    'debug-suite'
+                                                )}
+                                            />
+                                            <svg
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Default View Type */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-900 mb-1">
+                                            {__('Default View Type', 'debug-suite')}
+                                        </label>
+                                        <p className="text-xs text-gray-500">
+                                            {__('How files are displayed by default', 'debug-suite')}
+                                        </p>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <div className="flex space-x-4">
+                                            <label className="flex items-center cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="viewType"
+                                                    value="grid"
+                                                    checked={settings.defaultViewType === 'grid'}
+                                                    onChange={(e) =>
+                                                        handleInputChange('defaultViewType', e.target.value)
+                                                    }
+                                                    className="sr-only"
+                                                />
+                                                <div
+                                                    className={cn(
+                                                        'flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all',
+                                                        settings.defaultViewType === 'grid'
+                                                            ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                                                    )}
                                                 >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                                                    />
-                                                </svg>
-                                                Grid View
+                                                    <svg
+                                                        className="w-5 h-5 mr-2"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                                                        />
+                                                    </svg>
+                                                    {__('Grid View', 'debug-suite')}
+                                                </div>
+                                            </label>
+                                            <label className="flex items-center cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="viewType"
+                                                    value="list"
+                                                    checked={settings.defaultViewType === 'list'}
+                                                    onChange={(e) =>
+                                                        handleInputChange('defaultViewType', e.target.value)
+                                                    }
+                                                    className="sr-only"
+                                                />
+                                                <div
+                                                    className={cn(
+                                                        'flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all',
+                                                        settings.defaultViewType === 'list'
+                                                            ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                                                    )}
+                                                >
+                                                    <svg
+                                                        className="w-5 h-5 mr-2"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                                                        />
+                                                    </svg>
+                                                    {__('List View', 'debug-suite')}
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Toggle Options */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                    <div className="space-y-4">
+                                        <h4 className="font-medium text-gray-900">
+                                            {__('File Operations', 'debug-suite')}
+                                        </h4>
+
+                                        <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                            <div>
+                                                <span className="text-sm font-medium text-gray-900">
+                                                    {__('Enable Trash', 'debug-suite')}
+                                                </span>
+                                                <p className="text-xs text-gray-500">
+                                                    {__(
+                                                        'Move deleted files to trash instead of permanent deletion',
+                                                        'debug-suite'
+                                                    )}
+                                                </p>
+                                            </div>
+                                            <div className="relative">
+                                                <CustomSwitch
+                                                    checked={settings.enableTrash}
+                                                    onChange={(e) =>
+                                                        handleInputChange('enableTrash', e.currentTarget.checked)
+                                                    }
+                                                    id="custom_switch_checkbox_enableTrash"
+                                                />
                                             </div>
                                         </label>
-                                        <label className="flex items-center cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                name="viewType"
-                                                value="list"
-                                                checked={settings.defaultViewType === 'list'}
-                                                onChange={(e) => handleInputChange('defaultViewType', e.target.value)}
-                                                className="sr-only"
-                                            />
-                                            <div
-                                                className={cn(
-                                                    'flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all',
-                                                    settings.defaultViewType === 'list'
-                                                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                                                )}
-                                            >
-                                                <svg
-                                                    className="w-5 h-5 mr-2"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                                                    />
-                                                </svg>
-                                                List View
+
+                                        <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                            <div>
+                                                <span className="text-sm font-medium text-gray-900">
+                                                    {__('Hide .htaccess Files', 'debug-suite')}
+                                                </span>
+                                                <p className="text-xs text-gray-500">
+                                                    {__('Hide system files from the file manager', 'debug-suite')}
+                                                </p>
+                                            </div>
+                                            <div className="relative">
+                                                <CustomSwitch
+                                                    checked={settings.hideHtaccess}
+                                                    onChange={(e) =>
+                                                        handleInputChange('hideHtaccess', e.currentTarget.checked)
+                                                    }
+                                                    id="custom_switch_checkbox_hideHtaccess"
+                                                />
                                             </div>
                                         </label>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Toggle Options */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                                <div className="space-y-4">
-                                    <h4 className="font-medium text-gray-900">File Operations</h4>
+                        {/* Debug Settings */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                            <div className="border-l-4 border-l-green-500 px-4 sm:px-6 py-3 sm:py-4 bg-green-50">
+                                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                                    <svg
+                                        className="w-6 h-6 mr-3 text-green-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                    </svg>
+                                    {__('Debug Configuration', 'debug-suite')}
+                                </h2>
+                                <p className="text-sm text-green-700 mt-1">
+                                    {__('Configure debugging and logging options', 'debug-suite')}
+                                </p>
+                            </div>
 
-                                    <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
-                                        <div>
-                                            <span className="text-sm font-medium text-gray-900">Enable Trash</span>
-                                            <p className="text-xs text-gray-500">
-                                                Move deleted files to trash instead of permanent deletion
-                                            </p>
-                                        </div>
-                                        <div className="relative">
-                                            <CustomSwitch
-                                                checked={settings.enableTrash}
-                                                onChange={(e) =>
-                                                    handleInputChange('enableTrash', e.currentTarget.checked)
-                                                }
-                                                id="custom_switch_checkbox_enableTrash"
-                                            />
-                                        </div>
-                                    </label>
+                            <div className="p-4 sm:p-6 space-y-4">
+                                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                    <div>
+                                        <span className="text-sm font-medium text-gray-900">
+                                            {__('Enable WP Debug', 'debug-suite')}
+                                        </span>
+                                        <p className="text-xs text-gray-500">
+                                            {__('Enable WordPress debug mode', 'debug-suite')}
+                                        </p>
+                                    </div>
+                                    <div className="relative">
+                                        <CustomSwitch
+                                            checked={settings.wpDebug}
+                                            onChange={(e) => handleInputChange('wpDebug', e.currentTarget.checked)}
+                                            id="custom_switch_checkbox_wpDebug"
+                                        />
+                                    </div>
+                                </label>
 
-                                    <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
-                                        <div>
-                                            <span className="text-sm font-medium text-gray-900">
-                                                Hide .htaccess Files
-                                            </span>
-                                            <p className="text-xs text-gray-500">
-                                                Hide system files from the file manager
-                                            </p>
-                                        </div>
-                                        <div className="relative">
-                                            <CustomSwitch
-                                                checked={settings.hideHtaccess}
-                                                onChange={(e) =>
-                                                    handleInputChange('hideHtaccess', e.currentTarget.checked)
-                                                }
-                                                id="custom_switch_checkbox_hideHtaccess"
-                                            />
-                                        </div>
-                                    </label>
-                                </div>
+                                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                    <div>
+                                        <span className="text-sm font-medium text-gray-900">
+                                            {__('Enable WP Debug Log', 'debug-suite')}
+                                        </span>
+                                        <p className="text-xs text-gray-500">
+                                            {__('Enable WordPress debug log', 'debug-suite')}
+                                        </p>
+                                    </div>
+                                    <div className="relative">
+                                        <CustomSwitch
+                                            checked={settings.wpDebugLog}
+                                            onChange={(e) => handleInputChange('wpDebugLog', e.currentTarget.checked)}
+                                            id="custom_switch_checkbox_wpDebugLog"
+                                        />
+                                    </div>
+                                </label>
+
+                                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                    <div>
+                                        <span className="text-sm font-medium text-gray-900">
+                                            {__('Enable WP Debug Display', 'debug-suite')}
+                                        </span>
+                                        <p className="text-xs text-gray-500">
+                                            {__('Enable WordPress debug mode', 'debug-suite')}
+                                        </p>
+                                    </div>
+                                    <div className="relative">
+                                        <CustomSwitch
+                                            checked={settings.wpDebugDisplay}
+                                            onChange={(e) =>
+                                                handleInputChange('wpDebugDisplay', e.currentTarget.checked)
+                                            }
+                                            id="custom_switch_checkbox_wpDebugDisplay"
+                                        />
+                                    </div>
+                                </label>
+
+                                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                    <div>
+                                        <span className="text-sm font-medium text-gray-900">
+                                            {__('Log Database Queries', 'debug-suite')}
+                                        </span>
+                                        <p className="text-xs text-gray-500">
+                                            {__('Record all database queries for analysis', 'debug-suite')}
+                                        </p>
+                                    </div>
+                                    <div className="relative">
+                                        <CustomSwitch
+                                            checked={settings.logQueries}
+                                            onChange={(e) => handleInputChange('logQueries', e.currentTarget.checked)}
+                                            id="custom_switch_checkbox_logQueries"
+                                        />
+                                    </div>
+                                </label>
+
+                                <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                                    <div>
+                                        <span className="text-sm font-medium text-gray-900">
+                                            {__('Log PHP Errors', 'debug-suite')}
+                                        </span>
+                                        <p className="text-xs text-gray-500">
+                                            {__('Capture and log PHP errors and warnings', 'debug-suite')}
+                                        </p>
+                                    </div>
+                                    <div className="relative">
+                                        <CustomSwitch
+                                            checked={settings.logErrors}
+                                            onChange={(e) => handleInputChange('logErrors', e.currentTarget.checked)}
+                                            id="custom_switch_checkbox_logErrors"
+                                        />
+                                    </div>
+                                </label>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Debug Settings */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="border-l-4 border-l-green-500 px-4 sm:px-6 py-3 sm:py-4 bg-green-50">
-                            <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                                <svg
-                                    className="w-6 h-6 mr-3 text-green-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                </svg>
-                                Debug Configuration
-                            </h2>
-                            <p className="text-sm text-green-700 mt-1">Configure debugging and logging options</p>
-                        </div>
-
-                        <div className="p-4 sm:p-6 space-y-4">
-                            <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                        {/* Action Buttons */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
                                 <div>
-                                    <span className="text-sm font-medium text-gray-900">Enable Debug Mode</span>
-                                    <p className="text-xs text-gray-500">Enable WordPress debug mode</p>
-                                </div>
-                                <div className="relative">
-                                    <CustomSwitch
-                                        checked={settings.enableDebug}
-                                        onChange={(e) => handleInputChange('enableDebug', e.currentTarget.checked)}
-                                        id="custom_switch_checkbox_enableDebug"
-                                    />
-                                </div>
-                            </label>
-
-                            <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
-                                <div>
-                                    <span className="text-sm font-medium text-gray-900">Log Database Queries</span>
-                                    <p className="text-xs text-gray-500">Record all database queries for analysis</p>
-                                </div>
-                                <div className="relative">
-                                    <CustomSwitch
-                                        checked={settings.logQueries}
-                                        onChange={(e) => handleInputChange('logQueries', e.currentTarget.checked)}
-                                        id="custom_switch_checkbox_logQueries"
-                                    />
-                                </div>
-                            </label>
-
-                            <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
-                                <div>
-                                    <span className="text-sm font-medium text-gray-900">Log PHP Errors</span>
-                                    <p className="text-xs text-gray-500">Capture and log PHP errors and warnings</p>
-                                </div>
-                                <div className="relative">
-                                    <CustomSwitch
-                                        checked={settings.logErrors}
-                                        onChange={(e) => handleInputChange('logErrors', e.currentTarget.checked)}
-                                        id="custom_switch_checkbox_logErrors"
-                                    />
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
-                            <div>
-                                {hasChanges && (
-                                    <p className="text-sm text-amber-600 flex items-center">
-                                        <svg
-                                            className="w-4 h-4 mr-2"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                                            />
-                                        </svg>
-                                        You have unsaved changes
-                                    </p>
-                                )}
-                            </div>
-                            <div className="flex space-x-3">
-                                <button
-                                    onClick={handleReset}
-                                    className="px-4 py-2 sm:px-6 sm:py-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium"
-                                >
-                                    Reset to Defaults
-                                </button>
-                                <button
-                                    onClick={handleSave}
-                                    disabled={!hasChanges}
-                                    className={cn(
-                                        'px-4 py-2 sm:px-8 sm:py-3 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2',
-                                        hasChanges
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg shadow-blue-500/25'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    {hasChanges && (
+                                        <p className="text-sm text-amber-600 flex items-center">
+                                            <svg
+                                                className="w-4 h-4 mr-2"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                                                />
+                                            </svg>
+                                            {__('You have unsaved changes', 'debug-suite')}
+                                        </p>
                                     )}
-                                >
-                                    Save Changes
-                                </button>
+                                </div>
+                                <div className="flex space-x-3">
+                                    <button
+                                        onClick={handleReset}
+                                        className="px-4 py-2 sm:px-6 sm:py-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium"
+                                    >
+                                        {__('Reset to Defaults', 'debug-suite')}
+                                    </button>
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={!hasChanges || isSaving}
+                                        className={cn(
+                                            'px-4 py-2 sm:px-8 sm:py-3 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2',
+                                            hasChanges
+                                                ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg shadow-blue-500/25'
+                                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        )}
+                                    >
+                                        {__('Save Changes', 'debug-suite')}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

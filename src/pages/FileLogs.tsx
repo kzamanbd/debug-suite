@@ -1,4 +1,5 @@
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { Link } from 'react-router-dom';
 
 interface LogEntry {
@@ -60,9 +61,9 @@ const FileLogs = () => {
 
     return (
         <>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">File Logs Overview</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">{__('File Logs Overview', 'debug-suite')}</h1>
             <p className="text-gray-600 mb-6">
-                Welcome to the File Logs section. Choose an option below to get started.
+                {__('Welcome to the File Logs section. Choose an option below to get started.', 'debug-suite')}
             </p>
 
             <div className="flex flex-wrap gap-4 mb-8">
@@ -70,38 +71,38 @@ const FileLogs = () => {
                     to="/file-logs"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition-colors"
                 >
-                    <span role="img" aria-label="View">
+                    <span role="img" aria-label={__('View', 'debug-suite')}>
                         📄
                     </span>{' '}
-                    View Logs
+                    {__('View Logs', 'debug-suite')}
                 </Link>
                 <Link
                     to="/file-logs/manage"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gray-100 text-gray-800 font-medium shadow hover:bg-gray-200 transition-colors"
                 >
-                    <span role="img" aria-label="Manage">
+                    <span role="img" aria-label={__('Manage', 'debug-suite')}>
                         ⚙️
                     </span>{' '}
-                    Manage Logs
+                    {__('Manage Logs', 'debug-suite')}
                 </Link>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                <h2 className="text-lg font-semibold text-gray-900">Recent Log Entries</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{__('Recent Log Entries', 'debug-suite')}</h2>
                 <div className="flex gap-3 items-center">
                     <select
                         value={selectedLevel}
                         onChange={(e) => setSelectedLevel(e.target.value)}
                         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
                     >
-                        <option value="all">All Levels</option>
-                        <option value="error">Error</option>
-                        <option value="warning">Warning</option>
-                        <option value="info">Info</option>
-                        <option value="debug">Debug</option>
+                        <option value="all">{__('All Levels', 'debug-suite')}</option>
+                        <option value="error">{__('Error', 'debug-suite')}</option>
+                        <option value="warning">{__('Warning', 'debug-suite')}</option>
+                        <option value="info">{__('Info', 'debug-suite')}</option>
+                        <option value="debug">{__('Debug', 'debug-suite')}</option>
                     </select>
                     <button className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors text-sm">
-                        Clear Logs
+                        {__('Clear Logs', 'debug-suite')}
                     </button>
                 </div>
             </div>
@@ -110,17 +111,25 @@ const FileLogs = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Timestamp</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Level</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Message</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">File</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Timestamp', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Level', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Message', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('File', 'debug-suite')}
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {filteredLogs.length === 0 ? (
                             <tr>
                                 <td colSpan={4} className="text-center py-8 text-gray-400 text-sm">
-                                    No logs found for the selected level.
+                                    {__('No logs found for the selected level.', 'debug-suite')}
                                 </td>
                             </tr>
                         ) : (

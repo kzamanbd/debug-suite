@@ -58,6 +58,7 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
     - Maintain code quality with ESLint static analysis
 
 4. **Tailwind CSS v4**:
+
     - Use Tailwind CSS v4 with the Oxide engine for styling
     - Follow utility-first CSS approach with Tailwind classes
     - Use `@tailwindcss/postcss` for PostCSS integration
@@ -65,6 +66,12 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
     - Maintain consistent spacing and sizing using Tailwind's design system
     - Utilize Tailwind v4's CSS variables system for theme customization
     - Apply responsive design using Tailwind's breakpoint utilities
+
+5. **React Component String internationalization**:
+
+    - Use `@wordpress/i18n` for string internationalization
+    - Use `__()` and `_x()` functions for translating strings
+    - Ensure all user-facing strings are translatable
 
 ## Architecture Guidelines
 

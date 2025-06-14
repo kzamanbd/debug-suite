@@ -1,4 +1,5 @@
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 interface LogEntry {
     id: number;
@@ -67,8 +68,10 @@ const ViewLogs = () => {
 
     return (
         <>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">View File Logs</h1>
-            <p className="text-gray-600 mb-6">View and search through your application's log files.</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">{__('View File Logs', 'debug-suite')}</h1>
+            <p className="text-gray-600 mb-6">
+                {__("View and search through your application's log files.", 'debug-suite')}
+            </p>
 
             <div className="flex gap-3 mb-6">
                 <a
@@ -79,7 +82,7 @@ const ViewLogs = () => {
                         window.location.hash = '#/file-logs';
                     }}
                 >
-                    ← Back to Overview
+                    {'\u2190'} {__('Back to Overview', 'debug-suite')}
                 </a>
                 <a
                     href="#/file-logs/manage"
@@ -89,14 +92,14 @@ const ViewLogs = () => {
                         window.location.hash = '#/file-logs/manage';
                     }}
                 >
-                    ⚙️ Manage Logs
+                    {'\u2699\ufe0f'} {__('Manage Logs', 'debug-suite')}
                 </a>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
                 <div className="flex items-center gap-2">
                     <label htmlFor="log-level-filter" className="text-sm font-medium text-gray-700">
-                        Filter by Level:
+                        {__('Filter by Level:', 'debug-suite')}
                     </label>
                     <select
                         id="log-level-filter"
@@ -104,23 +107,23 @@ const ViewLogs = () => {
                         onChange={(e) => setSelectedLevel(e.target.value)}
                         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
                     >
-                        <option value="all">All Levels</option>
-                        <option value="error">Error</option>
-                        <option value="warning">Warning</option>
-                        <option value="info">Info</option>
-                        <option value="debug">Debug</option>
+                        <option value="all">{__('All Levels', 'debug-suite')}</option>
+                        <option value="error">{__('Error', 'debug-suite')}</option>
+                        <option value="warning">{__('Warning', 'debug-suite')}</option>
+                        <option value="info">{__('Info', 'debug-suite')}</option>
+                        <option value="debug">{__('Debug', 'debug-suite')}</option>
                     </select>
                 </div>
                 <div className="flex items-center gap-2">
                     <label htmlFor="search-logs" className="text-sm font-medium text-gray-700">
-                        Search:
+                        {__('Search:', 'debug-suite')}
                     </label>
                     <input
                         id="search-logs"
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Search logs..."
+                        placeholder={__('Search logs...', 'debug-suite')}
                         className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm w-56"
                     />
                 </div>
@@ -130,18 +133,28 @@ const ViewLogs = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Timestamp</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Level</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Message</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">File</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Line</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Timestamp', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Level', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Message', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('File', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Line', 'debug-suite')}
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {filteredLogs.length === 0 ? (
                             <tr>
                                 <td colSpan={5} className="text-center py-8 text-gray-400 text-sm">
-                                    No logs found matching your criteria.
+                                    {__('No logs found matching your criteria.', 'debug-suite')}
                                 </td>
                             </tr>
                         ) : (
@@ -169,7 +182,8 @@ const ViewLogs = () => {
 
             <div className="mt-6">
                 <p className="text-sm text-gray-700">
-                    <strong>Total logs:</strong> {filteredLogs.length} of {logs.length}
+                    <strong>{__('Total logs:', 'debug-suite')}</strong> {filteredLogs.length} {__('of', 'debug-suite')}{' '}
+                    {logs.length}
                 </p>
             </div>
         </>
