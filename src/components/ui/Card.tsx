@@ -8,7 +8,7 @@
 import { cn } from '@/utils/cn';
 
 interface CardProps {
-    children: JSX.Element;
+    children: JSX.Element | JSX.Element[];
     className?: string;
 }
 

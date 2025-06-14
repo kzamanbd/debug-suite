@@ -1,7 +1,8 @@
+import FileLogsSkeleton from '@/components/FileLogsSkeleton';
+import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Link } from 'react-router-dom';
-import apiFetch from '@wordpress/api-fetch';
 
 interface LogEntry {
     id: number;
@@ -48,31 +49,28 @@ const FileLogs = () => {
 
     const filteredLogs = selectedLevel === 'all' ? logs : logs.filter((log) => log.level === selectedLevel);
 
+    if (loading) {
+        return <FileLogsSkeleton />;
+    }
+
     return (
         <>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">{__('File Logs Overview', 'debug-suite')}</h1>
             <p className="text-gray-600 mb-6">
                 {__('Welcome to the File Logs section. Choose an option below to get started.', 'debug-suite')}
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-8">
+            <div className="flex gap-3 mb-6">
                 <Link
-                    to="/file-logs"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white font-medium shadow hover:bg-blue-700 transition-colors"
+                    to="/"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-800 font-medium hover:bg-gray-200 transition-colors"
                 >
-                    <span role="img" aria-label={__('View', 'debug-suite')}>
-                        📄
-                    </span>{' '}
-                    {__('View Logs', 'debug-suite')}
+                    {'\u2190'} {__('Back to Overview', 'debug-suite')}
                 </Link>
                 <Link
                     to="/file-logs/manage"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gray-100 text-gray-800 font-medium shadow hover:bg-gray-200 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition-colors"
                 >
-                    <span role="img" aria-label={__('Manage', 'debug-suite')}>
-                        ⚙️
-                    </span>{' '}
-                    {__('Manage Logs', 'debug-suite')}
+                    {'\ud83d\udcc4'} {__('Manage File Logs', 'debug-suite')}
                 </Link>
             </div>
 

@@ -7,11 +7,12 @@
  */
 import { cn } from '@/utils/cn';
 import { useState } from '@wordpress/element';
+import { ReactNode } from 'react';
 
 export type AlertVariant = 'primary' | 'success' | 'danger' | 'light';
 
 interface AlertProps {
-    children: JSX.Element;
+    children: ReactNode;
     variant?: AlertVariant;
     className?: string;
     dismissible?: boolean;

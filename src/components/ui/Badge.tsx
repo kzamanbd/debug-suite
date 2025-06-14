@@ -6,11 +6,12 @@
  * @since 1.0.0
  */
 import { cn } from '@/utils/cn';
+import { ReactNode } from 'react';
 
 export type BadgeVariant = 'primary' | 'success' | 'danger' | 'light';
 
 interface BadgeProps {
-    children: JSX.Element;
+    children: ReactNode;
     variant?: BadgeVariant;
     className?: string;
 }

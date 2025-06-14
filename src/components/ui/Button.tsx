@@ -6,12 +6,12 @@
  * @since 1.0.0
  */
 import { cn } from '@/utils/cn';
-import { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export type ButtonVariant = 'primary' | 'success' | 'danger' | 'light';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    children: JSX.Element;
+    children: ReactNode;
     variant?: ButtonVariant;
     loading?: boolean;
     spinnerClassName?: string;

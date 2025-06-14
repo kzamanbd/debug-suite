@@ -1,5 +1,6 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Link } from 'react-router-dom';
 
 interface LogFile {
     id: number;
@@ -111,32 +112,23 @@ const ManageLogs = () => {
 
     return (
         <>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">{__('Manage Log Files', 'debug-suite')}</h1>
             <p className="text-gray-600 mb-6">
                 {__("Manage your application's log files - clear, download, or archive them.", 'debug-suite')}
             </p>
 
             <div className="flex gap-3 mb-6">
-                <a
-                    href="#/file-logs"
+                <Link
+                    to="/"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-800 font-medium hover:bg-gray-200 transition-colors"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        window.location.hash = '#/file-logs';
-                    }}
                 >
                     {'\u2190'} {__('Back to Overview', 'debug-suite')}
-                </a>
-                <a
-                    href="#/file-logs"
+                </Link>
+                <Link
+                    to="/file-logs"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition-colors"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        window.location.hash = '#/file-logs';
-                    }}
                 >
                     {'\ud83d\udcc4'} {__('View Logs', 'debug-suite')}
-                </a>
+                </Link>
             </div>
 
             <div className="flex flex-wrap gap-3 mb-4">

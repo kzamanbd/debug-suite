@@ -1,17 +1,5 @@
-/**
- * SettingsSkeleton component.
- *
- * Skeleton loader for the Settings page, matching the layout and style of the settings form.
- *
- * @since 1.0.0
- */
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@/utils/cn';
 
-/**
- * SettingsSkeletonProps interface.
- *
- * @since 1.0.0
- */
 interface SettingsSkeletonProps {
     className?: string;
 }
@@ -23,10 +11,10 @@ interface SettingsSkeletonProps {
  */
 const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Element => {
     // Utility for skeleton blocks
-    const skeleton = (extra: string = '') => twMerge('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
+    const skeleton = (extra: string = '') => cn('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
 
     return (
-        <div className={twMerge('max-w-4xl mx-auto space-y-6', className)}>
+        <>
             {/* Header Skeleton */}
             <div className="mb-6 sm:mb-8">
                 <div className={skeleton('h-8 w-48 mb-2')}></div>
@@ -69,7 +57,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
                             {[1, 2].map((i) => (
                                 <div
                                     key={i}
-                                    className={twMerge(
+                                    className={cn(
                                         'flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg',
                                         className
                                     )}
@@ -94,7 +82,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
                         {[1, 2, 3, 4, 5].map((i) => (
                             <div
                                 key={i}
-                                className={twMerge(
+                                className={cn(
                                     'flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg',
                                     className
                                 )}
@@ -114,7 +102,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
                     <div className={skeleton('h-10 w-40')}></div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
