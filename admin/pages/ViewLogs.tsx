@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from '@wordpress/element';
 
 interface LogEntry {
     id: number;
@@ -9,7 +9,14 @@ interface LogEntry {
     line?: number;
 }
 
-const ViewLogs: React.FC = () => {
+const levelColors: Record<string, string> = {
+    error: 'bg-red-100 text-red-700',
+    warning: 'bg-yellow-100 text-yellow-800',
+    info: 'bg-blue-100 text-blue-700',
+    debug: 'bg-gray-100 text-gray-700'
+};
+
+const ViewLogs = () => {
     const [selectedLevel, setSelectedLevel] = useState<string>('all');
     const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -58,31 +65,15 @@ const ViewLogs: React.FC = () => {
         return matchesLevel && matchesSearch;
     });
 
-    const getLevelBadgeClass = (level: string) => {
-        switch (level) {
-            case 'error':
-                return 'notice notice-error inline';
-            case 'warning':
-                return 'notice notice-warning inline';
-            case 'info':
-                return 'notice notice-info inline';
-            case 'debug':
-                return 'notice notice-success inline';
-            default:
-                return 'notice inline';
-        }
-    };
-
     return (
-        <div className="wrap">
-            <h1>View File Logs</h1>
-            <p>View and search through your application's log files.</p>
+        <>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">View File Logs</h1>
+            <p className="text-gray-600 mb-6">View and search through your application's log files.</p>
 
-            <div style={{ marginBottom: '20px' }}>
+            <div className="flex gap-3 mb-6">
                 <a
                     href="#/file-logs"
-                    className="button"
-                    style={{ marginRight: '10px' }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-800 font-medium hover:bg-gray-200 transition-colors"
                     onClick={(e) => {
                         e.preventDefault();
                         window.location.hash = '#/file-logs';
@@ -92,7 +83,7 @@ const ViewLogs: React.FC = () => {
                 </a>
                 <a
                     href="#/file-logs/manage"
-                    className="button button-secondary"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition-colors"
                     onClick={(e) => {
                         e.preventDefault();
                         window.location.hash = '#/file-logs/manage';
@@ -102,16 +93,16 @@ const ViewLogs: React.FC = () => {
                 </a>
             </div>
 
-            <div style={{ display: 'flex', gap: '15px', marginBottom: '20px', alignItems: 'center' }}>
-                <div>
-                    <label htmlFor="log-level-filter" style={{ marginRight: '8px' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                    <label htmlFor="log-level-filter" className="text-sm font-medium text-gray-700">
                         Filter by Level:
                     </label>
                     <select
                         id="log-level-filter"
                         value={selectedLevel}
                         onChange={(e) => setSelectedLevel(e.target.value)}
-                        style={{ padding: '5px' }}
+                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
                     >
                         <option value="all">All Levels</option>
                         <option value="error">Error</option>
@@ -120,9 +111,8 @@ const ViewLogs: React.FC = () => {
                         <option value="debug">Debug</option>
                     </select>
                 </div>
-
-                <div>
-                    <label htmlFor="search-logs" style={{ marginRight: '8px' }}>
+                <div className="flex items-center gap-2">
+                    <label htmlFor="search-logs" className="text-sm font-medium text-gray-700">
                         Search:
                     </label>
                     <input
@@ -131,44 +121,45 @@ const ViewLogs: React.FC = () => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search logs..."
-                        style={{ padding: '5px', width: '200px' }}
+                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm w-56"
                     />
                 </div>
             </div>
 
-            <div className="wp-list-table widefat fixed striped">
-                <table className="wp-list-table widefat fixed striped">
-                    <thead>
+            <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
                         <tr>
-                            <th style={{ width: '140px' }}>Timestamp</th>
-                            <th style={{ width: '80px' }}>Level</th>
-                            <th>Message</th>
-                            <th style={{ width: '200px' }}>File</th>
-                            <th style={{ width: '60px' }}>Line</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Timestamp</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Level</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Message</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">File</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Line</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-100">
                         {filteredLogs.length === 0 ? (
                             <tr>
-                                <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>
+                                <td colSpan={5} className="text-center py-8 text-gray-400 text-sm">
                                     No logs found matching your criteria.
                                 </td>
                             </tr>
                         ) : (
                             filteredLogs.map((log) => (
-                                <tr key={log.id}>
-                                    <td>{log.timestamp}</td>
-                                    <td>
+                                <tr key={log.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                                        {log.timestamp}
+                                    </td>
+                                    <td className="px-4 py-2 whitespace-nowrap">
                                         <span
-                                            className={getLevelBadgeClass(log.level)}
-                                            style={{ padding: '2px 8px', fontSize: '11px' }}
+                                            className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${levelColors[log.level]}`}
                                         >
                                             {log.level.toUpperCase()}
                                         </span>
                                     </td>
-                                    <td>{log.message}</td>
-                                    <td>{log.file || '-'}</td>
-                                    <td>{log.line || '-'}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-800">{log.message}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-600">{log.file || '-'}</td>
+                                    <td className="px-4 py-2 text-sm text-gray-600">{log.line || '-'}</td>
                                 </tr>
                             ))
                         )}
@@ -176,12 +167,12 @@ const ViewLogs: React.FC = () => {
                 </table>
             </div>
 
-            <div style={{ marginTop: '20px' }}>
-                <p>
+            <div className="mt-6">
+                <p className="text-sm text-gray-700">
                     <strong>Total logs:</strong> {filteredLogs.length} of {logs.length}
                 </p>
             </div>
-        </div>
+        </>
     );
 };
 

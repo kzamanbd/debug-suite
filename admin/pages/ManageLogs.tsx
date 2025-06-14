@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from '@wordpress/element';
 
 interface LogFile {
     id: number;
@@ -9,7 +9,7 @@ interface LogFile {
     entries: number;
 }
 
-const ManageLogs: React.FC = () => {
+const ManageLogs = () => {
     const [logFiles] = useState<LogFile[]>([
         {
             id: 1,
@@ -109,15 +109,16 @@ const ManageLogs: React.FC = () => {
     };
 
     return (
-        <div className="wrap">
-            <h1>Manage Log Files</h1>
-            <p>Manage your application's log files - clear, download, or archive them.</p>
+        <>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Manage Log Files</h1>
+            <p className="text-gray-600 mb-6">
+                Manage your application's log files - clear, download, or archive them.
+            </p>
 
-            <div style={{ marginBottom: '20px' }}>
+            <div className="flex gap-3 mb-6">
                 <a
                     href="#/file-logs"
-                    className="button"
-                    style={{ marginRight: '10px' }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-800 font-medium hover:bg-gray-200 transition-colors"
                     onClick={(e) => {
                         e.preventDefault();
                         window.location.hash = '#/file-logs';
@@ -126,101 +127,92 @@ const ManageLogs: React.FC = () => {
                     ← Back to Overview
                 </a>
                 <a
-                    href="#/file-logs/view"
-                    className="button button-secondary"
+                    href="#/file-logs"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition-colors"
                     onClick={(e) => {
                         e.preventDefault();
-                        window.location.hash = '#/file-logs/view';
+                        window.location.hash = '#/file-logs';
                     }}
                 >
                     📄 View Logs
                 </a>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: '10px',
-                        marginBottom: '15px'
-                    }}
+            <div className="flex flex-wrap gap-3 mb-4">
+                <button
+                    className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleClearLogs}
+                    disabled={isProcessing || selectedFiles.length === 0}
                 >
-                    <button
-                        className="button button-primary"
-                        onClick={handleClearLogs}
-                        disabled={isProcessing || selectedFiles.length === 0}
-                    >
-                        {isProcessing ? 'Processing...' : 'Clear Selected'}
-                    </button>
-                    <button
-                        className="button"
-                        onClick={handleDownloadLogs}
-                        disabled={isProcessing || selectedFiles.length === 0}
-                    >
-                        Download Selected
-                    </button>
-                    <button
-                        className="button"
-                        onClick={handleArchiveLogs}
-                        disabled={isProcessing || selectedFiles.length === 0}
-                    >
-                        Archive Selected
-                    </button>
-                </div>
-
-                <p style={{ fontSize: '13px', color: '#666' }}>
-                    Selected: {selectedFiles.length} of {logFiles.length} files
-                </p>
+                    {isProcessing ? 'Processing...' : 'Clear Selected'}
+                </button>
+                <button
+                    className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleDownloadLogs}
+                    disabled={isProcessing || selectedFiles.length === 0}
+                >
+                    Download Selected
+                </button>
+                <button
+                    className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleArchiveLogs}
+                    disabled={isProcessing || selectedFiles.length === 0}
+                >
+                    Archive Selected
+                </button>
             </div>
+            <p className="text-sm text-gray-500 mb-6">
+                Selected: {selectedFiles.length} of {logFiles.length} files
+            </p>
 
-            <div className="wp-list-table widefat fixed striped">
-                <table className="wp-list-table widefat fixed striped">
-                    <thead>
+            <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200 mb-8">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
                         <tr>
-                            <td className="manage-column column-cb check-column">
+                            <th className="px-4 py-3">
                                 <input
                                     type="checkbox"
                                     checked={selectedFiles.length === logFiles.length && logFiles.length > 0}
                                     onChange={(e) => handleSelectAll(e.target.checked)}
+                                    className="accent-blue-600 w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
                                 />
-                            </td>
-                            <th>Log File</th>
-                            <th>Path</th>
-                            <th style={{ width: '100px' }}>Size</th>
-                            <th style={{ width: '140px' }}>Last Modified</th>
-                            <th style={{ width: '80px' }}>Entries</th>
-                            <th style={{ width: '120px' }}>Actions</th>
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Log File</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Path</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Size</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Last Modified</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Entries</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-100">
                         {logFiles.map((file) => (
-                            <tr key={file.id}>
-                                <th className="check-column">
+                            <tr key={file.id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-4 py-2 text-center">
                                     <input
                                         type="checkbox"
                                         checked={selectedFiles.indexOf(file.id) !== -1}
                                         onChange={(e) => handleSelectFile(file.id, e.target.checked)}
+                                        className="accent-blue-600 w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
                                     />
-                                </th>
-                                <td>
-                                    <strong>{file.name}</strong>
                                 </td>
-                                <td>
+                                <td className="px-4 py-2 font-semibold text-gray-900">{file.name}</td>
+                                <td className="px-4 py-2 text-xs text-gray-600">
                                     <code>{file.path}</code>
                                 </td>
-                                <td>{file.size}</td>
-                                <td>{file.lastModified}</td>
-                                <td>{file.entries.toLocaleString()}</td>
-                                <td>
-                                    <div style={{ display: 'flex', gap: '5px' }}>
+                                <td className="px-4 py-2 text-sm text-gray-700">{file.size}</td>
+                                <td className="px-4 py-2 text-sm text-gray-700">{file.lastModified}</td>
+                                <td className="px-4 py-2 text-sm text-gray-700">{file.entries.toLocaleString()}</td>
+                                <td className="px-4 py-2">
+                                    <div className="flex gap-2">
                                         <button
-                                            className="button button-small"
+                                            className="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors"
                                             onClick={() => alert(`Viewing ${file.name}...`)}
                                         >
                                             View
                                         </button>
                                         <button
-                                            className="button button-small"
+                                            className="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors"
                                             onClick={() => alert(`Downloading ${file.name}...`)}
                                         >
                                             Download
@@ -233,65 +225,63 @@ const ManageLogs: React.FC = () => {
                 </table>
             </div>
 
-            <div
-                style={{
-                    marginTop: '20px',
-                    padding: '15px',
-                    backgroundColor: '#f9f9f9',
-                    border: '1px solid #ddd'
-                }}
-            >
-                <h3>Log Management Settings</h3>
+            <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Log Management Settings</h3>
                 <form>
-                    <table className="form-table">
-                        <tbody>
-                            <tr>
-                                <th scope="row">Auto-Archive Logs</th>
-                                <td>
-                                    <fieldset>
-                                        <legend className="screen-reader-text">Auto-Archive Options</legend>
-                                        <label>
-                                            <input type="checkbox" /> Archive logs older than
-                                            <select style={{ margin: '0 5px' }}>
-                                                <option value="7">7 days</option>
-                                                <option value="30">30 days</option>
-                                                <option value="90">90 days</option>
-                                            </select>
-                                        </label>
-                                    </fieldset>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Max Log File Size</th>
-                                <td>
-                                    <input type="number" value="10" style={{ width: '80px' }} /> MB
-                                    <p className="description">Automatically rotate logs when they exceed this size.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Log Retention</th>
-                                <td>
-                                    <select>
-                                        <option value="30">30 days</option>
-                                        <option value="60">60 days</option>
-                                        <option value="90">90 days</option>
-                                        <option value="180">180 days</option>
-                                        <option value="365">1 year</option>
-                                    </select>
-                                    <p className="description">How long to keep log files before permanent deletion.</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <p className="submit">
-                        <button type="submit" className="button button-primary">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-2">
+                                <input
+                                    type="checkbox"
+                                    className="accent-blue-600 w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                                />
+                                Archive logs older than
+                                <select className="ml-2 px-2 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm">
+                                    <option value="7">7 days</option>
+                                    <option value="30">30 days</option>
+                                    <option value="90">90 days</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-900 mb-1">Max Log File Size</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="number"
+                                    value="10"
+                                    className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm"
+                                />
+                                <span className="text-gray-700">MB</span>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Automatically rotate logs when they exceed this size.
+                            </p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-900 mb-1">Log Retention</label>
+                            <select className="px-2 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm">
+                                <option value="30">30 days</option>
+                                <option value="60">60 days</option>
+                                <option value="90">90 days</option>
+                                <option value="180">180 days</option>
+                                <option value="365">1 year</option>
+                            </select>
+                            <p className="text-xs text-gray-500 mt-1">
+                                How long to keep log files before permanent deletion.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="mt-6">
+                        <button
+                            type="submit"
+                            className="px-6 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+                        >
                             Save Settings
                         </button>
-                    </p>
+                    </div>
                 </form>
             </div>
-        </div>
+        </>
     );
 };
 

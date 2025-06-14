@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from '@wordpress/element';
 
 interface SettingsState {
     fileManagerAccess: string;
@@ -12,7 +12,7 @@ interface SettingsState {
     logErrors: boolean;
 }
 
-const Settings: React.FC = () => {
+const Settings = () => {
     const [settings, setSettings] = useState<SettingsState>({
         fileManagerAccess: 'administrator',
         publicRootPath: '/wp-content/uploads/',
@@ -55,19 +55,21 @@ const Settings: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-                    <p className="text-gray-600 mt-2">Configure your debug suite and file manager preferences</p>
+                <div className="mb-6 sm:mb-8">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Settings</h1>
+                    <p className="text-gray-600 mt-2 text-sm sm:text-base">
+                        Configure your debug suite and file manager preferences
+                    </p>
                 </div>
 
                 {/* Settings Form */}
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                     {/* File Manager Settings */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="border-l-4 border-l-blue-500 px-6 py-4 bg-blue-50">
+                        <div className="border-l-4 border-l-blue-500 px-4 sm:px-6 py-3 sm:py-4 bg-blue-50">
                             <h2 className="text-xl font-semibold text-gray-900 flex items-center">
                                 <svg
                                     className="w-6 h-6 mr-3 text-blue-600"
@@ -95,7 +97,7 @@ const Settings: React.FC = () => {
                             </p>
                         </div>
 
-                        <div className="p-6 space-y-6">
+                        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                             {/* File Manager Access */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                                 <div>
@@ -110,7 +112,7 @@ const Settings: React.FC = () => {
                                     <select
                                         value={settings.fileManagerAccess}
                                         onChange={(e) => handleInputChange('fileManagerAccess', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                     >
                                         <option value="administrator">Administrator Only</option>
                                         <option value="editor">Editor and Above</option>
@@ -135,7 +137,7 @@ const Settings: React.FC = () => {
                                             type="text"
                                             value={settings.publicRootPath}
                                             onChange={(e) => handleInputChange('publicRootPath', e.target.value)}
-                                            className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                            className="w-full px-4 py-2 sm:py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                             placeholder="/wp-content/uploads/"
                                         />
                                         <svg
@@ -167,7 +169,7 @@ const Settings: React.FC = () => {
                                             type="url"
                                             value={settings.filesUrl}
                                             onChange={(e) => handleInputChange('filesUrl', e.target.value)}
-                                            className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                            className="w-full px-4 py-2 sm:py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                             placeholder="https://example.com/wp-content/uploads/"
                                         />
                                         <svg
@@ -207,7 +209,7 @@ const Settings: React.FC = () => {
                                                 className="sr-only"
                                             />
                                             <div
-                                                className={`flex items-center px-4 py-3 rounded-lg border-2 transition-all ${
+                                                className={`flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all ${
                                                     settings.defaultViewType === 'grid'
                                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                                                         : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
@@ -239,7 +241,7 @@ const Settings: React.FC = () => {
                                                 className="sr-only"
                                             />
                                             <div
-                                                className={`flex items-center px-4 py-3 rounded-lg border-2 transition-all ${
+                                                className={`flex items-center px-4 py-2 sm:py-3 rounded-lg border-2 transition-all ${
                                                     settings.defaultViewType === 'list'
                                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                                                         : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
@@ -266,7 +268,7 @@ const Settings: React.FC = () => {
                             </div>
 
                             {/* Toggle Options */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                 <div className="space-y-4">
                                     <h4 className="font-medium text-gray-900">File Operations</h4>
 
@@ -334,7 +336,7 @@ const Settings: React.FC = () => {
 
                     {/* Debug Settings */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="border-l-4 border-l-green-500 px-6 py-4 bg-green-50">
+                        <div className="border-l-4 border-l-green-500 px-4 sm:px-6 py-3 sm:py-4 bg-green-50">
                             <h2 className="text-xl font-semibold text-gray-900 flex items-center">
                                 <svg
                                     className="w-6 h-6 mr-3 text-green-600"
@@ -354,7 +356,7 @@ const Settings: React.FC = () => {
                             <p className="text-sm text-green-700 mt-1">Configure debugging and logging options</p>
                         </div>
 
-                        <div className="p-6 space-y-4">
+                        <div className="p-4 sm:p-6 space-y-4">
                             <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
                                 <div>
                                     <span className="text-sm font-medium text-gray-900">Enable Debug Mode</span>
@@ -436,7 +438,7 @@ const Settings: React.FC = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
                             <div>
                                 {hasChanges && (
@@ -461,14 +463,14 @@ const Settings: React.FC = () => {
                             <div className="flex space-x-3">
                                 <button
                                     onClick={handleReset}
-                                    className="px-6 py-2.5 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium"
+                                    className="px-4 py-2 sm:px-6 sm:py-3 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium"
                                 >
                                     Reset to Defaults
                                 </button>
                                 <button
                                     onClick={handleSave}
                                     disabled={!hasChanges}
-                                    className={`px-8 py-2.5 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                                    className={`px-4 py-2 sm:px-8 sm:py-3 rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                                         hasChanges
                                             ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg shadow-blue-500/25'
                                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
