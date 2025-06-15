@@ -12,7 +12,8 @@
         "debug-suite"
     ],
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+        "symfony/finder": "^7.3"
     },
     "autoload": {
         "psr-4": {
