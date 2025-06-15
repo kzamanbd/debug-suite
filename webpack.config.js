@@ -36,5 +36,11 @@ module.exports = {
         moduleIds: 'deterministic',
         chunkIds: 'deterministic',
         emitOnErrors: false
+    },
+    // Increase the size limits
+    performance: {
+        maxAssetSize: 1000000, // 1000KB
+        maxEntrypointSize: 1000000, // 1000KB
+        hints: 'warning'
     }
 };
