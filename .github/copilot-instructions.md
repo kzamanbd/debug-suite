@@ -220,6 +220,62 @@ interface ExampleInterface {
 }
 ```
 
+### React Component File Naming Convention
+
+**All React component files in `src/components` and its subdirectories must:**
+
+- Use lowercase letters only
+- Use hyphens (`-`) as word separators
+- Have the `.tsx` extension
+- Example: `my-component.tsx`, `logs-skeleton.tsx`, `settings-skeleton.tsx`, `base-layout.tsx`
+
+### React Component and Directory Structure Guidelines
+
+#### 1. Reusable Components
+
+- Store all **reusable UI components** in `src/components` or its subdirectories.
+- File names must be **lowercase** and use **hyphens** as word separators (e.g., `user-profile-card.tsx`).
+- Directory names under `src/components` must also be **lowercase** and **hyphen-separated** (e.g., `ui/`, `form-fields/`).
+
+#### 2. Feature-Labeled Components
+
+- Store **feature-specific components** inside their respective feature folders (e.g., `src/pages/feature-x/feature-x-table.tsx`).
+- Feature directories must be **lowercase** and **hyphen-separated**.
+- Do **not** place feature-specific components in `src/components`.
+
+#### 3. General Rules
+
+- Do **not** use camelCase, PascalCase, or underscores in file or directory names for components.
+- Do **not** use `index.tsx` for component exports.
+- Subcomponents should follow the same naming convention as above.
+
+---
+
+**Examples:**
+
+- Good: `src/components/ui/button.tsx`, `src/pages/file-logs/file-logs-table.tsx`
+- Bad: `src/components/UserProfileCard.tsx`, `src/pages/FileLogs/FileLogsTable.tsx`, `src/components/user_profile_card.tsx`, `src/components/User-Profile-Card.tsx`
+
+---
+
+**Enforce these conventions for all new and refactored React component files and directories.**
+
+### Rationale
+
+- This matches the current project structure (see: `src/components/logs-skeleton.tsx`, `src/components/settings-skeleton.tsx`, `src/components/base-layout.tsx`)
+- Ensures consistency and clarity in file naming
+- Avoids camelCase, PascalCase, or underscores in file names
+
+## Additional Guidelines
+
+- Each component should be in its own file unless it is a small utility or subcomponent.
+- Index files (e.g., `index.tsx`) are not used for component exports in this project.
+- Subcomponents should follow the same naming convention.
+
+---
+
+**Enforce this convention for all new and refactored React component files.**
+
 ### React Component Template with Tailwind CSS v4
 
 ```tsx
