@@ -1,7 +1,7 @@
-import FileLogs from '@/pages/FileLogs';
-import FileManager from '@/pages/FileManager';
-import ManageLogs from '@/pages/ManageLogs';
-import NotFound from '@/pages/NotFound';
+import FileLogs from '@/pages/file-logs';
+import FileManager from '@/pages/file-manager';
+import ManageLogs from '@/pages/manage-logs';
+import NotFound from '@/pages/not-found';
 import Settings from '@/pages/Settings';
 import { __ } from '@wordpress/i18n';
 
@@ -45,5 +45,4 @@ const routes: DebugSuiteRoute[] = [
         className: 'hidden'
     }
 ];
-
 export default routes;

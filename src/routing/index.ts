@@ -1,23 +1,17 @@
-
+import { cloneElement, createElement, isValidElement } from '@wordpress/element';
 import {
-    isValidElement,
-    cloneElement,
-    createElement,
-} from '@wordpress/element';
-import {
-    useNavigate,
-    useParams,
-    useLocation,
+    createSearchParams,
     redirect,
     replace,
+    useLocation,
     useMatches,
+    useNavigate,
     useNavigation,
-    createSearchParams,
+    useParams
 } from 'react-router-dom';
 
-
-export function withRouter( Component: any) {
-    return ( props: any ) => {
+export function withRouter(Component: any) {
+    return (props: any) => {
         const navigate = useNavigate();
         const params = useParams();
         const location = useLocation();
@@ -32,20 +26,19 @@ export function withRouter( Component: any) {
             replace,
             matches,
             navigation,
-            createSearchParams,
+            createSearchParams
         };
 
-
         // Check if Component is a valid element
-        if ( isValidElement( Component ) ) {
+        if (isValidElement(Component)) {
             // If it's a valid element, clone it and pass the router props
-            return cloneElement( Component, { ...props, ...routerProps } );
+            return cloneElement(Component, { ...props, ...routerProps });
         }
 
         // If it's a function component, render it with the router props
-        return createElement( Component, {
+        return createElement(Component, {
             ...props,
-            ...routerProps,
-        } );
-    }
+            ...routerProps
+        });
+    };
 }

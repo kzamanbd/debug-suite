@@ -5,20 +5,20 @@
  *
  * @since 1.0.0
  */
-import FileDetailSkeleton from '@/components/FileDetailSkeleton';
-import FileIcon from '@/components/FileIcon';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import InputField from '@/components/ui/InputField';
+import InputField from '@/components/ui/input-field';
 import { IFile } from '@/types';
 import { cn } from '@/utils/cn';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useEffect, useState } from 'react';
-import FileEditor from '../components/FileEditor';
-import FileTree from '../components/FileTree';
-import FileTreeSkeleton from '../components/FileTreeSkeleton';
+import FileDetailSkeleton from './components/detail-skeleton';
+import FileEditor from './components/file-editor';
+import FileIcon from './components/file-icon';
+import FileTree from './components/file-tree';
+import FileTreeSkeleton from './components/tree-skeleton';
 
 const FileManager = () => {
     const [files, setFiles] = useState<IFile[]>([]);
@@ -250,35 +250,38 @@ const FileManager = () => {
                     {detailLoading ? <FileDetailSkeleton /> : null}
                     {selectedFiles.length && !detailLoading ? (
                         <div className="h-[500px] overflow-y-auto">
-                            <table className="w-full text-left">
+                            <table className="w-full overflow-hidden rounded-lg border border-gray-200 text-left dark:border-gray-700">
                                 <thead>
-                                    <tr className="border-b text-sm text-gray-500 uppercase dark:text-gray-300">
-                                        <td className="sticky top-0 z-50 w-10 bg-white px-3 py-1.5">
+                                    <tr className="bg-gray-50 text-xs font-semibold text-gray-500 uppercase dark:bg-gray-800 dark:text-gray-300">
+                                        <td className="sticky top-0 z-50 w-10 rounded-tl-lg border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700">
                                             <input
                                                 type="checkbox"
-                                                className="form-input-checkbox"
+                                                className="form-input-checkbox accent-primary-500"
                                                 checked={allSelected}
                                                 onChange={checkedAllItems}
                                             />
                                         </td>
-                                        <th className="sticky top-0 z-50 bg-white px-3 py-1.5">
+                                        <th className="sticky top-0 z-50 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700">
                                             {__('Name', 'debug-suite')}
                                         </th>
-                                        <th className="sticky top-0 z-50 bg-white px-3 py-1.5">
+                                        <th className="sticky top-0 z-50 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700">
                                             {__('Size', 'debug-suite')}
                                         </th>
-                                        <th className="sticky top-0 z-50 bg-white px-3 py-1.5">
+                                        <th className="sticky top-0 z-50 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700">
                                             {__('Last Modified', 'debug-suite')}
                                         </th>
-                                        <th className="sticky top-0 z-50 bg-white px-3 py-1.5 text-center">
+                                        <th className="sticky top-0 z-50 rounded-tr-lg border-b border-gray-200 bg-white px-4 py-3 text-center dark:border-gray-700">
                                             {__('Actions', 'debug-suite')}
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-sm text-gray-700 dark:text-gray-100">
                                     {checkedItems.length ? (
-                                        <tr className="on-parent-hover-show border-b border-gray-200">
-                                            <td colSpan={5} className="px-3 py-2 text-center">
+                                        <tr className="on-parent-hover-show bg-primary-50/40 dark:bg-primary-900/10">
+                                            <td
+                                                colSpan={5}
+                                                className="rounded-lg border-b border-gray-200 px-4 py-3 text-center dark:border-gray-700"
+                                            >
                                                 {__('You have selected', 'debug-suite')}{' '}
                                                 <strong>{checkedItems.length}</strong> {__('users.', 'debug-suite')}
                                                 <button
@@ -295,29 +298,42 @@ const FileManager = () => {
                                     ) : null}
 
                                     {selectedFiles.map((file) => (
-                                        <tr key={file.path} className="border-b">
-                                            <td className="w-10 px-3 py-1.5">
+                                        <tr
+                                            key={file.path}
+                                            className={cn(
+                                                'group transition-colors',
+                                                file.checked
+                                                    ? 'bg-primary-50 dark:bg-primary-900/10'
+                                                    : 'hover:bg-gray-50 dark:hover:bg-gray-800/40'
+                                            )}
+                                        >
+                                            <td className="w-10 border-b border-gray-200 px-4 py-3 align-middle dark:border-gray-700">
                                                 <input
                                                     type="checkbox"
-                                                    className="form-input-checkbox"
+                                                    className="form-input-checkbox accent-primary-500"
                                                     onChange={checkedItem.bind(null, file)}
                                                     checked={file.checked}
                                                 />
                                             </td>
-                                            <td className="px-3 py-1.5">
+                                            <td className="border-b border-gray-200 px-4 py-3 align-middle dark:border-gray-700">
                                                 <div
                                                     onClick={fetchNestedFiles.bind(null, file)}
-                                                    className="flex cursor-pointer items-center"
+                                                    className="flex cursor-pointer items-center gap-2"
                                                 >
                                                     <FileIcon type={file.type} />
-
-                                                    <span className="mx-2">{file.name}</span>
+                                                    <span className="ml-2 truncate font-medium text-gray-900 dark:text-white">
+                                                        {file.name}
+                                                    </span>
                                                 </div>
                                             </td>
-                                            <td className="px-3 py-1.5">{file.size}</td>
-                                            <td className="px-3 py-1.5">{file.modified_at}</td>
-                                            <td className="px-3 py-1.5 text-center">
-                                                <button className="text-gray-500 hover:text-gray-700">
+                                            <td className="border-b border-gray-200 px-4 py-3 align-middle text-gray-500 dark:border-gray-700 dark:text-gray-300">
+                                                {file.size}
+                                            </td>
+                                            <td className="border-b border-gray-200 px-4 py-3 align-middle text-gray-500 dark:border-gray-700 dark:text-gray-300">
+                                                {file.modified_at}
+                                            </td>
+                                            <td className="border-b border-gray-200 px-4 py-3 text-center align-middle dark:border-gray-700">
+                                                <button className="hover:bg-primary-100 hover:text-primary-700 dark:hover:bg-primary-900/20 dark:hover:text-primary-300 rounded p-1 text-gray-500 transition-colors">
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         width="16"
@@ -342,5 +358,4 @@ const FileManager = () => {
         </Card>
     );
 };
-
 export default FileManager;

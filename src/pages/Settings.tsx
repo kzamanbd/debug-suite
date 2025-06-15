@@ -5,14 +5,14 @@
  *
  * @since 1.0.0
  */
-import SettingsSkeleton from '@/components/SettingsSkeleton';
+import SettingsSkeleton from '@/components/settings-skeleton';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import ContentTabs from '@/components/ui/ContentTabs';
-import CustomSwitch from '@/components/ui/CustomSwitch';
-import InputField from '@/components/ui/InputField';
-import RadioButton from '@/components/ui/RadioButton';
-import SearchableSelect from '@/components/ui/SearchableSelect';
+import ContentTabs from '@/components/ui/content-tabs';
+import CustomSwitch from '@/components/ui/custom-switch';
+import InputField from '@/components/ui/input-field';
+import RadioButton from '@/components/ui/radio-button';
+import SearchableSelect from '@/components/ui/searchable-select';
 
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';

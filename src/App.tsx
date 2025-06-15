@@ -1,6 +1,6 @@
 import { RouterProvider, createHashRouter } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
-import Layout from './components/Layout';
+import Layout from './components/base-layout';
 import { withRouter } from './routing';
 import routes, { DebugSuiteRoute } from './routing/routes';
 import { mutationObserver } from './utils';

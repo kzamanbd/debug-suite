@@ -1,5 +1,5 @@
-import FileLogsSkeleton from '@/components/FileLogsSkeleton';
-import SearchableSelect from '@/components/ui/SearchableSelect';
+import FileLogsSkeleton from '@/components/logs-skeleton';
+import SearchableSelect from '@/components/ui/searchable-select';
 import { cn } from '@/utils/cn';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import apiFetch from '@wordpress/api-fetch';
