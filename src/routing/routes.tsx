@@ -1,11 +1,12 @@
 import FileLogs from '@/pages/FileLogs';
 import ManageLogs from '@/pages/ManageLogs';
+import NotFound from '@/pages/NotFound';
 import Settings from '@/pages/Settings';
 import { __ } from '@wordpress/i18n';
 
 export type DebugSuiteRoute = {
     id: string;
-    title: string;
+    title?: string | JSX.Element;
     path: string;
     element: JSX.Element;
     className?: string;
@@ -29,6 +30,12 @@ const routes: DebugSuiteRoute[] = [
         title: __('Manage File Logs', 'debug-suite'),
         path: '/file-logs/manage',
         element: <ManageLogs />
+    },
+    {
+        id: 'not-found',
+        path: '*',
+        element: <NotFound />,
+        className: 'hidden'
     }
 ];
 

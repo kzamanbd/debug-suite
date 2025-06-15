@@ -401,30 +401,17 @@ const Settings = () => {
                     { key: 'debug', label: __('Debug', 'debug-suite'), content: debugTab }
                 ]}
             />
-            {/* Action Buttons */}
-            <div className="mt-4 flex flex-col items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white/90 p-3 shadow-md sm:flex-row dark:border-gray-700 dark:bg-gray-900/80">
-                {hasChanges && (
-                    <p className="flex items-center text-sm font-medium text-amber-600">
-                        <svg className="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                            />
-                        </svg>
-                        {__('You have unsaved changes', 'debug-suite')}
-                    </p>
-                )}
-                <div className="flex w-full justify-end gap-2 sm:w-auto">
-                    <Button onClick={handleReset} variant="light" className="rounded px-4 py-1.5 text-sm">
+            {/* Floating Action Button */}
+            <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center justify-center">
+                <div className="flex gap-2 rounded-full bg-white/90 p-2 shadow-lg dark:bg-gray-900/90">
+                    <Button onClick={handleReset} variant="light" className="rounded-full">
                         {__('Reset to Defaults', 'debug-suite')}
                     </Button>
                     <Button
                         onClick={handleSave}
                         disabled={!hasChanges || isSaving}
                         variant="primary"
-                        className="rounded px-4 py-1.5 text-sm"
+                        className="rounded-full"
                     >
                         {__('Save Changes', 'debug-suite')}
                     </Button>
