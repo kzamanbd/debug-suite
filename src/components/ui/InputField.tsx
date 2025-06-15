@@ -19,9 +19,9 @@ const randomId = () => `input-${Math.random().toString(36).slice(2, 9)}`;
 const InputField = ({ label, error, className = '', ...props }: InputFieldProps) => {
     const id = props.id || randomId();
     return (
-        <div className="space-y-1">
+        <>
             {label && (
-                <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+                <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
                     {label}
                 </label>
             )}
@@ -35,7 +35,7 @@ const InputField = ({ label, error, className = '', ...props }: InputFieldProps)
                 {...props}
             />
             {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
-        </div>
+        </>
     );
 };
 

@@ -1,4 +1,5 @@
 import FileLogs from '@/pages/FileLogs';
+import FileManager from '@/pages/FileManager';
 import ManageLogs from '@/pages/ManageLogs';
 import NotFound from '@/pages/NotFound';
 import Settings from '@/pages/Settings';
@@ -30,6 +31,12 @@ const routes: DebugSuiteRoute[] = [
         title: __('Manage File Logs', 'debug-suite'),
         path: '/file-logs/manage',
         element: <ManageLogs />
+    },
+    {
+        id: 'file-manager',
+        title: __('File Manager', 'debug-suite'),
+        path: '/file-manager',
+        element: <FileManager />
     },
     {
         id: 'not-found',
