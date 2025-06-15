@@ -25,13 +25,24 @@ interface LayoutProps {
  * @since 1.0.0
  */
 const Layout = ({ title, children, className = '' }: LayoutProps): JSX.Element => {
+    const LayoutTitle = () => {
+        if (!title) {
+            return null;
+        }
+        return (
+            <div className="mb-4">
+                {typeof title === 'string' ? (
+                    <div className="text-2xl font-semibold text-gray-900 dark:text-white">{title}</div>
+                ) : (
+                    title
+                )}
+            </div>
+        );
+    };
     return (
         <div className={cn(className, 'mt-5 min-h-screen rounded-lg bg-white p-6')}>
-            {typeof title === 'string' ? (
-                <div className="text-2xl font-semibold text-gray-900 dark:text-white">{title}</div>
-            ) : title ? (
-                title
-            ) : null}
+            <LayoutTitle />
+            {/* Main content area */}
             <div>{children}</div>
         </div>
     );
