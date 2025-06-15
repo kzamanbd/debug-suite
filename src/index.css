@@ -17,7 +17,7 @@
     --color-primary-950: var(--color-indigo-950, #1e1b4b);
 }
 
-#debug-suite-admin-app {
+.debug-suite-admin-app {
     @import 'tailwindcss/preflight.css' layer(base) important;
     @import 'tailwindcss/utilities.css' layer(utilities) important;
     @layer base {
@@ -67,4 +67,8 @@
 
 .react-select__input:focus {
     box-shadow: 0 0 0 transparent !important;
+}
+
+div[data-headlessui-state='open'][role='dialog'] {
+    z-index: 999 !important;
 }
