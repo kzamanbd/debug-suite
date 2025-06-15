@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  */
-import Modal from '@/components/ui/base-modal';
+import Modal from '@/components/ui/modal';
 import { cn } from '@/utils/cn';
 import MonacoEditor from '@monaco-editor/react';
 import { __ } from '@wordpress/i18n';

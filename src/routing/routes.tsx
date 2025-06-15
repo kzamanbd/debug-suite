@@ -2,7 +2,7 @@ import FileLogs from '@/pages/file-logs';
 import FileManager from '@/pages/file-manager';
 import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
-import Settings from '@/pages/Settings';
+import Settings from '@/pages/overview-settings';
 import { __ } from '@wordpress/i18n';
 
 export type DebugSuiteRoute = {
