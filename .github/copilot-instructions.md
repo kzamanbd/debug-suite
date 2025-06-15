@@ -60,9 +60,10 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
 4. **Tailwind CSS v4**:
 
     - Use Tailwind CSS v4 with the Oxide engine for styling
+    - **Always use the `primary` color as the brand color for all UI elements.**
     - Follow utility-first CSS approach with Tailwind classes
     - Use `@tailwindcss/postcss` for PostCSS integration
-    - Use `cn` utils for conditional class merging from `@/utils/cn`
+    - **Use the `cn` utility from `@/utils/cn` for conditional class merging instead of using `tailwind-merge` directly.**
     - Maintain consistent spacing and sizing using Tailwind's design system
     - Utilize Tailwind v4's CSS variables system for theme customization
     - Apply responsive design using Tailwind's breakpoint utilities
@@ -226,7 +227,7 @@ interface ExampleInterface {
  * External dependencies
  */
 import { useState } from '@wordpress/element';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@/utils/cn';
 
 /**
  * Internal dependencies
@@ -258,14 +259,14 @@ const ExampleComponent = ({ title, items, onAction, className = '' }: ExampleCom
     // Component implementation
 
     return (
-        <div className={twMerge('rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800', className)}>
+        <div className={cn('rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800', className)}>
             <h2 className="text-lg font-medium text-gray-900 dark:text-white">{title}</h2>
 
             <ul className="mt-3 space-y-2">
                 {items.map((item) => (
                     <li
                         key={item.id}
-                        className={twMerge(
+                        className={cn(
                             'cursor-pointer rounded p-2 transition-colors',
                             activeItem === item.id
                                 ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
