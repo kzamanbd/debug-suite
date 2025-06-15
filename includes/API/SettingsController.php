@@ -7,7 +7,7 @@
 
 namespace DebugSuite\API;
 
-use WP_Error;
+use WP_Roles;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -85,12 +85,27 @@ class SettingsController extends RestController {
 	 * @since 1.0.0
 	 */
 	public function get_settings( $request ): WP_REST_Response {
+		global $wp_roles;
+
+		if ( ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
+		}
+
+		$roles = array_map(
+			function ( $role ) {
+				return [
+					'name'        => $role['name'],
+				];
+			},
+			$wp_roles->roles
+		);
 		$constants = [
 			'wpDebug'        => WP_DEBUG,
 			'wpDebugLog'     => WP_DEBUG_LOG,
 			'wpDebugDisplay' => WP_DEBUG_DISPLAY,
 			'publicRootPath' => ABSPATH,
 			'filesUrl'       => content_url(),
+			'roles'          => $roles,
 		];
 		$settings  = get_option( 'debug_suite_settings', [] );
 		$settings  = array_merge( $constants, $settings );

@@ -71,7 +71,8 @@ class Admin implements Hookable {
 			$position
 		);
 
-		$submenu[ $slug ][] = [ __( 'Dashboard', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#' ];
+		$submenu[ $slug ][] = [ __( 'Overview', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#' ];
+		$submenu[ $slug ][] = [ __( 'File Manager', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#file-manager' ];
 		$submenu[ $slug ][] = [ __( 'File Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#file-logs' ];
 		$submenu[ $slug ][] = [ __( 'Manage Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#file-logs/manage' ];
 	}

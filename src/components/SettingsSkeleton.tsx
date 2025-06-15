@@ -16,7 +16,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
     return (
         <>
             {/* Header Skeleton */}
-            <div className="mb-6 sm:mb-8">
+            <div className="my-6 sm:mb-8">
                 <div className={skeleton('mb-2 h-8 w-48')}></div>
                 <div className={skeleton('h-4 w-80')}></div>
             </div>
