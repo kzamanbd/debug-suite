@@ -8,8 +8,8 @@
 import Modal from '@/components/ui/modal';
 import { classNames } from '@/utils';
 import MonacoEditor from '@monaco-editor/react';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from 'react';
 
 // Mapping of file extensions to Monaco languages
 const extensionToLanguageMap: Record<string, string> = {
@@ -57,6 +57,7 @@ function getLanguageFromExtension(filename: string): string {
  */
 interface FileEditorProps {
     open: boolean;
+    loading: boolean;
     fileContent: string;
     fileName: string;
     readOnly?: boolean;
@@ -68,11 +69,21 @@ interface FileEditorProps {
  *
  * @since 1.0.0
  */
-const FileEditor = ({ open, toggle, fileName, fileContent, readOnly = false }: FileEditorProps): JSX.Element => {
+const FileEditor = ({
+    open,
+    toggle,
+    fileName,
+    loading,
+    fileContent,
+    readOnly = false
+}: FileEditorProps): JSX.Element => {
     const editorRef = useRef<any>(undefined);
+    const [isLoading, setIsLoading] = useState(true);
 
     const handleEditorDidMount = (editor: any) => {
         editorRef.current = editor;
+        setIsLoading(false);
+        editor.focus();
     };
 
     useEffect(() => {
@@ -89,16 +100,24 @@ const FileEditor = ({ open, toggle, fileName, fileContent, readOnly = false }: F
             onClose={() => toggle(false)}
             className="mx-auto max-h-[calc(100svh_-_20px)] max-w-full"
         >
-            <div className="mt-2">
+            <div className="relative mt-2">
+                {(isLoading || loading) && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
+                        <span className="border-primary-500 inline-block h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></span>
+                        <span className="text-primary-700 dark:text-primary-300 ml-3 text-sm font-medium">
+                            {__('Loading editor…', 'debug-suite')}
+                        </span>
+                    </div>
+                )}
                 <MonacoEditor
-                    height="80vh"
+                    height="calc(100svh - 190px)"
                     defaultValue={fileContent}
                     onMount={handleEditorDidMount}
                     options={{ readOnly }}
                     defaultLanguage={getLanguageFromExtension(fileName)}
                 />
             </div>
-            <div className="flex items-center justify-end gap-2 border-t border-gray-100 bg-gray-50 px-6 py-3 dark:border-gray-800 dark:bg-gray-900">
+            <div className="flex items-center justify-end gap-2 px-6 py-3">
                 <button
                     className={classNames(
                         'bg-primary-500 rounded-lg px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors',

@@ -48,13 +48,13 @@ const Modal = ({ open, onClose, title, children, className = '' }: MyModalProps)
                     >
                         <DialogPanel
                             className={classNames(
-                                'w-full max-w-lg rounded bg-white shadow-2xl ring-1 ring-black/10 dark:bg-gray-900',
+                                'w-full max-w-lg rounded-lg bg-white shadow-2xl ring-1 ring-black/10 dark:bg-gray-900',
                                 'transition-all',
                                 className
                             )}
                         >
                             {title && (
-                                <DialogTitle className="mb-4 flex items-center justify-between rounded-t border-b bg-gray-50 p-4">
+                                <DialogTitle className="mb-4 flex items-center justify-between rounded-t-lg border-b bg-gray-50 p-4">
                                     <div className="text-primary-700 dark:text-primary-300 text-lg font-semibold">
                                         {title}
                                     </div>

@@ -28,6 +28,7 @@ const FileManager = () => {
     const [selectedFiles, setSelectedFiles] = useState<IFile[]>([]);
     const [initialLoading, setInitialLoading] = useState(false);
     const [detailLoading, setDetailLoading] = useState(false);
+    const [loadingFileContent, setLoadingFileContent] = useState(false);
     const [breadcrumb, setBreadcrumb] = useState<Record<string, string>[]>([
         {
             name: '',
@@ -103,12 +104,12 @@ const FileManager = () => {
     }, []);
 
     const fileEditHandler = async (file: IFile) => {
-        if (file.type === 'file') {
-            toggleEditor();
-            setFileName(file.name);
-            const response = await fetchFileContent(file.path);
-            setFileContent(response.contents);
-        }
+        toggleEditor();
+        setFileName(file.name);
+        setLoadingFileContent(true);
+        const response = await fetchFileContent(file.path);
+        setFileContent(response.contents);
+        setLoadingFileContent(false);
     };
 
     const toggleEditor = () => {
@@ -140,6 +141,7 @@ const FileManager = () => {
     useEffect(() => {
         setInitialLoading(true);
         fetchInitialFile();
+        setDetailLoading(true);
     }, []);
 
     return (
@@ -354,7 +356,13 @@ const FileManager = () => {
                     ) : null}
                 </div>
             </div>
-            <FileEditor open={openEditor} toggle={toggleEditor} fileContent={fileContent} fileName={fileName} />
+            <FileEditor
+                open={openEditor}
+                loading={loadingFileContent}
+                toggle={toggleEditor}
+                fileContent={fileContent}
+                fileName={fileName}
+            />
         </Card>
     );
 };
