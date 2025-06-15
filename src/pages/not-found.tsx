@@ -1,5 +1,6 @@
 import { classNames } from '@/utils';
 import { __ } from '@wordpress/i18n';
+import { TriangleAlert } from 'lucide-react';
 
 /**
  * NotFound page component for 404 routes.
@@ -16,14 +17,7 @@ const NotFound = (): JSX.Element => {
         >
             <div className="mb-6">
                 <span className="inline-flex items-center justify-center rounded-full bg-red-100 p-4 dark:bg-red-900">
-                    <svg className="h-10 w-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 9v2m0 4h.01M6.938 19h10.124c1.54 0 2.502-1.667 1.732-2.5L13.732 5c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                        />
-                    </svg>
+                    <TriangleAlert className="h-10 w-10 text-red-500" />
                 </span>
             </div>
             <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">

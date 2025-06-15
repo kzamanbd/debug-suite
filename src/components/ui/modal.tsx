@@ -1,85 +1,105 @@
-/**
- * MyModal component.
- *
- * A reusable modal dialog using Headless UI, with full accessibility and brand styling.
- *
- * @since 1.0.0
- */
 import { classNames } from '@/utils';
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
-import { Fragment, ReactNode } from 'react';
+import { Dialog, DialogBackdrop, Transition, TransitionChild } from '@headlessui/react';
+import React, { Fragment, HTMLAttributes } from 'react';
 
-interface MyModalProps {
-    open: boolean;
-    onClose: () => void;
-    title?: ReactNode;
-    children: ReactNode;
+export type ModalProps = {
+    children: React.ReactNode;
     className?: string;
-}
+    open: boolean;
+    showXButton?: boolean;
+    onClose: () => void;
+} & HTMLAttributes<HTMLDivElement>;
 
-const Modal = ({ open, onClose, title, children, className = '' }: MyModalProps): JSX.Element => {
+const Modal = ({ children, showXButton = true, className, open, onClose }: ModalProps) => {
     return (
-        <Transition show={open} as={Fragment}>
-            <Dialog as="div" className="relative z-[99999]" onClose={onClose}>
-                <DialogBackdrop
-                    onClick={onClose}
-                    className={classNames('fixed inset-0 bg-black/30 backdrop-blur-sm')}
-                />
-                <TransitionChild
-                    as={Fragment}
-                    enter="ease-out duration-200"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-150"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
-                </TransitionChild>
-                <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
-                    <TransitionChild
-                        as={Fragment}
-                        enter="ease-out duration-200"
-                        enterFrom="opacity-0 scale-95"
-                        enterTo="opacity-100 scale-100"
-                        leave="ease-in duration-150"
-                        leaveFrom="opacity-100 scale-100"
-                        leaveTo="opacity-0 scale-95"
-                    >
-                        <DialogPanel
-                            className={classNames(
-                                'w-full max-w-lg rounded-lg bg-white shadow-2xl ring-1 ring-black/10 dark:bg-gray-900',
-                                'transition-all',
-                                className
-                            )}
+        <>
+            <Transition appear show={open} as={Fragment}>
+                <Dialog as="div" className="fixed inset-0 z-[99999] overflow-auto" onClose={onClose}>
+                    <div className="flex min-h-screen justify-center p-4 text-center">
+                        <TransitionChild
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
                         >
-                            {title && (
-                                <DialogTitle className="mb-4 flex items-center justify-between rounded-t-lg border-b bg-gray-50 p-4">
-                                    <div className="text-primary-700 dark:text-primary-300 text-lg font-semibold">
-                                        {title}
-                                    </div>
-                                    <button type="button" onClick={onClose} aria-label="Close">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <g fill="none" stroke="currentColor" stroke-width="1.5">
-                                                <circle cx="12" cy="12" r="10" opacity="0.5" />
-                                                <path stroke-linecap="round" d="m14.5 9.5l-5 5m0-5l5 5" />
-                                            </g>
-                                        </svg>
+                            <DialogBackdrop className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
+                        </TransitionChild>
+
+                        <TransitionChild
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 scale-95"
+                            enterTo="opacity-100 scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 scale-100"
+                            leaveTo="opacity-0 scale-95"
+                        >
+                            <div
+                                className={classNames(
+                                    'relative inline-block w-full transform self-center rounded bg-white text-left shadow-xl transition-all',
+                                    className
+                                )}
+                            >
+                                {children}
+                                {showXButton && (
+                                    <button
+                                        type="button"
+                                        onClick={onClose}
+                                        className="rounded-primary absolute top-2 right-2 p-1.5 text-sm text-gray-500 transition-colors duration-150 outline-none hover:text-gray-700 focus:outline-none"
+                                    >
+                                        &#10005;
                                     </button>
-                                </DialogTitle>
-                            )}
-                            <div className="p-4">{children}</div>
-                        </DialogPanel>
-                    </TransitionChild>
-                </div>
-            </Dialog>
-        </Transition>
+                                )}
+                            </div>
+                        </TransitionChild>
+                    </div>
+                </Dialog>
+            </Transition>
+        </>
     );
 };
+
+export type TitleProps = {
+    className?: string;
+} & HTMLAttributes<HTMLDivElement>;
+
+const Title: React.FunctionComponent<TitleProps> = ({ children, className, ...rest }) => {
+    return (
+        <div className={classNames('rounded-t-lg border-b bg-gray-100 p-4 font-semibold', className)} {...rest}>
+            {children}
+        </div>
+    );
+};
+
+export type ContentProps = {
+    className?: string;
+} & HTMLAttributes<HTMLDivElement>;
+
+const Content: React.FunctionComponent<ContentProps> = ({ children, className, ...rest }) => {
+    return (
+        <div className={classNames('p-4', className)} {...rest}>
+            {children}
+        </div>
+    );
+};
+
+export type FooterProps = {
+    className?: string;
+} & HTMLAttributes<HTMLDivElement>;
+
+const Footer: React.FunctionComponent<FooterProps> = ({ children, className, ...rest }) => {
+    return (
+        <div className={classNames('rounded-b-lg border-t bg-gray-100 p-4', className)} {...rest}>
+            {children}
+        </div>
+    );
+};
+
+Modal.Title = Title;
+Modal.Content = Content;
+Modal.Footer = Footer;
 
 export default Modal;

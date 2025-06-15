@@ -100,6 +100,7 @@ const FileEditor = ({
             onClose={() => toggle(false)}
             className="mx-auto max-h-[calc(100svh_-_20px)] max-w-full"
         >
+            <Modal.Title>{fileName}</Modal.Title>
             <div className="relative mt-2">
                 {(isLoading || loading) && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-gray-900/80">
@@ -117,7 +118,7 @@ const FileEditor = ({
                     defaultLanguage={getLanguageFromExtension(fileName)}
                 />
             </div>
-            <div className="flex items-center justify-end gap-2 px-6 py-3">
+            <Modal.Footer className="flex items-center justify-end gap-2">
                 <button
                     className={classNames(
                         'bg-primary-500 rounded-lg px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors',
@@ -139,7 +140,7 @@ const FileEditor = ({
                 >
                     {__('Cancel', 'debug-suite')}
                 </button>
-            </div>
+            </Modal.Footer>
         </Modal>
     );
 };

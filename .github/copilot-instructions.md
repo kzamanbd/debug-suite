@@ -74,6 +74,14 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
     - Use `__()` and `_x()` functions for translating strings
     - Ensure all user-facing strings are translatable
 
+6. **Icons**:
+
+    - **Always use Lucide React icons for all UI icons**
+    - Import icons from `lucide-react` package
+    - Never use inline SVG code or other icon libraries
+    - Use consistent icon sizing (typically 16px or 24px)
+    - Example: `import { FolderOpen, Settings, X } from 'lucide-react';`
+
 ## Architecture Guidelines
 
 1. **Service Providers**:
@@ -284,6 +292,7 @@ interface ExampleInterface {
  */
 import { useState } from '@wordpress/element';
 import { classNames } from '@/utils';
+import { FolderOpen, Settings, X } from 'lucide-react';
 
 /**
  * Internal dependencies
@@ -333,6 +342,7 @@ const ExampleComponent = ({ title, items, onAction, className = '' }: ExampleCom
                             onAction(item.id);
                         }}
                     >
+                        <FolderOpen size={16} className="mr-2 inline" />
                         {item.name}
                     </li>
                 ))}

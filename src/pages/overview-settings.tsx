@@ -17,6 +17,7 @@ import SearchableSelect from '@/components/ui/searchable-select';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { FolderOpen, Settings as SettingsIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 interface SettingsState {
@@ -137,20 +138,7 @@ const Settings = () => {
         <Card className="rounded-lg border-0 bg-white/90 p-0 shadow-md dark:bg-gray-900/80">
             <div className="border-primary-100 from-primary-100 via-primary-50 rounded-t-lg border-b bg-gradient-to-r to-white px-4 py-3">
                 <h2 className="text-primary-900 dark:text-primary-200 flex items-center gap-2 text-lg font-semibold">
-                    <svg className="text-primary-600 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-                        />
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 5a2 2 0 012-2h4a2 2 0 012 2v1H8V5z"
-                        />
-                    </svg>
+                    <FolderOpen className="text-primary-600 h-5 w-5" />
                     {__('File Manager Configuration', 'debug-suite')}
                 </h2>
                 <p className="text-primary-700 dark:text-primary-300 mt-1 text-xs">
@@ -293,14 +281,7 @@ const Settings = () => {
         <Card className="rounded-lg border-0 bg-white/90 p-0 shadow-md dark:bg-gray-900/80">
             <div className="border-primary-100 from-primary-100 via-primary-50 rounded-t-lg border-b bg-gradient-to-r to-white px-4 py-3">
                 <h2 className="text-primary-900 dark:text-primary-200 flex items-center gap-2 text-lg font-semibold">
-                    <svg className="text-primary-600 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                    </svg>
+                    <SettingsIcon className="text-primary-600 h-5 w-5" />
                     {__('Debug Configuration', 'debug-suite')}
                 </h2>
                 <p className="text-primary-700 dark:text-primary-300 mt-1 text-xs">

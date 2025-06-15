@@ -13,6 +13,7 @@ import { IFile } from '@/types';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { FolderPlus, HardDrive, MoreVertical, Upload } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import FileDetailSkeleton from './components/detail-skeleton';
 import FileEditor from './components/file-editor';
@@ -155,37 +156,11 @@ const FileManager = () => {
                 />
                 <div className="flex flex-wrap gap-2 md:space-x-4">
                     <Button variant="light" aria-label={__('Create new folder', 'debug-suite')}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="bi bi-cloud-arrow-up"
-                            viewBox="0 0 16 16"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M7.646 5.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708z"
-                            />
-                            <path d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383m.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z" />
-                        </svg>
+                        <FolderPlus size={16} />
                         <span>{__('New Folder', 'debug-suite')}</span>
                     </Button>
                     <Button variant="primary" aria-label={__('Upload files', 'debug-suite')}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="bi bi-cloud-arrow-up"
-                            viewBox="0 0 16 16"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M7.646 5.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708z"
-                            />
-                            <path d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383m.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z" />
-                        </svg>
+                        <Upload size={16} />
                         <span>{__('Upload Files', 'debug-suite')}</span>
                     </Button>
                 </div>
@@ -194,20 +169,7 @@ const FileManager = () => {
             <div className="mb-4 flex flex-col gap-2 text-sm font-semibold text-gray-500 md:flex-row md:items-center md:justify-between dark:text-gray-300">
                 <div className="bg-primary-100 dark:bg-primary-900/20 flex w-max items-center gap-2 rounded-lg px-2 py-1">
                     <span className="text-primary-500">
-                        <svg className="size-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                            <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
-                            <g id="SVGRepo_iconCarrier">
-                                <path
-                                    d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                                    className="stroke-primary"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeDasharray="4 4"
-                                ></path>
-                            </g>
-                        </svg>
+                        <HardDrive size={24} />
                     </span>
                     <div className="flex gap-2">
                         {breadcrumb.map((item, index) => (
@@ -336,16 +298,7 @@ const FileManager = () => {
                                             </td>
                                             <td className="border-b border-gray-200 px-4 py-3 text-center align-middle dark:border-gray-700">
                                                 <button className="hover:bg-primary-100 hover:text-primary-700 dark:hover:bg-primary-900/20 dark:hover:text-primary-300 rounded p-1 text-gray-500 transition-colors">
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        width="16"
-                                                        height="16"
-                                                        fill="currentColor"
-                                                        className="bi bi-three-dots-vertical"
-                                                        viewBox="0 0 16 16"
-                                                    >
-                                                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                                    </svg>
+                                                    <MoreVertical size={16} />
                                                 </button>
                                             </td>
                                         </tr>
