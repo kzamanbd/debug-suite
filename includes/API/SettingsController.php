@@ -7,7 +7,7 @@
 
 namespace DebugSuite\API;
 
-use WP_Roles;
+use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -43,12 +43,7 @@ class SettingsController extends RestController {
 			'/' . $this->rest_base,
 			[
 				[
-					'methods'             => 'GET',
-					'callback'            => [ $this, 'get_settings' ],
-					'permission_callback' => [ $this, 'permissions_check' ],
-				],
-				[
-					'methods'             => 'POST',
+					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => [ $this, 'update_settings' ],
 					'permission_callback' => [ $this, 'permissions_check' ],
 					'args'                => [
@@ -58,13 +53,13 @@ class SettingsController extends RestController {
 							'description' => __( 'Enable or disable debugging mode.', 'debug-suite' ),
 							'enum'        => [ 'true', 'false' ],
 						],
-						'wp_debug_log'     => [
+						'debug_log'     => [
 							'type'        => 'string',
 							'default'     => 'false',
 							'description' => __( 'Enable or disable WP_DEBUG_LOG.', 'debug-suite' ),
 							'enum'        => [ 'true', 'false' ],
 						],
-						'wp_debug_display' => [
+						'debug_display' => [
 							'type'        => 'string',
 							'default'     => 'false',
 							'description' => __( 'Enable or disable WP_DEBUG_DISPLAY.', 'debug-suite' ),
@@ -74,43 +69,6 @@ class SettingsController extends RestController {
 				],
 			]
 		);
-	}
-
-	/**
-	 * Get Debug Suite settings.
-	 *
-	 * @param WP_REST_Request $request The REST request.
-	 *
-	 * @return WP_REST_Response
-	 * @since 1.0.0
-	 */
-	public function get_settings( $request ): WP_REST_Response {
-		global $wp_roles;
-
-		if ( ! isset( $wp_roles ) ) {
-			$wp_roles = new WP_Roles();
-		}
-
-		$roles = array_map(
-			function ( $role ) {
-				return [
-					'name'        => $role['name'],
-				];
-			},
-			$wp_roles->roles
-		);
-		$constants = [
-			'wpDebug'        => WP_DEBUG,
-			'wpDebugLog'     => WP_DEBUG_LOG,
-			'wpDebugDisplay' => WP_DEBUG_DISPLAY,
-			'publicRootPath' => ABSPATH,
-			'filesUrl'       => content_url(),
-			'roles'          => $roles,
-		];
-		$settings  = get_option( 'debug_suite_settings', [] );
-		$settings  = array_merge( $constants, $settings );
-
-		return rest_ensure_response( $settings, 200 );
 	}
 
 	/**
@@ -133,8 +91,8 @@ class SettingsController extends RestController {
 		}
 
 		$is_debug         = $params['debug'] ?? 'false';
-		$wp_debug_log     = $params['wp_debug_log'] ?? 'false';
-		$wp_debug_display = $params['wp_debug_display'] ?? 'true';
+		$wp_debug_log     = $params['debug_log'] ?? 'false';
+		$wp_debug_display = $params['debug_display'] ?? 'true';
 
 		// Default debug settings
 		$constants = [

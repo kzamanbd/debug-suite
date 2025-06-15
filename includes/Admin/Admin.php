@@ -10,6 +10,7 @@ use DebugSuite\API\FileLogsController;
 use DebugSuite\API\FileManagerController;
 use DebugSuite\API\SettingsController;
 use DebugSuite\Interfaces\Hookable;
+use WP_Roles;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -79,9 +80,9 @@ class Admin implements Hookable {
 			'admin.php?page=' . $slug . '#file-manager',
 		];
 		$submenu[ $slug ][] = [
-			__( 'File Logs', 'debug-suite' ),
+			__( 'Error Logs', 'debug-suite' ),
 			$capability,
-			'admin.php?page=' . $slug . '#file-logs',
+			'admin.php?page=' . $slug . '#error-logs',
 		];
 		$submenu[ $slug ][] = [
 			__( 'Manage Logs', 'debug-suite' ),
@@ -113,7 +114,37 @@ class Admin implements Hookable {
 			return;
 		}
 
+		global $wp_roles;
+
+		if ( ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
+		}
+
+		$roles = array_map(
+			function ( $role ) {
+				return [
+					'name'        => $role['name'],
+				];
+			},
+			$wp_roles->roles
+		);
+		$constants = [
+			'wpDebug'        => WP_DEBUG,
+			'wpDebugLog'     => WP_DEBUG_LOG,
+			'wpDebugDisplay' => WP_DEBUG_DISPLAY,
+			'publicRootPath' => ABSPATH,
+			'filesUrl'       => content_url(),
+			'roles'          => $roles,
+		];
+		$settings  = get_option( 'debug_suite_settings', [] );
+		$settings  = array_merge( $constants, $settings );
+
 		wp_enqueue_script( 'debug-suite-admin' );
 		wp_enqueue_style( 'debug-suite-admin' );
+		wp_localize_script(
+			'debug-suite-admin',
+			'debugSuiteSettings',
+			$settings
+		);
 	}
 }

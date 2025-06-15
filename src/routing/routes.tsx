@@ -1,4 +1,4 @@
-import FileLogs from '@/pages/file-logs';
+import ErrorLogs from '@/pages/error-logs';
 import FileManager from '@/pages/file-manager';
 import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
@@ -21,10 +21,10 @@ const routes: DebugSuiteRoute[] = [
         element: <Settings />
     },
     {
-        id: 'file-logs',
-        title: __('File Logs Overview', 'debug-suite'),
-        path: '/file-logs',
-        element: <FileLogs />
+        id: 'error-logs',
+        title: __('Error Logs Overview', 'debug-suite'),
+        path: '/error-logs',
+        element: <ErrorLogs />
     },
     {
         id: 'file-logs-manage',

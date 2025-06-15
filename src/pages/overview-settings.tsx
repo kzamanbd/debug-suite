@@ -5,7 +5,6 @@
  *
  * @since 1.0.0
  */
-import SettingsSkeleton from '@/components/settings-skeleton';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 import ContentTabs from '@/components/ui/content-tabs';
@@ -13,83 +12,23 @@ import CustomSwitch from '@/components/ui/custom-switch';
 import InputField from '@/components/ui/input-field';
 import RadioButton from '@/components/ui/radio-button';
 import SearchableSelect from '@/components/ui/searchable-select';
+import { SettingsState } from '@/types';
 
 import apiFetch from '@wordpress/api-fetch';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { FolderOpen, Settings as SettingsIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-interface SettingsState {
-    fileManagerAccess: string;
-    publicRootPath: string;
-    filesUrl: string;
-    defaultViewType: string;
-    enableTrash: boolean;
-    hideHtaccess: boolean;
-    logQueries: boolean;
-    logErrors: boolean;
-    wpDebug: boolean;
-    wpDebugLog: boolean;
-    wpDebugDisplay: boolean;
-    [key: string]: string | boolean | Record<string, { name: string }>;
-}
-
-type SettingsResponse = {
-    roles: Record<string, { name: string }>;
-} & SettingsState;
-
-const defaultSettings: SettingsState = {
-    fileManagerAccess: 'administrator',
-    publicRootPath: '/wp-content/uploads/',
-    filesUrl: 'https://example.com/wp-content/uploads/',
-    defaultViewType: 'grid',
-    enableTrash: true,
-    hideHtaccess: true,
-    logQueries: false,
-    logErrors: true,
-    wpDebug: false,
-    wpDebugLog: false,
-    wpDebugDisplay: false
-};
-
 const Settings = () => {
-    const [settings, setSettings] = useState<SettingsState>(defaultSettings);
+    const [settings, setSettings] = useState(window.debugSuiteSettings);
     const [hasChanges, setHasChanges] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [fileManagerAccessOptions, setFileManagerAccessOptions] = useState<
-        {
-            label: string;
-            value: string;
-        }[]
-    >([]);
-
-    const fetchSettings = async () => {
-        try {
-            setIsLoading(true);
-            const response = await apiFetch<SettingsResponse>({ path: '/debug-suite/v1/settings' });
-            if (response) {
-                setSettings((prev) => ({
-                    ...prev,
-                    ...response
-                }));
-                const roles = Object.keys(response.roles).map((role) => ({
-                    label: response.roles[role].name,
-                    value: role
-                }));
-                setFileManagerAccessOptions(roles);
-            }
-        } catch (error) {
-            toast.error(__('Failed to fetch settings.', 'debug-suite'));
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchSettings();
-    }, []);
+    const roles = window.debugSuiteSettings?.roles || {};
+    const fileManagerAccessOptions = Object.keys(roles).map((role) => ({
+        label: roles[role].name,
+        value: role
+    }));
 
     const handleInputChange = (field: keyof SettingsState, value: string | boolean) => {
         setSettings((prevSettings) => ({
@@ -97,6 +36,19 @@ const Settings = () => {
             [field]: value
         }));
         setHasChanges(true);
+    };
+
+    const forceBooleanString = (value: boolean | string): string => {
+        if (value === true || value === 'true' || value === '1') {
+            return 'true';
+        }
+        if (value === false || value === 'false' || value === '0') {
+            return 'false';
+        }
+        if (!value) {
+            return 'false';
+        }
+        return value.toString();
     };
 
     const handleSave = async () => {
@@ -110,9 +62,9 @@ const Settings = () => {
                 path: '/debug-suite/v1/settings',
                 method: 'POST',
                 data: {
-                    debug: settings.wpDebug.toString(),
-                    debug_log: settings.wpDebugLog.toString(),
-                    debug_display: settings.wpDebugDisplay.toString()
+                    debug: forceBooleanString(settings.wpDebug),
+                    debug_log: forceBooleanString(settings.wpDebugLog),
+                    debug_display: forceBooleanString(settings.wpDebugDisplay)
                 }
             });
             toast.success(__('Settings saved successfully!'));
@@ -125,13 +77,8 @@ const Settings = () => {
     };
 
     const handleReset = () => {
-        setSettings(defaultSettings);
         setHasChanges(false);
     };
-
-    if (isLoading) {
-        return <SettingsSkeleton />;
-    }
 
     // Compact File Manager Tab
     const fileManagerTab = (

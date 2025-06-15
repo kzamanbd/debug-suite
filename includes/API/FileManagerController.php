@@ -13,6 +13,7 @@ use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -26,6 +27,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class FileManagerController extends RestController {
+
+	private FileManager $file_manager;
 	/**
 	 * Route base for settings.
 	 *
@@ -33,6 +36,10 @@ class FileManagerController extends RestController {
 	 * @var string
 	 */
 	protected $rest_base = 'files';
+
+	public function __construct() {
+		$this->file_manager = new FileManager();
+	}
 
 	/**
 	 * Register the routes for settings.
@@ -46,7 +53,7 @@ class FileManagerController extends RestController {
 			'/' . $this->rest_base,
 			[
 				[
-					'methods'             => 'GET',
+					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_files' ],
 					'permission_callback' => [ $this, 'permissions_check' ],
 					'args'                => [
@@ -66,10 +73,10 @@ class FileManagerController extends RestController {
 		);
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<path>.+)',
+			'/' . $this->rest_base . '/content',
 			[
 				[
-					'methods'             => 'GET',
+					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_file_contents' ],
 					'permission_callback' => [ $this, 'permissions_check' ],
 					'args'                => [
@@ -99,10 +106,9 @@ class FileManagerController extends RestController {
 	 */
 	public function get_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		try {
-			$file_manager = new FileManager();
 			$path         = $request->get_param( 'path' ) ?? '';
 			$full_path    = ABSPATH . $path;
-			$files        = $file_manager->get_directory_tree( $full_path );
+			$files        = $this->file_manager->get_directory_tree( $full_path );
 
 			return rest_ensure_response(
 				[
@@ -142,13 +148,13 @@ class FileManagerController extends RestController {
 	public function get_file_contents( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$path = $request->get_param( 'path' );
 		try {
-			$file_contents = FileManager::get_file_contents( $path );
+			$contents = $this->file_manager->get_file_contents( $path );
 
 			return rest_ensure_response(
 				[
 					'path'      => $path,
 					'extension' => pathinfo( $path, PATHINFO_EXTENSION ),
-					'contents'  => $file_contents,
+					'contents'  => $contents,
 				]
 			);
 		} catch ( Exception $e ) {
@@ -156,6 +162,7 @@ class FileManagerController extends RestController {
 				'debug_suite_file_manager_error_contents',
 				$e->getMessage(),
 				[
+					'path'   => $path,
 					'status' => 500,
 				]
 			);

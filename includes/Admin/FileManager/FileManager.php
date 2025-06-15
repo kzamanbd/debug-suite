@@ -34,63 +34,6 @@ class FileManager {
 	}
 
 	/**
-	 * Get only directories
-	 *
-	 * @param $content
-	 *
-	 * @return array
-	 */
-	private function filter_dir( $content ): array {
-		$dirs = array_map(
-			function ( $item ) {
-				$path = pathinfo( $item['path'] );
-
-				return [
-					'type'       => $item['type'],
-					'path'       => $item['path'],
-					'basename'   => $path['basename'],
-					'dirname'    => $path['dirname'] === '.' ? '' : $path['dirname'],
-					'timestamp'  => $item['lastModified'],
-					'visibility' => $item['visibility'],
-				];
-			},
-			array_filter( $content, fn( $item ) => $item['type'] === 'dir' )
-		);
-
-		return array_values( $dirs );
-	}
-
-	/**
-	 * Get only files
-	 *
-	 * @param $content
-	 *
-	 * @return array
-	 */
-	private function filter_file( $content ): array {
-		$files = array_map(
-			function ( $item ) {
-				$path = pathinfo( $item['path'] );
-
-				return [
-					'type'       => $item['type'],
-					'path'       => $item['path'],
-					'basename'   => $path['basename'],
-					'dirname'    => $path['dirname'] === '.' ? '' : $path['dirname'],
-					'extension'  => $path['extension'] ?? '',
-					'filename'   => $path['filename'],
-					'size'       => $item['fileSize'],
-					'timestamp'  => $item['lastModified'],
-					'visibility' => $item['visibility'],
-				];
-			},
-			array_filter( $content, fn( $item ) => $item['type'] === 'file' )
-		);
-
-		return array_values( $files );
-	}
-
-	/**
 	 * Helper function to get the file or directory info
 	 *
 	 * @param $item SplFileInfo object
@@ -149,7 +92,7 @@ class FileManager {
 	 *
 	 * @return bool
 	 */
-	private static function is_valid_file_path( string $path ): bool {
+	private function is_valid_file_path( string $path ): bool {
 
 		// Check if the path has a file extension
 		$has_extension = pathinfo( $path, PATHINFO_EXTENSION ) !== '';
@@ -192,9 +135,9 @@ class FileManager {
 	 *
 	 * @return string|null
 	 */
-	public static function get_file_contents( string $file_path ): ?string {
+	public function get_file_contents( string $file_path ): ?string {
 		$full_path = ABSPATH . $file_path;
-		if ( ! self::is_valid_file_path( $full_path ) ) {
+		if ( ! $this->is_valid_file_path( $full_path ) ) {
 			throw new InvalidArgumentException( 'Invalid file path provided.' );
 		}
 		if ( ! file_exists( $full_path ) ) {
