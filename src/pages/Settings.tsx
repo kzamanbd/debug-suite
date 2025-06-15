@@ -135,9 +135,9 @@ const Settings = () => {
     // Compact File Manager Tab
     const fileManagerTab = (
         <Card className="rounded-lg border-0 bg-white/90 p-0 shadow-md dark:bg-gray-900/80">
-            <div className="rounded-t-lg border-b border-blue-100 bg-gradient-to-r from-blue-100 via-blue-50 to-white px-4 py-3">
-                <h2 className="flex items-center gap-2 text-lg font-semibold text-blue-900 dark:text-blue-200">
-                    <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="border-primary-100 from-primary-100 via-primary-50 rounded-t-lg border-b bg-gradient-to-r to-white px-4 py-3">
+                <h2 className="text-primary-900 dark:text-primary-200 flex items-center gap-2 text-lg font-semibold">
+                    <svg className="text-primary-600 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -153,7 +153,7 @@ const Settings = () => {
                     </svg>
                     {__('File Manager Configuration', 'debug-suite')}
                 </h2>
-                <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                <p className="text-primary-700 dark:text-primary-300 mt-1 text-xs">
                     {__('Control access and behavior of the file manager', 'debug-suite')}
                 </p>
             </div>
@@ -291,9 +291,9 @@ const Settings = () => {
     // Compact Debug Tab
     const debugTab = (
         <Card className="rounded-lg border-0 bg-white/90 p-0 shadow-md dark:bg-gray-900/80">
-            <div className="rounded-t-lg border-b border-green-100 bg-gradient-to-r from-green-100 via-green-50 to-white px-4 py-3">
-                <h2 className="flex items-center gap-2 text-lg font-semibold text-green-900 dark:text-green-200">
-                    <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="border-primary-100 from-primary-100 via-primary-50 rounded-t-lg border-b bg-gradient-to-r to-white px-4 py-3">
+                <h2 className="text-primary-900 dark:text-primary-200 flex items-center gap-2 text-lg font-semibold">
+                    <svg className="text-primary-600 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -303,7 +303,7 @@ const Settings = () => {
                     </svg>
                     {__('Debug Configuration', 'debug-suite')}
                 </h2>
-                <p className="mt-1 text-xs text-green-700 dark:text-green-300">
+                <p className="text-primary-700 dark:text-primary-300 mt-1 text-xs">
                     {__('Configure debugging and logging options', 'debug-suite')}
                 </p>
             </div>

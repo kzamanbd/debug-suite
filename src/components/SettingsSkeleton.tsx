@@ -24,7 +24,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
             <div className="space-y-4 sm:space-y-6">
                 {/* File Manager Settings Skeleton */}
                 <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <div className="border-l-4 border-l-blue-500 bg-blue-50 px-4 py-3 sm:px-6 sm:py-4 dark:bg-blue-950">
+                    <div className="border-l-primary-500 bg-primary-50 dark:bg-primary-950 border-l-4 px-4 py-3 sm:px-6 sm:py-4">
                         <div className={skeleton('mb-2 h-6 w-64')}></div>
                         <div className={skeleton('h-4 w-40')}></div>
                     </div>
@@ -74,7 +74,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
                 </div>
                 {/* Debug Settings Skeleton */}
                 <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <div className="border-l-4 border-l-green-500 bg-green-50 px-4 py-3 sm:px-6 sm:py-4 dark:bg-green-950">
+                    <div className="border-l-primary-500 bg-primary-50 dark:bg-primary-950 border-l-4 px-4 py-3 sm:px-6 sm:py-4">
                         <div className={skeleton('mb-2 h-6 w-64')}></div>
                         <div className={skeleton('h-4 w-40')}></div>
                     </div>

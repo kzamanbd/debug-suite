@@ -119,7 +119,7 @@ const ManageLogs = () => {
             <div className="flex justify-between">
                 <div className="flex flex-wrap gap-3">
                     <button
-                        className="rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="bg-primary-600 hover:bg-primary-700 rounded-md px-4 py-2 font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                         onClick={handleClearLogs}
                         disabled={isProcessing || selectedFiles.length === 0}
                     >
@@ -149,7 +149,7 @@ const ManageLogs = () => {
                     </Link>
                     <Link
                         to="/file-logs"
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-2 font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                        className="bg-primary-50 text-primary-700 hover:bg-primary-100 inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors"
                     >
                         {'\ud83d\udcc4'} {__('View Logs', 'debug-suite')}
                     </Link>
@@ -169,7 +169,7 @@ const ManageLogs = () => {
                                     type="checkbox"
                                     checked={selectedFiles.length === logFiles.length && logFiles.length > 0}
                                     onChange={(e) => handleSelectAll(e.target.checked)}
-                                    className="h-4 w-4 rounded border-gray-300 accent-blue-600 focus:ring-2 focus:ring-blue-500"
+                                    className="accent-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300 focus:ring-2"
                                 />
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
@@ -200,7 +200,7 @@ const ManageLogs = () => {
                                         type="checkbox"
                                         checked={selectedFiles.indexOf(file.id) !== -1}
                                         onChange={(e) => handleSelectFile(file.id, e.target.checked)}
-                                        className="h-4 w-4 rounded border-gray-300 accent-blue-600 focus:ring-2 focus:ring-blue-500"
+                                        className="accent-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300 focus:ring-2"
                                     />
                                 </td>
                                 <td className="px-4 py-2 font-semibold text-gray-900">{file.name}</td>
@@ -242,10 +242,10 @@ const ManageLogs = () => {
                             <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-900">
                                 <input
                                     type="checkbox"
-                                    className="h-4 w-4 rounded border-gray-300 accent-blue-600 focus:ring-2 focus:ring-blue-500"
+                                    className="accent-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300 focus:ring-2"
                                 />
                                 {__('Archive logs older than', 'debug-suite')}
-                                <select className="ml-2 rounded-md border border-gray-300 px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500">
+                                <select className="focus:ring-primary-500 ml-2 rounded-md border border-gray-300 px-2 py-1 text-sm focus:ring-2">
                                     <option value="7">{__('7 days', 'debug-suite')}</option>
                                     <option value="30">{__('30 days', 'debug-suite')}</option>
                                     <option value="90">{__('90 days', 'debug-suite')}</option>
@@ -260,7 +260,7 @@ const ManageLogs = () => {
                                 <input
                                     type="number"
                                     value="10"
-                                    className="w-20 rounded-md border border-gray-300 px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500"
+                                    className="focus:ring-primary-500 w-20 rounded-md border border-gray-300 px-2 py-1 text-sm focus:ring-2"
                                 />
                                 <span className="text-gray-700">{__('MB', 'debug-suite')}</span>
                             </div>
@@ -272,7 +272,7 @@ const ManageLogs = () => {
                             <label className="mb-1 block text-sm font-medium text-gray-900">
                                 {__('Log Retention', 'debug-suite')}
                             </label>
-                            <select className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500">
+                            <select className="focus:ring-primary-500 rounded-md border border-gray-300 px-2 py-1 text-sm focus:ring-2">
                                 <option value="30">{__('30 days', 'debug-suite')}</option>
                                 <option value="60">{__('60 days', 'debug-suite')}</option>
                                 <option value="90">{__('90 days', 'debug-suite')}</option>
@@ -287,7 +287,7 @@ const ManageLogs = () => {
                     <div className="mt-6">
                         <button
                             type="submit"
-                            className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white transition-colors hover:bg-blue-700"
+                            className="bg-primary-600 hover:bg-primary-700 rounded-lg px-6 py-2 font-medium text-white transition-colors"
                         >
                             {__('Save Settings', 'debug-suite')}
                         </button>

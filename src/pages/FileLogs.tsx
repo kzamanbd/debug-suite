@@ -20,7 +20,7 @@ interface LogEntry {
 const levelColors: Record<string, string> = {
     error: 'bg-red-100 text-red-700',
     warning: 'bg-yellow-100 text-yellow-800',
-    info: 'bg-blue-100 text-blue-700',
+    info: 'bg-primary-100 text-primary-700',
     debug: 'bg-gray-100 text-gray-700'
 };
 
@@ -92,7 +92,7 @@ const FileLogs = () => {
                     </Link>
                     <Link
                         to="/file-logs/manage"
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-2 font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                        className="bg-primary-50 text-primary-700 hover:bg-primary-100 inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors"
                     >
                         {'\ud83d\udcc4'} {__('Manage File Logs', 'debug-suite')}
                     </Link>
@@ -151,7 +151,7 @@ const FileLogs = () => {
                                                         <DisclosureButton className="w-full text-left focus:outline-none">
                                                             {log.message}
                                                             {log.trace && (
-                                                                <span className="ml-2 text-xs text-blue-500">
+                                                                <span className="text-primary-500 ml-2 text-xs">
                                                                     {open
                                                                         ? __('Hide Trace', 'debug-suite')
                                                                         : __('Show Trace', 'debug-suite')}

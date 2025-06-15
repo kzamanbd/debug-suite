@@ -26,8 +26,8 @@ const ContentTabs = ({ tabs, className = '' }: ContentTabsProps): JSX.Element =>
                                 cn(
                                     'px-4 py-2 text-sm font-medium transition-colors focus:outline-none',
                                     selected
-                                        ? 'border-b-2 border-blue-600 text-blue-700 dark:text-blue-300'
-                                        : 'text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-300'
+                                        ? 'border-primary-600 text-primary-700 dark:text-primary-300 border-b-2'
+                                        : 'hover:text-primary-600 dark:hover:text-primary-300 text-gray-500 dark:text-gray-400'
                                 )
                             }
                         >

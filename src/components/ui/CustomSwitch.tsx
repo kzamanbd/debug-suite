@@ -22,7 +22,7 @@ const CustomSwitch = ({ className = '', ...props }: CustomSwitchProps): JSX.Elem
         />
         <span
             className={cn(
-                'block h-full rounded-full bg-gray-200 peer-checked:bg-blue-500 before:absolute before:bottom-1 before:left-1 before:h-3 before:w-3 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:before:left-6 dark:bg-gray-700 dark:peer-checked:before:bg-white',
+                'peer-checked:bg-primary-500 block h-full rounded-full bg-gray-200 before:absolute before:bottom-1 before:left-1 before:h-3 before:w-3 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:before:left-6 dark:bg-gray-700 dark:peer-checked:before:bg-white',
                 props.disabled ? 'cursor-not-allowed opacity-50' : ''
             )}
         />

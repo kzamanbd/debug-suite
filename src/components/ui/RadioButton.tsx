@@ -18,7 +18,7 @@ const RadioButton = ({ label, className = '', id, ...props }: RadioButtonProps) 
         <input
             type="radio"
             id={id}
-            className="h-4 w-4 rounded border-gray-300 accent-blue-600 focus:ring-2 focus:ring-blue-500"
+            className="accent-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300 focus:ring-2"
             {...props}
         />
         <span className="text-sm text-gray-700">{label}</span>
