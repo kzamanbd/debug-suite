@@ -4,7 +4,7 @@
 
     <!-- What to scan -->
     <file>.</file>
-    
+
     <!-- What to exclude -->
     <exclude-pattern type="relative">^/\.git/*</exclude-pattern>
     <exclude-pattern type="relative">^/\.githooks/*</exclude-pattern>
@@ -18,9 +18,8 @@
     <exclude-pattern type="relative">node_modules/*</exclude-pattern>
     <exclude-pattern type="relative">^/node_modules/*</exclude-pattern>
     <exclude-pattern type="relative">^/vendor/*</exclude-pattern>
-    <exclude-pattern type="relative">*/vendor/*</exclude-pattern>
     <exclude-pattern type="relative">vendor/*</exclude-pattern>
-    <exclude-pattern type="relative">^/tests/*</exclude-pattern>
+    <exclude-pattern type="relative">tests/*</exclude-pattern>
     <exclude-pattern type="relative">^/dependencies/*</exclude-pattern>
     <exclude-pattern type="relative">*\.twig$</exclude-pattern>
     <exclude-pattern type="relative">*\.css$</exclude-pattern>
@@ -33,7 +32,7 @@
     <arg name="colors"/>
     <arg name="extensions" value="php"/>
     <arg name="parallel" value="8"/>
-    
+
     <!-- Memory and error handling -->
     <ini name="memory_limit" value="512M"/>
     <arg name="error-severity" value="1"/>
@@ -53,7 +52,7 @@
     <rule ref="WordPress-Extra"/>
 
     <!-- WordPress.org CRITICAL Requirements -->
-    
+
     <!-- Prefix all globals (REQUIRED) -->
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
         <properties>
@@ -67,13 +66,13 @@
 
     <!-- Security - Output escaping (CRITICAL) -->
     <rule ref="WordPress.Security.EscapeOutput"/>
-    
+
     <!-- Security - Database queries (CRITICAL) -->
     <rule ref="WordPress.DB.PreparedSQL"/>
-    
+
     <!-- Security - Input validation (CRITICAL) -->
     <rule ref="WordPress.Security.ValidatedSanitizedInput"/>
-    
+
     <!-- Security - Nonce verification (CRITICAL) -->
     <rule ref="WordPress.Security.NonceVerification"/>
 
@@ -98,13 +97,13 @@
     <rule ref="WordPress.DB.SlowDBQuery"/>
 
     <!-- WordPress.org specific customizations -->
-    
+
     <!-- Make security violations errors -->
     <rule ref="WordPress.Security.EscapeOutput.OutputNotEscaped">
         <type>error</type>
         <message>All output must be escaped. Use esc_html(), esc_attr(), wp_kses() or similar.</message>
     </rule>
-    
+
     <rule ref="WordPress.DB.PreparedSQL.NotPrepared">
         <type>error</type>
         <message>Use $wpdb->prepare() for all database queries.</message>
@@ -113,7 +112,7 @@
     <rule ref="WordPress.Security.ValidatedSanitizedInput.InputNotValidated">
         <type>error</type>
     </rule>
-    
+
     <rule ref="WordPress.Security.ValidatedSanitizedInput.InputNotSanitized">
         <type>error</type>
     </rule>
@@ -122,13 +121,13 @@
     <rule ref="WordPress.PHP.StrictInArray">
         <type>error</type>
     </rule>
-    
+
     <rule ref="Universal.Operators.StrictComparisons">
         <type>error</type>
     </rule>
 
     <!-- Relaxed rules for debug plugins -->
-    
+
     <!-- Allow development functions in debug plugins -->
     <rule ref="WordPress.PHP.DevelopmentFunctions">
         <type>warning</type>
@@ -139,7 +138,7 @@
     <rule ref="WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned">
         <severity>0</severity>
     </rule>
-    
+
     <!-- Prevent overriding WordPress global variables -->
     <rule ref="WordPress.WP.GlobalVariablesOverride">
         <severity>0</severity>
@@ -153,8 +152,8 @@
     <rule ref="Squiz.Commenting">
         <severity>0</severity>
     </rule>
-    
-    
+
+
     <rule ref="WordPress.Files.FileName">
         <severity>0</severity>
     </rule>
