@@ -58,3 +58,19 @@ if ( ! function_exists( 'debug_suite_service_manager' ) ) {
 		return debug_suite()->get_service_manager();
 	}
 }
+
+if ( ! function_exists( 'debug_suite_date' ) ) {
+	/**
+	 * Register a service with the Debug Suite service manager.
+	 *
+	 * @param string $timestamp
+	 *
+	 * @return string
+	 */
+	function debug_suite_date( $timestamp ): string {
+		// Get a date format from WP settings (Settings > General)
+		$date_format = get_option( 'date_format' );
+		// Convert the timestamp to formatted date
+		return date_i18n( $date_format, $timestamp );
+	}
+}

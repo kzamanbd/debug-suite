@@ -104,7 +104,7 @@ class FileManager {
 			'name'        => $item->getFilename(),
 			'path'        => $item->getPathname(),
 			'size'        => $this->format_size_units( $item->getSize() ),
-			'modified_at' => $item->getMTime(),
+			'modified_at' => debug_suite_date( $item->getMTime() ),
 		];
 
 		if ( $item->getType() === 'dir' ) {
