@@ -156,3 +156,4 @@ assets/js/
 assets/css/
 vendor
 .idea
+.phpunit.result.cache

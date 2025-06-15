@@ -17,6 +17,7 @@ parameters:
         - message: '#Unsafe access to private property .+::\$instance through static::#'
         # Ignore missing array typehints 
         - identifier: missingType.iterableValue
+        - identifier: class.notFound
         
     # Bootstrap files
     bootstrapFiles:

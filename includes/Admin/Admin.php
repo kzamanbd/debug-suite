@@ -6,6 +6,8 @@
 
 namespace DebugSuite\Admin;
 
+use DebugSuite\API\FileLogsController;
+use DebugSuite\API\SettingsController;
 use DebugSuite\Interfaces\Hookable;
 
 /**
@@ -21,6 +23,31 @@ class Admin implements Hookable {
 	public function register_hooks(): void {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+		add_action( 'rest_api_init', [ $this, 'register_api_routes' ] );
+	}
+
+
+	/**
+	 * Register all API controller routes using the DI container.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	public function register_api_routes(): void {
+		$controllers = [
+			SettingsController::class,
+			FileLogsController::class,
+			// Add more API controllers here as needed.
+		];
+		$controllers = apply_filters( 'debug_suite_api_controllers', $controllers );
+
+		foreach ( $controllers as $controller_class ) {
+			$controller = new $controller_class();
+			if ( method_exists( $controller, 'register_routes' ) ) {
+				$controller->register_routes();
+			}
+		}
 	}
 
 	/**
@@ -44,7 +71,8 @@ class Admin implements Hookable {
 			$position
 		);
 
-		$submenu[ $slug ][] = [ __( 'Dashboard', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#' ];
+		$submenu[ $slug ][] = [ __( 'Overview', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#' ];
+		$submenu[ $slug ][] = [ __( 'File Manager', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#file-manager' ];
 		$submenu[ $slug ][] = [ __( 'File Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#file-logs' ];
 		$submenu[ $slug ][] = [ __( 'Manage Logs', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#file-logs/manage' ];
 	}

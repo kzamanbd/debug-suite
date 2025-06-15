@@ -1,0 +1,167 @@
+<?php
+/**
+ * Settings REST API controller for Debug Suite.
+ *
+ * @package DebugSuite
+ */
+
+namespace DebugSuite\API;
+
+use WP_Roles;
+use WP_REST_Request;
+use WP_REST_Response;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
+/**
+ * Class SettingsController
+ *
+ * Handles REST API endpoints for Debug Suite settings.
+ *
+ * @since 1.0.0
+ */
+class SettingsController extends RestController {
+	/**
+	 * Route base for settings.
+	 *
+	 * @since 1.0.0
+	 * @var string
+	 */
+	protected $rest_base = 'settings';
+
+	/**
+	 * Register the routes for settings.
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function register_routes(): void {
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			[
+				[
+					'methods'             => 'GET',
+					'callback'            => [ $this, 'get_settings' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
+				],
+				[
+					'methods'             => 'POST',
+					'callback'            => [ $this, 'update_settings' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
+					'args'                => [
+						'debug'            => [
+							'type'        => 'string',
+							'default'     => 'false',
+							'description' => __( 'Enable or disable debugging mode.', 'debug-suite' ),
+							'enum'        => [ 'true', 'false' ],
+						],
+						'wp_debug_log'     => [
+							'type'        => 'string',
+							'default'     => 'false',
+							'description' => __( 'Enable or disable WP_DEBUG_LOG.', 'debug-suite' ),
+							'enum'        => [ 'true', 'false' ],
+						],
+						'wp_debug_display' => [
+							'type'        => 'string',
+							'default'     => 'false',
+							'description' => __( 'Enable or disable WP_DEBUG_DISPLAY.', 'debug-suite' ),
+							'enum'        => [ 'true', 'false' ],
+						],
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Get Debug Suite settings.
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 *
+	 * @return WP_REST_Response
+	 * @since 1.0.0
+	 */
+	public function get_settings( $request ): WP_REST_Response {
+		global $wp_roles;
+
+		if ( ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
+		}
+
+		$roles = array_map(
+			function ( $role ) {
+				return [
+					'name'        => $role['name'],
+				];
+			},
+			$wp_roles->roles
+		);
+		$constants = [
+			'wpDebug'        => WP_DEBUG,
+			'wpDebugLog'     => WP_DEBUG_LOG,
+			'wpDebugDisplay' => WP_DEBUG_DISPLAY,
+			'publicRootPath' => ABSPATH,
+			'filesUrl'       => content_url(),
+			'roles'          => $roles,
+		];
+		$settings  = get_option( 'debug_suite_settings', [] );
+		$settings  = array_merge( $constants, $settings );
+
+		return rest_ensure_response( $settings, 200 );
+	}
+
+	/**
+	 * Update Debug Suite settings.
+	 *
+	 * @param WP_REST_Request $request The REST request.
+	 *
+	 * @return WP_REST_Response
+	 * @since 1.0.0
+	 */
+	public function update_settings( $request ): WP_REST_Response {
+		$params = $request->get_json_params();
+		if ( ! is_array( $params ) ) {
+			return rest_ensure_response( [ 'error' => __( 'Invalid settings data.', 'debug-suite' ) ], 400 );
+		}
+		$file_path = ABSPATH . 'wp-config.php';
+		// Sanitize and validate settings here as needed.
+		if ( ! file_exists( $file_path ) || ! is_writable( $file_path ) ) {
+			return rest_ensure_response( [ 'error' => __( 'Cannot write to wp-config.php file.', 'debug-suite' ) ], 500 );
+		}
+
+		$is_debug         = $params['debug'] ?? 'false';
+		$wp_debug_log     = $params['wp_debug_log'] ?? 'false';
+		$wp_debug_display = $params['wp_debug_display'] ?? 'true';
+
+		// Default debug settings
+		$constants = [
+			'WP_DEBUG'         => $is_debug,
+			'WP_DEBUG_LOG'     => $wp_debug_log,
+			'WP_DEBUG_DISPLAY' => $wp_debug_display,
+		];
+
+		$contents = file_get_contents( $file_path );
+		foreach ( $constants as $constant => $value ) {
+			// Regex to match existing define statements
+			$pattern     = "/define\s*\(\s*['\"]{$constant}['\"]\s*,\s*.*?\);/";
+			$replacement = "define('{$constant}', {$value});";
+
+			if ( preg_match( $pattern, $contents ) ) {
+				$contents = preg_replace( $pattern, $replacement, $contents );
+			} else {
+				// If not found, add it before the "stop editing" line
+				$insertion_point = strpos( $contents, '/* That\'s all, stop editing!' );
+				if ( $insertion_point !== false ) {
+					$contents = substr_replace( $contents, $replacement . "\n", $insertion_point, 0 );
+				}
+			}
+		}
+		// Write the updated contents back to the file
+		$is_update = file_put_contents( $file_path, $contents ) !== false;
+
+		return rest_ensure_response( [ 'success' => $is_update ] );
+	}
+}

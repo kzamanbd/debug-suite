@@ -21,13 +21,17 @@
     "dependencies": {
         "@headlessui/react": "^2.2.4",
         "@tailwindcss/forms": "^0.5.10",
+        "@types/react-select": "^5.0.1",
         "@wordpress/api-fetch": "^7.25.0",
         "@wordpress/data": "^10.25.0",
         "@wordpress/dom-ready": "^4.25.0",
         "@wordpress/element": "^6.25.0",
+        "@wordpress/i18n": "^5.25.0",
         "@wordpress/plugins": "^7.25.0",
         "clsx": "^2.1.1",
         "react-router-dom": "^7.6.2",
+        "react-select": "^5.10.1",
+        "react-toastify": "^11.0.5",
         "tailwind-merge": "^3.3.1"
     },
     "devDependencies": {
@@ -39,6 +43,7 @@
         "concurrently": "^9.1.2",
         "eslint-config-prettier": "^10.1.5",
         "prettier": "^3.5.3",
+        "prettier-plugin-tailwindcss": "^0.6.12",
         "tailwindcss": "^4.1.10",
         "typescript": "^5.8.3"
     }

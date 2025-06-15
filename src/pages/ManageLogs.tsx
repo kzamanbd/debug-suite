@@ -1,4 +1,6 @@
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Link } from 'react-router-dom';
 
 interface LogFile {
     id: number;
@@ -110,62 +112,55 @@ const ManageLogs = () => {
 
     return (
         <>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">Manage Log Files</h1>
-            <p className="text-gray-600 mb-6">
-                Manage your application's log files - clear, download, or archive them.
+            <p className="mb-6 text-gray-600">
+                {__("Manage your application's log files - clear, download, or archive them.", 'debug-suite')}
             </p>
 
-            <div className="flex gap-3 mb-6">
-                <a
-                    href="#/file-logs"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-800 font-medium hover:bg-gray-200 transition-colors"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        window.location.hash = '#/file-logs';
-                    }}
-                >
-                    ← Back to Overview
-                </a>
-                <a
-                    href="#/file-logs"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition-colors"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        window.location.hash = '#/file-logs';
-                    }}
-                >
-                    📄 View Logs
-                </a>
+            <div className="flex justify-between">
+                <div className="flex flex-wrap gap-3">
+                    <button
+                        className="bg-primary-600 hover:bg-primary-700 rounded-md px-4 py-2 font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                        onClick={handleClearLogs}
+                        disabled={isProcessing || selectedFiles.length === 0}
+                    >
+                        {isProcessing ? __('Processing...', 'debug-suite') : __('Clear Selected', 'debug-suite')}
+                    </button>
+                    <button
+                        className="rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                        onClick={handleDownloadLogs}
+                        disabled={isProcessing || selectedFiles.length === 0}
+                    >
+                        {__('Download Selected', 'debug-suite')}
+                    </button>
+                    <button
+                        className="rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                        onClick={handleArchiveLogs}
+                        disabled={isProcessing || selectedFiles.length === 0}
+                    >
+                        {__('Archive Selected', 'debug-suite')}
+                    </button>
+                </div>
+                <div className="flex gap-3">
+                    <Link
+                        to="/"
+                        className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-800 transition-colors hover:bg-gray-200"
+                    >
+                        {'\u2190'} {__('Back to Overview', 'debug-suite')}
+                    </Link>
+                    <Link
+                        to="/file-logs"
+                        className="bg-primary-50 text-primary-700 hover:bg-primary-100 inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors"
+                    >
+                        {'\ud83d\udcc4'} {__('View Logs', 'debug-suite')}
+                    </Link>
+                </div>
             </div>
-
-            <div className="flex flex-wrap gap-3 mb-4">
-                <button
-                    className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handleClearLogs}
-                    disabled={isProcessing || selectedFiles.length === 0}
-                >
-                    {isProcessing ? 'Processing...' : 'Clear Selected'}
-                </button>
-                <button
-                    className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handleDownloadLogs}
-                    disabled={isProcessing || selectedFiles.length === 0}
-                >
-                    Download Selected
-                </button>
-                <button
-                    className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handleArchiveLogs}
-                    disabled={isProcessing || selectedFiles.length === 0}
-                >
-                    Archive Selected
-                </button>
-            </div>
-            <p className="text-sm text-gray-500 mb-6">
-                Selected: {selectedFiles.length} of {logFiles.length} files
+            <p className="mb-6 text-sm text-gray-500">
+                {__('Selected:', 'debug-suite')} {selectedFiles.length} {__('of', 'debug-suite')} {logFiles.length}{' '}
+                {__('files', 'debug-suite')}
             </p>
 
-            <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200 mb-8">
+            <div className="mb-8 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -174,26 +169,38 @@ const ManageLogs = () => {
                                     type="checkbox"
                                     checked={selectedFiles.length === logFiles.length && logFiles.length > 0}
                                     onChange={(e) => handleSelectAll(e.target.checked)}
-                                    className="accent-blue-600 w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                                    className="accent-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300 focus:ring-2"
                                 />
                             </th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Log File</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Path</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Size</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Last Modified</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Entries</th>
-                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">Actions</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Log File', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Path', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Size', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Last Modified', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Entries', 'debug-suite')}
+                            </th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600">
+                                {__('Actions', 'debug-suite')}
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {logFiles.map((file) => (
-                            <tr key={file.id} className="hover:bg-gray-50 transition-colors">
+                            <tr key={file.id} className="transition-colors hover:bg-gray-50">
                                 <td className="px-4 py-2 text-center">
                                     <input
                                         type="checkbox"
                                         checked={selectedFiles.indexOf(file.id) !== -1}
                                         onChange={(e) => handleSelectFile(file.id, e.target.checked)}
-                                        className="accent-blue-600 w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                                        className="accent-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300 focus:ring-2"
                                     />
                                 </td>
                                 <td className="px-4 py-2 font-semibold text-gray-900">{file.name}</td>
@@ -206,16 +213,16 @@ const ManageLogs = () => {
                                 <td className="px-4 py-2">
                                     <div className="flex gap-2">
                                         <button
-                                            className="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors"
+                                            className="rounded bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200"
                                             onClick={() => alert(`Viewing ${file.name}...`)}
                                         >
-                                            View
+                                            {__('View', 'debug-suite')}
                                         </button>
                                         <button
-                                            className="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors"
+                                            className="rounded bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200"
                                             onClick={() => alert(`Downloading ${file.name}...`)}
                                         >
-                                            Download
+                                            {__('Download', 'debug-suite')}
                                         </button>
                                     </div>
                                 </td>
@@ -225,58 +232,64 @@ const ManageLogs = () => {
                 </table>
             </div>
 
-            <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Log Management Settings</h3>
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-6">
+                <h3 className="mb-4 text-lg font-semibold text-gray-900">
+                    {__('Log Management Settings', 'debug-suite')}
+                </h3>
                 <form>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
-                            <label className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-2">
+                            <label className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-900">
                                 <input
                                     type="checkbox"
-                                    className="accent-blue-600 w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                                    className="accent-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300 focus:ring-2"
                                 />
-                                Archive logs older than
-                                <select className="ml-2 px-2 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm">
-                                    <option value="7">7 days</option>
-                                    <option value="30">30 days</option>
-                                    <option value="90">90 days</option>
+                                {__('Archive logs older than', 'debug-suite')}
+                                <select className="focus:ring-primary-500 ml-2 rounded-md border border-gray-300 px-2 py-1 text-sm focus:ring-2">
+                                    <option value="7">{__('7 days', 'debug-suite')}</option>
+                                    <option value="30">{__('30 days', 'debug-suite')}</option>
+                                    <option value="90">{__('90 days', 'debug-suite')}</option>
                                 </select>
                             </label>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 mb-1">Max Log File Size</label>
+                            <label className="mb-1 block text-sm font-medium text-gray-900">
+                                {__('Max Log File Size', 'debug-suite')}
+                            </label>
                             <div className="flex items-center gap-2">
                                 <input
                                     type="number"
                                     value="10"
-                                    className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm"
+                                    className="focus:ring-primary-500 w-20 rounded-md border border-gray-300 px-2 py-1 text-sm focus:ring-2"
                                 />
-                                <span className="text-gray-700">MB</span>
+                                <span className="text-gray-700">{__('MB', 'debug-suite')}</span>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">
-                                Automatically rotate logs when they exceed this size.
+                            <p className="mt-1 text-xs text-gray-500">
+                                {__('Automatically rotate logs when they exceed this size.', 'debug-suite')}
                             </p>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-900 mb-1">Log Retention</label>
-                            <select className="px-2 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm">
-                                <option value="30">30 days</option>
-                                <option value="60">60 days</option>
-                                <option value="90">90 days</option>
-                                <option value="180">180 days</option>
-                                <option value="365">1 year</option>
+                            <label className="mb-1 block text-sm font-medium text-gray-900">
+                                {__('Log Retention', 'debug-suite')}
+                            </label>
+                            <select className="focus:ring-primary-500 rounded-md border border-gray-300 px-2 py-1 text-sm focus:ring-2">
+                                <option value="30">{__('30 days', 'debug-suite')}</option>
+                                <option value="60">{__('60 days', 'debug-suite')}</option>
+                                <option value="90">{__('90 days', 'debug-suite')}</option>
+                                <option value="180">{__('180 days', 'debug-suite')}</option>
+                                <option value="365">{__('1 year', 'debug-suite')}</option>
                             </select>
-                            <p className="text-xs text-gray-500 mt-1">
-                                How long to keep log files before permanent deletion.
+                            <p className="mt-1 text-xs text-gray-500">
+                                {__('How long to keep log files before permanent deletion.', 'debug-suite')}
                             </p>
                         </div>
                     </div>
                     <div className="mt-6">
                         <button
                             type="submit"
-                            className="px-6 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+                            className="bg-primary-600 hover:bg-primary-700 rounded-lg px-6 py-2 font-medium text-white transition-colors"
                         >
-                            Save Settings
+                            {__('Save Settings', 'debug-suite')}
                         </button>
                     </div>
                 </form>
