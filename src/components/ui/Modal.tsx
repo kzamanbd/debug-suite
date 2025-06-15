@@ -51,12 +51,22 @@ const Modal = ({ open, onClose, title, children, className = '' }: MyModalProps)
                             )}
                         >
                             {title && (
-                                <DialogTitle className="mb-4 flex items-center justify-between rounded-t border-b bg-gray-50 px-2 py-4">
+                                <DialogTitle className="mb-4 flex items-center justify-between rounded-t border-b bg-gray-50 p-4">
                                     <div className="text-primary-700 dark:text-primary-300 text-lg font-semibold">
                                         {title}
                                     </div>
                                     <button type="button" onClick={onClose} aria-label="Close">
-                                        Close
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <g fill="none" stroke="currentColor" stroke-width="1.5">
+                                                <circle cx="12" cy="12" r="10" opacity="0.5" />
+                                                <path stroke-linecap="round" d="m14.5 9.5l-5 5m0-5l5 5" />
+                                            </g>
+                                        </svg>
                                     </button>
                                 </DialogTitle>
                             )}

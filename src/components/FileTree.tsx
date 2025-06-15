@@ -34,7 +34,7 @@ const FileTree = ({ file, action, className = '' }: TreeProps) => {
                         className="flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
                     >
                         <FileIcon type="file" />
-                        <span className="text-gray-800 dark:text-gray-100">{file.name}</span>
+                        <span className="text-left text-gray-800 dark:text-gray-100">{file.name}</span>
                     </div>
                 )}
             </DisclosureButton>

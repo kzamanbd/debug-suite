@@ -5,6 +5,7 @@
  *
  * @since 1.0.0
  */
+import FileDetailSkeleton from '@/components/FileDetailSkeleton';
 import FileIcon from '@/components/FileIcon';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -17,7 +18,7 @@ import { __ } from '@wordpress/i18n';
 import { useCallback, useEffect, useState } from 'react';
 import FileEditor from '../components/FileEditor';
 import FileTree from '../components/FileTree';
-import LoadingSkeleton from '../components/LoadingSkeleton';
+import FileTreeSkeleton from '../components/FileTreeSkeleton';
 
 const FileManager = () => {
     const [files, setFiles] = useState<IFile[]>([]);
@@ -231,8 +232,8 @@ const FileManager = () => {
                 <div className="col-span-2">
                     {initialLoading ? (
                         <div className="p-4">
-                            {Array.from({ length: 10 }).map((_, index) => (
-                                <LoadingSkeleton key={index} />
+                            {Array.from({ length: 5 }).map((_, index) => (
+                                <FileTreeSkeleton key={index} />
                             ))}
                         </div>
                     ) : (
@@ -246,13 +247,7 @@ const FileManager = () => {
                     )}
                 </div>
                 <div className="col-span-5 border-l dark:border-gray-800">
-                    {detailLoading ? (
-                        <div className="p-4">
-                            {Array.from({ length: 10 }).map((_, index) => (
-                                <LoadingSkeleton key={index} />
-                            ))}
-                        </div>
-                    ) : null}
+                    {detailLoading ? <FileDetailSkeleton /> : null}
                     {selectedFiles.length && !detailLoading ? (
                         <div className="h-[500px] overflow-y-auto">
                             <table className="w-full text-left">
