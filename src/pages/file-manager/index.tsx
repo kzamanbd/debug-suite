@@ -5,9 +5,9 @@
  *
  * @since 1.0.0
  */
-import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/base-badge';
+import Button from '@/components/ui/base-button';
+import Card from '@/components/ui/base-card';
 import InputField from '@/components/ui/input-field';
 import { IFile } from '@/types';
 import { cn } from '@/utils/cn';

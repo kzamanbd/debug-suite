@@ -5,11 +5,11 @@
  *
  * @since 1.0.0
  */
+import Modal from '@/components/ui/base-modal';
 import { cn } from '@/utils/cn';
 import MonacoEditor from '@monaco-editor/react';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from 'react';
-import Modal from './ui/Modal';
 
 // Mapping of file extensions to Monaco languages
 const extensionToLanguageMap: Record<string, string> = {

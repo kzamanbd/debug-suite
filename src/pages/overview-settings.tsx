@@ -6,8 +6,8 @@
  * @since 1.0.0
  */
 import SettingsSkeleton from '@/components/settings-skeleton';
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
+import Button from '@/components/ui/base-button';
+import Card from '@/components/ui/base-card';
 import ContentTabs from '@/components/ui/content-tabs';
 import CustomSwitch from '@/components/ui/custom-switch';
 import InputField from '@/components/ui/input-field';

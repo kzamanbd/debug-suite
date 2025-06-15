@@ -143,7 +143,7 @@ All DocBlocks should follow this format:
  * Longer description if needed with more details about functionality,
  * implementation details, or usage examples.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  *
  * @param string $param1 Description of the first parameter.
  * @param int    $param2 Description of the second parameter.
@@ -189,7 +189,7 @@ use SomeNamespace\SomeClass;
  *
  * More detailed description if needed.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 class ExampleClass {
     // Class implementation
@@ -213,7 +213,7 @@ namespace DebugSuite\Interfaces;
  *
  * More detailed description if needed.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 interface ExampleInterface {
     // Interface methods
@@ -237,7 +237,7 @@ import { SomeType } from '../types';
 /**
  * Props for the ExampleComponent component.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 interface ExampleComponentProps {
     title: string;
@@ -251,7 +251,7 @@ interface ExampleComponentProps {
  *
  * Description of what this component does.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 const ExampleComponent = ({ title, items, onAction, className = '' }: ExampleComponentProps): JSX.Element => {
     const [activeItem, setActiveItem] = useState<number | null>(null);
