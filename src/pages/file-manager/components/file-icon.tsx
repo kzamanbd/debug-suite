@@ -5,7 +5,8 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+
+import { classNames } from '@/utils';
 
 interface FileIconProps {
     type?: string;
@@ -17,7 +18,7 @@ const FileIcon = ({ type = 'file', className = '' }: FileIconProps) => {
         return (
             <svg
                 aria-label="Directory"
-                className={cn('text-primary', className)}
+                className={classNames('text-primary', className)}
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
@@ -36,7 +37,7 @@ const FileIcon = ({ type = 'file', className = '' }: FileIconProps) => {
     return (
         <svg
             aria-label="File"
-            className={cn('text-primary', className)}
+            className={classNames('text-primary', className)}
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"

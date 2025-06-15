@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { ReactNode } from 'react';
 
 export type BadgeVariant = 'primary' | 'success' | 'danger' | 'light';
@@ -24,7 +24,13 @@ const variantClasses: Record<BadgeVariant, string> = {
 };
 
 const Badge = ({ children, variant = 'primary', className = '' }: BadgeProps) => (
-    <span className={cn('inline-block rounded px-2 py-0.5 text-xs font-semibold', variantClasses[variant], className)}>
+    <span
+        className={classNames(
+            'inline-block rounded px-2 py-0.5 text-xs font-semibold',
+            variantClasses[variant],
+            className
+        )}
+    >
         {children}
     </span>
 );

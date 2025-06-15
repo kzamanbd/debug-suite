@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 
 interface SettingsSkeletonProps {
     className?: string;
@@ -11,7 +11,7 @@ interface SettingsSkeletonProps {
  */
 const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Element => {
     // Utility for skeleton blocks
-    const skeleton = (extra: string = '') => cn('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
+    const skeleton = (extra: string = '') => classNames('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
 
     return (
         <>
@@ -57,7 +57,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
                             {[1, 2].map((i) => (
                                 <div
                                     key={i}
-                                    className={cn(
+                                    className={classNames(
                                         'flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-900',
                                         className
                                     )}
@@ -82,7 +82,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
                         {[1, 2, 3, 4, 5].map((i) => (
                             <div
                                 key={i}
-                                className={cn(
+                                className={classNames(
                                     'flex items-center justify-between rounded-lg bg-gray-50 p-4 dark:bg-gray-900',
                                     className
                                 )}

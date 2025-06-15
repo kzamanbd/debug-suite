@@ -6,7 +6,7 @@
  * @since 1.0.0
  */
 import { IFile } from '@/types';
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import FileIcon from './file-icon';
 
@@ -19,13 +19,13 @@ interface TreeProps {
 const FileTree = ({ file, action, className = '' }: TreeProps) => {
     const isDirectory = file.type === 'directory';
     return (
-        <Disclosure as="li" className={cn('mb-1', className)}>
+        <Disclosure as="li" className={classNames('mb-1', className)}>
             {({ open }) => (
                 <>
                     <DisclosureButton className="w-full focus:outline-none">
                         <div
                             onClick={() => action(file)}
-                            className={cn(
+                            className={classNames(
                                 'group flex items-center gap-2 rounded-lg px-2 py-1 transition-colors',
                                 isDirectory
                                     ? 'hover:bg-primary-50 dark:hover:bg-primary-900/20 active:bg-primary-100 dark:active:bg-primary-900/40'
@@ -35,7 +35,7 @@ const FileTree = ({ file, action, className = '' }: TreeProps) => {
                         >
                             <FileIcon
                                 type={isDirectory ? 'directory' : 'file'}
-                                className={cn(
+                                className={classNames(
                                     'transition-colors',
                                     isDirectory
                                         ? 'text-primary-600 dark:text-primary-300'
@@ -43,7 +43,7 @@ const FileTree = ({ file, action, className = '' }: TreeProps) => {
                                 )}
                             />
                             <span
-                                className={cn(
+                                className={classNames(
                                     'truncate text-left',
                                     isDirectory
                                         ? 'text-primary-800 dark:text-primary-200 font-semibold'

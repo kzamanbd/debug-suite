@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { InputHTMLAttributes } from 'react';
 
 interface RadioButtonProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
@@ -14,7 +14,7 @@ interface RadioButtonProps extends Omit<InputHTMLAttributes<HTMLInputElement>, '
 }
 
 const RadioButton = ({ label, className = '', id, ...props }: RadioButtonProps) => (
-    <label className={cn('inline-flex cursor-pointer items-center gap-2', className)} htmlFor={id}>
+    <label className={classNames('inline-flex cursor-pointer items-center gap-2', className)} htmlFor={id}>
         <input
             type="radio"
             id={id}

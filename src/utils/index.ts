@@ -1,3 +1,6 @@
+import { ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
 /**
  * mutationObserver hook.
  *
@@ -16,4 +19,8 @@ export const mutationObserver = (
     observer.observe(targetNode, config);
 
     return observer;
+};
+
+export const classNames = (...inputs: ClassValue[]) => {
+    return twMerge(clsx(inputs));
 };

@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export type ButtonVariant = 'primary' | 'success' | 'danger' | 'light';
@@ -27,7 +27,7 @@ const variantClasses: Record<ButtonVariant, string> = {
 
 const Spinner = ({ className = '' }: { className?: string }) => (
     <svg
-        className={cn('h-5 w-5 animate-spin text-white', className)}
+        className={classNames('h-5 w-5 animate-spin text-white', className)}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -48,7 +48,7 @@ const Button = ({
 }: ButtonProps) => (
     <button
         type="button"
-        className={cn(
+        className={classNames(
             'inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
             variantClasses[variant],
             className

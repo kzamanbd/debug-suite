@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { useState } from '@wordpress/element';
 import { ReactNode } from 'react';
 
@@ -31,7 +31,7 @@ const Alert = ({ children, variant = 'primary', className = '', dismissible = fa
     if (!visible) return null;
     return (
         <div
-            className={cn(
+            className={classNames(
                 'relative flex items-start gap-2 rounded-lg border px-4 py-3',
                 variantClasses[variant],
                 className

@@ -6,7 +6,7 @@
  * @since 1.0.0
  */
 import Modal from '@/components/ui/modal';
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import MonacoEditor from '@monaco-editor/react';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from 'react';
@@ -100,7 +100,7 @@ const FileEditor = ({ open, toggle, fileName, fileContent, readOnly = false }: F
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-gray-100 bg-gray-50 px-6 py-3 dark:border-gray-800 dark:bg-gray-900">
                 <button
-                    className={cn(
+                    className={classNames(
                         'bg-primary-500 rounded-lg px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors',
                         'hover:bg-primary-600 focus:ring-primary-400 focus:ring-2 focus:outline-none',
                         'disabled:opacity-60',
@@ -111,7 +111,7 @@ const FileEditor = ({ open, toggle, fileName, fileContent, readOnly = false }: F
                     {__('Save', 'debug-suite')}
                 </button>
                 <button
-                    className={cn(
+                    className={classNames(
                         'rounded-lg border border-gray-200 bg-white px-5 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors',
                         'focus:ring-primary-400 hover:bg-gray-100 focus:ring-2 focus:outline-none',
                         'dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'

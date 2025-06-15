@@ -1,6 +1,6 @@
 import FileLogsSkeleton from '@/components/logs-skeleton';
 import SearchableSelect from '@/components/ui/searchable-select';
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
@@ -132,7 +132,7 @@ const FileLogs = () => {
                                         return (
                                             <>
                                                 <tr
-                                                    className={cn(
+                                                    className={classNames(
                                                         'transition-colors hover:bg-gray-50',
                                                         open && 'bg-gray-50'
                                                     )}

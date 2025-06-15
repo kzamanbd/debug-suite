@@ -10,7 +10,7 @@ import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 import InputField from '@/components/ui/input-field';
 import { IFile } from '@/types';
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useEffect, useState } from 'react';
@@ -143,7 +143,7 @@ const FileManager = () => {
     }, []);
 
     return (
-        <Card className={cn('p-4 shadow-xs dark:bg-gray-900')}>
+        <Card className={classNames('p-4 shadow-xs dark:bg-gray-900')}>
             {/* <!-- Search and Action Buttons --> */}
             <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <InputField
@@ -300,7 +300,7 @@ const FileManager = () => {
                                     {selectedFiles.map((file) => (
                                         <tr
                                             key={file.path}
-                                            className={cn(
+                                            className={classNames(
                                                 'group transition-colors',
                                                 file.checked
                                                     ? 'bg-primary-50 dark:bg-primary-900/10'

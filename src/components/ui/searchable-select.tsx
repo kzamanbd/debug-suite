@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import Select, { GroupBase, Props as SelectProps } from 'react-select';
 
 interface SearchableSelectProps<
@@ -32,7 +32,7 @@ const SearchableSelect = <
         <div className="space-y-1">
             {label && <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>}
             <Select
-                className={cn('react-select-container', className)}
+                className={classNames('react-select-container', className)}
                 classNamePrefix="react-select"
                 styles={{
                     option: (provided, state) => ({

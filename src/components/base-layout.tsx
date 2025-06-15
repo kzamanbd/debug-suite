@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { DebugSuiteRoute } from '@/routing/routes';
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { ReactNode } from 'react';
 
 /**
@@ -40,7 +40,7 @@ const Layout = ({ title, children, className = '' }: LayoutProps): JSX.Element =
         );
     };
     return (
-        <div className={cn(className, 'mt-5 min-h-screen rounded-lg bg-white p-6')}>
+        <div className={classNames(className, 'mt-5 min-h-screen rounded-lg bg-white p-6')}>
             <LayoutTitle />
             {/* Main content area */}
             <div>{children}</div>

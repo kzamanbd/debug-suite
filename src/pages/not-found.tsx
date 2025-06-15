@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 const NotFound = (): JSX.Element => {
     return (
         <div
-            className={cn(
+            className={classNames(
                 'flex h-screen flex-col items-center justify-center py-12',
                 'mx-auto max-w-lg rounded-xl bg-white text-center dark:bg-gray-900'
             )}

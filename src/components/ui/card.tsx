@@ -5,7 +5,8 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+
+import { classNames } from '@/utils';
 
 interface CardProps {
     children: JSX.Element | JSX.Element[];
@@ -13,7 +14,7 @@ interface CardProps {
 }
 
 const Card = ({ children, className = '' }: CardProps) => (
-    <div className={cn('rounded-xl border border-gray-200 bg-white p-6 shadow-sm', className)}>{children}</div>
+    <div className={classNames('rounded-xl border border-gray-200 bg-white p-6 shadow-sm', className)}>{children}</div>
 );
 
 Card.Body = ({ children }: { children: JSX.Element }) => <div className="flex flex-col gap-4">{children}</div>;

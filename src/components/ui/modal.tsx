@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { Fragment, ReactNode } from 'react';
 
@@ -21,7 +21,10 @@ const Modal = ({ open, onClose, title, children, className = '' }: MyModalProps)
     return (
         <Transition show={open} as={Fragment}>
             <Dialog as="div" className="relative z-[99999]" onClose={onClose}>
-                <DialogBackdrop onClick={onClose} className={cn('fixed inset-0 bg-black/30 backdrop-blur-sm')} />
+                <DialogBackdrop
+                    onClick={onClose}
+                    className={classNames('fixed inset-0 bg-black/30 backdrop-blur-sm')}
+                />
                 <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-200"
@@ -44,7 +47,7 @@ const Modal = ({ open, onClose, title, children, className = '' }: MyModalProps)
                         leaveTo="opacity-0 scale-95"
                     >
                         <DialogPanel
-                            className={cn(
+                            className={classNames(
                                 'w-full max-w-lg rounded bg-white shadow-2xl ring-1 ring-black/10 dark:bg-gray-900',
                                 'transition-all',
                                 className

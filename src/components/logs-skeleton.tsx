@@ -5,17 +5,18 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+
+import { classNames } from '@/utils';
 
 interface FileLogsSkeletonProps {
     className?: string;
 }
 
-const skeleton = (extra: string = '') => cn('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
+const skeleton = (extra: string = '') => classNames('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
 
 const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Element => {
     return (
-        <div className={cn('space-y-6', className)}>
+        <div className={classNames('space-y-6', className)}>
             {/* Header skeleton */}
             <div className={skeleton('mb-4 h-5 w-80')}></div>
             {/* Action buttons skeleton */}

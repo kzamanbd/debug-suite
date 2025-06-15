@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  */
-import { cn } from '@/utils/cn';
+import { classNames } from '@/utils';
 import { InputHTMLAttributes } from 'react';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -27,7 +27,7 @@ const InputField = ({ label, error, className = '', ...props }: InputFieldProps)
             )}
             <input
                 id={id}
-                className={cn(
+                className={classNames(
                     'focus:ring-primary-500 block w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none',
                     error ? 'border-red-500' : 'border-gray-300',
                     className
