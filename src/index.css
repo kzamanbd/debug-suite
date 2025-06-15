@@ -1,4 +1,4 @@
-@import 'simplebar/dist/simplebar.css';
+@import 'simplebar-react/dist/simplebar.min.css';
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme) important;
 
@@ -70,5 +70,5 @@
 }
 
 div[data-headlessui-state='open'][role='dialog'] {
-    z-index: 999 !important;
+    z-index: 99999 !important;
 }
