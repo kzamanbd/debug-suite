@@ -26,7 +26,7 @@ interface LayoutProps {
  */
 const Layout = ({ title, children, className = '' }: LayoutProps): JSX.Element => {
     return (
-        <div className={cn(className, 'mt-5 rounded-lg bg-white p-6 shadow-md')}>
+        <div className={cn(className, 'mt-5 min-h-screen rounded-lg bg-white p-6 shadow-md')}>
             {typeof title === 'string' ? (
                 <div className="text-2xl font-semibold text-gray-900 dark:text-white">{title}</div>
             ) : title ? (
