@@ -2,9 +2,6 @@
 <ruleset name="WordPress Coding Standards for Debug Suite">
     <description>WordPress.org compliant coding standards for WordPress plugins.</description>
 
-    <!-- What to scan -->
-    <file>.</file>
-
     <!-- What to exclude -->
     <exclude-pattern>*/.git/*</exclude-pattern>
     <exclude-pattern>*/.githooks/*</exclude-pattern>
@@ -24,17 +21,14 @@
     <exclude-pattern>*.scss</exclude-pattern>
     <exclude-pattern>languages/*</exclude-pattern>
 
-    <!-- How to scan -->
+    <!-- Optional performance-related arguments -->
     <arg name="colors"/>
-    <arg name="basepath" value="./"/>
     <arg name="extensions" value="php"/>
-    <arg name="parallel" value="8"/>
 
     <!-- Memory and error handling -->
     <ini name="memory_limit" value="512M"/>
     <arg name="error-severity" value="1"/>
     <arg name="warning-severity" value="6"/>
-
 
     <!-- WordPress Core Standards -->
     <rule ref="WordPress-Core">
@@ -59,18 +53,19 @@
     </rule>
 
     <!-- Enforce short array syntax -->
-    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax">
+        <severity>1</severity>
+    </rule>
+    <exclude name="WordPress.Arrays.ArrayDeclaration" />
+    <exclude name="WordPress.Arrays.LongArraySyntax" />
+    <rule ref="Universal.Arrays.DisallowShortArraySyntax">
+        <severity>0</severity>
+    </rule>
 
-    <!-- Security - Output escaping (CRITICAL) -->
+    <!-- Security Rules -->
     <rule ref="WordPress.Security.EscapeOutput"/>
-
-    <!-- Security - Database queries (CRITICAL) -->
     <rule ref="WordPress.DB.PreparedSQL"/>
-
-    <!-- Security - Input validation (CRITICAL) -->
     <rule ref="WordPress.Security.ValidatedSanitizedInput"/>
-
-    <!-- Security - Nonce verification (CRITICAL) -->
     <rule ref="WordPress.Security.NonceVerification"/>
 
     <!-- I18n with text domain -->
@@ -87,27 +82,22 @@
     <rule ref="WordPress.DB.SlowDBQuery"/>
 
     <!-- WordPress.org specific customizations -->
-
-    <!-- Make security violations errors -->
     <rule ref="WordPress.Security.EscapeOutput.OutputNotEscaped">
         <type>error</type>
         <message>All output must be escaped. Use esc_html(), esc_attr(), wp_kses() or similar.</message>
     </rule>
-
     <rule ref="WordPress.DB.PreparedSQL.NotPrepared">
         <type>error</type>
         <message>Use $wpdb->prepare() for all database queries.</message>
     </rule>
-
     <rule ref="WordPress.Security.ValidatedSanitizedInput.InputNotValidated">
         <type>error</type>
     </rule>
-
     <rule ref="WordPress.Security.ValidatedSanitizedInput.InputNotSanitized">
         <type>error</type>
     </rule>
 
-    <!-- Strict comparisons for security -->
+    <!-- Strict comparisons -->
     <rule ref="WordPress.PHP.StrictInArray">
         <type>error</type>
     </rule>
