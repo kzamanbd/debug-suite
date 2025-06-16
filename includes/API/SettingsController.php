@@ -7,6 +7,7 @@
 
 namespace DebugSuite\API;
 
+use WP_Error;
 use WP_REST_Server;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -76,18 +77,26 @@ class SettingsController extends RestController {
 	 *
 	 * @param WP_REST_Request $request The REST request.
 	 *
-	 * @return WP_REST_Response
+	 * @return WP_REST_Response|WP_Error
 	 * @since 1.0.0
 	 */
-	public function update_settings( $request ): WP_REST_Response {
+	public function update_settings( $request ): WP_REST_Response|WP_Error {
 		$params = $request->get_json_params();
 		if ( ! is_array( $params ) ) {
-			return rest_ensure_response( [ 'error' => __( 'Invalid settings data.', 'debug-suite' ) ], 400 );
+			return new WP_Error(
+				'invalid_params',
+				__( 'Invalid parameters provided.', 'debug-suite' ),
+				[ 'status' => 400 ]
+			);
 		}
 		$file_path = ABSPATH . 'wp-config.php';
 		// Sanitize and validate settings here as needed.
 		if ( ! file_exists( $file_path ) || ! is_writable( $file_path ) ) {
-			return rest_ensure_response( [ 'error' => __( 'Cannot write to wp-config.php file.', 'debug-suite' ) ], 500 );
+			return new WP_Error(
+				'file_not_writable',
+				__( 'The wp-config.php file is not writable or does not exist.', 'debug-suite' ),
+				[ 'status' => 500 ]
+			);
 		}
 
 		$is_debug         = $params['debug'] ?? 'false';
