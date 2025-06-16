@@ -55,10 +55,11 @@ const FileManager = () => {
             fileEditHandler(file);
             return;
         }
-        const data = file.path.split('\\').map((item) => {
+        console.log('fetchNestedFiles', file.path);
+        const data = file.path.split('/').map((item) => {
             return item.trim();
         });
-        setBreadcrumb([...breadcrumb, ...data]);
+        setBreadcrumb(data);
         if (file.children?.length) {
             setSelectedFiles(file.children);
             return;
@@ -74,10 +75,16 @@ const FileManager = () => {
         }
     };
 
-    const breadcrumbClickHandler = async (index: number) => {
-        const data = breadcrumb.slice(0, index + 1);
-        setBreadcrumb(data);
-        const path = data.map((item) => item).join('\\');
+    const breadcrumbClickHandler = async (index?: number) => {
+        let path = '';
+        if (index) {
+            const data = breadcrumb.slice(0, index + 1);
+            setBreadcrumb(data);
+            path = data.map((item) => item).join('\\');
+        } else {
+            setBreadcrumb([]);
+            setInitialLoading(true);
+        }
         fetchInitialFile(path);
         setDetailLoading(true);
     };
@@ -161,13 +168,14 @@ const FileManager = () => {
             <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <ol className="flex items-center whitespace-nowrap">
                     <li className="inline-flex items-center">
-                        <a
+                        <button
+                            type="button"
                             className="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-hidden dark:text-neutral-500 dark:hover:text-blue-500 dark:focus:text-blue-500"
-                            href="#"
+                            onClick={() => breadcrumbClickHandler()}
                         >
                             <HardDrive size={16} className="mr-2" />
-                            {__('Local', 'debug-suite')}
-                        </a>
+                            {__('root', 'debug-suite')}
+                        </button>
                         {breadcrumb.length > 0 && (
                             <svg
                                 className="mx-2 size-5 shrink-0 text-gray-400 dark:text-neutral-600"
@@ -192,7 +200,7 @@ const FileManager = () => {
                                 {item}
                                 {index < breadcrumb.length - 1 && (
                                     <svg
-                                        className="mx-2 size-5 shrink-0 text-gray-400 dark:text-neutral-600"
+                                        className="size-5 shrink-0 text-gray-400 dark:text-neutral-600"
                                         width="16"
                                         height="16"
                                         viewBox="0 0 16 16"
