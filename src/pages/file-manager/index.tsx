@@ -166,8 +166,8 @@ const FileManager = () => {
             </div>
             {/* <!-- Breadcrumb --> */}
             <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                <ol className="flex items-center whitespace-nowrap">
-                    <li className="inline-flex items-center">
+                <div className="flex items-center whitespace-nowrap">
+                    <div className="inline-flex items-center">
                         <button
                             type="button"
                             className="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-hidden dark:text-neutral-500 dark:hover:text-blue-500 dark:focus:text-blue-500"
@@ -178,7 +178,7 @@ const FileManager = () => {
                         </button>
                         {breadcrumb.length > 0 && (
                             <svg
-                                className="mx-2 size-5 shrink-0 text-gray-400 dark:text-neutral-600"
+                                className="size-5 shrink-0 text-gray-400 dark:text-neutral-600"
                                 width="16"
                                 height="16"
                                 viewBox="0 0 16 16"
@@ -189,9 +189,9 @@ const FileManager = () => {
                                 <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
                             </svg>
                         )}
-                    </li>
+                    </div>
                     {breadcrumb.map((item, index) => (
-                        <li className="inline-flex items-center">
+                        <div className="inline-flex items-center">
                             <button
                                 type="button"
                                 className="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-hidden dark:text-neutral-500 dark:hover:text-blue-500 dark:focus:text-blue-500"
@@ -212,9 +212,9 @@ const FileManager = () => {
                                     </svg>
                                 )}
                             </button>
-                        </li>
+                        </div>
                     ))}
-                </ol>
+                </div>
 
                 <Badge variant="primary">
                     {selectedFiles.length} {__('items', 'debug-suite')}
