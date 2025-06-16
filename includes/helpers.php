@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Global helper functions for the Debug Suite plugin.
  *
@@ -61,7 +62,7 @@ if ( ! function_exists( 'debug_suite_service_manager' ) ) {
 
 if ( ! function_exists( 'debug_suite_date' ) ) {
 	/**
-	 * Register a service with the Debug Suite service manager.
+	 * Format a timestamp into a localized date string.
 	 *
 	 * @param string $timestamp
 	 *

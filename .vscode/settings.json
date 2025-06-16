@@ -9,11 +9,7 @@
     "phpcbf.onsave": false,
     "phpcbf.debug": false,
     "[php]": {
-        "editor.defaultFormatter": "persoderlind.vscode-phpcbf",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.fixAll.phpcs": "always"
-        }
+        "editor.defaultFormatter": "persoderlind.vscode-phpcbf"
     },
     "[javascript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
