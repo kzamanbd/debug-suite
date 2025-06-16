@@ -30,12 +30,7 @@ const FileManager = () => {
     const [initialLoading, setInitialLoading] = useState(false);
     const [detailLoading, setDetailLoading] = useState(false);
     const [loadingFileContent, setLoadingFileContent] = useState(false);
-    const [breadcrumb, setBreadcrumb] = useState<Record<string, string>[]>([
-        {
-            name: '',
-            separator: '/'
-        }
-    ]);
+    const [breadcrumb, setBreadcrumb] = useState<string[]>([]);
 
     const fetchFiles = async (path?: string) => {
         // Fetch files from the server
@@ -61,12 +56,9 @@ const FileManager = () => {
             return;
         }
         const data = file.path.split('\\').map((item) => {
-            return {
-                name: item.trim(),
-                separator: '/'
-            };
+            return item.trim();
         });
-        setBreadcrumb(data);
+        setBreadcrumb([...breadcrumb, ...data]);
         if (file.children?.length) {
             setSelectedFiles(file.children);
             return;
@@ -85,7 +77,7 @@ const FileManager = () => {
     const breadcrumbClickHandler = async (index: number) => {
         const data = breadcrumb.slice(0, index + 1);
         setBreadcrumb(data);
-        const path = data.map((item) => item.name).join('\\');
+        const path = data.map((item) => item).join('\\');
         fetchInitialFile(path);
         setDetailLoading(true);
     };
@@ -166,27 +158,56 @@ const FileManager = () => {
                 </div>
             </div>
             {/* <!-- Breadcrumb --> */}
-            <div className="mb-4 flex flex-col gap-2 text-sm font-semibold text-gray-500 md:flex-row md:items-center md:justify-between dark:text-gray-300">
-                <div className="bg-primary-100 dark:bg-primary-900/20 flex w-max items-center gap-2 rounded-lg px-2 py-1">
-                    <span className="text-primary-500">
-                        <HardDrive size={24} />
-                    </span>
-                    <div className="flex gap-2">
-                        {breadcrumb.map((item, index) => (
-                            <div key={index} className="text-primary-500">
-                                <span
-                                    onClick={breadcrumbClickHandler.bind(null, index)}
-                                    className="cursor-pointer underline"
-                                >
-                                    {item.name || __('Local', 'debug-suite')}
-                                </span>
-                                {index !== breadcrumb.length - 1 ? (
-                                    <span className="ml-2 text-gray-700 dark:text-gray-300">{item.separator}</span>
-                                ) : null}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+            <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <ol className="flex items-center whitespace-nowrap">
+                    <li className="inline-flex items-center">
+                        <a
+                            className="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-hidden dark:text-neutral-500 dark:hover:text-blue-500 dark:focus:text-blue-500"
+                            href="#"
+                        >
+                            <HardDrive size={16} className="mr-2" />
+                            {__('Local', 'debug-suite')}
+                        </a>
+                        {breadcrumb.length > 0 && (
+                            <svg
+                                className="mx-2 size-5 shrink-0 text-gray-400 dark:text-neutral-600"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true"
+                            >
+                                <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
+                            </svg>
+                        )}
+                    </li>
+                    {breadcrumb.map((item, index) => (
+                        <li className="inline-flex items-center">
+                            <button
+                                type="button"
+                                className="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-hidden dark:text-neutral-500 dark:hover:text-blue-500 dark:focus:text-blue-500"
+                                onClick={() => breadcrumbClickHandler(index)}
+                            >
+                                {item}
+                                {index < breadcrumb.length - 1 && (
+                                    <svg
+                                        className="mx-2 size-5 shrink-0 text-gray-400 dark:text-neutral-600"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
+                                    </svg>
+                                )}
+                            </button>
+                        </li>
+                    ))}
+                </ol>
+
                 <Badge variant="primary">
                     {selectedFiles.length} {__('items', 'debug-suite')}
                 </Badge>
