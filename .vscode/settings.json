@@ -2,7 +2,7 @@
     "intelephense.environment.includePaths": ["../../../../"],
     "php.workspace.includePath": "../../../../",
     "editor.formatOnSave": true,
-    "phpcbf.standard": "${workspaceRoot}/phpcs.xml",
+    "phpcbf.standard": "WordPress",
     "phpcbf.enable": true,
     "phpcbf.executablePath": "${workspaceRoot}/vendor/bin/phpcbf",
     "phpcbf.documentFormattingProvider": true,
