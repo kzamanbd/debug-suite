@@ -20,10 +20,10 @@ class CoreServiceProvider extends AbstractServiceProvider {
 	/**
 	 * Services provided by this provider.
 	 */
-	protected $provides = array(
+	protected $provides = [
 		Assets::class,
 		I18n::class,
-	);
+	];
 
 	/**
 	 * Register services with the container.

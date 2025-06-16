@@ -27,7 +27,7 @@ class ServiceManager {
 	 *
 	 * @var ServiceProviderInterface[]
 	 */
-	private $providers = array();
+	private $providers = [];
 
 	/**
 	 * Whether all providers have been booted.

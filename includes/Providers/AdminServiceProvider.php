@@ -19,9 +19,9 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	/**
 	 * Services provided by this provider.
 	 */
-	protected $provides = array(
+	protected $provides = [
 		Admin::class,
-	);
+	];
 
 	/**
 	 * Register services with the container.

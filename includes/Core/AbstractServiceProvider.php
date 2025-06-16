@@ -1,6 +1,8 @@
 <?php
 /**
- * Abstract base class for service providers.
+ * Abstract base class for service providers in Debug Suite.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Core;
@@ -8,14 +10,19 @@ namespace DebugSuite\Core;
 use DebugSuite\Interfaces\ServiceProviderInterface;
 
 /**
- * Abstract Service Provider class.
+ * Abstract base class for service providers in Debug Suite.
+ *
+ * Provides common functionality for service providers including
+ * registration tracking and service listing capabilities.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 abstract class AbstractServiceProvider implements ServiceProviderInterface {
 
 	/**
 	 * Services provided by this provider.
 	 */
-	protected $provides = array();
+	protected $provides = [];
 
 	/**
 	 * Whether the provider has been registered.

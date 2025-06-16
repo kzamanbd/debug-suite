@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Assets management for the plugin.
+ * Assets management for the Debug Suite plugin.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Core;
@@ -9,22 +11,38 @@ namespace DebugSuite\Core;
 use DebugSuite\Interfaces\Hookable;
 
 /**
- * The assets-specific functionality of the plugin.
+ * Assets management for the Debug Suite plugin.
  *
- * Handles the enqueuing of stylesheets and JavaScript files.
+ * Handles the registration and enqueuing of stylesheets and JavaScript files
+ * for both admin and frontend contexts. Manages asset dependencies and versioning.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class Assets implements Hookable {
 
 	/**
 	 * Register hooks for WordPress.
-	 * This method will be called automatically to register the hooks.
+	 *
+	 * Registers the necessary WordPress hooks for asset management,
+	 * including script and style registration and enqueuing.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return void
 	 */
 	public function register_hooks(): void {
 		add_action( 'init', [ $this, 'register_all_scripts' ] );
 	}
 
 	/**
-	 * All available scripts
+	 * Get all available scripts configuration.
+	 *
+	 * Returns an array of JavaScript files that can be registered and enqueued.
+	 * Includes information about dependencies, versions, and source paths.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return array<string, array{src: string, version: string, deps: array<string>}> Scripts configuration array.
 	 */
 	public function scripts(): array {
 		$scripts = [];
@@ -44,7 +62,14 @@ class Assets implements Hookable {
 	}
 
 	/**
-	 * All available styles
+	 * Get all available styles configuration.
+	 *
+	 * Returns an array of CSS files that can be registered and enqueued.
+	 * Includes information about dependencies, versions, and source paths.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return array<string, array{src: string, version: string, deps: array<string>}> Styles configuration array.
 	 */
 	public function styles(): array {
 		$styles = [];
@@ -64,7 +89,14 @@ class Assets implements Hookable {
 	}
 
 	/**
-	 * Register scripts and styles
+	 * Register all scripts and styles with WordPress.
+	 *
+	 * Registers all available scripts and styles with WordPress using
+	 * wp_register_script() and wp_register_style() functions.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return void
 	 */
 	public function register_all_scripts(): void {
 		$scripts = $this->scripts();

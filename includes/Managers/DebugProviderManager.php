@@ -19,14 +19,14 @@ class DebugProviderManager {
 	 *
 	 * @var DebugProviderInterface[]
 	 */
-	private array $providers = array();
+	private array $providers = [];
 
 	/**
 	 * Active debug providers.
 	 *
 	 * @var DebugProviderInterface[]
 	 */
-	private array $active_providers = array();
+	private array $active_providers = [];
 
 	/**
 	 * Initialize the manager.

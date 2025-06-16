@@ -8,11 +8,13 @@
 namespace DebugSuite\Interfaces;
 
 /**
- * Debug Provider Interface.
+ * Debug Provider Interface for Debug Suite plugin.
  *
- * Interface for all debug providers in the Debug Suite plugin.
+ * Defines the contract for all debug providers in the Debug Suite plugin.
+ * Debug providers are responsible for collecting, managing, and providing
+ * specific types of debug information.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 interface DebugProviderInterface {
 
@@ -20,7 +22,10 @@ interface DebugProviderInterface {
 	/**
 	 * Initialize the debug provider.
 	 *
-	 * @since 1.0.0
+	 * Performs initial setup and configuration for the debug provider.
+	 * Called during the provider registration process.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
 	 */
@@ -29,7 +34,10 @@ interface DebugProviderInterface {
 	/**
 	 * Get the provider name.
 	 *
-	 * @since 1.0.0
+	 * Returns a human-readable name for the debug provider.
+	 * Used for identification in the admin interface.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return string The provider name.
 	 */
@@ -38,7 +46,10 @@ interface DebugProviderInterface {
 	/**
 	 * Get the provider description.
 	 *
-	 * @since 1.0.0
+	 * Returns a detailed description of what this debug provider does
+	 * and what type of debug information it provides.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return string The provider description.
 	 */
@@ -47,7 +58,10 @@ interface DebugProviderInterface {
 	/**
 	 * Check if the provider is enabled.
 	 *
-	 * @since 1.0.0
+	 * Determines whether this debug provider is currently active
+	 * and should collect debug information.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return bool Whether the provider is enabled.
 	 */
@@ -56,7 +70,10 @@ interface DebugProviderInterface {
 	/**
 	 * Get debug data from this provider.
 	 *
-	 * @since 1.0.0
+	 * Collects and returns the debug information managed by this provider.
+	 * The returned array should contain structured debug data.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return array<string, mixed> The debug data.
 	 */
@@ -65,7 +82,10 @@ interface DebugProviderInterface {
 	/**
 	 * Activate the debug provider.
 	 *
-	 * @since 1.0.0
+	 * Enables the debug provider and starts collecting debug information.
+	 * Called when the provider is turned on through the admin interface.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
 	 */
@@ -74,7 +94,10 @@ interface DebugProviderInterface {
 	/**
 	 * Deactivate the debug provider.
 	 *
-	 * @since 1.0.0
+	 * Disables the debug provider and stops collecting debug information.
+	 * Called when the provider is turned off through the admin interface.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
 	 */

@@ -10,11 +10,13 @@ namespace DebugSuite\Providers;
 use DebugSuite\Interfaces\DebugProviderInterface;
 
 /**
- * Abstract Debug Provider.
+ * Abstract base class for debug providers.
  *
- * Provides base functionality for all debug providers.
+ * Provides common functionality and structure for all debug providers
+ * in the Debug Suite plugin. Implements the DebugProviderInterface
+ * with default behavior that can be overridden by concrete providers.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 abstract class AbstractDebugProvider implements DebugProviderInterface {
 
@@ -22,7 +24,7 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Provider name.
 	 *
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var string
 	 */
@@ -31,7 +33,7 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Provider description.
 	 *
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var string
 	 */
@@ -40,16 +42,20 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Whether the provider is enabled.
 	 *
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var bool
 	 */
 	protected bool $enabled;
 
 	/**
-	 * Constructor.
+	 * Constructor for AbstractDebugProvider.
 	 *
-	 * @since 1.0.0
+	 * Initializes the debug provider with default enabled state.
+	 * Concrete providers should call parent constructor and set
+	 * name and description properties.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 */
 	public function __construct() {
 		$this->enabled = true;
@@ -58,7 +64,9 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Get the provider name.
 	 *
-	 * @since 1.0.0
+	 * Returns the human-readable name of this debug provider.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return string The provider name.
 	 */
@@ -69,7 +77,10 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Get the provider description.
 	 *
-	 * @since 1.0.0
+	 * Returns a detailed description of what this debug provider does
+	 * and what type of information it provides.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return string The provider description.
 	 */
@@ -80,7 +91,9 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Check if the provider is enabled.
 	 *
-	 * @since 1.0.0
+	 * Returns the current enabled state of this debug provider.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return bool Whether the provider is enabled.
 	 */
@@ -91,7 +104,10 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Enable the provider.
 	 *
-	 * @since 1.0.0
+	 * Sets the provider's enabled state to true, allowing it to
+	 * collect and provide debug information.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
 	 */
@@ -102,7 +118,10 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Disable the provider.
 	 *
-	 * @since 1.0.0
+	 * Sets the provider's enabled state to false, preventing it from
+	 * collecting and providing debug information.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
 	 */
@@ -113,7 +132,10 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Activate the debug provider.
 	 *
-	 * @since 1.0.0
+	 * Enables the provider and initializes it. This is typically called
+	 * when the provider is turned on through the admin interface.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
 	 */
@@ -125,7 +147,10 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Deactivate the debug provider.
 	 *
-	 * @since 1.0.0
+	 * Disables the provider, stopping it from collecting debug information.
+	 * This is typically called when the provider is turned off through the admin interface.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
 	 */
@@ -136,7 +161,10 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Get debug data from this provider.
 	 *
-	 * @since 1.0.0
+	 * Abstract method that must be implemented by concrete providers
+	 * to return their specific debug information.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return array<string, mixed> The debug data.
 	 */
@@ -145,7 +173,10 @@ abstract class AbstractDebugProvider implements DebugProviderInterface {
 	/**
 	 * Initialize the debug provider.
 	 *
-	 * @since 1.0.0
+	 * Abstract method that must be implemented by concrete providers
+	 * to perform their specific initialization tasks.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
 	 */

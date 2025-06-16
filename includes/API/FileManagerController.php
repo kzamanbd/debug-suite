@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings REST API controller for Debug Suite.
+ * File manager REST API controller for Debug Suite.
  *
  * @package DebugSuite
  */
@@ -20,32 +20,54 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class SettingsController
+ * REST API controller for Debug Suite file management.
  *
- * Handles REST API endpoints for Debug Suite settings.
+ * Handles REST API endpoints for browsing files and directories, retrieving
+ * file contents, and managing file system operations within the WordPress
+ * installation directory.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 class FileManagerController extends RestController {
 
-	private FileManager $file_manager;
 	/**
-	 * Route base for settings.
+	 * File manager instance for handling file operations.
 	 *
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @var FileManager
+	 */
+	private FileManager $file_manager;
+
+	/**
+	 * Route base for files endpoints.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @var string
 	 */
 	protected $rest_base = 'files';
 
+	/**
+	 * Constructor for FileManagerController.
+	 *
+	 * Initializes the file manager instance for handling file operations.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 */
 	public function __construct() {
 		$this->file_manager = new FileManager();
 	}
 
 	/**
-	 * Register the routes for settings.
+	 * Register the routes for file management endpoints.
+	 *
+	 * Registers REST API routes for browsing directories and retrieving
+	 * file contents with proper validation and authentication.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
-	 * @since 1.0.0
 	 */
 	public function register_routes(): void {
 		register_rest_route(
@@ -97,18 +119,25 @@ class FileManagerController extends RestController {
 	}
 
 	/**
-	 * Get Debug Suite File Logs.
+	 * Get files and directories from specified path.
 	 *
-	 * @param WP_REST_Request $request The REST request.
+	 * Retrieves the directory tree structure from the specified path
+	 * relative to the WordPress installation directory. Handles errors
+	 * gracefully with proper exception handling.
 	 *
-	 * @return WP_REST_Response | WP_Error
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param WP_REST_Request $request The REST request object containing path parameter.
+	 *
+	 * @return WP_REST_Response|WP_Error Response with directory tree or error on failure.
+	 *
+	 * @throws Exception When directory operations fail.
 	 */
 	public function get_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		try {
-			$path         = $request->get_param( 'path' ) ?? '';
-			$full_path    = ABSPATH . $path;
-			$files        = $this->file_manager->get_directory_tree( $full_path );
+			$path      = $request->get_param( 'path' ) ?? '';
+			$full_path = ABSPATH . $path;
+			$files     = $this->file_manager->get_directory_tree( $full_path );
 
 			return rest_ensure_response(
 				[
@@ -137,12 +166,18 @@ class FileManagerController extends RestController {
 	}
 
 	/**
-	 * Get the contents of a file.
+	 * Get the contents of a specified file.
 	 *
-	 * @param WP_REST_Request $request The REST request.
+	 * Retrieves and returns the raw contents of a file along with
+	 * metadata such as file extension and path information.
 	 *
-	 * @return WP_REST_Response | WP_Error
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param WP_REST_Request $request The REST request object containing file path.
+	 *
+	 * @return WP_REST_Response|WP_Error Response with file contents or error on failure.
+	 *
+	 * @throws Exception When file reading operations fail.
 	 */
 
 	public function get_file_contents( WP_REST_Request $request ): WP_REST_Response|WP_Error {

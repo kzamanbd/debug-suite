@@ -11,49 +11,72 @@ use ReflectionException;
 
 /**
  * Dependency Injection Container for managing class dependencies.
+ *
+ * Provides a singleton container implementation for dependency injection
+ * with support for service binding, singleton management, and automatic
+ * dependency resolution using reflection.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class Container {
 
 	/**
-	 * Container instance.
+	 * Container singleton instance.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var Container|null
 	 */
 	private static ?Container $instance = null;
 
 	/**
-	 * Registered services.
+	 * Registered services array.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var array<string, mixed>
 	 */
 	// @phpstan-ignore-next-line
-	private array $services = array();
+	private array $services = [];
 
 	/**
-	 * Singleton instances.
+	 * Singleton instances cache.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var array<string, mixed>
 	 */
-	private array $instances = array();
+	private array $instances = [];
 
 	/**
-	 * Service bindings.
+	 * Service bindings configuration.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var array<string, array{resolver: mixed, singleton: bool}>
 	 */
-	private array $bindings = array();
+	private array $bindings = [];
 
 	/**
 	 * Private constructor to prevent direct instantiation.
+	 *
+	 * Implements singleton pattern by preventing external instantiation.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 */
 	private function __construct() {
 		// Private constructor
 	}
 
 	/**
-	 * Get the container instance.
+	 * Get the container singleton instance.
 	 *
-	 * @return Container
+	 * Returns the singleton instance of the container, creating it if
+	 * it doesn't exist yet.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return Container The container instance.
 	 */
 	public static function get_instance(): Container {
 		if ( null === self::$instance ) {
@@ -66,17 +89,22 @@ class Container {
 	/**
 	 * Bind a service to the container.
 	 *
+	 * Registers a service resolver in the container with optional singleton behavior.
+	 * The resolver can be a class name, closure, or any callable.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @param string $name Service name/identifier.
-	 * @param mixed $resolver Resolver function or class name.
-	 * @param bool $singleton Whether to treat as singleton.
+	 * @param mixed  $resolver Resolver function or class name.
+	 * @param bool   $singleton Whether to treat as singleton.
 	 *
 	 * @return void
 	 */
 	public function bind( string $name, $resolver, bool $singleton = false ): void {
-		$this->bindings[ $name ] = array(
+		$this->bindings[ $name ] = [
 			'resolver'  => $resolver,
 			'singleton' => $singleton,
-		);
+		];
 
 		// Remove any existing instance if rebinding
 		if ( isset( $this->instances[ $name ] ) ) {
@@ -87,8 +115,13 @@ class Container {
 	/**
 	 * Bind a singleton service to the container.
 	 *
+	 * Convenience method for binding a service as a singleton.
+	 * Equivalent to calling bind() with singleton parameter set to true.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @param string $name Service name/identifier.
-	 * @param mixed $resolver Resolver function or class name.
+	 * @param mixed  $resolver Resolver function or class name.
 	 *
 	 * @return void
 	 */
@@ -99,8 +132,13 @@ class Container {
 	/**
 	 * Register an existing instance as a singleton.
 	 *
+	 * Stores an already instantiated object in the container as a singleton.
+	 * Useful for registering objects that were created externally.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @param string $name Service name/identifier.
-	 * @param mixed $instance Service instance.
+	 * @param mixed  $instance Service instance.
 	 *
 	 * @return void
 	 */
@@ -111,10 +149,16 @@ class Container {
 	/**
 	 * Resolve a service from the container.
 	 *
+	 * Retrieves a service instance from the container, creating it if necessary.
+	 * Handles singleton caching and automatic dependency injection through reflection.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @param string $name Service name/identifier.
 	 *
-	 * @return mixed
-	 * @throws Exception If service not found.
+	 * @return mixed The resolved service instance.
+	 *
+	 * @throws Exception If service not found or cannot be resolved.
 	 */
 	public function resolve( string $name ) {
 		// Check if we have a cached singleton instance
@@ -155,10 +199,16 @@ class Container {
 	/**
 	 * Auto-resolve a class using reflection.
 	 *
+	 * Uses reflection to automatically resolve class dependencies by analyzing
+	 * constructor parameters and recursively resolving dependencies from the container.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @param string $class_name Class name to resolve.
 	 *
-	 * @return mixed
-	 * @throws Exception If class cannot be resolved.
+	 * @return mixed The instantiated class with resolved dependencies.
+	 *
+	 * @throws Exception If class cannot be resolved or dependencies are missing.
 	 */
 	private function auto_resolve( string $class_name ) {
 		try {
@@ -178,7 +228,7 @@ class Container {
 			}
 
 			// Resolve constructor dependencies
-			$dependencies = array();
+			$dependencies = [];
 			foreach ( $parameters as $parameter ) {
 				$type = $parameter->getType();
 				// @phpstan-ignore-next-line
@@ -200,20 +250,30 @@ class Container {
 	}
 
 	/**
-	 * Check if a service is bound.
+	 * Check if a service is bound in the container.
+	 *
+	 * Verifies whether a service is registered in the bindings or
+	 * exists as a cached instance.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @param string $name Service name/identifier.
 	 *
-	 * @return bool
+	 * @return bool True if service exists, false otherwise.
 	 */
 	public function has( string $name ): bool {
 		return isset( $this->bindings[ $name ] ) || isset( $this->instances[ $name ] );
 	}
 
 	/**
-	 * Get all registered services.
+	 * Get all registered service names.
 	 *
-	 * @return array
+	 * Returns an array of all service names that are either bound
+	 * in the container or exist as cached instances.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return array<string> Array of service names.
 	 */
 	public function get_services(): array {
 		return array_merge( array_keys( $this->bindings ), array_keys( $this->instances ) );
@@ -222,21 +282,32 @@ class Container {
 	/**
 	 * Magic method to resolve services using property syntax.
 	 *
+	 * Allows accessing services using property syntax: $container->service_name
+	 * instead of $container->resolve('service_name').
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @param string $name Service name.
 	 *
-	 * @return mixed
-	 * @throws Exception
+	 * @return mixed The resolved service instance.
+	 *
+	 * @throws Exception If service cannot be resolved.
 	 */
 	public function __get( string $name ) {
 		return $this->resolve( $name );
 	}
 
 	/**
-	 * Magic method to check if service exists.
+	 * Magic method to check if service exists using isset().
+	 *
+	 * Allows checking service existence using isset($container->service_name)
+	 * syntax instead of $container->has('service_name').
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @param string $name Service name.
 	 *
-	 * @return bool
+	 * @return bool True if service exists, false otherwise.
 	 */
 	public function __isset( string $name ): bool {
 		return $this->has( $name );

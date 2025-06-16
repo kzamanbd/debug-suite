@@ -8,16 +8,21 @@
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class ExampleTest
+ * Example test case for Debug Suite plugin functionality.
  *
- * @since 1.0.0
+ * Provides basic test cases to verify that core plugin functionality
+ * is working correctly, including REST API endpoints.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class ExampleTest extends TestCase
 {
     /**
-     * Test true is true.
+     * Test that true equals true.
      *
-     * @since 1.0.0
+     * Basic sanity test to verify that the testing framework is working.
+     *
+     * @since DEBUG_SUITE_SINCE
      *
      * @return void
      */
@@ -29,7 +34,10 @@ class ExampleTest extends TestCase
     /**
      * Test that the settings REST API endpoint exists.
      *
-     * @since 1.0.0
+     * Verifies that the Debug Suite settings REST API endpoint is properly
+     * registered and responds with appropriate status codes.
+     *
+     * @since DEBUG_SUITE_SINCE
      *
      * @return void
      */

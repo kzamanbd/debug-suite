@@ -17,26 +17,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class SettingsController
+ * REST API controller for Debug Suite settings management.
  *
- * Handles REST API endpoints for Debug Suite settings.
+ * Handles REST API endpoints for managing Debug Suite settings including
+ * updating wp-config.php constants for debug configuration.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 class SettingsController extends RestController {
 	/**
-	 * Route base for settings.
+	 * Route base for settings endpoints.
 	 *
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @var string
 	 */
 	protected $rest_base = 'settings';
 
 	/**
-	 * Register the routes for settings.
+	 * Register the routes for settings endpoints.
+	 *
+	 * Registers REST API routes for updating Debug Suite settings
+	 * including debug, debug_log, and debug_display configuration.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
-	 * @since 1.0.0
 	 */
 	public function register_routes(): void {
 		register_rest_route(
@@ -48,7 +54,7 @@ class SettingsController extends RestController {
 					'callback'            => [ $this, 'update_settings' ],
 					'permission_callback' => [ $this, 'permissions_check' ],
 					'args'                => [
-						'debug'            => [
+						'debug'         => [
 							'type'        => 'string',
 							'default'     => 'false',
 							'description' => __( 'Enable or disable debugging mode.', 'debug-suite' ),
@@ -73,12 +79,17 @@ class SettingsController extends RestController {
 	}
 
 	/**
-	 * Update Debug Suite settings.
+	 * Update Debug Suite settings in wp-config.php.
 	 *
-	 * @param WP_REST_Request $request The REST request.
+	 * Updates debugging constants in the wp-config.php file based on the
+	 * provided parameters. Handles WP_DEBUG, WP_DEBUG_LOG, and WP_DEBUG_DISPLAY
+	 * constants with proper validation and error handling.
 	 *
-	 * @return WP_REST_Response|WP_Error
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param WP_REST_Request $request The REST request object containing settings data.
+	 *
+	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error on failure.
 	 */
 	public function update_settings( $request ): WP_REST_Response|WP_Error {
 		$params = $request->get_json_params();

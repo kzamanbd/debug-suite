@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings REST API controller for Debug Suite.
+ * File logs REST API controller for Debug Suite.
  *
  * @package DebugSuite
  */
@@ -16,26 +16,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class SettingsController
+ * REST API controller for Debug Suite file logs management.
  *
- * Handles REST API endpoints for Debug Suite settings.
+ * Handles REST API endpoints for retrieving and processing WordPress debug log
+ * files, parsing log entries with timestamps, types, and stack traces.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 class FileLogsController extends RestController {
 	/**
-	 * Route base for settings.
+	 * Route base for logs endpoints.
 	 *
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @var string
 	 */
 	protected $rest_base = 'logs';
 
 	/**
-	 * Register the routes for settings.
+	 * Register the routes for file logs endpoints.
+	 *
+	 * Registers REST API routes for retrieving WordPress debug log entries
+	 * with proper authentication and permission checking.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
-	 * @since 1.0.0
 	 */
 	public function register_routes(): void {
 		register_rest_route(
@@ -52,12 +58,17 @@ class FileLogsController extends RestController {
 	}
 
 	/**
-	 * Get Debug Suite File Logs.
+	 * Get Debug Suite file logs from debug.log.
 	 *
-	 * @param WP_REST_Request $request The REST request.
+	 * Reads and parses the WordPress debug.log file, extracting log entries
+	 * with timestamps, types, messages, and stack traces. Categorizes entries
+	 * by severity level (error, warning, notice, debug).
 	 *
-	 * @return WP_REST_Response
-	 * @since 1.0.0
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param WP_REST_Request $request The REST request object.
+	 *
+	 * @return WP_REST_Response Response object containing parsed log entries.
 	 */
 	public function get_file_logs( $request ): WP_REST_Response {
 		$log_file = WP_CONTENT_DIR . '/debug.log';
