@@ -1,17 +1,18 @@
-# Debug Suite - Enhanced DI Container System
+# Debug Suite - PSR-11 Compliant DI Container System
 
-This document explains the enhanced dependency injection container system with full PSR-11 compliance and PHP-DI compatibility.
+This document explains the PSR-11 compliant dependency injection container system with PHP-DI compatibility features that powers the Debug Suite WordPress plugin.
 
 ## Overview
 
-The Debug Suite now includes a comprehensive DI container system located in the `DebugSuite\Core\DI` namespace that provides:
+The Debug Suite includes a comprehensive DI container system located in the `DebugSuite\Core\DI` namespace that provides:
 
-- **Full PSR-11 Compliance**: Implements `Psr\Container\ContainerInterface` with proper exceptions
-- **PHP-DI Compatibility**: Supports PHP-DI style definitions and patterns  
+- **Full PSR-11 Compliance**: Implements `Psr\Container\ContainerInterface` with proper exception handling
+- **PHP-DI Style Definitions**: Support for autowiring, factory, and value definitions with PHP-DI patterns
 - **Advanced Autowiring**: Automatic dependency resolution using reflection
-- **Definition System**: Factory, Autowired, and Value definitions
-- **Container Builder**: Fluent interface for container configuration
+- **Definition System**: Factory, Autowired, and Value definitions for flexible service configuration
+- **Container Builder**: Fluent interface for container configuration and setup
 - **Service Management**: Enhanced service provider system with lifecycle management
+- **WordPress Integration**: Seamless integration with WordPress hooks and lifecycle events
 
 ## Key Components
 
