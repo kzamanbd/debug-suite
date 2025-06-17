@@ -1,14 +1,14 @@
 <?php
 /**
- * Interface for DI service providers.
+ * Interface for Container service providers.
  *
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core\DI;
+namespace DebugSuite\Core\Container;
 
 /**
- * Service Provider Interface for registering services with the DI container.
+ * Service Provider Interface for registering services with the DI Container.
  *
  * Defines the contract for service providers that register and boot services
  * within the dependency injection container. Providers should implement both

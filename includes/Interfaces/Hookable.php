@@ -8,7 +8,7 @@
 namespace DebugSuite\Interfaces;
 
 /**
- * Interface for classes that register WordPress hooks with DI container integration.
+ * Interface for classes that register WordPress hooks with DI Container integration.
  *
  * Ensures automatic hook registration when services are resolved from the container.
  *

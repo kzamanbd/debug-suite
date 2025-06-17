@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core\DI;
+namespace DebugSuite\Core\Container;
 
 use DebugSuite\Interfaces\Hookable;
 
@@ -51,7 +51,7 @@ class ServiceManager {
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
-	 * @param Container $container Container instance.
+	 * @param Container $DI Container instance.
 	 */
 	public function __construct( Container $container ) {
 		$this->container = $container;

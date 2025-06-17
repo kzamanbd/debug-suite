@@ -2,7 +2,7 @@
 
 ## Summary of Changes
 
-The Debug Suite dependency injection system has been refactored to use the `DebugSuite\Core\DI` namespace for better organization and enhanced PSR-11/PHP-DI compatibility.
+The Debug Suite dependency injection system has been refactored to use the `DebugSuite\Core\Container` namespace for better organization and enhanced PSR-11/PHP-DI compatibility.
 
 ## Namespace Changes
 
@@ -10,11 +10,11 @@ The Debug Suite dependency injection system has been refactored to use the `Debu
 
 | Old Class | New Class |
 |-----------|-----------|
-| `DebugSuite\Core\Container` | `DebugSuite\Core\DI\Container` |
-| `DebugSuite\Core\ServiceManager` | `DebugSuite\Core\DI\ServiceManager` |
-| `DebugSuite\Core\Exceptions\ContainerException` | `DebugSuite\Core\DI\Exceptions\ContainerException` |
-| `DebugSuite\Core\Exceptions\NotFoundException` | `DebugSuite\Core\DI\Exceptions\NotFoundException` |
-| `DebugSuite\Core\Definitions\*` | `DebugSuite\Core\DI\Definitions\*` |
+| `DebugSuite\Core\Container` | `DebugSuite\Core\Container\Container` |
+| `DebugSuite\Core\ServiceManager` | `DebugSuite\Core\Container\ServiceManager` |
+| `DebugSuite\Core\Exceptions\ContainerException` | `DebugSuite\Core\Container\Exceptions\ContainerException` |
+| `DebugSuite\Core\Exceptions\NotFoundException` | `DebugSuite\Core\Container\Exceptions\NotFoundException` |
+| `DebugSuite\Core\Definitions\*` | `DebugSuite\Core\Container\Definitions\*` |
 
 ## Required Updates
 
@@ -32,8 +32,9 @@ class MyServiceProvider extends AbstractServiceProvider {
 ```
 
 **After:**
+
 ```php
-use DebugSuite\Core\DI\Container;
+use DebugSuite\Core\Container\Container;
 
 class MyServiceProvider extends AbstractServiceProvider {
     public function register(Container $container): void {
@@ -51,9 +52,10 @@ use DebugSuite\Core\ServiceManager;
 ```
 
 **After:**
+
 ```php
-use DebugSuite\Core\DI\Container;
-use DebugSuite\Core\DI\ServiceManager;
+use DebugSuite\Core\Container\Container;
+use DebugSuite\Core\Container\ServiceManager;
 ```
 
 ### 3. Helper Functions Usage
@@ -80,7 +82,7 @@ $service = debug_suite_di_resolve(MyService::class);
 ### 1. Container Builder
 
 ```php
-use DebugSuite\Core\DI\ContainerBuilder;
+use DebugSuite\Core\Container\ContainerBuilder;
 
 $container = (new ContainerBuilder())
     ->enable_autowiring(true)
@@ -94,7 +96,7 @@ $container = (new ContainerBuilder())
 ### 2. PHP-DI Style Definitions
 
 ```php
-use function DI\{create, factory, value, autowire, object};
+use function Container\{create, factory, value, autowire, object};
 
 $definitions = [
     'config' => value(['debug' => true]),
@@ -133,7 +135,7 @@ All existing helper functions remain functional:
 - Advanced autowiring capabilities
 
 ### Better Organization
-- Clear namespace separation for DI components
+- Clear namespace separation for Container components
 - Modular design with focused responsibilities
 - Enhanced documentation and type safety
 
@@ -173,12 +175,13 @@ Class 'DebugSuite\Core\Container' not found
 ```
 
 **Solution:**
+
 ```php
 // Change this
 use DebugSuite\Core\Container;
 
 // To this  
-use DebugSuite\Core\DI\Container;
+use DebugSuite\Core\Container\Container;
 ```
 
 The migration maintains full backward compatibility while providing enhanced dependency injection capabilities following industry standards.

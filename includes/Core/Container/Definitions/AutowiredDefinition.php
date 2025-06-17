@@ -5,11 +5,11 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core\DI\Definitions;
+namespace DebugSuite\Core\Container\Definitions;
 
 use ReflectionClass;
 use ReflectionException;
-use DebugSuite\Core\DI\Exceptions\ContainerException;
+use DebugSuite\Core\Container\Exceptions\ContainerException;
 
 /**
  * Autowired definition for dependency injection.

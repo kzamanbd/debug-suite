@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core\DI\Exceptions;
+namespace DebugSuite\Core\Container\Exceptions;
 
 use Exception;
 use Psr\Container\ContainerExceptionInterface;

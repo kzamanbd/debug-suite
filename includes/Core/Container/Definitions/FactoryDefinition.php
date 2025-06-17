@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core\DI\Definitions;
+namespace DebugSuite\Core\Container\Definitions;
 
 /**
  * Factory definition for dependency injection.

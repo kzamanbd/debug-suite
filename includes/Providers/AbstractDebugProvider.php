@@ -10,7 +10,7 @@ namespace DebugSuite\Providers;
 use DebugSuite\Interfaces\DebugProviderInterface;
 
 /**
- * Abstract base class for debug providers with DI container integration.
+ * Abstract base class for debug providers with DI Container integration.
  *
  * Provides common functionality and structure for all debug providers.
  *

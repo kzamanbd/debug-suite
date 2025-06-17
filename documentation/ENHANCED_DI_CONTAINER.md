@@ -4,7 +4,7 @@ This document explains the PSR-11 compliant dependency injection container syste
 
 ## Overview
 
-The Debug Suite includes a comprehensive DI container system located in the `DebugSuite\Core\DI` namespace that provides:
+The Debug Suite includes a comprehensive DI Container system located in the `DebugSuite\Core\Container` namespace that provides:
 
 - **Full PSR-11 Compliance**: Implements `Psr\Container\ContainerInterface` with proper exception handling
 - **PHP-DI Style Definitions**: Support for autowiring, factory, and value definitions with PHP-DI patterns
@@ -16,12 +16,12 @@ The Debug Suite includes a comprehensive DI container system located in the `Deb
 
 ## Key Components
 
-### 1. Container (`DebugSuite\Core\DI\Container`)
+### 1. Container (`DebugSuite\Core\Container\Container`)
 
 The main PSR-11 compliant dependency injection container:
 
 ```php
-use DebugSuite\Core\DI\Container;
+use DebugSuite\Core\Container\Container;
 
 $container = Container::get_instance();
 
@@ -35,13 +35,13 @@ $container->bind('config', ['debug' => true]);
 $container->instance('logger', $loggerInstance);
 ```
 
-### 2. Container Builder (`DebugSuite\Core\DI\ContainerBuilder`)
+### 2. Container Builder (`DebugSuite\Core\Container\ContainerBuilder`)
 
 Fluent interface for container configuration:
 
 ```php
-use DebugSuite\Core\DI\ContainerBuilder;
-use function DebugSuite\Core\DI\Definitions\{autowire, factory, value};
+use DebugSuite\Core\Container\ContainerBuilder;
+use function DebugSuite\Core\Container\Definitions\{autowire, factory, value};
 
 $container = (new ContainerBuilder())
     ->enable_autowiring(true)
@@ -54,12 +54,12 @@ $container = (new ContainerBuilder())
     ->build();
 ```
 
-### 3. Service Manager (`DebugSuite\Core\DI\ServiceManager`)
+### 3. Service Manager (`DebugSuite\Core\Container\ServiceManager`)
 
 Enhanced service provider management:
 
 ```php
-use DebugSuite\Core\DI\ServiceManager;
+use DebugSuite\Core\Container\ServiceManager;
 
 $serviceManager = new ServiceManager($container);
 $serviceManager->register_providers([
@@ -74,7 +74,7 @@ $serviceManager->boot();
 #### Autowired Definition
 
 ```php
-use DebugSuite\Core\DI\Definitions\AutowiredDefinition;
+use DebugSuite\Core\Container\Definitions\AutowiredDefinition;
 
 $definition = new AutowiredDefinition(MyService::class, true); // singleton
 $definition->constructor_parameter('config', ['debug' => true]);
@@ -83,7 +83,7 @@ $definition->constructor_parameter('config', ['debug' => true]);
 #### Factory Definition
 
 ```php
-use DebugSuite\Core\DI\Definitions\FactoryDefinition;
+use DebugSuite\Core\Container\Definitions\FactoryDefinition;
 
 $definition = new FactoryDefinition(function($container) {
     return new ComplexService($container->get('dependency'));
@@ -93,7 +93,7 @@ $definition = new FactoryDefinition(function($container) {
 #### Value Definition
 
 ```php
-use DebugSuite\Core\DI\Definitions\ValueDefinition;
+use DebugSuite\Core\Container\Definitions\ValueDefinition;
 
 $definition = new ValueDefinition(['host' => 'localhost', 'port' => 3306]);
 ```
@@ -105,7 +105,7 @@ $definition = new ValueDefinition(['host' => 'localhost', 'port' => 3306]);
 The system provides PHP-DI compatible global functions:
 
 ```php
-use function DI\{create, factory, value, autowire, object};
+use function Container\{create, factory, value, autowire, object};
 
 $definitions = [
     'config' => value(['debug' => true]),
@@ -119,7 +119,7 @@ $definitions = [
 ### Definition Helpers
 
 ```php
-use function DebugSuite\Core\DI\Definitions\{factory, singleton, autowire, value, object};
+use function DebugSuite\Core\Container\Definitions\{factory, singleton, autowire, value, object};
 
 $container->set('service', factory(fn() => new Service()));
 $container->set('config', value(['key' => 'value']));
@@ -131,7 +131,7 @@ $container->set(MyClass::class, autowire(MyClass::class));
 ### Exceptions
 
 ```php
-use DebugSuite\Core\DI\Exceptions\{ContainerException, NotFoundException};
+use DebugSuite\Core\Container\Exceptions\{ContainerException, NotFoundException};
 
 try {
     $service = $container->get('non_existent_service');
@@ -149,13 +149,13 @@ The container fully implements `Psr\Container\ContainerInterface`:
 - `get(string $id): mixed` - Retrieve service by identifier
 - `has(string $id): bool` - Check if service exists
 
-## Service Providers with New DI System
+## Service Providers with New Container System
 
 ### Updated Service Provider
 
 ```php
 use DebugSuite\Core\AbstractServiceProvider;
-use DebugSuite\Core\DI\Container;
+use DebugSuite\Core\Container\Container;
 
 class MyServiceProvider extends AbstractServiceProvider {
     protected $provides = [MyService::class];
@@ -204,13 +204,13 @@ $exists = isset($container->MyService);
 
 ## Helper Functions
 
-### Global DI Helpers
+### Global Container Helpers
 
 ```php
-// Get DI container
+// Get DI Container
 $container = debug_suite_di_container();
 
-// Resolve from DI container  
+// Resolve from DI Container  
 $service = debug_suite_di_resolve(MyService::class);
 
 // Create container builder
@@ -231,7 +231,7 @@ use DebugSuite\Core\Container;
 $container = Container::get_instance();
 
 // New way  
-use DebugSuite\Core\DI\Container;
+use DebugSuite\Core\Container\Container;
 $container = Container::get_instance();
 ```
 
@@ -242,7 +242,7 @@ $container = Container::get_instance();
 use DebugSuite\Core\Container;
 
 // New import
-use DebugSuite\Core\DI\Container;
+use DebugSuite\Core\Container\Container;
 ```
 
 ## Best Practices
@@ -263,7 +263,7 @@ use DebugSuite\Core\DI\Container;
 
 ## Testing
 
-The DI system enhances testability:
+The Container system enhances testability:
 
 ```php
 // Test with mock dependencies
@@ -272,4 +272,4 @@ $container->bind(DatabaseInterface::class, $mockDatabase);
 $service = $container->resolve(MyService::class);
 ```
 
-This enhanced DI system provides enterprise-grade dependency injection capabilities while maintaining full backward compatibility and WordPress integration.
+This enhanced Container system provides enterprise-grade dependency injection capabilities while maintaining full backward compatibility and WordPress integration.

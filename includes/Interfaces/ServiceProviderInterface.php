@@ -1,16 +1,16 @@
 <?php
 /**
- * Interface for service providers with PSR-11 DI container integration.
+ * Interface for service providers with PSR-11 DI Container integration.
  *
  * @package DebugSuite
  */
 
 namespace DebugSuite\Interfaces;
 
-use DebugSuite\Core\DI\Container;
+use DebugSuite\Core\Container\Container;
 
 /**
- * Service Provider Interface for registering services with the DI container.
+ * Service Provider Interface for registering services with the DI Container.
  *
  * Defines the contract for service providers that register and boot services.
  *

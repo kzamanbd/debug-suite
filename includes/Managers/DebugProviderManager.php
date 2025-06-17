@@ -1,6 +1,6 @@
 <?php
 /**
- * Manager for debug providers with PSR-11 DI container integration.
+ * Manager for debug providers with PSR-11 DI Container integration.
  *
  * @package DebugSuite
  */

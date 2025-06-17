@@ -5,15 +5,15 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core\DI;
+namespace DebugSuite\Core\Container;
 
 use Psr\Container\ContainerInterface;
-use DebugSuite\Core\DI\Exceptions\ContainerException;
-use DebugSuite\Core\DI\Exceptions\NotFoundException;
-use DebugSuite\Core\DI\Definitions\DefinitionInterface;
-use DebugSuite\Core\DI\Definitions\FactoryDefinition;
-use DebugSuite\Core\DI\Definitions\AutowiredDefinition;
-use DebugSuite\Core\DI\Definitions\ValueDefinition;
+use DebugSuite\Core\Container\Exceptions\ContainerException;
+use DebugSuite\Core\Container\Exceptions\NotFoundException;
+use DebugSuite\Core\Container\Definitions\DefinitionInterface;
+use DebugSuite\Core\Container\Definitions\FactoryDefinition;
+use DebugSuite\Core\Container\Definitions\AutowiredDefinition;
+use DebugSuite\Core\Container\Definitions\ValueDefinition;
 use ReflectionClass;
 use ReflectionException;
 

@@ -1,16 +1,16 @@
 <?php
 /**
- * Container builder for configuring and creating DI containers.
+ * Container builder for configuring and creating DI Containers.
  *
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core\DI;
+namespace DebugSuite\Core\Container;
 
-use DebugSuite\Core\DI\Definitions\DefinitionInterface;
+use DebugSuite\Core\Container\Definitions\DefinitionInterface;
 
 /**
- * Container builder for configuring and creating DI containers.
+ * Container builder for configuring and creating DI Containers.
  *
  * Provides a fluent interface for configuring dependency injection containers
  * with PHP-DI compatible features and configuration options.

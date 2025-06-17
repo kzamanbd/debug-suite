@@ -1,14 +1,14 @@
 <?php
 /**
- * Abstract base class for service providers in Debug Suite with DI namespace.
+ * Abstract base class for service providers in Debug Suite with Container namespace.
  *
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core\DI;
+namespace DebugSuite\Core\Container;
 
 /**
- * Abstract base class for service providers in Debug Suite with DI namespace.
+ * Abstract base class for service providers in Debug Suite with Container namespace.
  *
  * Provides common functionality for service providers including
  * registration tracking and service listing capabilities.

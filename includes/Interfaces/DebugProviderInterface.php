@@ -1,6 +1,6 @@
 <?php
 /**
- * Interface for debug providers with PSR-11 DI container integration.
+ * Interface for debug providers with PSR-11 DI Container integration.
  *
  * @package DebugSuite
  */
@@ -8,7 +8,7 @@
 namespace DebugSuite\Interfaces;
 
 /**
- * Debug Provider Interface for Debug Suite with DI container integration.
+ * Debug Provider Interface for Debug Suite with DI Container integration.
  *
  * Defines the contract for debug providers that collect and manage debug information.
  *

@@ -8,7 +8,7 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
 
 ### Core Architecture
 
-- **PSR-11 Compliant DI Container**: Full compliance with PSR-11 Container Interface specification
+- **PSR-11 Compliant DI Container**: Full compliance with PSR-11 DI Interface specification
 - **PHP-DI Style Definitions**: Support for autowiring, factory, and value definitions
 - **Enhanced Service Provider System**: Lifecycle management with registration and booting phases
 - **Container Builder Pattern**: Fluent interface for container configuration
@@ -94,11 +94,11 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
 
 1. **PSR-11 Dependency Injection Container**:
 
-    - Follow PSR-11 Container Interface specification
-    - Use `DebugSuite\Core\DI\Container` which implements `Psr\Container\ContainerInterface`
+    - Follow PSR-11 DI Interface specification
+    - Use `DebugSuite\Core\Container\Container` which implements `Psr\Container\ContainerInterface`
     - Support for `get()` and `has()` methods with proper exception handling
-    - Throw `DebugSuite\Core\DI\Exceptions\NotFoundException` for missing services
-    - Throw `DebugSuite\Core\DI\Exceptions\ContainerException` for container errors
+    - Throw `DebugSuite\Core\Container\Exceptions\NotFoundException` for missing services
+    - Throw `DebugSuite\Core\Container\Exceptions\ContainerException` for container errors
 
 2. **PHP-DI Style Definitions**:
 
@@ -109,7 +109,7 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
 
 3. **Service Providers**:
 
-    - Extend `DebugSuite\Core\DI\AbstractServiceProvider` for new service providers
+    - Extend `DebugSuite\Core\Container\AbstractServiceProvider` for new service providers
     - Register services with the container in the `register()` method
     - Boot services and register hooks in the `boot()` method
     - Use proper dependency injection for all service dependencies
@@ -117,14 +117,14 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
 
 4. **Container Builder**:
 
-    - Use `DebugSuite\Core\DI\ContainerBuilder` for container configuration
+    - Use `DebugSuite\Core\Container\ContainerBuilder` for container configuration
     - Enable autowiring for automatic dependency resolution
     - Add definitions using the fluent interface
     - Configure container settings before building
 
 5. **Service Manager**:
 
-    - Use `DebugSuite\Core\DI\ServiceManager` for provider lifecycle management
+    - Use `DebugSuite\Core\Container\ServiceManager` for provider lifecycle management
     - Register all providers before booting any
     - Automatically register hooks for `Hookable` services
     - Resolve services through the container
@@ -159,7 +159,7 @@ Debug Suite is a WordPress plugin that provides debugging tools for WordPress de
 
 - **Maintain separation of concerns**:
     - Core services in the `Core` namespace
-    - DI Container system in the `Core\DI` namespace
+    - DI Container system in the `Core\Container` namespace
     - Admin interfaces in the `Admin` namespace
     - Frontend code in the `Frontend` namespace
     - Debug providers in the `Providers` namespace

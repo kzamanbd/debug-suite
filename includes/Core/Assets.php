@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Assets management for Debug Suite with PSR-11 DI container support.
+ * Assets management for Debug Suite with PSR-11 DI Container support.
  *
  * @package DebugSuite
  */

@@ -48,8 +48,8 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 use DebugSuite\Admin\Admin;
 use DebugSuite\Core\Activator;
 use DebugSuite\Core\Deactivator;
-use DebugSuite\Core\DI\Container;
-use DebugSuite\Core\DI\ServiceManager;
+use DebugSuite\Core\Container\Container;
+use DebugSuite\Core\Container\ServiceManager;
 use DebugSuite\Frontend\Frontend;
 use DebugSuite\Providers\CoreServiceProvider;
 use DebugSuite\Providers\AdminServiceProvider;
@@ -58,7 +58,7 @@ use DebugSuite\Providers\FrontendServiceProvider;
 /**
  * Main plugin bootstrap and orchestration class for Debug Suite.
  *
- * Primary entry point that manages PSR-11 DI container, service providers,
+ * Primary entry point that manages PSR-11 DI Container, service providers,
  * and coordinates the entire plugin initialization process.
  *
  * @since DEBUG_SUITE_SINCE
@@ -90,7 +90,7 @@ final class DebugSuite {
 	 * PSR-11 compliant dependency injection container.
 	 *
 	 * Provides service resolution, autowiring, and dependency management
-	 * with full PSR-11 Container Interface compliance and PHP-DI style
+	 * with full PSR-11 DI Interface compliance and PHP-DI style
 	 * definition support.
 	 *
 	 * @since DEBUG_SUITE_SINCE
@@ -126,7 +126,7 @@ final class DebugSuite {
 	/**
 	 * Initialize the PSR-11 compliant dependency injection container.
 	 *
-	 * Creates and configures the DI container with the service manager,
+	 * Creates and configures the DI Container with the service manager,
 	 * then registers the container and manager as singleton instances
 	 * for easy access throughout the application lifecycle.
 	 *

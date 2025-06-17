@@ -8,8 +8,8 @@
 
 namespace DebugSuite\Providers;
 
-use DebugSuite\Core\DI\AbstractServiceProvider;
-use DebugSuite\Core\DI\Container;
+use DebugSuite\Core\Container\AbstractServiceProvider;
+use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Assets;
 use DebugSuite\Core\I18n;
 use Exception;

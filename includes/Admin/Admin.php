@@ -43,7 +43,7 @@ class Admin implements Hookable {
 
 
 	/**
-	 * Register all API controller routes using the DI container.
+	 * Register all API controller routes using the DI Container.
 	 *
 	 * Instantiates and registers routes for all API controllers including
 	 * settings, file logs, and file manager endpoints.

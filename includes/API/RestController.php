@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API base controller for Debug Suite with PSR-11 DI container integration.
+ * REST API base controller for Debug Suite with PSR-11 DI Container integration.
  *
  * @package DebugSuite
  */

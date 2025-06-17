@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core\DI\Definitions;
+namespace DebugSuite\Core\Container\Definitions;
 
 /**
  * Base definition interface for dependency injection definitions.
