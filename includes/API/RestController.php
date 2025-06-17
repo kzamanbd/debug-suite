@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API base controller for Debug Suite.
+ * REST API base controller for Debug Suite with PSR-11 DI container integration.
  *
  * @package DebugSuite
  */
@@ -32,8 +32,10 @@ class RestController extends WP_REST_Controller {
 	/**
 	 * Checks if the current user has permission for the endpoint.
 	 *
-	 * Verifies that the current user has 'manage_options' capability.
-	 * Override in child classes for custom permission logic.
+	 * Verifies that the current user has 'manage_options' capability,
+	 * which is appropriate for Debug Suite's administrative functionality.
+	 * Override in child classes for custom permission logic specific to
+	 * individual endpoints.
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *

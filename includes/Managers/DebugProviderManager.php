@@ -1,6 +1,8 @@
 <?php
 /**
- * Manager for debug providers.
+ * Manager for debug providers with PSR-11 DI container integration.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Managers;
@@ -10,6 +12,10 @@ use DebugSuite\Interfaces\DebugProviderInterface;
 
 /**
  * Debug Provider Manager for managing debug providers.
+ *
+ * Manages registration, activation, and lifecycle of debug providers.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class DebugProviderManager {
 	use Singleton;

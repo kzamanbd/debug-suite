@@ -1,10 +1,12 @@
 <?php
 
 /**
- * Global helper functions for the Debug Suite plugin.
+ * Global helper functions for Debug Suite with PSR-11 DI container integration.
  *
  * This file contains all helper functions for the Debug Suite plugin including
- * dependency injection helpers, container utilities, and general utility functions.
+ * PSR-11 compliant dependency injection helpers, container utilities, PHP-DI
+ * style definition functions, and general utility functions for seamless
+ * integration with the enhanced DI container system.
  *
  * @since      1.0.0
  *

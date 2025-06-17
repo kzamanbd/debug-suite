@@ -1,6 +1,6 @@
 <?php
 /**
- * File manager REST API controller for Debug Suite.
+ * File manager REST API controller for Debug Suite with PSR-11 DI integration.
  *
  * @package DebugSuite
  */
@@ -20,11 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * REST API controller for Debug Suite file management.
+ * File system management REST API controller for Debug Suite.
  *
- * Handles REST API endpoints for browsing files and directories, retrieving
- * file contents, and managing file system operations within the WordPress
- * installation directory.
+ * Handles REST API endpoints for browsing files and managing file operations.
  *
  * @since DEBUG_SUITE_SINCE
  */

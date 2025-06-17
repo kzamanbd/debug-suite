@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings REST API controller for Debug Suite.
+ * Settings REST API controller for Debug Suite with PSR-11 DI integration.
  *
  * @package DebugSuite
  */
@@ -17,10 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * REST API controller for Debug Suite settings management.
+ * Settings management REST API controller for Debug Suite.
  *
- * Handles REST API endpoints for managing Debug Suite settings including
- * updating wp-config.php constants for debug configuration.
+ * Handles REST API endpoints for managing Debug Suite configuration settings.
  *
  * @since DEBUG_SUITE_SINCE
  */

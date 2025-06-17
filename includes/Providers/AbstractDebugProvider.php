@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract base class for debug providers.
+ * Abstract base class for debug providers with PSR-11 DI integration.
  *
  * @package DebugSuite
  */
@@ -10,11 +10,9 @@ namespace DebugSuite\Providers;
 use DebugSuite\Interfaces\DebugProviderInterface;
 
 /**
- * Abstract base class for debug providers.
+ * Abstract base class for debug providers with DI container integration.
  *
- * Provides common functionality and structure for all debug providers
- * in the Debug Suite plugin. Implements the DebugProviderInterface
- * with default behavior that can be overridden by concrete providers.
+ * Provides common functionality and structure for all debug providers.
  *
  * @since DEBUG_SUITE_SINCE
  */

@@ -1,12 +1,18 @@
 <?php
 /**
- * Plugin deactivation functionality.
+ * Plugin deactivation functionality for Debug Suite.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Core;
 
 /**
- * Fired during plugin deactivation.
+ * Plugin deactivation handler for Debug Suite.
+ *
+ * Handles plugin deactivation logic and cleanup procedures.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class Deactivator {
 

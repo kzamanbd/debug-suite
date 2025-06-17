@@ -1,6 +1,6 @@
 <?php
 /**
- * File logs REST API controller for Debug Suite.
+ * File logs REST API controller for Debug Suite with PSR-11 DI integration.
  *
  * @package DebugSuite
  */
@@ -16,10 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * REST API controller for Debug Suite file logs management.
+ * File logs management REST API controller for Debug Suite.
  *
- * Handles REST API endpoints for retrieving and processing WordPress debug log
- * files, parsing log entries with timestamps, types, and stack traces.
+ * Handles REST API endpoints for retrieving and processing WordPress debug logs.
  *
  * @since DEBUG_SUITE_SINCE
  */

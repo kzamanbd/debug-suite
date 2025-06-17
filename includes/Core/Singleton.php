@@ -1,12 +1,18 @@
 <?php
 /**
- * Singleton trait for ensuring only one instance of a class.
+ * Singleton trait for ensuring only one instance of a class in Debug Suite.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Core;
 
 /**
  * Singleton trait for ensuring single instance of classes.
+ *
+ * Provides singleton functionality for classes that need only one instance.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 trait Singleton {
 

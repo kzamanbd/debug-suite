@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Core service provider for registering core services.
+ * Core service provider for registering essential Debug Suite services.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Providers;
@@ -13,7 +15,11 @@ use DebugSuite\Core\I18n;
 use Exception;
 
 /**
- * Core Service Provider for registering core services.
+ * Core Service Provider for registering essential Debug Suite services.
+ *
+ * Registers core services such as Assets, I18n, and foundational components.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class CoreServiceProvider extends AbstractServiceProvider {
 

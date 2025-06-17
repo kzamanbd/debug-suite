@@ -3,9 +3,16 @@
  * The plugin bootstrap file
  *
  * WordPress reads this file to generate the plugin information in the plugin
- * admin area. This file also includes all the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
+ * admin area. This file includes all dependencies, registers activation and
+ * deactivation functions, and initializes the PSR-11 compliant dependency
+ * injection container with PHP-DI style features.
+ *
+ * The plugin uses a modern architecture with:
+ * - PSR-11 compliant dependency injection container
+ * - PHP-DI style definitions for service configuration
+ * - Service provider pattern for modular service registration
+ * - Automatic hook registration for services implementing Hookable interface
+ * - Type-safe service resolution with proper exception handling
  *
  * @link              https://kzaman.me/plugins/debug-suite
  * @since             1.0.0
@@ -49,38 +56,60 @@ use DebugSuite\Providers\AdminServiceProvider;
 use DebugSuite\Providers\FrontendServiceProvider;
 
 /**
- * Main class for the Debug Suite plugin.
+ * Main plugin bootstrap and orchestration class for Debug Suite.
  *
- * @since    1.0.0
+ * Primary entry point that manages PSR-11 DI container, service providers,
+ * and coordinates the entire plugin initialization process.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 final class DebugSuite {
 
 	/**
-	 * Instance of self
+	 * Singleton instance of the Debug Suite plugin.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var DebugSuite|null
 	 */
 	private static ?DebugSuite $instance = null;
 
 	/**
-	 * Service Manager instance.
+	 * PSR-11 compliant service manager instance.
+	 *
+	 * Manages the lifecycle of service providers including registration,
+	 * booting, and automatic hook registration for Hookable services.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var ServiceManager
 	 */
 	private ServiceManager $service_manager;
 
 	/**
-	 * Container instance.
+	 * PSR-11 compliant dependency injection container.
+	 *
+	 * Provides service resolution, autowiring, and dependency management
+	 * with full PSR-11 Container Interface compliance and PHP-DI style
+	 * definition support.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var Container
 	 */
 	private Container $container;
 
 	/**
-	 * Define the core functionality of the plugin.
+	 * Initialize the Debug Suite plugin.
 	 *
-	 * @throws Exception If a service cannot be resolved.
-	 * @since    1.0.0
+	 * Sets up the PSR-11 compliant dependency injection container,
+	 * registers service providers, and initializes the plugin's
+	 * core functionality. This method orchestrates the entire
+	 * plugin initialization process.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @throws Exception If a service cannot be resolved during initialization.
 	 */
 	public function __construct() {
 		$this->define_constants();
@@ -95,10 +124,14 @@ final class DebugSuite {
 	}
 
 	/**
-	 * Initialize the dependency injection container.
+	 * Initialize the PSR-11 compliant dependency injection container.
 	 *
-	 * @since    1.0.0
-	 * @access   private
+	 * Creates and configures the DI container with the service manager,
+	 * then registers the container and manager as singleton instances
+	 * for easy access throughout the application lifecycle.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @return void
 	 */
 	private function init_container(): void {

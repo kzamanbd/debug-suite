@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Assets management for the Debug Suite plugin.
+ * Assets management for Debug Suite with PSR-11 DI container support.
  *
  * @package DebugSuite
  */
@@ -11,10 +11,9 @@ namespace DebugSuite\Core;
 use DebugSuite\Interfaces\Hookable;
 
 /**
- * Assets management for the Debug Suite plugin.
+ * Assets registration and management for Debug Suite.
  *
- * Handles the registration and enqueuing of stylesheets and JavaScript files
- * for both admin and frontend contexts. Manages asset dependencies and versioning.
+ * Handles registration and enqueuing of stylesheets and JavaScript files.
  *
  * @since DEBUG_SUITE_SINCE
  */

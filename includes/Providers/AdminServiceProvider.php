@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Admin service provider for registering admin services.
+ * Admin service provider for registering WordPress admin-specific services.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Providers;
@@ -9,10 +11,13 @@ namespace DebugSuite\Providers;
 use DebugSuite\Core\DI\AbstractServiceProvider;
 use DebugSuite\Core\DI\Container;
 use DebugSuite\Admin\Admin;
-use DebugSuite\Interfaces\Hookable;
 
 /**
- * Admin Service Provider for registering admin services.
+ * Admin Service Provider for registering WordPress admin functionality.
+ *
+ * Registers admin-specific services and WordPress admin interface components.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class AdminServiceProvider extends AbstractServiceProvider {
 

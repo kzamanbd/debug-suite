@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Internationalization functionality for Debug Suite plugin.
+ * Internationalization functionality for Debug Suite with PSR-11 DI support.
  *
  * @package DebugSuite
  */
@@ -11,10 +11,9 @@ namespace DebugSuite\Core;
 use DebugSuite\Interfaces\Hookable;
 
 /**
- * Internationalization functionality for Debug Suite plugin.
+ * Internationalization and translation management for Debug Suite.
  *
- * Handles the loading of translation files and text domain registration
- * for proper internationalization support.
+ * Handles loading of translation files and text domain registration.
  *
  * @since DEBUG_SUITE_SINCE
  */

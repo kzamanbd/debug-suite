@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Frontend service provider for registering frontend services.
+ * Frontend service provider for registering public-facing services.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Providers;
@@ -11,7 +13,11 @@ use DebugSuite\Core\DI\Container;
 use DebugSuite\Frontend\Frontend;
 
 /**
- * Frontend Service Provider for registering frontend services.
+ * Frontend Service Provider for registering public-facing functionality.
+ *
+ * Registers frontend-specific services and public-facing components.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class FrontendServiceProvider extends AbstractServiceProvider {
 

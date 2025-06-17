@@ -72,6 +72,7 @@ $serviceManager->boot();
 ### 4. Definition System
 
 #### Autowired Definition
+
 ```php
 use DebugSuite\Core\DI\Definitions\AutowiredDefinition;
 
@@ -80,6 +81,7 @@ $definition->constructor_parameter('config', ['debug' => true]);
 ```
 
 #### Factory Definition
+
 ```php
 use DebugSuite\Core\DI\Definitions\FactoryDefinition;
 
@@ -89,6 +91,7 @@ $definition = new FactoryDefinition(function($container) {
 ```
 
 #### Value Definition
+
 ```php
 use DebugSuite\Core\DI\Definitions\ValueDefinition;
 
