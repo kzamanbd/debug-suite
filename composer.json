@@ -13,6 +13,7 @@
     ],
     "require": {
         "php": ">=8.2",
+        "monolog/monolog": "^3.9",
         "psr/container": "^2.0",
         "symfony/finder": "^7.3"
     },
