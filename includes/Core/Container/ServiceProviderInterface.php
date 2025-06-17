@@ -59,13 +59,4 @@ interface ServiceProviderInterface {
 	 * @return array<string> Array of service identifiers.
 	 */
 	public function provides(): array;
-
-	/**
-	 * Check if the provider has been registered.
-	 *
-	 * @since DEBUG_SUITE_SINCE
-	 *
-	 * @return bool
-	 */
-	public function is_registered(): bool;
 }

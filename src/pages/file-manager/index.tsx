@@ -35,7 +35,7 @@ const FileManager = () => {
     const fetchFiles = async (path?: string) => {
         // Fetch files from the server
         return apiFetch<{
-            files: IFile[];
+            tree: IFile[];
         }>({
             path: `/debug-suite/v1/files?path=${encodeURIComponent(path || '')}`
         });
@@ -67,7 +67,7 @@ const FileManager = () => {
         try {
             setDetailLoading(true);
             const response = await fetchFiles(file.path);
-            file.children.push(...response.files);
+            file.children.push(...response.tree);
             setSelectedFiles(file.children);
             setDetailLoading(false);
         } catch (err) {
@@ -93,9 +93,9 @@ const FileManager = () => {
         try {
             const response = await fetchFiles(path);
             if (!path) {
-                setFiles(response.files);
+                setFiles(response.tree);
             }
-            setSelectedFiles(response.files);
+            setSelectedFiles(response.tree);
             setDetailLoading(false);
             setInitialLoading(false);
         } catch (err) {

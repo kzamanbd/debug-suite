@@ -54,6 +54,7 @@ use DebugSuite\Frontend\Frontend;
 use DebugSuite\Providers\CoreServiceProvider;
 use DebugSuite\Providers\AdminServiceProvider;
 use DebugSuite\Providers\FrontendServiceProvider;
+use DebugSuite\Providers\AppServiceProvider;
 
 /**
  * Main plugin bootstrap and orchestration class for Debug Suite.
@@ -154,6 +155,7 @@ final class DebugSuite {
 	 */
 	private function register_providers(): void {
 		$providers = [
+			AppServiceProvider::class,
 			CoreServiceProvider::class,
 			AdminServiceProvider::class,
 			FrontendServiceProvider::class,

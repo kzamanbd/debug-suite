@@ -8,9 +8,6 @@
 
 namespace DebugSuite\Admin;
 
-use DebugSuite\API\FileLogsController;
-use DebugSuite\API\FileManagerController;
-use DebugSuite\API\SettingsController;
 use DebugSuite\Interfaces\Hookable;
 use WP_Roles;
 
@@ -28,8 +25,9 @@ class Admin implements Hookable {
 	/**
 	 * Register hooks for WordPress.
 	 *
-	 * Registers admin-specific hooks including menu registration,
-	 * script enqueuing, and REST API route initialization.
+	 * Registers admin-specific hooks including menu registration
+	 * and script enqueuing. REST API routes are automatically registered
+	 * by controllers implementing the Hookable interface.
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
@@ -38,39 +36,10 @@ class Admin implements Hookable {
 	public function register_hooks(): void {
 		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
-		add_action( 'rest_api_init', [ $this, 'register_api_routes' ] );
-	}
-
-
-	/**
-	 * Register all API controller routes using the DI Container.
-	 *
-	 * Instantiates and registers routes for all API controllers including
-	 * settings, file logs, and file manager endpoints.
-	 *
-	 * @since DEBUG_SUITE_SINCE
-	 *
-	 * @return void
-	 */
-	public function register_api_routes(): void {
-		$controllers = [
-			SettingsController::class,
-			FileLogsController::class,
-			FileManagerController::class,
-			// Add more API controllers here as needed.
-		];
-		$controllers = apply_filters( 'debug_suite_api_controllers', $controllers );
-
-		foreach ( $controllers as $controller_class ) {
-			$controller = new $controller_class();
-			if ( method_exists( $controller, 'register_routes' ) ) {
-				$controller->register_routes();
-			}
-		}
 	}
 
 	/**
-	 * Add admin menu and initialize settings.
+	 * Add an admin menu and initialize settings.
 	 *
 	 * Creates the main Debug Suite admin menu and submenus for different
 	 * sections like file manager, error logs, and log management.
@@ -125,7 +94,7 @@ class Admin implements Hookable {
 	 *
 	 * @return void
 	 */
-	public function admin_page() {
+	public function admin_page(): void {
 		// Check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'debug-suite' ) );
@@ -139,7 +108,7 @@ class Admin implements Hookable {
 	/**
 	 * Enqueue admin scripts and styles.
 	 *
-	 * Loads necessary JavaScript and CSS files for the Debug Suite admin interface.
+	 * Loads the necessary JavaScript and CSS files for the Debug Suite admin interface.
 	 * Also localizes script data including WordPress debug constants and user roles.
 	 *
 	 * @since DEBUG_SUITE_SINCE

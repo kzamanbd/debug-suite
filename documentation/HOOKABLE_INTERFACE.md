@@ -63,7 +63,6 @@ class AdminServiceProvider extends AbstractServiceProvider {
     protected $provides = [ Admin::class ];
     public function register(Container $container): void {
         $container->singleton(Admin::class, fn($c) => new Admin());
-        $this->mark_registered();
     }
 }
 ```

@@ -27,15 +27,6 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	protected array $provides = [];
 
 	/**
-	 * Whether the provider has been registered.
-	 *
-	 * @since DEBUG_SUITE_SINCE
-	 *
-	 * @var bool
-	 */
-	protected bool $registered = false;
-
-	/**
 	 * Register services with the container.
 	 *
 	 * @since DEBUG_SUITE_SINCE
@@ -69,27 +60,5 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	 */
 	public function provides(): array {
 		return $this->provides;
-	}
-
-	/**
-	 * Check if the provider has been registered.
-	 *
-	 * @since DEBUG_SUITE_SINCE
-	 *
-	 * @return bool
-	 */
-	public function is_registered(): bool {
-		return $this->registered;
-	}
-
-	/**
-	 * Mark the provider as registered.
-	 *
-	 * @since DEBUG_SUITE_SINCE
-	 *
-	 * @return void
-	 */
-	protected function mark_registered(): void {
-		$this->registered = true;
 	}
 }

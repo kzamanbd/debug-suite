@@ -1,10 +1,12 @@
 # Debug Providers Guide
 
-This document explains how to create and work with Debug Providers in the Debug Suite plugin.
+> **DEPRECATED**: The Debug Provider system described in this document has been deprecated in favor of the PSR-11 DI Container system. Use the service provider pattern with the PSR-11 Container instead. This document is kept for historical purposes.
+
+This document explains the legacy Debug Providers system in the Debug Suite plugin, which has been replaced by the PSR-11 compliant Dependency Injection container system.
 
 ## What are Debug Providers?
 
-Debug Providers are components that collect and provide specific types of debug information. Each provider focuses on a particular aspect of WordPress, such as:
+In the legacy architecture, Debug Providers were components that collected and provided specific types of debug information. Each provider focused on a particular aspect of WordPress, such as:
 
 - PHP configuration
 - WordPress constants
@@ -14,39 +16,37 @@ Debug Providers are components that collect and provide specific types of debug 
 - Server environment
 - Custom functionality
 
-## Provider Architecture
+## Current Architecture
 
-Debug providers follow a standardized structure:
+The PSR-11 DI Container now handles all dependency management:
 
-1. **Interface**: All providers implement the `DebugProviderInterface`
-2. **Base Class**: Most providers extend the `AbstractDebugProvider` base class
-3. **Optional Interface**: Providers can also implement `Hookable` if they need to register WordPress hooks
+1. **PSR-11 Container**: Use `DebugSuite\Core\Container\Container` for dependency injection
+2. **Service Providers**: Extend `DebugSuite\Core\Container\AbstractServiceProvider` for registering services
+3. **Hookable Interface**: Services can implement `Hookable` if they need to register WordPress hooks
 
-## Creating a New Debug Provider
+## Creating a Debug Service (Modern Approach)
 
-### Step 1: Create a Provider Class
+### Step 1: Create a Service Class
 
-Create a new class in the `includes/Providers` directory:
+Create a new class in the `includes/Services` directory:
 
 ```php
 <?php
 
-namespace DebugSuite\Providers;
+namespace DebugSuite\Services;
 
-use DebugSuite\Interfaces\DebugProviderInterface;
-use DebugSuite\Providers\AbstractDebugProvider;
+use DebugSuite\Core\ServiceResult;
+use DebugSuite\Interfaces\ServiceInterface;
 use DebugSuite\Interfaces\Hookable;
 
-class ExampleDebugProvider extends AbstractDebugProvider implements DebugProviderInterface, Hookable {
-    protected readonly string $name = 'example';
-    protected readonly string $description = 'Example debug provider.';
+class ExampleDebugService implements ServiceInterface, Hookable {
+    private string $name = 'example';
+    private string $description = 'Example debug service.';
 
-    public function init(): void {
-        // Initialization logic
-    }
-
-    public function get_debug_data(): array {
-        return [ 'example' => 'data' ];
+    public function get_debug_data(): ServiceResult {
+        return ServiceResult::success([
+            'example' => 'data'
+        ]);
     }
 
     public function register_hooks(): void {
@@ -55,19 +55,20 @@ class ExampleDebugProvider extends AbstractDebugProvider implements DebugProvide
 }
 ```
 
-### Step 2: Register the Provider
+### Step 2: Register the Service with the DI Container
 
-Register your provider with the Debug Provider Manager in your service provider's `register` method:
+Register your service in a service provider's `register` method:
 
 ```php
-use DebugSuite\Managers\DebugProviderManager;
-use DebugSuite\Providers\ExampleDebugProvider;
+use DebugSuite\Services\ExampleDebugService;
 
 public function register(Container $container): void {
-    $container->singleton(ExampleDebugProvider::class, fn($c) => new ExampleDebugProvider());
-    $manager = DebugProviderManager::get_instance();
-    $manager->register_provider('example', $container->resolve(ExampleDebugProvider::class));
-    $this->mark_registered();
+    $container->singleton(ExampleDebugService::class, fn() => new ExampleDebugService());
+    
+    // Register controller using the service
+    $container->singleton(ExampleController::class, fn($c) => 
+        new ExampleController($c->get(ExampleDebugService::class))
+    );
 }
 ```
 
@@ -85,15 +86,11 @@ $service_manager->register_providers([
 ]);
 ```
 
-## Key Methods to Implement
+## Best Practices with the New Architecture
 
-- `init()`: Initialize the provider
-- `get_debug_data()`: Return an array of debug data
-- `register_hooks()`: (optional, when implementing Hookable) Register any WordPress hooks needed by your provider
-
-## Best Practices
-
-1. **Performance**: Make sure your provider doesn't impact site performance, especially on production sites
-2. **Data Structure**: Return structured data that can be easily displayed in the UI
-3. **Security**: Be careful with sensitive data - don't expose passwords or private information
-4. **Error Handling**: Use proper error handling to prevent your provider from breaking the site
+1. **Service Layer Pattern**: Follow the service layer pattern for separation of concerns
+2. **Return ServiceResult**: Services should return `ServiceResult` objects for consistent error handling
+3. **PSR-11 Container**: Use the PSR-11 container for dependency injection
+4. **Autowiring**: Take advantage of autowiring for automatic dependency resolution
+5. **Configuration**: Accept configuration through constructor parameters for testability
+6. **Documentation**: Fully document all public methods with PHPDoc

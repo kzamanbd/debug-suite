@@ -164,8 +164,6 @@ class MyServiceProvider extends AbstractServiceProvider {
         $container->singleton(MyService::class, function(Container $c) {
             return new MyService($c->get('dependency'));
         });
-        
-        $this->mark_registered();
     }
     
     public function boot(Container $container): void {

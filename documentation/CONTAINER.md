@@ -59,7 +59,7 @@ Service providers register services with the container:
 - Register services as singletons or instances
 - Optionally implement `boot()` for post-registration logic
 
-#### Example
+#### Example 1
 
 ```php
 use DebugSuite\Core\AbstractServiceProvider;
@@ -69,7 +69,6 @@ class ExampleServiceProvider extends AbstractServiceProvider {
     protected $provides = [ExampleService::class];
     public function register(Container $container): void {
         $container->singleton(ExampleService::class, fn($c) => new ExampleService());
-        $this->mark_registered();
     }
 }
 ```
@@ -83,7 +82,7 @@ Manages the registration and booting of service providers:
 - Prevents duplicate registrations
 - Centrally registers hooks for all `Hookable` services
 
-#### Example 1
+#### Example 2
 
 ```php
 $service_manager = new ServiceManager($container);
@@ -94,22 +93,23 @@ $service_manager->register_providers([
 $service_manager->boot();
 ```
 
-### 4. Singleton Trait (`DebugSuite\Core\Singleton`)
+### 4. Container Singleton Pattern
 
-Provides singleton functionality for manager classes:
+The `Container` class implements the singleton pattern internally:
 
-- Ensures a single instance
-- Prevents cloning and serialization
-- Provides `get_instance()` method
+- Ensures a single instance with `get_instance()` method
+- Used by the helper function `debug_suite_container()`
+- Prevents multiple container instances
+- No need for external singleton trait
 
-#### Example 2
+#### Example 3
 
 ```php
-class MyManager {
-    use \DebugSuite\Core\Singleton;
-    // ...
-}
-$instance = MyManager::get_instance();
+// Get the container instance
+$container = Container::get_instance();
+
+// Or use the helper function
+$container = debug_suite_container();
 ```
 
 ## Helper Functions
