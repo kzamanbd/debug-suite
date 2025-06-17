@@ -6,8 +6,8 @@
 
 namespace DebugSuite\Providers;
 
-use DebugSuite\Core\AbstractServiceProvider;
-use DebugSuite\Core\Container;
+use DebugSuite\Core\DI\AbstractServiceProvider;
+use DebugSuite\Core\DI\Container;
 use DebugSuite\Core\Assets;
 use DebugSuite\Core\I18n;
 use Exception;
@@ -19,14 +19,24 @@ class CoreServiceProvider extends AbstractServiceProvider {
 
 	/**
 	 * Services provided by this provider.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @var array<string>
 	 */
-	protected $provides = [
+	protected array $provides = [
 		Assets::class,
 		I18n::class,
 	];
 
 	/**
 	 * Register services with the container.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param Container $container The container instance.
+	 *
+	 * @return void
 	 */
 	public function register( Container $container ): void {
 		// Register Assets service

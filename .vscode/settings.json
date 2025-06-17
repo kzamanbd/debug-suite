@@ -1,7 +1,7 @@
 {
     "intelephense.environment.includePaths": ["../../../../"],
     "php.workspace.includePath": "../../../../",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "phpcbf.standard": "${workspaceFolder}/phpcs.xml",
     "phpcbf.enable": true,
     "phpcbf.executablePath": "${workspaceFolder}/vendor/bin/phpcbf",

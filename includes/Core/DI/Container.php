@@ -1,24 +1,32 @@
 <?php
 /**
- * Dependency Injection Container for managing class dependencies.
+ * PSR-11 compliant dependency injection container with PHP-DI features.
+ *
+ * @package DebugSuite
  */
 
-namespace DebugSuite\Core;
+namespace DebugSuite\Core\DI;
 
-use Exception;
+use Psr\Container\ContainerInterface;
+use DebugSuite\Core\DI\Exceptions\ContainerException;
+use DebugSuite\Core\DI\Exceptions\NotFoundException;
+use DebugSuite\Core\DI\Definitions\DefinitionInterface;
+use DebugSuite\Core\DI\Definitions\FactoryDefinition;
+use DebugSuite\Core\DI\Definitions\AutowiredDefinition;
+use DebugSuite\Core\DI\Definitions\ValueDefinition;
 use ReflectionClass;
 use ReflectionException;
 
 /**
- * Dependency Injection Container for managing class dependencies.
+ * PSR-11 compliant dependency injection container with PHP-DI features.
  *
  * Provides a singleton container implementation for dependency injection
- * with support for service binding, singleton management, and automatic
- * dependency resolution using reflection.
+ * with support for service binding, singleton management, automatic
+ * dependency resolution using reflection, and PHP-DI style definitions.
  *
  * @since DEBUG_SUITE_SINCE
  */
-class Container {
+class Container implements ContainerInterface {
 
 	/**
 	 * Container singleton instance.
@@ -49,13 +57,31 @@ class Container {
 	private array $instances = [];
 
 	/**
-	 * Service bindings configuration.
+	 * Service definitions configuration.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @var array<string, DefinitionInterface>
+	 */
+	private array $definitions = [];
+
+	/**
+	 * Legacy service bindings configuration (for backward compatibility).
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @var array<string, array{resolver: mixed, singleton: bool}>
 	 */
 	private array $bindings = [];
+
+	/**
+	 * Autowiring enabled flag.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @var bool
+	 */
+	private bool $autowiring_enabled = true;
 
 	/**
 	 * Private constructor to prevent direct instantiation.
@@ -84,6 +110,110 @@ class Container {
 		}
 
 		return self::$instance;
+	}
+
+	/**
+	 * PSR-11: Finds an entry of the container by its identifier and returns it.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $id Identifier of the entry to look for.
+	 *
+	 * @return mixed Entry.
+	 *
+	 * @throws NotFoundException  No entry was found for this identifier.
+	 * @throws ContainerException Error while retrieving the entry.
+	 */
+	public function get( string $id ) {
+		return $this->resolve( $id );
+	}
+
+	/**
+	 * PSR-11: Returns true if the container can return an entry for the given identifier.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $id Identifier of the entry to look for.
+	 *
+	 * @return bool
+	 */
+	public function has( string $id ): bool {
+		return isset( $this->definitions[ $id ] ) ||
+			   isset( $this->bindings[ $id ] ) ||
+			   isset( $this->instances[ $id ] ) ||
+			   ( $this->autowiring_enabled && class_exists( $id ) );
+	}
+
+	/**
+	 * Set a definition for a service.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string              $id         Service identifier.
+	 * @param DefinitionInterface $definition Service definition.
+	 *
+	 * @return void
+	 */
+	public function set( string $id, DefinitionInterface $definition ): void {
+		$definition->set_name( $id );
+		$this->definitions[ $id ] = $definition;
+
+		// Remove any existing instance if rebinding
+		if ( isset( $this->instances[ $id ] ) ) {
+			unset( $this->instances[ $id ] );
+		}
+	}
+
+	/**
+	 * Create a factory definition.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param callable $factory The factory callable.
+	 *
+	 * @return FactoryDefinition
+	 */
+	public function factory( callable $factory ): FactoryDefinition {
+		return new FactoryDefinition( $factory );
+	}
+
+	/**
+	 * Create an autowired definition.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $class_name The class name to autowire.
+	 *
+	 * @return AutowiredDefinition
+	 */
+	public function autowire( string $class_name ): AutowiredDefinition {
+		return new AutowiredDefinition( $class_name );
+	}
+
+	/**
+	 * Create a value definition.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param mixed $value The value to return.
+	 *
+	 * @return ValueDefinition
+	 */
+	public function value( $value ): ValueDefinition {
+		return new ValueDefinition( $value );
+	}
+
+	/**
+	 * Create an object definition (autowired singleton).
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $class_name The class name to autowire.
+	 *
+	 * @return AutowiredDefinition
+	 */
+	public function object( string $class_name ): AutowiredDefinition {
+		return new AutowiredDefinition( $class_name, true );
 	}
 
 	/**
@@ -158,7 +288,8 @@ class Container {
 	 *
 	 * @return mixed The resolved service instance.
 	 *
-	 * @throws Exception If service not found or cannot be resolved.
+	 * @throws NotFoundException  If service not found.
+	 * @throws ContainerException If service cannot be resolved.
 	 */
 	public function resolve( string $name ) {
 		// Check if we have a cached singleton instance
@@ -166,34 +297,47 @@ class Container {
 			return $this->instances[ $name ];
 		}
 
-		// Check if we have a binding for this service
-		if ( ! isset( $this->bindings[ $name ] ) ) {
-			// Try to auto-resolve if it's a class name
-			if ( class_exists( $name ) ) {
-				return $this->auto_resolve( $name );
+		// Check for definition first
+		if ( isset( $this->definitions[ $name ] ) ) {
+			$definition = $this->definitions[ $name ];
+			$instance   = $definition->resolve( [ $this, 'resolve' ] );
+
+			// Cache singleton instances
+			if ( $definition->is_singleton() ) {
+				$this->instances[ $name ] = $instance;
 			}
 
-			throw new Exception( "Service [$name] not found in container." ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			return $instance;
 		}
 
-		$binding  = $this->bindings[ $name ];
-		$resolver = $binding['resolver'];
+		// Check for legacy binding
+		if ( isset( $this->bindings[ $name ] ) ) {
+			$binding  = $this->bindings[ $name ];
+			$resolver = $binding['resolver'];
 
-		// Resolve the service
-		if ( is_callable( $resolver ) ) {
-			$instance = $resolver( $this );
-		} elseif ( is_string( $resolver ) && class_exists( $resolver ) ) {
-			$instance = $this->auto_resolve( $resolver );
-		} else {
-			$instance = $resolver;
+			// Resolve the service
+			if ( is_callable( $resolver ) ) {
+				$instance = $resolver( $this );
+			} elseif ( is_string( $resolver ) && class_exists( $resolver ) ) {
+				$instance = $this->auto_resolve( $resolver );
+			} else {
+				$instance = $resolver;
+			}
+
+			// Cache singleton instances
+			if ( $binding['singleton'] ) {
+				$this->instances[ $name ] = $instance;
+			}
+
+			return $instance;
 		}
 
-		// Cache singleton instances
-		if ( $binding['singleton'] ) {
-			$this->instances[ $name ] = $instance;
+		// Try to auto-resolve if enabled and it's a class name
+		if ( $this->autowiring_enabled && class_exists( $name ) ) {
+			return $this->auto_resolve( $name );
 		}
 
-		return $instance;
+		throw NotFoundException::for_identifier( $name );
 	}
 
 	/**
@@ -208,7 +352,7 @@ class Container {
 	 *
 	 * @return mixed The instantiated class with resolved dependencies.
 	 *
-	 * @throws Exception If class cannot be resolved or dependencies are missing.
+	 * @throws ContainerException If class cannot be resolved or dependencies are missing.
 	 */
 	private function auto_resolve( string $class_name ) {
 		try {
@@ -239,44 +383,56 @@ class Container {
 				} elseif ( $parameter->isDefaultValueAvailable() ) {
 					$dependencies[] = $parameter->getDefaultValue();
 				} else {
-					throw new Exception( "Cannot resolve parameter [{$parameter->getName()}] for class [$class_name]." );
+					throw new ContainerException( "Cannot resolve parameter [{$parameter->getName()}] for class [$class_name]." );
 				}
 			}
 
 			return $reflection->newInstanceArgs( $dependencies );
 		} catch ( ReflectionException $e ) {
-			throw new Exception( "Cannot auto-resolve class [$class_name]: " . $e->getMessage() ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new ContainerException( "Cannot auto-resolve class [$class_name]: " . $e->getMessage(), 0, $e );
 		}
 	}
 
 	/**
-	 * Check if a service is bound in the container.
-	 *
-	 * Verifies whether a service is registered in the bindings or
-	 * exists as a cached instance.
+	 * Enable or disable autowiring.
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
-	 * @param string $name Service name/identifier.
+	 * @param bool $enabled Whether autowiring is enabled.
 	 *
-	 * @return bool True if service exists, false otherwise.
+	 * @return void
 	 */
-	public function has( string $name ): bool {
-		return isset( $this->bindings[ $name ] ) || isset( $this->instances[ $name ] );
+	public function set_autowiring( bool $enabled ): void {
+		$this->autowiring_enabled = $enabled;
+	}
+
+	/**
+	 * Check if autowiring is enabled.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return bool
+	 */
+	public function is_autowiring_enabled(): bool {
+		return $this->autowiring_enabled;
 	}
 
 	/**
 	 * Get all registered service names.
 	 *
-	 * Returns an array of all service names that are either bound
-	 * in the container or exist as cached instances.
+	 * Returns an array of all service names that are either defined,
+	 * bound in the container, or exist as cached instances.
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return array<string> Array of service names.
 	 */
 	public function get_services(): array {
-		return array_merge( array_keys( $this->bindings ), array_keys( $this->instances ) );
+		return array_merge(
+			array_keys( $this->definitions ),
+			array_keys( $this->bindings ),
+			array_keys( $this->instances )
+		);
 	}
 
 	/**
@@ -291,7 +447,8 @@ class Container {
 	 *
 	 * @return mixed The resolved service instance.
 	 *
-	 * @throws Exception If service cannot be resolved.
+	 * @throws NotFoundException  If service not found.
+	 * @throws ContainerException If service cannot be resolved.
 	 */
 	public function __get( string $name ) {
 		return $this->resolve( $name );

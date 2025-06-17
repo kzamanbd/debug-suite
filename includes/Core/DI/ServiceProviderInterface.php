@@ -1,16 +1,14 @@
 <?php
 /**
- * Interface for service providers.
+ * Interface for DI service providers.
  *
  * @package DebugSuite
  */
 
-namespace DebugSuite\Interfaces;
-
-use DebugSuite\Core\DI\Container;
+namespace DebugSuite\Core\DI;
 
 /**
- * Service Provider Interface for registering services with the container.
+ * Service Provider Interface for registering services with the DI container.
  *
  * Defines the contract for service providers that register and boot services
  * within the dependency injection container. Providers should implement both
@@ -19,7 +17,6 @@ use DebugSuite\Core\DI\Container;
  * @since DEBUG_SUITE_SINCE
  */
 interface ServiceProviderInterface {
-
 
 	/**
 	 * Register services with the container.
@@ -50,4 +47,25 @@ interface ServiceProviderInterface {
 	 * @return void
 	 */
 	public function boot( Container $container ): void;
+
+	/**
+	 * Get the services provided by this provider.
+	 *
+	 * Returns an array of service identifiers that this provider
+	 * registers with the container.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return array<string> Array of service identifiers.
+	 */
+	public function provides(): array;
+
+	/**
+	 * Check if the provider has been registered.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return bool
+	 */
+	public function is_registered(): bool;
 }

@@ -13,7 +13,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "symfony/finder": "^7.3"
+        "symfony/finder": "^7.3",
+        "psr/container": "^2.0"
     },
     "autoload": {
         "psr-4": {
