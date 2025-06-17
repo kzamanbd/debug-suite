@@ -1,6 +1,12 @@
-# Debug Suite - Container System
+# Debug Suite - Container System (Legacy Documentation)
+
+> **Note**: This documentation covers the legacy container system. For the enhanced DI system with PSR-11 compliance and PHP-DI compatibility, see [ENHANCED_DI_CONTAINER.md](ENHANCED_DI_CONTAINER.md).
 
 This document explains how to use the Debug Suite's dependency injection container system for managing classes and their dependencies.
+
+## Migration Notice
+
+The container system has been enhanced and moved to the `DebugSuite\Core\DI` namespace. While the old API continues to work through class aliases, we recommend migrating to the new enhanced system. See [DI_MIGRATION.md](DI_MIGRATION.md) for migration instructions.
 
 ## Overview
 

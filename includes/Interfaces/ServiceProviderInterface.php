@@ -7,7 +7,7 @@
 
 namespace DebugSuite\Interfaces;
 
-use DebugSuite\Core\Container;
+use DebugSuite\Core\DI\Container;
 
 /**
  * Service Provider Interface for registering services with the container.
