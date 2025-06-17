@@ -15,7 +15,3 @@ function autoload_if_possible(): void {
         require_once $autoload;
     }
 }
-
-// Set up WordPress test environment if needed.
-// You may need to adjust this path depending on your setup.
-// require_once getenv( 'WP_TESTS_DIR' ) . '/includes/bootstrap.php';
