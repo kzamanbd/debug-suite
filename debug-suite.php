@@ -41,8 +41,8 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 use DebugSuite\Admin\Admin;
 use DebugSuite\Core\Activator;
 use DebugSuite\Core\Deactivator;
-use DebugSuite\Core\Container;
-use DebugSuite\Core\ServiceManager;
+use DebugSuite\Core\DI\Container;
+use DebugSuite\Core\DI\ServiceManager;
 use DebugSuite\Frontend\Frontend;
 use DebugSuite\Providers\CoreServiceProvider;
 use DebugSuite\Providers\AdminServiceProvider;

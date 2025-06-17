@@ -1,45 +1,38 @@
 {
-    "editor.formatOnSave": true,
-    "phpcbf.standard": "WordPress",
+    "intelephense.environment.includePaths": ["../../../../"],
+    "php.workspace.includePath": "../../../../",
+    "editor.formatOnSave": false,
+    "phpcbf.standard": "${workspaceFolder}/phpcs.xml",
     "phpcbf.enable": true,
-    "phpcbf.executablePath": "phpcbf",
+    "phpcbf.executablePath": "${workspaceFolder}/vendor/bin/phpcbf",
     "phpcbf.documentFormattingProvider": true,
     "phpcbf.onsave": false,
     "phpcbf.debug": false,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "[php]": {
-        "editor.formatOnSave": false
-    },
-    "[typescript]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll": "always",
-            "source.fixAll.eslint": "always",
-            "source.organizeImports": "always"
-        }
+        "editor.defaultFormatter": "persoderlind.vscode-phpcbf"
     },
     "[javascript]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll": "always",
-            "source.fixAll.eslint": "always",
-            "source.organizeImports": "always"
-        }
+        "editor.defaultFormatter": "vscode.typescript-language-features"
     },
-    "[typescriptreact]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll": "always",
-            "source.fixAll.eslint": "always",
-            "source.organizeImports": "always"
-        }
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[javascriptreact]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll": "always",
-            "source.fixAll.eslint": "always",
-            "source.organizeImports": "always"
-        }
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "always"
+        "source.fixAll.eslint": "explicit",
+        "source.fixAll.tslint": "always",
+        "source.organizeImports": "explicit"
     },
     "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"]
 }
