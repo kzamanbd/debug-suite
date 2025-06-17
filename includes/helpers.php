@@ -158,7 +158,6 @@ if ( ! function_exists( 'debug_suite_container_builder' ) ) {
 	 *
 	 * @return ContainerBuilder
 	 *@since DEBUG_SUITE_SINCE
-	 *
 	 */
 	function debug_suite_container_builder(): ContainerBuilder {
 		return new ContainerBuilder();
