@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <ruleset name="WordPress Coding Standards for Debug Suite">
     <description>WordPress.org compliant coding standards for WordPress plugins.</description>
+    <!-- What to scan -->
+    <file>.</file>
 
     <!-- What to exclude -->
     <exclude-pattern>*/.git/*</exclude-pattern>
