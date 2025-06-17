@@ -147,7 +147,7 @@ class AutowiredDefinition implements DefinitionInterface {
 
 			return $reflection->newInstanceArgs( $dependencies );
 		} catch ( ReflectionException $e ) {
-			throw new ContainerException( "Cannot autowire class [{$this->class_name}]: " . $e->getMessage(), 0, $e );
+			throw new ContainerException( "Cannot autowire class [{$this->class_name}]: " . $e->getMessage(), 0, $e ); // phpcs:ignore
 		}
 	}
 

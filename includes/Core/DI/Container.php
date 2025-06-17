@@ -337,7 +337,7 @@ class Container implements ContainerInterface {
 			return $this->auto_resolve( $name );
 		}
 
-		throw NotFoundException::for_identifier( $name );
+		throw NotFoundException::for_identifier( $name ); // phpcs:ignore
 	}
 
 	/**
@@ -389,7 +389,7 @@ class Container implements ContainerInterface {
 
 			return $reflection->newInstanceArgs( $dependencies );
 		} catch ( ReflectionException $e ) {
-			throw new ContainerException( "Cannot auto-resolve class [$class_name]: " . $e->getMessage(), 0, $e );
+			throw new ContainerException( "Cannot auto-resolve class [$class_name]: " . $e->getMessage(), 0, $e ); // phpcs:ignore
 		}
 	}
 
