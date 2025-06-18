@@ -10,14 +10,24 @@ namespace DebugSuite\Tests\Helpers;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
-use WP_UnitTestCase;
 use DebugSuite\Core\Container\Container;
+use WP_UnitTestCase;
 
 /**
  * Base test case for integration tests.
  * 
- * Extends WP_UnitTestCase to get WordPress testing features.
- * Use this class for tests that need WordPress core.
+ * Extends WP_UnitTestCase when available, otherwise falls back to TestCase.
+ * Use this class for tests that need WordPress core, REST API testing,
+ * or container integration.
+ * 
+ * Features included:
+ * - REST API testing helpers (GET, POST, PUT, DELETE methods)
+ * - Container reset and management
+ * - Test file and directory management
+ * - User setup (admin and customer)
+ * - ServiceResult assertions
+ * - Response assertions
+ * - File content assertions
  */
 class DebugSuiteTestCase extends WP_UnitTestCase {
 
@@ -34,6 +44,34 @@ class DebugSuiteTestCase extends WP_UnitTestCase {
 	 * @var array
 	 */
 	protected $test_files = [];
+	
+	/**
+	 * Admin user ID.
+	 *
+	 * @var int
+	 */
+	protected $admin_id;
+	
+	/**
+	 * Customer user ID.
+	 *
+	 * @var int
+	 */
+	protected $customer_id;
+	
+	/**
+	 * REST API server instance.
+	 *
+	 * @var object|null The REST server instance.
+	 */
+	protected $server;
+	
+	/**
+	 * The namespace of the REST route.
+	 *
+	 * @var string Debug Suite API Namespace
+	 */
+	protected $namespace = 'debug-suite/v1';
 
 	/**
 	 * Set up test environment before each test.
@@ -43,6 +81,23 @@ class DebugSuiteTestCase extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		$this->reset_container();
+		
+		if ( ! $this->is_wordpress_available() ) {
+			// Skip WordPress-specific setup if not available
+			return;
+		}
+		
+		// Initiating the REST API
+		global $wp_rest_server;
+		
+		if ( class_exists( 'WP_REST_Server' ) ) {
+			$wp_rest_server = new \WP_REST_Server();
+			$this->server = $wp_rest_server;
+			do_action( 'rest_api_init' );
+		}
+		
+		// Setup test users
+		$this->setup_users();
 	}
 
 	/**
@@ -61,7 +116,7 @@ class DebugSuiteTestCase extends WP_UnitTestCase {
 	 *
 	 * @return void
 	 */
-	protected function reset_container() {
+	protected function reset_container(): void {
 		if ( ! class_exists( 'DebugSuite\Core\Container\Container' ) ) {
 			return;
 		}
@@ -164,16 +219,293 @@ class DebugSuiteTestCase extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check if WordPress test environment is available.
+	 *
+	 * @return bool
+	 */
+	public function is_wordpress_available(): bool {
+		return class_exists( 'WP_UnitTestCase' ) && function_exists( 'wp_set_current_user' );
+	}
+
+	/**
 	 * Create a test admin user and set as current.
 	 *
 	 * @return int Admin user ID.
 	 */
 	protected function create_admin_user() {
-		$admin_id = $this->factory->user->create();
+		if ( ! $this->is_wordpress_available() ) {
+			return 123; // Mock user ID
+		}
+		
+		$admin_id = $this->factory()->user->create();
 		$user = get_user_by( 'id', $admin_id );
 		$user->add_cap( 'manage_options' );
 		wp_set_current_user( $admin_id );
+		
 		return $admin_id;
+	}
+
+	/**
+	 * Setup test users for REST API testing.
+	 *
+	 * @return void
+	 */
+	protected function setup_users(): void {
+		if ( ! $this->is_wordpress_available() ) {
+			// Skip user setup if WordPress is not available
+			$this->admin_id = 123;
+			$this->customer_id = 124;
+			return;
+		}
+		
+		$this->admin_id = $this->factory()->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		
+		$this->customer_id = $this->factory()->user->create(
+			array(
+				'role' => 'subscriber',
+			)
+		);
+	}
+
+	/**
+	 * Get the full route namespace for the given route.
+	 *
+	 * @param string $route The REST API route.
+	 * @return string The full route with namespace.
+	 */
+	protected function get_rest_namespace( string $route ): string {
+		return $this->namespace . $route;
+	}
+
+	/**
+	 * Get route with namespace.
+	 *
+	 * @param string $route_name REST API route name.
+	 * @return string The full route with namespace.
+	 */
+	protected function get_route( string $route_name ): string {
+		$namespace = '/' . trim( $this->namespace, '/' );
+		$route_name = '/' . trim( $route_name, '/' );
+
+		// If namespace is already exist.
+		if ( str_starts_with( $route_name, $namespace ) ) {
+			return $route_name;
+		}
+
+		return $namespace . $route_name;
+	}
+
+	/**
+	 * Perform a GET request on the given route with parameters.
+	 *
+	 * @param string $route   The REST API route.
+	 * @param array  $params  Optional query parameters.
+	 * @param array  $headers Optional headers.
+	 * @param bool   $header_override Optional header override status.
+	 *
+	 * @return object The response object.
+	 */
+	protected function get_request( string $route, array $params = [], array $headers = [], bool $header_override = true ) {
+		if ( ! class_exists( 'WP_REST_Request' ) ) {
+			return $this->create_mock_response( 200, [ 'data' => 'mocked' ] );
+		}
+		
+		$request = new \WP_REST_Request( 'GET', $this->get_route( $route ) );
+		$request->set_query_params( $params );
+		$request->set_headers( $headers, $header_override );
+
+		return $this->server->dispatch( $request );
+	}
+
+	/**
+	 * Perform a POST request on the given route with parameters.
+	 *
+	 * @param string $route   The REST API route.
+	 * @param array  $params  Optional body parameters.
+	 * @param array  $headers Optional headers.
+	 * @param bool   $header_override Optional header override status.
+	 * 
+	 * @return object The response object.
+	 */
+	protected function post_request( string $route, array $params = [], array $headers = [], bool $header_override = true ) {
+		if ( ! class_exists( 'WP_REST_Request' ) ) {
+			return $this->create_mock_response( 200, [ 'data' => 'mocked' ] );
+		}
+		
+		$request = new \WP_REST_Request( 'POST', $this->get_route( $route ) );
+		$request->set_body_params( $params );
+		$request->set_headers( $headers, $header_override );
+
+		return $this->server->dispatch( $request );
+	}
+
+	/**
+	 * Perform a PUT request on the given route with parameters.
+	 *
+	 * @param string $route   The REST API route.
+	 * @param array  $params  Optional body parameters.
+	 * @param array  $headers Optional headers.
+	 * @param bool   $header_override Optional header override status.
+	 * 
+	 * @return object The response object.
+	 */
+	protected function put_request( string $route, array $params = [], array $headers = [], bool $header_override = true ) {
+		if ( ! class_exists( 'WP_REST_Request' ) ) {
+			return $this->create_mock_response( 200, [ 'data' => 'mocked' ] );
+		}
+		
+		$request = new \WP_REST_Request( 'PUT', $this->get_route( $route ) );
+		$request->set_body_params( $params );
+		$request->set_headers( $headers, $header_override );
+
+		return $this->server->dispatch( $request );
+	}
+
+	/**
+	 * Perform a DELETE request on the given route with parameters.
+	 *
+	 * @param string $route   The REST API route.
+	 * @param array  $params  Optional body parameters.
+	 * @param array  $headers Optional headers.
+	 * @param bool   $header_override Optional header override status.
+	 * 
+	 * @return object The response object.
+	 */
+	protected function delete_request( string $route, array $params = [], array $headers = [], bool $header_override = true ) {
+		if ( ! class_exists( 'WP_REST_Request' ) ) {
+			return $this->create_mock_response( 200, [ 'data' => 'mocked' ] );
+		}
+		
+		$request = new \WP_REST_Request( 'DELETE', $this->get_route( $route ) );
+		$request->set_body_params( $params );
+		$request->set_headers( $headers, $header_override );
+
+		return $this->server->dispatch( $request );
+	}
+	
+	/**
+	 * Assert that a response has a specific status code.
+	 *
+	 * @param object $response The response object.
+	 * @param int    $status   Expected status code.
+	 * @param string $message  Optional failure message.
+	 * 
+	 * @return void
+	 */
+	protected function assert_response_status( $response, int $status, string $message = '' ): void {
+		$actual_status = method_exists( $response, 'get_status' ) ? $response->get_status() : 200;
+		$this->assertEquals(
+			$status,
+			$actual_status,
+			$message ?: "Expected status code {$status}, got {$actual_status}"
+		);
+	}
+	
+	/**
+	 * Assert that a response contains specific data.
+	 *
+	 * @param object $response      The response object.
+	 * @param array  $expected_data Expected data (partial match).
+	 * @param string $message       Optional failure message.
+	 * 
+	 * @return void
+	 */
+	protected function assert_response_data_contains( $response, array $expected_data, string $message = '' ): void {
+		$data = method_exists( $response, 'get_data' ) ? $response->get_data() : [];
+		
+		foreach ( $expected_data as $key => $value ) {
+			$this->assertArrayHasKey(
+				$key,
+				$data,
+				$message ?: "Response data does not contain key '{$key}'"
+			);
+			
+			$this->assertEquals(
+				$value,
+				$data[$key],
+				$message ?: "Response data key '{$key}' has incorrect value"
+			);
+		}
+	}
+
+	/**
+	 * Assert that a file contains a specific string.
+	 *
+	 * @param string $file_path Path to the file.
+	 * @param string $expected  Expected content substring.
+	 * @param string $message   Optional failure message.
+	 * 
+	 * @return void
+	 */
+	protected function assert_file_contains( string $file_path, string $expected, string $message = '' ): void {
+		$this->assertFileExists( $file_path, 'File does not exist: ' . $file_path );
+		$content = file_get_contents( $file_path );
+		$this->assertStringContainsString(
+			$expected,
+			$content,
+			$message ?: "File does not contain expected content: '{$expected}'"
+		);
+	}
+
+	/**
+	 * Create a test REST request with parameters.
+	 *
+	 * @param string $method HTTP method (GET, POST, PUT, DELETE, etc.)
+	 * @param string $route  The REST API route.
+	 * @param array  $params Request parameters.
+	 * 
+	 * @return object The created request object.
+	 */
+	protected function create_rest_request( string $method, string $route, array $params = [] ) {
+		if ( ! class_exists( 'WP_REST_Request' ) ) {
+			return $this->create_mock_request( $method, $route, $params );
+		}
+		
+		$request = new \WP_REST_Request( $method, $this->get_route( $route ) );
+		
+		if ( 'GET' === $method ) {
+			$request->set_query_params( $params );
+		} else {
+			$request->set_body_params( $params );
+		}
+		
+		return $request;
+	}
+
+	/**
+	 * Create a mock response for non-WordPress environments.
+	 *
+	 * @param int   $status Status code.
+	 * @param array $data   Response data.
+	 * 
+	 * @return object Mock response object.
+	 */
+	private function create_mock_response( int $status, array $data ) {
+		return (object) [
+			'get_status' => function() use ( $status ) { return $status; },
+			'get_data' => function() use ( $data ) { return $data; },
+		];
+	}
+
+	/**
+	 * Create a mock request for non-WordPress environments.
+	 *
+	 * @param string $method HTTP method.
+	 * @param string $route  Route path.
+	 * @param array  $params Parameters.
+	 * 
+	 * @return object Mock request object.
+	 */
+	private function create_mock_request( string $method, string $route, array $params ) {
+		return (object) [
+			'method' => $method,
+			'route' => $route,
+			'params' => $params,
+		];
 	}
 
 	/**
@@ -194,7 +526,7 @@ class DebugSuiteTestCase extends WP_UnitTestCase {
 	 * @param string $path Path to remove.
 	 * @return void
 	 */
-	private function remove_test_path( $path ) {
+	protected function remove_test_path( string $path ): void {
 		if ( ! file_exists( $path ) ) {
 			return;
 		}

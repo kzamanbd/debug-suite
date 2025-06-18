@@ -9,9 +9,10 @@
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
 // Detect if we're running the tests from the command line
-$_tests_dir = getenv( 'WP_TESTS_DIR' );
+$_tests_dir = getenv( 'WP_TESTS_DIR' ) ? getenv( 'WP_TESTS_DIR' ) : getenv( 'WP_PHPUNIT__DIR' );
+
 if ( ! $_tests_dir ) {
-	$_tests_dir = rtrim( sys_get_temp_dir(), '/\\' ) . '/wordpress-tests-lib';
+    $_tests_dir = rtrim( sys_get_temp_dir(), '/\\' ) . '/wordpress-tests-lib';
 }
 
 // If WP_TESTS_DIR is not set, this is a basic test run without WP core
@@ -22,7 +23,7 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 		if ( strpos( $test_path, 'Integration' ) !== false ) {
 			echo "Warning: WordPress test environment not properly set up.\n";
 			echo "Integration tests will be skipped.\n";
-			echo "Run: bash bin/install-wp-tests.sh wordpress_test root PASSWORD localhost latest\n";
+			echo "Run: bash tests/install-wp-tests.sh wordpress_test root PASSWORD localhost latest\n";
 			echo "Where PASSWORD is your MySQL password (leave empty if none).\n";
 			exit(0); // Exit gracefully without error
 		}

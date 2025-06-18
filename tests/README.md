@@ -46,7 +46,7 @@ To run integration tests, you'll need to set up the WordPress test environment:
 
 ```bash
 # Install WP test environment
-bin/install-wp-tests.sh wordpress_test root password localhost latest
+tests/install-wp-tests.sh wordpress_test root password localhost latest
 ```
 
 This script will download WordPress core and create a test database.

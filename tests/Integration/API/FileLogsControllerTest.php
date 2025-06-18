@@ -42,7 +42,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 	 *
 	 * @var string
 	 */
-	private $namespace = 'debug-suite/v1';
+	protected $namespace = 'debug-suite/v1';
 
 	/**
 	 * Set up test environment.

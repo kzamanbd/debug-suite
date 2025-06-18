@@ -126,7 +126,7 @@ class TestCase extends YoastTestCase {
 	 * @param string $suffix  File suffix (default: .tmp).
 	 * @return string Path to created file.
 	 */
-	protected function create_test_file( $content = '', $suffix = '.tmp' ) {
+	protected function create_test_file( string $content = '', string $suffix = '.tmp' ): string {
 		$temp_file = tempnam( sys_get_temp_dir(), 'debug_suite_test_' ) . $suffix;
 		file_put_contents( $temp_file, $content );
 		$this->test_files[] = $temp_file;
@@ -139,7 +139,7 @@ class TestCase extends YoastTestCase {
 	 * @param string $prefix Directory prefix.
 	 * @return string Path to created directory.
 	 */
-	protected function create_test_directory( $prefix = 'debug_suite_test_' ) {
+	protected function create_test_directory( string $prefix = 'debug_suite_test_' ): string {
 		$temp_dir = sys_get_temp_dir() . '/' . uniqid( $prefix );
 		mkdir( $temp_dir, 0755, true );
 		$this->test_files[] = $temp_dir;
@@ -152,7 +152,7 @@ class TestCase extends YoastTestCase {
 	 * @param string $path Path to remove.
 	 * @return void
 	 */
-	protected function remove_test_path( $path ) {
+	protected function remove_test_path( string $path ): void {
 		if ( ! file_exists( $path ) ) {
 			return;
 		}

@@ -43,7 +43,7 @@ class FileManagerControllerTest extends DebugSuiteTestCase {
 	 *
 	 * @var string
 	 */
-	private $namespace = 'debug-suite/v1';
+	protected $namespace = 'debug-suite/v1';
 
 	/**
 	 * Test directory.

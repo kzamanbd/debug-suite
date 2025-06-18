@@ -983,7 +983,7 @@ Integration tests require a WordPress test environment, which can be set up usin
 
 ```bash
 # Set up WP test environment
-bin/install-wp-tests.sh wordpress_test root password localhost latest
+tests/install-wp-tests.sh wordpress_test root password localhost latest
 ```
 
 ### Test Mocking Strategies
