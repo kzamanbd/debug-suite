@@ -1,8 +1,4 @@
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+on: pull_request
 
 name: PHPUnit Tests
 jobs:
@@ -50,6 +46,9 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
+      - name: Install required system packages
+        run: sudo apt-get update && sudo apt-get install -y subversion
+
       - name: Install WordPress Test Suite
         run: |
           bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 ${{ matrix.wp-versions }}
@@ -59,6 +58,11 @@ jobs:
 
       - name: Run Integration Tests
         run: composer run test:integration
+
+      - name: Generate Code Coverage Report
+        run: |
+          mkdir -p build/logs
+          vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
