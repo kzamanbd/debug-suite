@@ -212,7 +212,7 @@ class WPLogReaderService implements ServiceInterface {
 
 		if ( preg_match( $wordpress_pattern, $line, $matches ) ) {
 			return [
-				'timestamp' => $this->parse_wordpress_timestamp( $matches[1] ),
+				'timestamp' => $this->parse_timestamp( $matches[1] ),
 				'level'     => $this->normalize_log_level( $matches[2] ),
 				'message'   => trim( $matches[3] ),
 				'raw_line'  => $line,
@@ -230,7 +230,7 @@ class WPLogReaderService implements ServiceInterface {
 
 		if ( preg_match( $php_error_pattern, $line, $matches ) ) {
 			return [
-				'timestamp' => $this->parse_wordpress_timestamp( $matches[1] ),
+				'timestamp' => $this->parse_timestamp( $matches[1] ),
 				'level'     => $this->normalize_log_level( $matches[2] ),
 				'message'   => trim( $matches[3] ),
 				'raw_line'  => $line,
@@ -363,7 +363,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * @param string $timestamp WordPress timestamp.
 	 * @return string
 	 */
-	private function parse_wordpress_timestamp( string $timestamp ): string {
+	private function parse_timestamp( string $timestamp ): string {
 		// Convert WordPress format to standard format
 		// From: 19-Jun-2025 01:30:45 UTC
 		// To: 2025-06-19 01:30:45
