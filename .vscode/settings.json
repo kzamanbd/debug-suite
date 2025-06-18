@@ -35,5 +35,15 @@
         "source.fixAll.tslint": "always",
         "source.organizeImports": "explicit"
     },
-    "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"]
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "cSpell.words": [
+        "ABSPATH",
+        "kses",
+        "phpunit"
+    ]
 }

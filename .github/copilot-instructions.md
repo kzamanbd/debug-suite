@@ -603,135 +603,9 @@ class ExampleController extends RestController {
 
 - **Error Handling**: Properly map service errors to HTTP status codes
 
-### 4. **Testing Strategy**
-
-**Service Testing**:
-```php
-class ExampleServiceTest extends TestCase {
-    public function test_process_data_success() {
-        $service = new ExampleService();
-        $result = $service->process_data( [ 'valid' => 'data' ] );
-        
-        $this->assertTrue( $result->is_success() );
-        $this->assertArrayHasKey( 'processed', $result->get_data() );
-    }
-
-    public function test_process_data_failure() {
-        $service = new ExampleService();
-        $result = $service->process_data( [ 'invalid' => 'data' ] );
-        
-        $this->assertTrue( $result->is_failure() );
-        $this->assertEquals( 'processing_error', $result->get_error_code() );
-    }
-}
-```
-
-**Controller Testing**:
-```php
-class ExampleControllerTest extends WP_REST_UnitTestCase {
-    public function test_endpoint_success() {
-        $mock_service = $this->createMock( ExampleService::class );
-        $mock_service->method( 'process_data' )
-                    ->willReturn( ServiceResult::success( [ 'result' => 'data' ] ) );
-        
-        $controller = new ExampleController( $mock_service );
-        // Test controller logic
-    }
-}
-```
-
-### 5. **Error Handling Patterns**
-
-**Service Layer Error Handling**:
-```php
-// For validation errors
-if ( empty( $required_field ) ) {
-    return ServiceResult::failure(
-        __( 'Required field is missing.', 'debug-suite' ),
-        'validation_error',
-        [ 'field' => 'required_field' ]
-    );
-}
-
-// For system errors
-try {
-    $result = $this->perform_operation();
-} catch ( Exception $e ) {
-    return ServiceResult::failure(
-        sprintf( __( 'Operation failed: %s', 'debug-suite' ), $e->getMessage() ),
-        'system_error',
-        [ 'exception' => $e->getMessage() ]
-    );
-}
-```
-
-**Controller Error Mapping**:
-```php
-$result = $this->service->perform_operation();
-
-if ( $result->is_failure() ) {
-    $status_code = match( $result->get_error_code() ) {
-        'validation_error' => 400,
-        'not_found' => 404,
-        'permission_denied' => 403,
-        default => 500
-    };
-    
-    return new WP_Error(
-        $result->get_error_code(),
-        $result->get_error_message(),
-        [ 'status' => $status_code ]
-    );
-}
-```
-
 ## REST API Architecture
 
 ### API Controllers Structure
-- **Base Controller**: `DebugSuite\API\RestController` - Provides common functionality and implements `Hookable`
-- **Settings Controller**: `DebugSuite\API\SettingsController` - Delegates to `SettingsService` for wp-config.php management
-- **File Manager Controller**: `DebugSuite\API\FileManagerController` - Delegates to `FileManagerService` for file operations
-- **File Logs Controller**: `DebugSuite\API\FileLogsController` - Delegates to `FileLogsService` for debug.log processing
-
-### Controller Lifecycle
-- **Hookable Implementation**: All controllers extend `RestController` which implements `Hookable`
-- **Automatic Registration**: Controllers automatically register their routes via the `register_hooks()` method
-- **ServiceManager Integration**: The service manager handles registration and boot lifecycle
-- **Hook Registration**: When a controller is resolved, its hooks are automatically registered
-- **No Manual Registration**: No need to manually register controllers in `rest_api_init`
-
-### Service Layer Integration
-- **Controllers are thin**: Handle only HTTP request/response concerns
-- **Business logic in services**: All domain logic implemented in dedicated service classes
-- **Consistent error handling**: Services return `ServiceResult` objects, controllers transform to HTTP responses
-- **Dependency injection**: Controllers receive service instances via constructor injection or container resolution
-
-### API Endpoints
-```php
-// Settings endpoints
-GET /wp-json/debug-suite/v1/settings          # Get current debug settings
-POST /wp-json/debug-suite/v1/settings         # Update debug settings
-POST /wp-json/debug-suite/v1/settings/reset   # Reset settings to defaults
-
-// File manager endpoints  
-GET /wp-json/debug-suite/v1/files?path={path}        # Browse directory structure
-GET /wp-json/debug-suite/v1/files/content?path={path} # Get file contents
-POST /wp-json/debug-suite/v1/files/content           # Save file contents with backup
-
-// File logs endpoints
-GET /wp-json/debug-suite/v1/logs              # Get parsed log entries
-GET /wp-json/debug-suite/v1/logs/stats        # Get log file statistics
-DELETE /wp-json/debug-suite/v1/logs/clear     # Clear log file
-```
-
-### Permission System
-- All endpoints require `manage_options` capability
-- Consistent permission checking via `permissions_check()` method
-- Proper error handling with WP_Error responses
-
-## Frontend Architecture
-
-### React Application Structure
 ```
 src/
 ├── App.tsx                 # Main application component
@@ -900,32 +774,22 @@ define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 - **Tailwind CLI**: CSS processing
 
 ## Build Configuration
-
-### Webpack Configuration
-```js
-// webpack.config.js
-module.exports = {
-    entry: { 'debug-suite-admin': './src/index.tsx' },
-    resolve: {
-        alias: { '@': path.resolve(__dirname, 'src') }
-    },
-    externals: {
-        react: 'React',
-        'react-dom': 'ReactDOM'
-    }
-};
-```
-
-### TypeScript Configuration
 ```json
-// tsconfig.json
 {
-    "compilerOptions": {
-        "target": "ES2020",
-        "strict": true,
-        "jsx": "react-jsx",
-        "paths": { "@/*": ["src/*"] }
+  "entry": "./src/index.tsx",
+  "output": {
+    "filename": "debug-suite.js",
+    "path": "/build"
+  },
+  "resolve": {
+    "alias": {
+      "@": "/src"
     }
+  },
+  "externals": {
+    "react": "React",
+    "react-dom": "ReactDOM"
+  }
 }
 ```
 
@@ -960,16 +824,189 @@ module.exports = {
 
 ## Testing Guidelines
 
-### PHP Testing
-- **PHPUnit** for unit testing
-- **Mock objects** for dependencies
-- **Container testing** without WordPress hooks
-- **Integration testing** with WordPress APIs
+### PHP Testing Framework
 
-### Frontend Testing
-- **Jest** for unit testing (if implemented)
-- **React Testing Library** for component testing
-- **Type checking** with TypeScript compiler
-- **Linting** with ESLint for code quality
+The Debug Suite plugin uses a comprehensive testing framework that supports both unit tests and WordPress integration tests:
 
-This comprehensive guide ensures consistent development practices across the Debug Suite plugin while leveraging modern PHP and JavaScript/TypeScript development standards.
+1. **Test Directory Structure**:
+   ```
+   tests/
+   ├── bootstrap.php               # Main test bootstrap file
+   ├── README.md                   # Testing documentation
+   ├── Helpers/                    # Test helpers and utilities
+   │   ├── TestCase.php            # Base test case for unit tests
+   │   ├── DebugSuiteTestCase.php  # Base test case for WordPress integration tests
+   │   ├── MockFactory.php         # Factory for creating test mocks
+   │   └── wp-functions-mock.php   # Mock WordPress functions
+   ├── Unit/                       # Unit tests (no WordPress dependencies)
+   │   ├── BasicTest.php           # Basic tests to verify setup
+   │   ├── Core/                   # Tests for core functionality
+   │   └── Services/               # Tests for service classes
+   └── Integration/                # Integration tests (with WordPress)
+       └── API/                    # Tests for API controllers
+   ```
+
+2. **Test Types**:
+   - **Unit Tests**: Extend `DebugSuite\Tests\Helpers\TestCase` for tests that don't need WordPress core
+   - **Integration Tests**: Extend `DebugSuite\Tests\Helpers\DebugSuiteTestCase` for tests that require WordPress
+
+3. **PHPUnit Configuration**:
+   - Configuration file: `phpunit.xml` 
+   - Test suites: unit, integration, and all
+   - Coverage reporting configured for the `includes` directory
+
+4. **Testing Base Classes**:
+   - `TestCase`: Extends Yoast's PHPUnit polyfills for cross-version compatibility
+   - `DebugSuiteTestCase`: Extends `WP_UnitTestCase` for WordPress-specific testing
+
+5. **Mock System**:
+   - WordPress function mocks in `wp-functions-mock.php`
+   - `MockFactory` helper for creating test doubles
+
+6. **Test Groups**:
+   - Use `@group` annotations to categorize tests (e.g., `@group api`, `@group integration`)
+   - Run specific groups with `composer run test -- --group=integration`
+
+### Service Testing Best Practices
+
+When writing tests for services, follow these best practices:
+
+```php
+/**
+ * @covers \DebugSuite\Services\ExampleService
+ * @group services
+ */
+class ExampleServiceTest extends TestCase {
+    private ExampleService $service;
+    
+    protected function set_up() {
+        parent::set_up();
+        $this->service = new ExampleService();
+    }
+    
+    public function test_process_data_with_valid_input() {
+        $result = $this->service->process_data([
+            'required_field' => 'test value'
+        ]);
+        
+        $this->assertTrue($result->is_success());
+        $this->assertArrayHasKey('processed_data', $result->get_data());
+    }
+    
+    public function test_process_data_with_missing_required_field() {
+        $result = $this->service->process_data([]);
+        
+        $this->assertTrue($result->is_failure());
+        $this->assertEquals('validation_error', $result->get_error_code());
+    }
+}
+```
+
+### API Controller Testing Best Practices
+
+For testing API controllers, use the WordPress REST API testing framework:
+
+```php
+/**
+ * @covers \DebugSuite\API\ExampleController
+ * @group api
+ * @group integration
+ */
+class ExampleControllerTest extends DebugSuiteTestCase {
+    private $controller;
+    private $service;
+    
+    protected function set_up() {
+        parent::set_up();
+        $this->service = $this->createMock(ExampleService::class);
+        $this->controller = new ExampleController($this->service);
+        $this->controller->register_routes();
+    }
+    
+    public function test_permission_check() {
+        // Test without admin privileges
+        wp_set_current_user(0);
+        $request = new WP_REST_Request('GET', '/debug-suite/v1/example');
+        $response = $this->controller->permissions_check($request);
+        $this->assertInstanceOf(WP_Error::class, $response);
+        
+        // Test with admin privileges
+        $user_id = $this->factory->user->create(['role' => 'administrator']);
+        wp_set_current_user($user_id);
+        $response = $this->controller->permissions_check($request);
+        $this->assertTrue($response);
+    }
+    
+    public function test_process_request() {
+        // Mock service response
+        $this->service->method('process_data')
+            ->willReturn(ServiceResult::success(['key' => 'value']));
+            
+        // Create request
+        $request = new WP_REST_Request('POST', '/debug-suite/v1/example');
+        $request->set_param('required_field', 'test value');
+        
+        // Execute controller method
+        $response = $this->controller->process_request($request);
+        
+        // Assert response
+        $this->assertInstanceOf(WP_REST_Response::class, $response);
+        $data = $response->get_data();
+        $this->assertArrayHasKey('key', $data);
+        $this->assertEquals('value', $data['key']);
+    }
+}
+```
+
+### Running Tests
+
+The plugin supports various test commands via Composer:
+
+```bash
+# Run all tests
+composer run test
+
+# Run unit tests only
+composer run test:unit
+
+# Run integration tests only
+composer run test:integration
+
+# Run tests with coverage report
+composer run test:coverage
+
+# Run specific test file
+composer run test -- --filter=ExampleServiceTest
+```
+
+Integration tests require a WordPress test environment, which can be set up using:
+
+```bash
+# Set up WP test environment
+bin/install-wp-tests.sh wordpress_test root password localhost latest
+```
+
+### Test Mocking Strategies
+
+1. **Service Testing**: Create mock dependencies when testing service interaction
+   ```php
+   $mock_dependency = $this->createMock(DependencyClass::class);
+   $mock_dependency->method('some_method')->willReturn('expected value');
+   $service = new TestedService($mock_dependency);
+   ```
+
+2. **Controller Testing**: Mock service layer responses
+   ```php
+   $mock_service = $this->createMock(ExampleService::class);
+   $mock_service->method('process_data')
+       ->willReturn(ServiceResult::success(['result' => 'data']));
+   $controller = new ExampleController($mock_service);
+   ```
+
+3. **WordPress Function Mocking**: Use the provided wp-functions-mock.php for unit tests
+
+4. **Container Testing**: Use the test container factory in TestCase
+   ```php
+   $container = $this->get_test_container();
+   $container->bind(Service::class, $mock_service);
+   ```

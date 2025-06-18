@@ -1,0 +1,218 @@
+# Debug Suite Plugin Tests
+
+This directory contains the automated tests for the Debug Suite WordPress plugin.
+
+## Test Structure
+
+The tests are organized into the following structure:
+
+```md
+tests/
+├── bootstrap.php               # Main test bootstrap file
+├── README.md                   # This file
+├── Helpers/                    # Helper classes and utilities
+│   ├── TestCase.php            # Base test case for unit tests
+│   ├── DebugSuiteTestCase.php  # Base test case for WordPress integration tests
+│   └── wp-functions-mock.php   # Mock WordPress functions
+├── Unit/                       # Unit tests (no WordPress dependencies)
+│   ├── BasicTest.php           # Basic tests to verify test setup
+│   ├── Core/                   # Tests for core functionality
+│   └── Services/               # Tests for service classes
+└── Integration/                # Integration tests (with WordPress)
+    └── API/                    # Tests for API controllers
+```
+
+## Test Types
+
+### Unit Tests
+
+Unit tests verify individual components in isolation without dependencies on WordPress core. These tests run faster and don't require a WordPress test environment.
+
+Location: `tests/Unit/`
+Base Class: `DebugSuite\Tests\Helpers\TestCase`
+Run Command: `vendor/bin/phpunit --testsuite=unit`
+
+### Integration Tests
+
+Integration tests verify components that interact with WordPress core. These tests require a WordPress test environment to be set up.
+
+Location: `tests/Integration/`
+Base Class: `DebugSuite\Tests\Helpers\DebugSuiteTestCase`
+Run Command: `vendor/bin/phpunit --testsuite=integration`
+
+## Setup WordPress Test Environment
+
+To run integration tests, you'll need to set up the WordPress test environment:
+
+```bash
+# Install WP test environment
+bin/install-wp-tests.sh wordpress_test root password localhost latest
+```
+
+This script will download WordPress core and create a test database.
+
+## Running Tests
+
+### Run All Tests
+
+```bash
+vendor/bin/phpunit
+```
+
+### Run Unit Tests Only
+
+```bash
+vendor/bin/phpunit --testsuite=unit
+```
+
+### Run Integration Tests Only
+
+```bash
+vendor/bin/phpunit --testsuite=integration
+```
+
+### Run Specific Test File
+
+```bash
+vendor/bin/phpunit tests/Unit/Core/ServiceResultTest.php
+```
+
+### Run Tests Matching a Pattern
+
+```bash
+vendor/bin/phpunit --filter=test_successful_service_result
+```
+
+### Run Tests in a Group
+
+```bash
+vendor/bin/phpunit --group=services
+```
+
+## Writing New Tests
+
+### Unit Test Example
+
+```php
+<?php
+namespace DebugSuite\Tests\Unit;
+
+use DebugSuite\Tests\Helpers\TestCase;
+
+/**
+ * Example unit test class.
+ * 
+ * @group example
+ */
+class ExampleTest extends TestCase {
+    
+    /**
+     * Set up test environment.
+     */
+    protected function set_up() {
+        parent::set_up();
+        // Create test fixtures here
+    }
+    
+    /**
+     * Test something.
+     * 
+     * @covers \DebugSuite\ExampleClass::example_method
+     */
+    public function test_something() {
+        $this->assertTrue(true);
+    }
+    
+    /**
+     * Clean up after tests.
+     */
+    protected function tear_down() {
+        // Clean up test fixtures here
+        parent::tear_down();
+    }
+}
+```
+
+### Integration Test Example
+
+```php
+<?php
+namespace DebugSuite\Tests\Integration;
+
+use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
+
+/**
+ * Example integration test class.
+ * 
+ * @group integration
+ * @group example
+ */
+class ExampleIntegrationTest extends DebugSuiteTestCase {
+    
+    /**
+     * Set up test environment.
+     */
+    protected function set_up() {
+        parent::set_up();
+        // Create WordPress test fixtures here
+    }
+    
+    /**
+     * Test with WordPress functionality.
+     */
+    public function test_with_wordpress() {
+        $post_id = $this->factory->post->create();
+        $this->assertIsInt($post_id);
+    }
+}
+```
+
+## Helper Classes
+
+### TestCase (Unit Tests)
+
+Base class for unit tests that provides:
+
+- Container management and reset
+- File and directory creation helpers
+- ServiceResult assertion methods
+- Utility methods for testing
+
+### DebugSuiteTestCase (Integration Tests)
+
+Base class for integration tests that provides:
+
+- All features from TestCase
+- WordPress test environment integration
+- WordPress factory methods for creating test data
+- User and permission testing helpers
+
+## Custom Assertions
+
+```php
+// Assert successful service result
+$this->assert_service_result_success($result);
+
+// Assert failed service result
+$this->assert_service_result_failure($result);
+
+// Assert specific error code
+$this->assert_service_result_error_code($result, 'expected_code');
+
+// Assert arrays are equal as sets (order doesn't matter)
+$this->assert_equal_sets($expected, $actual);
+```
+
+## Best Practices
+
+1. Use descriptive test method names that explain what's being tested
+2. Add `@covers` annotations to indicate which methods/classes are being tested
+3. Add `@group` annotations to organize tests
+4. Use proper assertions with meaningful messages
+5. Keep tests small, focused, and independent
+6. Follow WordPress naming conventions (snake_case for methods)
+7. Create fixtures in `set_up()` methods
+8. Clean up in `tear_down()` methods
+9. Use reflection to access/modify private properties when needed
+
+For more information, see the [WordPress PHPUnit documentation](https://make.wordpress.org/core/handbook/testing/automated-testing/phpunit/).

@@ -48,6 +48,123 @@ DELETE /wp-json/debug-suite/v1/logs/clear     # Clear log file
 - Consistent permission checking via `permissions_check()` method
 - Proper error handling with WP_Error responses
 
+## Testing REST API Controllers
+
+The plugin includes a comprehensive testing framework for REST API controllers. Controllers are tested using integration tests that verify:
+
+1. **Route Registration**: Ensure routes are properly registered with WordPress
+2. **Permission Checks**: Verify that only authorized users can access endpoints
+3. **Request Parameters**: Validate parameter handling and sanitization
+4. **Service Integration**: Test controller interactions with services
+5. **Response Formatting**: Verify proper HTTP response formats
+
+### Controller Test Example
+
+```php
+/**
+ * @covers \DebugSuite\API\FileLogsController
+ * @group api
+ * @group integration
+ */
+class FileLogsControllerTest extends DebugSuiteTestCase {
+    private $controller;
+    private $service;
+    
+    protected function set_up() {
+        parent::set_up();
+        $this->service = $this->createMock(FileLogsService::class);
+        $this->controller = new FileLogsController($this->service);
+        $this->controller->register_routes();
+    }
+    
+    public function test_get_logs_endpoint() {
+        // Mock service response
+        $this->service->method('get_log_entries')
+            ->willReturn(ServiceResult::success(['logs' => []]));
+        
+        // Create and execute request
+        $request = new WP_REST_Request('GET', '/debug-suite/v1/logs');
+        $response = rest_get_server()->dispatch($request);
+        
+        // Verify response
+        $this->assertEquals(200, $response->get_status());
+        $data = $response->get_data();
+        $this->assertArrayHasKey('logs', $data);
+    }
+    
+    public function test_permissions() {
+        // Test unauthorized access
+        wp_set_current_user(0);
+        $request = new WP_REST_Request('GET', '/debug-suite/v1/logs');
+        $response = rest_get_server()->dispatch($request);
+        $this->assertEquals(401, $response->get_status());
+        
+        // Test authorized access
+        $user_id = $this->factory->user->create(['role' => 'administrator']);
+        wp_set_current_user($user_id);
+        $response = rest_get_server()->dispatch($request);
+        $this->assertNotEquals(401, $response->get_status());
+    }
+}
+```
+
+### Mocking Service Layer
+
+When testing controllers, the service layer is typically mocked to isolate controller logic:
+
+```php
+// Mock service response for success case
+$this->service->method('get_log_entries')
+    ->willReturn(ServiceResult::success(['data' => 'value']));
+
+// Mock service response for error case
+$this->service->method('clear_logs')
+    ->willReturn(ServiceResult::failure('Error message', 'error_code'));
+```
+
+### Testing Response Transformation
+
+Controllers should transform `ServiceResult` objects into appropriate WordPress responses:
+
+```php
+public function test_error_transformation() {
+    // Mock service error
+    $this->service->method('get_log_entries')
+        ->willReturn(ServiceResult::failure('Not found', 'not_found'));
+    
+    // Execute request
+    $request = new WP_REST_Request('GET', '/debug-suite/v1/logs');
+    $response = $this->controller->get_file_logs($request);
+    
+    // Verify WP_Error response
+    $this->assertInstanceOf(WP_Error::class, $response);
+    $this->assertEquals('not_found', $response->get_error_code());
+    $this->assertEquals(404, $response->get_error_data()['status']);
+}
+```
+
+For more detailed testing guidelines, see the [TESTING.md](./TESTING.md) documentation.
+POST /wp-json/debug-suite/v1/settings         # Update debug settings
+POST /wp-json/debug-suite/v1/settings/reset   # Reset settings to defaults
+
+// File manager endpoints  
+GET /wp-json/debug-suite/v1/files?path={path}        # Browse directory structure
+GET /wp-json/debug-suite/v1/files/content?path={path} # Get file contents
+POST /wp-json/debug-suite/v1/files/content           # Save file contents with backup
+
+// File logs endpoints
+GET /wp-json/debug-suite/v1/logs              # Get parsed log entries
+GET /wp-json/debug-suite/v1/logs/stats        # Get log file statistics
+DELETE /wp-json/debug-suite/v1/logs/clear     # Clear log file
+
+```md
+
+## Permission System
+
+- All endpoints require `manage_options` capability
+- Consistent permission checking via `permissions_check()` method
+- Proper error handling with WP_Error responses
+
 ## Adding a New API Controller
 
 1. **Create Controller Class**: Extend `RestController` which already implements `Hookable`

@@ -202,6 +202,30 @@ final class ServiceResult {
 	}
 
 	/**
+	 * Get the context data for an error.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function get_error_context(): array {
+		return $this->context;
+	}
+
+	/**
+	 * Get the data or a default value if this is a failure.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param mixed $default The default value to return if this is a failure.
+	 *
+	 * @return mixed
+	 */
+	public function get_data_or( mixed $default ): mixed {
+		return $this->is_success() ? $this->data : $default;
+	}
+
+	/**
 	 * Convert the result to an array suitable for API responses.
 	 *
 	 * @since DEBUG_SUITE_SINCE
@@ -219,10 +243,11 @@ final class ServiceResult {
 			$result['error'] = [
 				'message' => $this->error_message,
 				'code'    => $this->error_code,
+				'context' => $this->context,
 			];
 		}
 
-		if ( ! empty( $this->context ) ) {
+		if ( ! empty( $this->context ) && $this->success ) {
 			$result['context'] = $this->context;
 		}
 

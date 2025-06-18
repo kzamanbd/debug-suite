@@ -247,6 +247,109 @@ class CustomFileLogsService extends FileLogsService {
 }
 ```
 
+## Testing the Service Layer
+
+The service layer architecture is designed to be highly testable without requiring WordPress functions or database access. This makes unit testing much simpler.
+
+### Service Testing Strategy
+
+1. **Isolated Unit Tests**: Services can be tested in isolation with mock dependencies
+2. **No WordPress Dependencies**: Unit tests don't require WordPress core functions
+3. **Predictable Results**: Services return consistent `ServiceResult` objects
+4. **Configurable Services**: Optional constructor parameters allow test configuration
+
+### Service Unit Test Example
+
+```php
+/**
+ * @covers \DebugSuite\Services\FileLogsService
+ * @group services
+ */
+class FileLogsServiceTest extends TestCase {
+    private FileLogsService $service;
+    private string $test_log_path;
+    
+    protected function set_up() {
+        parent::set_up();
+        
+        // Create a test log file
+        $this->test_log_path = sys_get_temp_dir() . '/test-debug.log';
+        file_put_contents($this->test_log_path, "[2023-06-18 10:15:30] PHP Warning: Test warning\n");
+        
+        // Initialize service with test path
+        $this->service = new FileLogsService($this->test_log_path);
+    }
+    
+    protected function tear_down() {
+        // Clean up test file
+        if (file_exists($this->test_log_path)) {
+            unlink($this->test_log_path);
+        }
+        
+        parent::tear_down();
+    }
+    
+    public function test_get_log_entries() {
+        $result = $this->service->get_log_entries();
+        
+        $this->assertTrue($result->is_success());
+        $this->assertArrayHasKey('entries', $result->get_data());
+        $this->assertNotEmpty($result->get_data()['entries']);
+    }
+    
+    public function test_get_log_entries_with_missing_file() {
+        // Create service with non-existent path
+        $service = new FileLogsService('/non/existent/path');
+        $result = $service->get_log_entries();
+        
+        $this->assertTrue($result->is_failure());
+        $this->assertEquals('file_not_found', $result->get_error_code());
+    }
+}
+```
+
+### Mocking Dependencies
+
+For services with dependencies on other services, use PHPUnit's mocking capabilities:
+
+```php
+public function test_service_with_dependencies() {
+    // Create mock dependency
+    $mock_dependency = $this->createMock(DependencyInterface::class);
+    $mock_dependency->method('get_data')
+        ->willReturn(['key' => 'value']);
+    
+    // Create service with mock dependency
+    $service = new TestedService($mock_dependency);
+    
+    // Test service
+    $result = $service->process();
+    $this->assertTrue($result->is_success());
+}
+```
+
+### Testing ServiceResult
+
+The `ServiceResult` class provides methods to check the success/failure state and access data:
+
+```php
+// Testing success results
+$result = ServiceResult::success(['key' => 'value']);
+$this->assertTrue($result->is_success());
+$this->assertFalse($result->is_failure());
+$this->assertEquals(['key' => 'value'], $result->get_data());
+
+// Testing failure results
+$result = ServiceResult::failure('Error message', 'error_code', ['context' => 'data']);
+$this->assertFalse($result->is_success());
+$this->assertTrue($result->is_failure());
+$this->assertEquals('Error message', $result->get_error_message());
+$this->assertEquals('error_code', $result->get_error_code());
+$this->assertEquals(['context' => 'data'], $result->get_error_data());
+```
+
+For more comprehensive testing guidelines, see the [TESTING.md](./TESTING.md) documentation.
+
 ## Migration Guide
 
 For future services, follow this pattern:
