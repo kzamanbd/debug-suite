@@ -55,7 +55,24 @@ class WPLogReaderService implements ServiceInterface {
 	 * @param string|null $log_path Optional custom log file path.
 	 */
 	public function __construct( ?string $log_path = null ) {
+		// TODO: clean up this constructor to use a more flexible configuration system.
 		$this->default_log_path = $log_path ?? WP_CONTENT_DIR . '/debug.log';
+	}
+
+	/**
+	 * Get the list of log levels with their labels.
+	 *
+	 * @return array
+	 */
+	public function get_log_levels(): array {
+		$levels = [];
+		foreach ( $this->log_levels as $level => $value ) {
+			$levels[ $level ] = [
+				'label' => ucfirst( $level ),
+				'value' => $value,
+			];
+		}
+		return $levels;
 	}
 
 	/**
@@ -111,6 +128,7 @@ class WPLogReaderService implements ServiceInterface {
 					'total'   => count( $filtered_entries ),
 					'file'    => $log_file,
 					'size'    => filesize( $log_file ),
+					'labels'  => $this->get_log_levels(),
 				]
 			);
 

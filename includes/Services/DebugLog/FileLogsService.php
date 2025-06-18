@@ -26,16 +26,13 @@ class FileLogsService implements ServiceInterface {
 	 *
 	 * @var WPLogReaderService
 	 */
-	private WPLogReaderService $advanced_reader;
+	private WPLogReaderService $log_reader;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param WPLogReaderService|null $advanced_reader Optional advanced reader service instance.
-	 * @param string|null             $log_file_path Optional custom log file path.
+	 * Constructor for FileLogsService.
 	 */
-	public function __construct( ?WPLogReaderService $advanced_reader = null, ?string $log_file_path = null ) {
-		$this->advanced_reader = $advanced_reader ?? new WPLogReaderService( $log_file_path );
+	public function __construct() {
+		$this->log_reader = new WPLogReaderService();
 	}
 
 	/**
@@ -55,7 +52,7 @@ class FileLogsService implements ServiceInterface {
 		// Set default limit for backward compatibility
 		$options['limit'] = $options['limit'] ?? 100;
 
-		return $this->advanced_reader->get_log_entries( $options );
+		return $this->log_reader->get_log_entries( $options );
 	}
 
 	/**
@@ -64,7 +61,7 @@ class FileLogsService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	public function clear_log_file(): ServiceResponse {
-		return $this->advanced_reader->clear_log_file();
+		return $this->log_reader->clear_log_file();
 	}
 
 	/**
@@ -73,7 +70,7 @@ class FileLogsService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	public function get_log_file_stats(): ServiceResponse {
-		return $this->advanced_reader->get_log_file_stats();
+		return $this->log_reader->get_log_file_stats();
 	}
 
 	/**
@@ -83,7 +80,7 @@ class FileLogsService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	public function export_logs( array $options = [] ): ServiceResponse {
-		return $this->advanced_reader->export_logs( $options );
+		return $this->log_reader->export_logs( $options );
 	}
 
 	/**
@@ -96,6 +93,6 @@ class FileLogsService implements ServiceInterface {
 		// Use higher default limit for advanced features
 		$options['limit'] = $options['limit'] ?? 1000;
 
-		return $this->advanced_reader->get_log_entries( $options );
+		return $this->log_reader->get_log_entries( $options );
 	}
 }
