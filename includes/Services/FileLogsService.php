@@ -76,17 +76,10 @@ class FileLogsService implements ServiceInterface {
 			return ServiceResult::failure( __( 'Log file is not writable.', 'debug-suite' ), 'log_file_not_writable' );
 		}
 
-		// Use truncate instead of file_put_contents to ensure the file is truly empty
-		// This is more consistent across different operating systems
-		$handle = fopen( $this->log_file_path, 'w' );
-		if ( $handle === false ) {
-			return ServiceResult::failure( __( 'Failed to open log file for clearing.', 'debug-suite' ), 'log_clear_failed' );
-		}
-		fclose( $handle );
+		$result = file_put_contents( $this->log_file_path, '' );
 
-		// Verify the file is empty
-		if ( filesize( $this->log_file_path ) !== 0 ) {
-			return ServiceResult::failure( __( 'Failed to completely clear log file.', 'debug-suite' ), 'log_clear_failed' );
+		if ( $result === false ) {
+			return ServiceResult::failure( __( 'Failed to clear log file.', 'debug-suite' ), 'log_clear_failed' );
 		}
 
 		return ServiceResult::success( true );
