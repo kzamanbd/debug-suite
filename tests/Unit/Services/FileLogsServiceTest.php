@@ -188,7 +188,8 @@ EOT;
 		// Check if file exists and is either empty or very small (≤ 5 bytes)
 		// This accommodates platform differences in file handling
 		$this->assertTrue(file_exists($this->test_log_file), 'Log file should exist after clearing');
-		$this->assertLessThanOrEqual(5, filesize($this->test_log_file), 'Log file size should be 5 bytes or less after clearing');
+		// Optionally, check if the content is empty
+		$this->assertEmpty(file_get_contents($this->test_log_file), 'Log file content should be empty after clearing');
 	}
 
 	/**
