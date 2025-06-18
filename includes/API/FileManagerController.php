@@ -1,164 +1,98 @@
 <?php
 /**
- * Settings REST API controller for Debug Suite.
+ * File manager REST API controller for Debug Suite.
  *
  * @package DebugSuite
  */
 
 namespace DebugSuite\API;
 
-use DebugSuite\Admin\FileManager\FileManager;
-use Exception;
-use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
+use DebugSuite\Services\FileManagerService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 /**
- * Class SettingsController
+ * Simple file manager controller for Debug Suite.
  *
- * Handles REST API endpoints for Debug Suite settings.
- *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 class FileManagerController extends RestController {
-	/**
-	 * Route base for settings.
-	 *
-	 * @since 1.0.0
-	 * @var string
-	 */
+
+	private FileManagerService $service;
 	protected $rest_base = 'files';
 
-	/**
-	 * Register the routes for settings.
-	 *
-	 * @return void
-	 * @since 1.0.0
-	 */
+	public function __construct( FileManagerService $service ) {
+		$this->service = $service;
+	}
+
 	public function register_routes(): void {
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
 			[
-				[
-					'methods'             => 'GET',
-					'callback'            => [ $this, 'get_files' ],
-					'permission_callback' => [ $this, 'permissions_check' ],
-					'args'                => [
-						'path' => [
-							'description'       => __( 'The path to the directory to retrieve files from.', 'debug-suite' ),
-							'type'              => 'string',
-							'required'          => false,
-							'default'           => '',
-							'validate_callback' => function ( $param ) {
-								// Validate that the path is a valid string.
-								return is_string( $param );
-							},
-						],
-					],
-				],
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_files' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
 			]
 		);
+
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<path>.+)',
+			'/' . $this->rest_base . '/content',
 			[
 				[
-					'methods'             => 'GET',
+					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => [ $this, 'get_file_contents' ],
 					'permission_callback' => [ $this, 'permissions_check' ],
-					'args'                => [
-						'path' => [
-							'description'       => __( 'The path to the directory to retrieve files from.', 'debug-suite' ),
-							'type'              => 'string',
-							'required'          => true,
-							'default'           => '',
-							'validate_callback' => function ( $param ) {
-								// Validate that the path is a valid string.
-								return is_string( $param );
-							},
-						],
-					],
+				],
+				[
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => [ $this, 'save_file_contents' ],
+					'permission_callback' => [ $this, 'permissions_check' ],
 				],
 			]
 		);
 	}
 
-	/**
-	 * Get Debug Suite File Logs.
-	 *
-	 * @param WP_REST_Request $request The REST request.
-	 *
-	 * @return WP_REST_Response | WP_Error
-	 * @since 1.0.0
-	 */
 	public function get_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		try {
-			$file_manager = new FileManager();
-			$path         = $request->get_param( 'path' ) ?? '';
-			$full_path    = ABSPATH . $path;
-			$files        = $file_manager->get_directory_tree( $full_path );
+		$path = $request->get_param( 'path' ) ?? '';
+		$result = $this->service->get_directory_tree( $path );
 
-			return rest_ensure_response(
-				[
-					'current_path' => $path,
-					'files'        => $files,
-				]
-			);
-		} catch ( Exception $e ) {
-			$message = $e->getMessage();
-			if ( $e instanceof DirectoryNotFoundException ) {
-				$message = sprintf(
-				// translators: %s is the directory path that was not found.
-					__( 'Directory not found: %s', 'debug-suite' ),
-					$request->get_param( 'path' )
-				);
-			}
-
-			return new WP_Error(
-				'debug_suite_file_manager_error',
-				$message,
-				[
-					'status' => 500,
-				]
-			);
-		}
+		return $result->is_failure()
+			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
+			: rest_ensure_response( $result->get_data() );
 	}
-
-	/**
-	 * Get the contents of a file.
-	 *
-	 * @param WP_REST_Request $request The REST request.
-	 *
-	 * @return WP_REST_Response | WP_Error
-	 * @since 1.0.0
-	 */
 
 	public function get_file_contents( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$path = $request->get_param( 'path' );
-		try {
-			$file_contents = FileManager::get_file_contents( $path );
+		$result = $this->service->get_file_contents( $path );
 
-			return rest_ensure_response(
+		return $result->is_failure()
+			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
+			: rest_ensure_response( $result->get_data() );
+	}
+
+	public function save_file_contents( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$path = $request->get_param( 'path' );
+		$contents = $request->get_param( 'contents' );
+		$create_backup = $request->get_param( 'create_backup' ) ?? false;
+
+		$options = [ 'create_backup' => $create_backup ];
+		$result = $this->service->save_file_contents( $path, $contents, $options );
+
+		return $result->is_failure()
+			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
+			: rest_ensure_response(
 				[
-					'path'      => $path,
-					'extension' => pathinfo( $path, PATHINFO_EXTENSION ),
-					'contents'  => $file_contents,
+					'success' => true,
+					'message' => __( 'File saved successfully.', 'debug-suite' ),
 				]
 			);
-		} catch ( Exception $e ) {
-			return new WP_Error(
-				'debug_suite_file_manager_error_contents',
-				$e->getMessage(),
-				[
-					'status' => 500,
-				]
-			);
-		}
 	}
 }

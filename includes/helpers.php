@@ -1,10 +1,12 @@
 <?php
 
 /**
- * Global helper functions for the Debug Suite plugin.
+ * Global helper functions for Debug Suite with PSR-11 DI Container integration.
  *
  * This file contains all helper functions for the Debug Suite plugin including
- * dependency injection helpers, container utilities, and general utility functions.
+ * PSR-11 compliant dependency injection helpers, container utilities, PHP-DI
+ * style definition functions, and general utility functions for seamless
+ * integration with the enhanced DI Container system.
  *
  * @since      1.0.0
  *
@@ -13,8 +15,12 @@
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
-use DebugSuite\Core\DI\Container;
-use DebugSuite\Core\DI\ServiceManager;
+use DebugSuite\Core\Container\Container;
+use DebugSuite\Core\Container\ContainerBuilder;
+use DebugSuite\Core\Container\Definitions\AutowiredDefinition;
+use DebugSuite\Core\Container\Definitions\FactoryDefinition;
+use DebugSuite\Core\Container\Definitions\ValueDefinition;
+use DebugSuite\Core\Container\ServiceManager;
 
 if ( ! function_exists( 'debug_suite' ) ) {
 	/**
@@ -35,7 +41,7 @@ if ( ! function_exists( 'debug_suite_container' ) ) {
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
-	 * @return Container The DI container instance.
+	 * @return Container The DI Container instance.
 	 */
 	function debug_suite_container(): Container {
 		return debug_suite()->get_container();
@@ -82,7 +88,7 @@ if ( ! function_exists( 'debug_suite_autowire' ) ) {
 	 * @return mixed Autowired definition for the container.
 	 */
 	function debug_suite_autowire( string $class_name ) {
-		return new \DebugSuite\Core\DI\Definitions\AutowiredDefinition( $class_name );
+		return new AutowiredDefinition( $class_name );
 	}
 }
 
@@ -97,7 +103,7 @@ if ( ! function_exists( 'debug_suite_factory' ) ) {
 	 * @return mixed Factory definition for the container.
 	 */
 	function debug_suite_factory( callable $factory ) {
-		return new \DebugSuite\Core\DI\Definitions\FactoryDefinition( $factory );
+		return new FactoryDefinition( $factory );
 	}
 }
 
@@ -112,7 +118,7 @@ if ( ! function_exists( 'debug_suite_singleton' ) ) {
 	 * @return mixed Singleton factory definition for the container.
 	 */
 	function debug_suite_singleton( callable $factory ) {
-		return new \DebugSuite\Core\DI\Definitions\FactoryDefinition( $factory, true );
+		return new FactoryDefinition( $factory, true );
 	}
 }
 
@@ -127,7 +133,7 @@ if ( ! function_exists( 'debug_suite_value' ) ) {
 	 * @return mixed Value definition for the container.
 	 */
 	function debug_suite_value( $value ) {
-		return new \DebugSuite\Core\DI\Definitions\ValueDefinition( $value );
+		return new ValueDefinition( $value );
 	}
 }
 
@@ -142,7 +148,7 @@ if ( ! function_exists( 'debug_suite_object' ) ) {
 	 * @return mixed Autowired singleton definition for the container.
 	 */
 	function debug_suite_object( string $class_name ) {
-		return new \DebugSuite\Core\DI\Definitions\AutowiredDefinition( $class_name, true );
+		return new AutowiredDefinition( $class_name, true );
 	}
 }
 
@@ -150,12 +156,11 @@ if ( ! function_exists( 'debug_suite_container_builder' ) ) {
 	/**
 	 * Create a new container builder instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
-	 *
-	 * @return \DebugSuite\Core\DI\ContainerBuilder
+	 * @return ContainerBuilder
+	 *@since DEBUG_SUITE_SINCE
 	 */
-	function debug_suite_container_builder(): \DebugSuite\Core\DI\ContainerBuilder {
-		return new \DebugSuite\Core\DI\ContainerBuilder();
+	function debug_suite_container_builder(): ContainerBuilder {
+		return new ContainerBuilder();
 	}
 }
 

@@ -1,8 +1,9 @@
 import { RouterProvider, createHashRouter } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
-import Layout from './components/Layout';
+import Layout from './components/base-layout';
 import { withRouter } from './routing';
 import routes, { DebugSuiteRoute } from './routing/routes';
+import { mutationObserver } from './utils';
 
 const App = () => {
     // Map the routes to include withRouter for each route element
@@ -18,6 +19,24 @@ const App = () => {
             )
         };
     });
+
+    mutationObserver(
+        document.body,
+        (mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.type !== 'childList') {
+                    continue;
+                }
+                for (const node of mutation.addedNodes) {
+                    if (node instanceof HTMLElement && node.id === 'headlessui-portal-root') {
+                        node.classList.add('debug-suite-admin-app');
+                        node.style.display = 'block';
+                    }
+                }
+            }
+        },
+        { childList: true }
+    );
 
     const router = createHashRouter(mappedRoutes);
 

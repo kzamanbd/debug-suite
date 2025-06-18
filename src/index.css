@@ -1,3 +1,4 @@
+@import 'simplebar-react/dist/simplebar.min.css';
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme) important;
 
@@ -16,7 +17,7 @@
     --color-primary-950: var(--color-indigo-950, #1e1b4b);
 }
 
-#debug-suite-admin-app {
+.debug-suite-admin-app {
     @import 'tailwindcss/preflight.css' layer(base) important;
     @import 'tailwindcss/utilities.css' layer(utilities) important;
     @layer base {
@@ -66,4 +67,17 @@
 
 .react-select__input:focus {
     box-shadow: 0 0 0 transparent !important;
+}
+.react-select__value-container {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+.react-select__value-container,
+.react-select__input-container {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+div[data-headlessui-state='open'][role='dialog'] {
+    z-index: 99999 !important;
 }

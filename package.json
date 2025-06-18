@@ -20,6 +20,7 @@
     "license": "MIT",
     "dependencies": {
         "@headlessui/react": "^2.2.4",
+        "@monaco-editor/react": "^4.7.0",
         "@tailwindcss/forms": "^0.5.10",
         "@types/react-select": "^5.0.1",
         "@wordpress/api-fetch": "^7.25.0",
@@ -29,9 +30,11 @@
         "@wordpress/i18n": "^5.25.0",
         "@wordpress/plugins": "^7.25.0",
         "clsx": "^2.1.1",
+        "lucide-react": "^0.515.0",
         "react-router-dom": "^7.6.2",
         "react-select": "^5.10.1",
         "react-toastify": "^11.0.5",
+        "simplebar-react": "^3.3.1",
         "tailwind-merge": "^3.3.1"
     },
     "devDependencies": {

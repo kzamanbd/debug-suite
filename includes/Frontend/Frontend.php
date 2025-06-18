@@ -1,11 +1,17 @@
 <?php
 /**
- * The frontend-specific functionality of the plugin.
+ * Frontend-specific functionality for Debug Suite with PSR-11 DI integration.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Frontend;
 
 /**
- * The public-facing functionality of the plugin.
+ * Frontend functionality handler for Debug Suite.
+ *
+ * Manages public-facing functionality of the Debug Suite plugin.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class Frontend {}

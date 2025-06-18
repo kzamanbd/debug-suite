@@ -1,0 +1,77 @@
+on: pull_request
+
+name: PHPUnit Tests
+jobs:
+  runPHPUnitTests:
+    name: Run PHPUnit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: ['8.2']
+        wp-versions: ['latest']
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          coverage: xdebug
+          tools: composer:v2
+          extensions: mysqli, mbstring
+
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: "${{ runner.os }}-php-${{ matrix.php-versions }}-composer-${{ hashFiles('**/composer.lock') }}"
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php-versions }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Install required system packages
+        run: sudo apt-get update && sudo apt-get install -y subversion
+
+      - name: Install WordPress Test Suite
+        run: |
+          bash tests/install-wp-tests.sh wordpress_test root root 127.0.0.1 ${{ matrix.wp-versions }}
+
+      - name: Run Unit Tests
+        run: composer run test:unit
+
+      # Conditionally run integration tests if environment is set up correctly
+      - name: Run Integration Tests
+        # TODO: Need to set up the environment for integration tests
+        run: |
+          echo "Integration tests are not set up yet. Skipping..."
+        continue-on-error: true
+
+      - name: Generate Code Coverage Report
+        run: |
+          mkdir -p build/logs
+          vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+        continue-on-error: true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./build/logs/clover.xml
+          fail_ci_if_error: false
+        continue-on-error: true

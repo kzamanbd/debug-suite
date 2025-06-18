@@ -1,13 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="tests/bootstrap.php" colors="true" verbose="true" stopOnFailure="false" stopOnError="false" stopOnWarning="false" stopOnIncomplete="false" stopOnRisky="false" stopOnSkipped="false" failOnWarning="true" failOnRisky="true" testdox="true">
+<phpunit
+    bootstrap="tests/bootstrap.php"
+    colors="true"
+    verbose="true"
+    stopOnFailure="false"
+    stopOnError="false"
+    stopOnWarning="false"
+    stopOnIncomplete="false"
+    stopOnRisky="false"
+    stopOnSkipped="false"
+    failOnWarning="true"
+    failOnRisky="true"
+    testdox="true"
+    cacheResult="false"
+    beStrictAboutOutputDuringTests="true"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+    beStrictAboutChangesToGlobalState="true"
+    defaultTestSuite="unit">
+    
     <testsuites>
-        <testsuite name="DebugSuite Test Suite">
-            <directory>./tests</directory>
+        <testsuite name="unit">
+            <directory suffix=".php">./tests/Unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory suffix=".php">./tests/Integration</directory>
+        </testsuite>
+        <testsuite name="all">
+            <directory suffix=".php">./tests/Unit</directory>
+            <directory suffix=".php">./tests/Integration</directory>
         </testsuite>
     </testsuites>
+    
     <coverage processUncoveredFiles="true">
         <include>
             <directory suffix=".php">./includes</directory>
         </include>
+        <exclude>
+            <directory>./vendor</directory>
+            <file>./includes/helpers.php</file>
+        </exclude>
     </coverage>
+    
+    <php>
+        <const name="WP_TESTS_PHPUNIT_POLYFILLS_PATH" value="./vendor/yoast/phpunit-polyfills" />
+        <env name="WP_TESTS_DIR" value="/tmp/wordpress-tests-lib" />
+        <env name="WP_CORE_DIR" value="/tmp/wordpress" />
+    </php>
+    
+    <groups>
+        <exclude>
+            <group>ajax</group>
+            <group>ms-required</group>
+            <group>external-http</group>
+        </exclude>
+    </groups>
 </phpunit>

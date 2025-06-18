@@ -1,58 +1,52 @@
 <?php
 
 /**
- * The admin-specific functionality of the plugin.
+ * Admin functionality for the Debug Suite plugin.
+ *
+ * @package DebugSuite
  */
 
 namespace DebugSuite\Admin;
 
-use DebugSuite\API\FileLogsController;
-use DebugSuite\API\FileManagerController;
-use DebugSuite\API\SettingsController;
 use DebugSuite\Interfaces\Hookable;
+use WP_Roles;
 
 /**
- * The admin-specific functionality of the plugin.
+ * Admin functionality for the Debug Suite plugin.
+ *
+ * Handles admin menu registration, script enqueuing, API route registration,
+ * and the main admin interface for the Debug Suite plugin.
+ *
+ * @since DEBUG_SUITE_SINCE
  */
 class Admin implements Hookable {
 
 
 	/**
 	 * Register hooks for WordPress.
-	 * This method will be called automatically to register the hooks.
-	 */
-	public function register_hooks(): void {
-		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
-		add_action( 'rest_api_init', [ $this, 'register_api_routes' ] );
-	}
-
-
-	/**
-	 * Register all API controller routes using the DI container.
+	 *
+	 * Registers admin-specific hooks including menu registration
+	 * and script enqueuing. REST API routes are automatically registered
+	 * by controllers implementing the Hookable interface.
+	 *
+	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return void
-	 * @since 1.0.0
 	 */
-	public function register_api_routes(): void {
-		$controllers = [
-			SettingsController::class,
-			FileLogsController::class,
-			FileManagerController::class,
-			// Add more API controllers here as needed.
-		];
-		$controllers = apply_filters( 'debug_suite_api_controllers', $controllers );
-
-		foreach ( $controllers as $controller_class ) {
-			$controller = new $controller_class();
-			if ( method_exists( $controller, 'register_routes' ) ) {
-				$controller->register_routes();
-			}
-		}
+	public function register_hooks(): void {
+		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 	}
 
 	/**
-	 * Add admin menu and initialize settings.
+	 * Add an admin menu and initialize settings.
+	 *
+	 * Creates the main Debug Suite admin menu and submenus for different
+	 * sections like file manager, error logs, and log management.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return void
 	 */
 	public function add_admin_menu(): void {
 		global $submenu;
@@ -79,9 +73,9 @@ class Admin implements Hookable {
 			'admin.php?page=' . $slug . '#file-manager',
 		];
 		$submenu[ $slug ][] = [
-			__( 'File Logs', 'debug-suite' ),
+			__( 'Error Logs', 'debug-suite' ),
 			$capability,
-			'admin.php?page=' . $slug . '#file-logs',
+			'admin.php?page=' . $slug . '#error-logs',
 		];
 		$submenu[ $slug ][] = [
 			__( 'Manage Logs', 'debug-suite' ),
@@ -92,20 +86,36 @@ class Admin implements Hookable {
 
 	/**
 	 * Render the admin page.
+	 *
+	 * Outputs the main container div for the React application and
+	 * verifies user permissions before rendering.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return void
 	 */
-	public function admin_page() {
+	public function admin_page(): void {
 		// Check user capabilities
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'debug-suite' ) );
 		}
 
 		ob_start();
-		echo '<div class="wrap"><div id="debug-suite-admin-app"></div></div>';
+		echo '<div class="wrap"><div id="debug-suite-admin-app" class="debug-suite-admin-app"></div></div>';
 		echo ob_get_clean(); // phpcs:ignore
 	}
 
 	/**
 	 * Enqueue admin scripts and styles.
+	 *
+	 * Loads the necessary JavaScript and CSS files for the Debug Suite admin interface.
+	 * Also localizes script data including WordPress debug constants and user roles.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $hook_suffix The current admin page hook suffix.
+	 *
+	 * @return void
 	 */
 	public function admin_enqueue_scripts( $hook_suffix ): void {
 		// Only enqueue on our plugin's admin page
@@ -113,7 +123,37 @@ class Admin implements Hookable {
 			return;
 		}
 
+		global $wp_roles;
+
+		if ( ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
+		}
+
+		$roles     = array_map(
+			function ( $role ) {
+				return [
+					'name' => $role['name'],
+				];
+			},
+			$wp_roles->roles
+		);
+		$constants = [
+			'wpDebug'        => WP_DEBUG,
+			'wpDebugLog'     => WP_DEBUG_LOG,
+			'wpDebugDisplay' => WP_DEBUG_DISPLAY,
+			'publicRootPath' => ABSPATH,
+			'filesUrl'       => content_url(),
+			'roles'          => $roles,
+		];
+		$settings  = get_option( 'debug_suite_settings', [] );
+		$settings  = array_merge( $constants, $settings );
+
 		wp_enqueue_script( 'debug-suite-admin' );
 		wp_enqueue_style( 'debug-suite-admin' );
+		wp_localize_script(
+			'debug-suite-admin',
+			'debugSuiteSettings',
+			$settings
+		);
 	}
 }

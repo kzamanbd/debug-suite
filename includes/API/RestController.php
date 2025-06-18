@@ -8,43 +8,37 @@
 namespace DebugSuite\API;
 
 use WP_REST_Controller;
-use WP_REST_Request;
 use WP_Error;
-/**
- * Class RestController
- *
- * Base REST API controller for Debug Suite endpoints.
- *
- * @since 1.0.0
- */
-class RestController extends WP_REST_Controller {
+use DebugSuite\Interfaces\Hookable;
 
-	/**
-	 * Namespace for the REST API routes.
-	 *
-	 * @since 1.0.0
-	 * @var string
-	 */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Simple base REST controller for Debug Suite.
+ *
+ * @since DEBUG_SUITE_SINCE
+ */
+class RestController extends WP_REST_Controller implements Hookable {
+
 	protected $namespace = 'debug-suite/v1';
 
 	/**
-	 * Checks if the current user has permission for the endpoint.
+	 * Register hooks for WordPress.
 	 *
-	 * Override in child classes for custom permission logic.
+	 * Automatically registers REST API routes when the controller
+	 * is resolved from the container.
 	 *
-	 * @param WP_REST_Request|null $request Optional. The REST request object.
-	 *
-	 * @return bool|WP_Error True if the request has access, WP_Error otherwise.
-	 * @since 1.0.0
+	 * @return void
 	 */
+	public function register_hooks(): void {
+		add_action( 'rest_api_init', [ $this, 'register_routes' ] );
+	}
+
 	public function permissions_check( $request ): bool|WP_Error {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return new WP_Error(
-				'rest_forbidden',
-				__( 'You do not have permission to access this endpoint.', 'debug-suite' ),
-				[ 'status' => 403 ]
-			);
-		}
-		return true;
+		return current_user_can( 'manage_options' )
+			? true
+			: new WP_Error( 'rest_forbidden', __( 'You do not have permission to access this endpoint.', 'debug-suite' ), [ 'status' => 403 ] );
 	}
 }

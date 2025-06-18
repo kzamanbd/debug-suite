@@ -1,7 +1,8 @@
-import FileLogs from '@/pages/FileLogs';
-import ManageLogs from '@/pages/ManageLogs';
-import NotFound from '@/pages/NotFound';
-import Settings from '@/pages/Settings';
+import ErrorLogs from '@/pages/error-logs';
+import FileManager from '@/pages/file-manager';
+import ManageLogs from '@/pages/manage-logs';
+import NotFound from '@/pages/not-found';
+import Settings from '@/pages/overview-settings';
 import { __ } from '@wordpress/i18n';
 
 export type DebugSuiteRoute = {
@@ -20,10 +21,10 @@ const routes: DebugSuiteRoute[] = [
         element: <Settings />
     },
     {
-        id: 'file-logs',
-        title: __('File Logs Overview', 'debug-suite'),
-        path: '/file-logs',
-        element: <FileLogs />
+        id: 'error-logs',
+        title: __('Error Logs Overview', 'debug-suite'),
+        path: '/error-logs',
+        element: <ErrorLogs />
     },
     {
         id: 'file-logs-manage',
@@ -32,11 +33,16 @@ const routes: DebugSuiteRoute[] = [
         element: <ManageLogs />
     },
     {
+        id: 'file-manager',
+        title: __('File Manager', 'debug-suite'),
+        path: '/file-manager',
+        element: <FileManager />
+    },
+    {
         id: 'not-found',
         path: '*',
         element: <NotFound />,
         className: 'hidden'
     }
 ];
-
 export default routes;
