@@ -378,19 +378,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ExampleService implements ServiceInterface {
 
 	/**
-	 * Custom configuration path.
+	 * Service Variable
 	 *
-	 * @var string
+	 * @var mixed
 	 */
-	private string $config_path;
+	private mixed $variable;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string|null $config_path Optional custom config path.
+	 * @param mixed $variable Optional custom config path.
 	 */
-	public function __construct( ?string $config_path = null ) {
-		$this->config_path = $config_path ?? '/default/config/path';
+	public function __construct( $variable ) {
+		$this->variable = $variable
 	}
 
 	/**
@@ -501,7 +501,7 @@ class ExampleController extends RestController {
 	 * @param ExampleService $service Service instance.
 	 */
 	public function __construct( ExampleService $service ) {
-		$this->example_service = $example_service;
+		$this->example_service = $service;
 	}
 
 	/**
