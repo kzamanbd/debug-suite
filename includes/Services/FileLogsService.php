@@ -176,8 +176,16 @@ class FileLogsService implements ServiceInterface {
 		$date = DateTime::createFromFormat( 'd-M-Y H:i:s T', $timestamp );
 		// Get the format settings from WordPress
 
+		// Check if the date was successfully parsed
+		if ( $date === false ) {
+			// Fallback to current time if date parsing fails
+			$formatted_time = wp_date( $format );
+		} else {
+			$formatted_time = wp_date( $format, $date->getTimestamp() );
+		}
+
 		return [
-			'timestamp' => wp_date( $format, $date->getTimestamp() ),
+			'timestamp' => $formatted_time,
 			'type' => $type,
 			'level' => $this->determine_level( $type ),
 			'message' => $message,

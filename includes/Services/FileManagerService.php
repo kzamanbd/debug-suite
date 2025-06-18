@@ -268,17 +268,17 @@ class FileManagerService implements ServiceInterface {
 	 */
 	private function is_path_safe( string $full_path ): bool {
 		$real_base = realpath( $this->base_path );
-		
+
 		if ( ! $real_base ) {
 			return false;
 		}
-		
+
 		if ( file_exists( $full_path ) ) {
 			// For existing paths, verify the resolved path starts with base path
 			$real_path = realpath( $full_path );
 			return $real_path && str_starts_with( $real_path, $real_base );
 		}
-		
+
 		// For new files, verify the parent directory is within allowed boundaries
 		$parent_dir = realpath( dirname( $full_path ) );
 		return $parent_dir && str_starts_with( $parent_dir, $real_base );
