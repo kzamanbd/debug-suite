@@ -10,7 +10,7 @@
 namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Tests\Helpers\TestCase;
-use DebugSuite\Services\FileLogsService;
+use DebugSuite\Services\DebugLog\FileLogsService;
 use ReflectionClass;
 
 /**
