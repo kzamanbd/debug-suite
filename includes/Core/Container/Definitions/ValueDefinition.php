@@ -11,7 +11,7 @@ namespace DebugSuite\Core\Container\Definitions;
  * Value definition for dependency injection.
  *
  * Represents a static value that will be returned directly.
- * Follows PHP-DI's value pattern for simple value injection.
+ * Follow PHP-DI's value pattern for simple value injection.
  *
  * @since DEBUG_SUITE_SINCE
  */

@@ -20,6 +20,8 @@ use DebugSuite\Core\Container\ContainerBuilder;
 use DebugSuite\Core\Container\Definitions\AutowiredDefinition;
 use DebugSuite\Core\Container\Definitions\FactoryDefinition;
 use DebugSuite\Core\Container\Definitions\ValueDefinition;
+use DebugSuite\Core\Container\Definitions\ConfigDefinition;
+use DebugSuite\Core\Container\Definitions\DecoratorDefinition;
 use DebugSuite\Core\Container\ServiceManager;
 
 if ( ! function_exists( 'debug_suite' ) ) {
@@ -56,10 +58,9 @@ if ( ! function_exists( 'debug_suite_resolve' ) ) {
 	 *
 	 * @param string $service Service name or class name.
 	 *
-	 * @return mixed The resolved service instance.
 	 * @throws Exception If the service cannot be resolved.
 	 */
-	function debug_suite_resolve( string $service ) {
+	function debug_suite_resolve( string $service ): mixed {
 		return debug_suite_container()->resolve( $service );
 	}
 }
@@ -85,9 +86,9 @@ if ( ! function_exists( 'debug_suite_autowire' ) ) {
 	 *
 	 * @param string $class_name The class name to autowire.
 	 *
-	 * @return mixed Autowired definition for the container.
+	 * @return AutowiredDefinition Autowired definition for the container.
 	 */
-	function debug_suite_autowire( string $class_name ) {
+	function debug_suite_autowire( string $class_name ): AutowiredDefinition {
 		return new AutowiredDefinition( $class_name );
 	}
 }
@@ -100,9 +101,9 @@ if ( ! function_exists( 'debug_suite_factory' ) ) {
 	 *
 	 * @param callable $factory The factory callable.
 	 *
-	 * @return mixed Factory definition for the container.
+	 * @return FactoryDefinition Factory definition for the container.
 	 */
-	function debug_suite_factory( callable $factory ) {
+	function debug_suite_factory( callable $factory ): FactoryDefinition {
 		return new FactoryDefinition( $factory );
 	}
 }
@@ -115,9 +116,9 @@ if ( ! function_exists( 'debug_suite_singleton' ) ) {
 	 *
 	 * @param callable $factory The factory callable.
 	 *
-	 * @return mixed Singleton factory definition for the container.
+	 * @return FactoryDefinition Singleton factory definition for the container.
 	 */
-	function debug_suite_singleton( callable $factory ) {
+	function debug_suite_singleton( callable $factory ): FactoryDefinition {
 		return new FactoryDefinition( $factory, true );
 	}
 }
@@ -130,9 +131,9 @@ if ( ! function_exists( 'debug_suite_value' ) ) {
 	 *
 	 * @param mixed $value The value to inject.
 	 *
-	 * @return mixed Value definition for the container.
+	 * @return ValueDefinition Value definition for the container.
 	 */
-	function debug_suite_value( $value ) {
+	function debug_suite_value( mixed $value ): ValueDefinition {
 		return new ValueDefinition( $value );
 	}
 }
@@ -145,9 +146,9 @@ if ( ! function_exists( 'debug_suite_object' ) ) {
 	 *
 	 * @param string $class_name The class name to autowire as singleton.
 	 *
-	 * @return mixed Autowired singleton definition for the container.
+	 * @return AutowiredDefinition Autowired singleton definition for the container.
 	 */
-	function debug_suite_object( string $class_name ) {
+	function debug_suite_object( string $class_name ): AutowiredDefinition {
 		return new AutowiredDefinition( $class_name, true );
 	}
 }
@@ -156,8 +157,9 @@ if ( ! function_exists( 'debug_suite_container_builder' ) ) {
 	/**
 	 * Create a new container builder instance.
 	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @return ContainerBuilder
-	 *@since DEBUG_SUITE_SINCE
 	 */
 	function debug_suite_container_builder(): ContainerBuilder {
 		return new ContainerBuilder();
@@ -174,10 +176,122 @@ if ( ! function_exists( 'debug_suite_date' ) ) {
 	 *
 	 * @return string Formatted date string.
 	 */
-	function debug_suite_date( $timestamp ): string {
+	function debug_suite_date( string $timestamp ): string {
 		// Get a date format from WP settings (Settings > General)
 		$date_format = get_option( 'date_format' );
 		// Convert the timestamp to formatted date
 		return date_i18n( $date_format, $timestamp );
+	}
+}
+
+if ( ! function_exists( 'debug_suite_config' ) ) {
+	/**
+	 * Create a configuration service definition.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param array      $configurations Environment-specific configurations.
+	 * @param mixed|null $default_config Default configuration.
+	 * @param bool       $singleton      Whether this is a singleton.
+	 *
+	 * @return ConfigDefinition Configuration definition for the container.
+	 */
+	function debug_suite_config( array $configurations = [], mixed $default_config = null, bool $singleton = false ): ConfigDefinition {
+		return new ConfigDefinition( $configurations, $default_config, $singleton );
+	}
+}
+
+if ( ! function_exists( 'debug_suite_tagged' ) ) {
+	/**
+	 * Get all services tagged with a specific tag.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $tag The tag to search for.
+	 *
+	 * @return array Array of resolved service instances.
+	 */
+	function debug_suite_tagged( string $tag ): array {
+		return debug_suite_container()->tagged( $tag );
+	}
+}
+
+if ( ! function_exists( 'debug_suite_decorate' ) ) {
+	/**
+	 * Create a decorator service definition.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $decorator_class   The decorator class name.
+	 * @param string $decorated_service The service to decorate.
+	 * @param bool   $singleton         Whether this is a singleton.
+	 *
+	 * @return DecoratorDefinition Decorator definition for the container.
+	 */
+	function debug_suite_decorate( string $decorator_class, string $decorated_service, bool $singleton = false ): DecoratorDefinition {
+		return new DecoratorDefinition( $decorator_class, $decorated_service, $singleton );
+	}
+}
+
+if ( ! function_exists( 'debug_suite_autowire_with_params' ) ) {
+	/**
+	 * Create an autowired definition with parameter overrides.
+	 *
+	 * Convenience function to quickly create an autowired definition with
+	 * static parameter overrides in a single call.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $class_name  The class name to autowire.
+	 * @param array  $parameters  Associative array of parameter_name => value pairs.
+	 * @param bool   $singleton   Whether this should be a singleton.
+	 *
+	 * @return AutowiredDefinition Configured autowired definition.
+	 *
+	 * @example
+	 * ```php
+	 * $definition = debug_suite_autowire_with_params(LoggerService::class, [
+	 *     'log_level' => 'debug',
+	 *     'log_file' => '/var/log/app.log'
+	 * ], true);
+	 * ```
+	 */
+	function debug_suite_autowire_with_params( string $class_name, array $parameters = [], bool $singleton = false ): AutowiredDefinition {
+		return ( new AutowiredDefinition( $class_name, $singleton ) )
+			->constructor_parameters( $parameters );
+	}
+}
+
+if ( ! function_exists( 'debug_suite_autowire_env' ) ) {
+	/**
+	 * Create an autowired definition with environment-specific parameters.
+	 *
+	 * Convenience function for creating environment-aware service definitions
+	 * with different configurations for development, production, etc.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $class_name             The class name to autowire.
+	 * @param array  $environment_parameters Multi-dimensional array with environment => parameters.
+	 * @param bool   $singleton              Whether this should be a singleton.
+	 *
+	 * @return AutowiredDefinition Configured autowired definition.
+	 *
+	 * @example
+	 * ```php
+	 * $definition = debug_suite_autowire_env(DatabaseService::class, [
+	 *     'development' => ['host' => 'localhost', 'debug' => true],
+	 *     'production' => ['host' => 'prod-db.com', 'debug' => false]
+	 * ], true);
+	 * ```
+	 */
+	function debug_suite_autowire_env( string $class_name, array $environment_parameters = [], bool $singleton = false ): AutowiredDefinition {
+		$definition = new AutowiredDefinition( $class_name, $singleton );
+
+		foreach ( $environment_parameters as $environment => $parameters ) {
+			$definition->environment_parameters( $environment, $parameters );
+		}
+
+		return $definition;
 	}
 }

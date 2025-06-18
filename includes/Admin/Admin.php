@@ -68,14 +68,14 @@ class Admin implements Hookable {
 
 		$submenu[ $slug ][] = [ __( 'Overview', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#' ];
 		$submenu[ $slug ][] = [
+			__( 'Debug Log', 'debug-suite' ),
+			$capability,
+			'admin.php?page=' . $slug . '#debug-log',
+		];
+		$submenu[ $slug ][] = [
 			__( 'File Manager', 'debug-suite' ),
 			$capability,
 			'admin.php?page=' . $slug . '#file-manager',
-		];
-		$submenu[ $slug ][] = [
-			__( 'Error Logs', 'debug-suite' ),
-			$capability,
-			'admin.php?page=' . $slug . '#error-logs',
 		];
 		$submenu[ $slug ][] = [
 			__( 'Manage Logs', 'debug-suite' ),

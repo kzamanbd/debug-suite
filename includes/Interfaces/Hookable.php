@@ -16,7 +16,6 @@ namespace DebugSuite\Interfaces;
  */
 interface Hookable {
 
-
 	/**
 	 * Register hooks for WordPress.
 	 *

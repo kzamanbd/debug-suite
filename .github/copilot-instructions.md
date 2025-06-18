@@ -99,6 +99,7 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 ## TypeScript and Build Configuration
 
 ### Project Configuration
+
 - **TypeScript**: Version 5.x with strict mode enabled
 - **Build Tool**: WordPress Scripts (@wordpress/scripts) for bundling
 - **Path Aliases**: Use `@/*` for `src/*` imports (configured in tsconfig.json)
@@ -106,7 +107,8 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 - **Target**: ES2020 with DOM libraries
 
 ### Package Dependencies
-```json
+
+````json
 {
   "dependencies": {
     "@wordpress/element": "React components",
@@ -119,9 +121,14 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     "react-toastify": "Toast notifications",
     "simplebar-react": "Custom scrollbars",
     "@monaco-editor/react": "Code editor"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "Build tooling and configuration",
+    "typescript": "TypeScript language support",
+    "@types/react": "React type definitions",
+    "@types/wordpress__element": "WordPress element types"
   }
 }
-```
 
 ### Build Scripts
 ```bash
@@ -136,7 +143,7 @@ npm run type-check
 
 # Linting
 npm run lint
-```
+````
 
 ## Architecture Guidelines
 
@@ -151,11 +158,17 @@ npm run lint
 2. **PHP-DI Style Definition System**:
 
     - **AutowiredDefinition**: Use for automatic dependency resolution with reflection-based injection
+        - Advanced parameter injection with static overrides, dynamic callbacks, and environment-aware configuration
+        - Multiple parameter resolution strategies with priority-based fallback system
+        - Enhanced error messages with actionable suggestions for parameter resolution failures
+        - Convenience methods for bulk parameter setting and introspection
     - **FactoryDefinition**: Use for factory-based service creation with callable factories
     - **ValueDefinition**: Use for static values and configuration data
+    - **ConfigDefinition**: Use for environment-aware configuration management
+    - **DecoratorDefinition**: Use for service decoration patterns
     - **Definition Interface**: All definitions implement `DefinitionInterface` with `resolve()` method
     - **Singleton Support**: Definitions support both singleton and transient service lifetimes
-    - **Parameter Injection**: Support for constructor parameter injection in autowired definitions
+    - **Parameter Injection**: Comprehensive constructor parameter injection with multiple strategies
 
 3. **Enhanced Service Provider System**:
 
@@ -165,6 +178,7 @@ npm run lint
     - **Clean Structure**: Use minimal boilerplate with focused, readable code
 
     **Example Service Provider Pattern**:
+
     ```php
     <?php
     namespace DebugSuite\Providers;
@@ -240,7 +254,96 @@ npm run lint
     - **Service Manager**: Use `debug_suite_service_manager()` to get service manager instance
     - **Main Instance**: Use `debug_suite()` to get main plugin instance
     - **DI Definitions**: Use helper functions like `debug_suite_autowire()`, `debug_suite_factory()` for creating definitions
+    - **Advanced Autowiring**: Use `debug_suite_autowire_with_params()` for quick parameter injection
+    - **Environment Autowiring**: Use `debug_suite_autowire_env()` for environment-specific service configuration
+    - **Configuration Management**: Use `debug_suite_config()` for environment-aware configuration
+    - **Service Decoration**: Use `debug_suite_decorate()` for decorator pattern implementation
+    - **Tagged Services**: Use `debug_suite_tagged()` to retrieve services by tag
     - **Legacy Compatibility**: All legacy helper functions remain functional for backward compatibility
+
+## Advanced Dependency Injection Patterns
+
+### AutowiredDefinition Parameter Injection
+
+The `AutowiredDefinition` class supports multiple parameter injection strategies with priority-based resolution:
+
+1. **Environment-Specific Parameters** (highest priority)
+
+    ```php
+    $definition = $container->autowire(DatabaseService::class)
+        ->environment_parameters('development', [
+            'host' => 'localhost',
+            'debug' => true
+        ])
+        ->environment_parameters('production', [
+            'host' => 'prod-db.example.com',
+            'debug' => false
+        ]);
+    ```
+
+2. **Dynamic Parameter Callbacks**
+
+    ```php
+    $definition = $container->autowire(EmailService::class)
+        ->constructor_parameter_callback('api_key', function($resolver) {
+            $config = $resolver(ConfigService::class);
+            return $config->get('email.api_key');
+        });
+    ```
+
+3. **Static Parameter Overrides**
+
+    ```php
+    // Single parameter
+    $definition = $container->autowire(LoggerService::class)
+        ->constructor_parameter('log_level', 'debug');
+
+    // Multiple parameters
+    $definition = $container->autowire(LoggerService::class)
+        ->constructor_parameters([
+            'log_level' => 'debug',
+            'log_file' => '/var/log/app.log'
+        ]);
+    ```
+
+4. **Type-Based Dependency Injection** (automatic)
+5. **Default Parameter Values** (from constructor)
+6. **Enhanced Error Messages** (with actionable suggestions)
+
+### Environment-Aware Services
+
+Services automatically adapt to WordPress environment using:
+
+- `WP_ENVIRONMENT_TYPE` constant (WordPress 5.5+)
+- `WP_DEBUG` constant (fallback)
+- Default to 'production' if neither is set
+
+Supported environments: `development`, `staging`, `production`, `testing`
+
+### Convenience Helper Functions
+
+```php
+// Quick autowiring with parameters
+$definition = debug_suite_autowire_with_params(LoggerService::class, [
+    'log_level' => 'debug',
+    'log_file' => '/var/log/app.log'
+], true); // singleton
+
+// Environment-aware autowiring
+$definition = debug_suite_autowire_env(DatabaseService::class, [
+    'development' => ['host' => 'localhost', 'debug' => true],
+    'production' => ['host' => 'prod-db.com', 'debug' => false]
+], true); // singleton
+
+// Configuration management
+$config = debug_suite_config([
+    'development' => ['api_url' => 'https://dev-api.com'],
+    'production' => ['api_url' => 'https://api.com']
+]);
+
+// Service decoration
+$decorated = debug_suite_decorate(CachedEmailService::class, EmailService::class, true);
+```
 
 ## Feature Implementation Guidelines
 
@@ -249,6 +352,7 @@ When implementing new features in Debug Suite, follow the Service Layer Pattern 
 ### 1. **New API Endpoint Implementation**
 
 **Step 1: Create the Service Class**
+
 ```php
 <?php
 /**
@@ -331,6 +435,7 @@ class ExampleService implements ServiceInterface {
 ```
 
 **Step 2: Register Service with DI Container**
+
 ```php
 // In AppServiceProvider::register()
 $container->singleton( ExampleService::class, fn() => new ExampleService() );
@@ -341,7 +446,7 @@ $container->singleton( ExampleController::class, fn( $c ) => new ExampleControll
 // Add to $provides array (follow existing pattern)
 protected array $provides = [
 	FileLogsService::class,
-	FileManagerService::class, 
+	FileManagerService::class,
 	SettingsService::class,
 	ExampleService::class,      // Add new service here
 	ExampleController::class,   // Add new controller here
@@ -349,6 +454,7 @@ protected array $provides = [
 ```
 
 **Step 3: Create/Update REST Controller**
+
 ```php
 <?php
 /**
@@ -437,7 +543,7 @@ class ExampleController extends RestController {
 
 		// Delegate to service
 		$result = $this->example_service->process_data( $input );
-		
+
 		// Transform service result to HTTP response
 		if ( $result->is_failure() ) {
 			$status_code = match( $result->get_error_code() ) {
@@ -446,14 +552,14 @@ class ExampleController extends RestController {
 				'permission_denied'  => 403,
 				default              => 500
 			};
-			
+
 			return new WP_Error(
 				$result->get_error_code(),
 				$result->get_error_message(),
 				[ 'status' => $status_code ]
 			);
 		}
-		
+
 		return rest_ensure_response( $result->to_array() );
 	}
 }
@@ -462,447 +568,76 @@ class ExampleController extends RestController {
 ### 2. **Service Layer Best Practices**
 
 - **Single Responsibility**: Each service handles one domain of business logic
-  - `FileLogsService`: Debug log operations only
-  - `SettingsService`: wp-config.php management only
-  - `FileManagerService`: File system operations only
+
+    - `FileLogsService`: Debug log operations only
+    - `SettingsService`: wp-config.php management only
+    - `FileManagerService`: File system operations only
 
 - **Return ServiceResponse**: Always return `ServiceResponse` objects, never throw exceptions to controllers
-  ```php
-  // ✅ Good - From FileLogsService
-  if ( ! file_exists( $this->log_file_path ) ) {
-      return ServiceResponse::failure(
-          __( 'Debug log file not found.', 'debug-suite' ),
-          'file_not_found',
-          [ 'path' => $this->log_file_path ]
-      );
-  }
-  
-  // ❌ Bad - Don't throw exceptions to controllers
-  if ( ! file_exists( $this->log_file_path ) ) {
-      throw new Exception( 'File not found' );
-  }
-  ```
+
+    ```php
+    // ✅ Good - From FileLogsService
+    if ( ! file_exists( $this->log_file_path ) ) {
+        return ServiceResponse::failure(
+            __( 'Debug log file not found.', 'debug-suite' ),
+            'file_not_found',
+            [ 'path' => $this->log_file_path ]
+        );
+    }
+
+    // ❌ Bad - Don't throw exceptions to controllers
+    if ( ! file_exists( $this->log_file_path ) ) {
+        throw new Exception( 'File not found' );
+    }
+    ```
 
 - **Validate Input**: Perform all business validation in the service layer
-  ```php
-  // Example from SettingsService
-  public function update_debug_settings( array $settings ): ServiceResponse {
-      $valid_keys = [ 'WP_DEBUG', 'WP_DEBUG_LOG', 'WP_DEBUG_DISPLAY' ];
-      
-      foreach ( $settings as $key => $value ) {
-          if ( ! in_array( $key, $valid_keys, true ) ) {
-              return ServiceResponse::failure(
-                  sprintf( __( 'Invalid setting key: %s', 'debug-suite' ), $key ),
-                  'invalid_setting',
-                  [ 'key' => $key, 'valid_keys' => $valid_keys ]
-              );
-          }
-      }
-      // Continue with processing...
-  }
-  ```
+
+    ```php
+    // Example from SettingsService
+    public function update_debug_settings( array $settings ): ServiceResponse {
+        $valid_keys = [ 'WP_DEBUG', 'WP_DEBUG_LOG', 'WP_DEBUG_DISPLAY' ];
+
+        foreach ( $settings as $key => $value ) {
+            if ( ! in_array( $key, $valid_keys, true ) ) {
+                return ServiceResponse::failure(
+                    sprintf( __( 'Invalid setting key: %s', 'debug-suite' ), $key ),
+                    'invalid_setting',
+                    [ 'key' => $key, 'valid_keys' => $valid_keys ]
+                );
+            }
+        }
+        // Continue with processing...
+    }
+    ```
 
 - **Error Context**: Include helpful context data in error results
 - **Configuration**: Accept dependencies through constructor for testability
-  ```php
-  // From FileManagerService - accepts custom base path
-  public function __construct( ?string $base_path = null ) {
-      $this->base_path = $base_path ?? ABSPATH;
-  }
-  ```
+
+    ```php
+    // From FileManagerService - accepts custom base path
+    public function __construct( ?string $base_path = null ) {
+        $this->base_path = $base_path ?? ABSPATH;
+    }
+    ```
 
 - **Documentation**: Fully document all public methods with PHPDoc
-  ```php
-  /**
-   * Get directory tree structure with file metadata.
-   *
-   * @param string $relative_path The path relative to the base directory.
-   * @param array  $options {
-   *     Optional arguments.
-   *     @type bool $include_hidden Whether to include hidden files. Default false.
-   *     @type int  $max_depth     Maximum directory depth. Default 3.
-   * }
-   * @return ServiceResponse Success with tree data or failure with error message.
-   */
-  public function get_directory_tree( string $relative_path = '', array $options = [] ): ServiceResponse
-  ```
+    ```php
+    /**
+     * Get directory tree structure with file metadata.
+     *
+     * @param string $relative_path The path relative to the base directory.
+     * @param array  $options {
+     *     Optional arguments.
+     *     @type bool $include_hidden Whether to include hidden files. Default false.
+     *     @type int  $max_depth     Maximum directory depth. Default 3.
+     * }
+     * @return ServiceResponse Success with tree data or failure with error message.
+     */
+    public function get_directory_tree( string $relative_path = '', array $options = [] ): ServiceResponse
+    ```
 
-### 3. **API Controller Best Practices**
-
-- **Thin Controllers**: Controllers should only handle HTTP concerns (request/response)
-  ```php
-  // ✅ Good - From FileLogsController
-  public function get_file_logs( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-      $options = [
-          'limit' => $request->get_param( 'limit' ),
-          'level' => $request->get_param( 'level' ),
-          'search' => $request->get_param( 'search' ),
-      ];
-      
-      $result = $this->file_logs_service->get_log_entries( $options );
-      
-      return $result->is_failure()
-          ? new WP_Error( $result->get_error_code(), $result->get_error_message() )
-          : rest_ensure_response( $result->to_array() );
-  }
-  
-  // ❌ Bad - Business logic in controller
-  public function get_file_logs( WP_REST_Request $request ): WP_REST_Response {
-      $log_file = WP_CONTENT_DIR . '/debug.log';
-      if ( ! file_exists( $log_file ) ) {
-          return new WP_Error( 'file_not_found', 'Log file not found' );
-      }
-      
-      $content = file_get_contents( $log_file );
-      $lines = explode( "\n", $content );
-      // ... 50+ lines of parsing logic
-  }
-  ```
-
-- **Parameter Extraction**: Extract and validate request parameters
-  ```php
-  // Proper parameter handling with validation
-  public function save_file_contents( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-      $path = $request->get_param( 'path' );
-      $contents = $request->get_param( 'contents' );
-      $create_backup = $request->get_param( 'create_backup' ) ?? true;
-      
-      // Delegate to service
-      $result = $this->file_manager_service->save_file_contents( $path, $contents, [
-          'create_backup' => $create_backup
-      ]);
-      
-      return $this->transform_service_result( $result );
-  }
-  ```
-
-- **Service Delegation**: Delegate all business logic to service layer
-- **Response Transformation**: Convert `ServiceResponse` to appropriate HTTP responses
-  ```php
-  // Helper method for consistent response transformation
-  private function transform_service_result( ServiceResponse $result ): WP_REST_Response|WP_Error {
-      if ( $result->is_failure() ) {
-          $status_code = match( $result->get_error_code() ) {
-              'validation_error' => 400,
-              'not_found' => 404,
-              'permission_denied' => 403,
-              'file_system_error' => 500,
-              default => 500
-          };
-          
-          return new WP_Error(
-              $result->get_error_code(),
-              $result->get_error_message(),
-              [ 'status' => $status_code ]
-          );
-      }
-      
-      return rest_ensure_response( $result->to_array() );
-  }
-  ```
-
-- **Error Handling**: Properly map service errors to HTTP status codes
-
-## REST API Architecture
-
-### API Controllers Structure
-```
-src/
-├── App.tsx                 # Main application component
-├── index.tsx              # Entry point
-├── index.css              # Tailwind CSS configuration
-├── components/            # Reusable UI components
-│   ├── base-layout.tsx    # Layout wrapper
-│   ├── ui/                # Base UI components
-│   └── *.tsx              # Feature components
-├── pages/                 # Route components
-│   ├── overview-settings.tsx
-│   ├── error-logs.tsx
-│   ├── manage-logs.tsx
-│   └── file-manager/
-├── routing/               # Router configuration
-├── types/                 # TypeScript definitions
-└── utils/                 # Utility functions
-```
-
-### Key Frontend Features
-- **Hash-based routing** with React Router DOM
-- **Monaco Editor** integration for file editing
-- **Toast notifications** with react-toastify
-- **Custom scrollbars** with simplebar-react
-- **Responsive design** with Tailwind CSS v4
-- **Dark mode support** throughout the interface
-
-### State Management
-- Local state with React hooks
-- Global settings via `window.debugSuiteSettings`
-- API data fetching with `@wordpress/api-fetch`
-
-## Helper Functions Reference
-
-### Container Access Functions
-```php
-// Get the main plugin instance
-$plugin = debug_suite();
-
-// Get the DI container
-$container = debug_suite_container();
-
-// Resolve a service from the container
-$service = debug_suite_resolve( MyService::class );
-
-// Get the service manager
-$manager = debug_suite_service_manager();
-```
-
-### Definition Helper Functions
-```php
-// Create autowired definition
-$autowired = debug_suite_autowire( MyService::class );
-
-// Create factory definition
-$factory = debug_suite_factory( function() {
-    return new ComplexService();
-});
-
-// Create singleton factory definition
-$singleton = debug_suite_singleton( function() {
-    return new SingletonService();
-});
-
-// Create value definition
-$value = debug_suite_value( [ 'key' => 'value' ] );
-```
-
-### Container Methods
-```php
-// PSR-11 methods
-$service = $container->get( MyService::class );
-$exists = $container->has( MyService::class );
-
-// Enhanced container methods
-$container->singleton( MyService::class, fn( $c ) => new MyService() );
-$container->bind( 'config', [ 'debug' => true ] );
-$container->instance( 'logger', $loggerInstance );
-
-// Magic property access
-$service = $container->MyService;
-$exists = isset( $container->MyService );
-```
-
-## File Manager System
-
-### Backend File Operations
-- **Symfony Finder** component for file discovery
-- **FileManager class** in `DebugSuite\Admin\FileManager\FileManager`
-- **Directory tree** generation with metadata
-- **File content** reading and writing capabilities
-- **Security validation** for file access
-
-### Frontend File Manager
-- **Tree view** for directory navigation
-- **Table view** for file details
-- **Monaco Editor** for file editing
-- **Breadcrumb navigation** for path tracking
-- **File type icons** with Lucide React icons
-
-## Development Tools and Quality Assurance
-
-### PHP Code Quality Tools
-- **PHPStan**: Static analysis with level 5 configuration (`phpstan.neon`)
-- **PHP_CodeSniffer**: WordPress and PSR-12 coding standards (`phpcs.xml`)
-- **Composer Scripts**: Quality assurance scripts available
-  - `composer run phpstan` - Static analysis
-  - `composer run phpcs` - Code style checking
-  - `composer run phpcs:fix` - Automatic code style fixes
-  - `composer run qa` - Combined quality checks
-
-### Frontend Quality Tools
-- **ESLint**: JavaScript/TypeScript linting with WordPress standards
-- **Prettier**: Code formatting with Tailwind plugin
-- **TypeScript**: Strict mode compilation
-- **WordPress Scripts**: Build and development tools
-
-### Code Standards Configuration
-```bash
-# Run static analysis
-composer run phpstan
-
-# Check coding standards
-composer run phpcs:check
-
-# Fix coding standards automatically
-composer run phpcs:fix
-
-# Combined QA checks
-composer run qa
-```
-
-### WordPress Integration Standards
-- **Plugin Structure**: Follow WordPress plugin development best practices
-- **Hooks and Filters**: Use WordPress action/filter system properly
-- **Internationalization**: All strings must be translatable with text domain `debug-suite`
-- **Capabilities**: Implement proper capability checks for admin functions
-- **Nonces**: Use WordPress nonce system for form security
-- **Sanitization**: Sanitize all input data using WordPress functions
-
-## Project Constants and Versioning
-
-### Plugin Constants
-```php
-// Defined in debug-suite.php
-define( 'DEBUG_SUITE_VERSION', '1.0.0' );
-define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-```
-
-### Version Information
-- **Current Version**: 1.0.0
-- **PHP Requirement**: 8.2+
-- **WordPress Requirement**: 5.7+
-- **License**: GPL-2.0-or-later
-
-### Text Domain
-- **Text Domain**: `debug-suite`
-- **Domain Path**: `/languages`
-- **POT File**: `languages/debug-suite.pot`
-
-### Package Management
-- **PNPM**: Package manager for frontend dependencies
-- **Composer**: PHP dependency management
-- **WordPress Scripts**: Build tooling
-- **Tailwind CLI**: CSS processing
-
-## Build Configuration
-```json
-{
-  "entry": "./src/index.tsx",
-  "output": {
-    "filename": "debug-suite.js",
-    "path": "/build"
-  },
-  "resolve": {
-    "alias": {
-      "@": "/src"
-    }
-  },
-  "externals": {
-    "react": "React",
-    "react-dom": "ReactDOM"
-  }
-}
-```
-
-## Security Considerations
-
-### Backend Security
-- **Capability checks** for all admin functionality
-- **Nonce verification** for form submissions
-- **Path validation** for file operations
-- **Input sanitization** for all user data
-- **ABSPATH protection** in all PHP files
-
-### Frontend Security
-- **XSS prevention** with proper escaping
-- **CSRF protection** via WordPress nonces
-- **API authentication** via WordPress REST API
-- **File path validation** for file manager operations
-
-## Performance Optimization
-
-### Backend Performance
-- **Singleton containers** for service caching
-- **Lazy loading** of services
-- **Optimized autoloading** with Composer
-- **Efficient file operations** with Symfony Finder
-
-### Frontend Performance
-- **Code splitting** with webpack
-- **Tree shaking** for unused code elimination
-- **CSS optimization** with Tailwind's purge
-- **Asset minification** in production builds
-
-## Testing Guidelines
-
-### PHP Testing Framework
-
-The Debug Suite plugin uses a comprehensive testing framework that supports both unit tests and WordPress integration tests:
-
-1. **Test Directory Structure**:
-   ```
-   tests/
-   ├── bootstrap.php               # Main test bootstrap file
-   ├── README.md                   # Testing documentation
-   ├── Helpers/                    # Test helpers and utilities
-   │   ├── TestCase.php            # Base test case for unit tests
-   │   ├── DebugSuiteTestCase.php  # Base test case for WordPress integration tests
-   │   ├── MockFactory.php         # Factory for creating test mocks
-   │   └── wp-functions-mock.php   # Mock WordPress functions
-   ├── Unit/                       # Unit tests (no WordPress dependencies)
-   │   ├── BasicTest.php           # Basic tests to verify setup
-   │   ├── Core/                   # Tests for core functionality
-   │   └── Services/               # Tests for service classes
-   └── Integration/                # Integration tests (with WordPress)
-       └── API/                    # Tests for API controllers
-   ```
-
-2. **Test Types**:
-   - **Unit Tests**: Extend `DebugSuite\Tests\Helpers\TestCase` for tests that don't need WordPress core
-   - **Integration Tests**: Extend `DebugSuite\Tests\Helpers\DebugSuiteTestCase` for tests that require WordPress
-
-3. **PHPUnit Configuration**:
-   - Configuration file: `phpunit.xml` 
-   - Test suites: unit, integration, and all
-   - Coverage reporting configured for the `includes` directory
-
-4. **Testing Base Classes**:
-   - `TestCase`: Extends Yoast's PHPUnit polyfills for cross-version compatibility
-   - `DebugSuiteTestCase`: Extends `WP_UnitTestCase` for WordPress-specific testing
-
-5. **Mock System**:
-   - WordPress function mocks in `wp-functions-mock.php`
-   - `MockFactory` helper for creating test doubles
-
-6. **Test Groups**:
-   - Use `@group` annotations to categorize tests (e.g., `@group api`, `@group integration`)
-   - Run specific groups with `composer run test -- --group=integration`
-
-### Service Testing Best Practices
-
-When writing tests for services, follow these best practices:
-
-```php
-/**
- * @covers \DebugSuite\Services\ExampleService
- * @group services
- */
-class ExampleServiceTest extends TestCase {
-    private ExampleService $service;
-    
-    protected function set_up() {
-        parent::set_up();
-        $this->service = new ExampleService();
-    }
-    
-    public function test_process_data_with_valid_input() {
-        $result = $this->service->process_data([
-            'required_field' => 'test value'
-        ]);
-        
-        $this->assertTrue($result->is_success());
-        $this->assertArrayHasKey('processed_data', $result->get_data());
-    }
-    
-    public function test_process_data_with_missing_required_field() {
-        $result = $this->service->process_data([]);
-        
-        $this->assertTrue($result->is_failure());
-        $this->assertEquals('validation_error', $result->get_error_code());
-    }
-}
-```
-
-### API Controller Testing Best Practices
+### 3. **API Controller Testing Best Practices**
 
 For testing API controllers, use the WordPress REST API testing framework:
 
@@ -915,40 +650,40 @@ For testing API controllers, use the WordPress REST API testing framework:
 class ExampleControllerTest extends DebugSuiteTestCase {
     private $controller;
     private $service;
-    
+
     protected function set_up() {
         parent::set_up();
         $this->service = $this->createMock(ExampleService::class);
         $this->controller = new ExampleController($this->service);
         $this->controller->register_routes();
     }
-    
+
     public function test_permission_check() {
         // Test without admin privileges
         wp_set_current_user(0);
         $request = new WP_REST_Request('GET', '/debug-suite/v1/example');
         $response = $this->controller->permissions_check($request);
         $this->assertInstanceOf(WP_Error::class, $response);
-        
+
         // Test with admin privileges
         $user_id = $this->factory->user->create(['role' => 'administrator']);
         wp_set_current_user($user_id);
         $response = $this->controller->permissions_check($request);
         $this->assertTrue($response);
     }
-    
+
     public function test_process_request() {
         // Mock service response
         $this->service->method('process_data')
             ->willReturn(ServiceResponse::success(['key' => 'value']));
-            
+
         // Create request
         $request = new WP_REST_Request('POST', '/debug-suite/v1/example');
         $request->set_param('required_field', 'test value');
-        
+
         // Execute controller method
         $response = $this->controller->process_request($request);
-        
+
         // Assert response
         $this->assertInstanceOf(WP_REST_Response::class, $response);
         $data = $response->get_data();
@@ -958,55 +693,183 @@ class ExampleControllerTest extends DebugSuiteTestCase {
 }
 ```
 
-### Running Tests
+## Container System Feature Usage Patterns
 
-The plugin supports various test commands via Composer:
+The Debug Suite Container System provides enterprise-grade dependency injection capabilities. Here are the most common and recommended usage patterns based on the current implementation:
 
-```bash
-# Run all tests
-composer run test
+### 1. **Service Registration Patterns**
 
-# Run unit tests only
-composer run test:unit
+#### Modern PHP-DI Style Registration (Current Implementation)
 
-# Run integration tests only
-composer run test:integration
+```php
+class AppServiceProvider extends AbstractServiceProvider {
+    protected array $provides = [
+        FileLogsService::class,
+        FileManagerService::class,
+        SettingsService::class,
+        FileLogsController::class,
+        FileManagerController::class,
+        SettingsController::class,
+    ];
 
-# Run tests with coverage report
-composer run test:coverage
+    public function register(Container $container): void {
+        // Modern definition array approach
+        $container->add_definitions([
+            // Services with simple autowiring
+            FileLogsService::class    => $container->object(FileLogsService::class),
+            FileManagerService::class => $container->object(FileManagerService::class),
+            SettingsService::class   => $container->object(SettingsService::class),
 
-# Run specific test file
-composer run test -- --filter=ExampleServiceTest
+            // Controllers with dependency injection
+            FileLogsController::class    => $container->autowire(FileLogsController::class),
+            FileManagerController::class => $container->autowire(FileManagerController::class),
+            SettingsController::class   => $container->autowire(SettingsController::class),
+        ]);
+    }
+}
 ```
 
-Integration tests require a WordPress test environment, which can be set up using:
+#### Environment-Aware Service Registration
 
-```bash
-# Set up WP test environment
-tests/install-wp-tests.sh wordpress_test root password localhost latest
+```php
+public function register(Container $container): void {
+    // Environment-specific configuration
+    $container->set(ApiService::class,
+        debug_suite_autowire_env(ApiService::class, [
+            'development' => [
+                'base_url' => 'https://dev-api.example.com',
+                'timeout' => 30,
+                'debug' => true,
+                'rate_limit' => false
+            ],
+            'staging' => [
+                'base_url' => 'https://staging-api.example.com',
+                'timeout' => 20,
+                'debug' => true,
+                'rate_limit' => true
+            ],
+            'production' => [
+                'base_url' => 'https://api.example.com',
+                'timeout' => 10,
+                'debug' => false,
+                'rate_limit' => true
+            ]
+        ], true) // singleton
+    );
+}
 ```
 
-### Test Mocking Strategies
+### 2. **WordPress Integration Patterns**
 
-1. **Service Testing**: Create mock dependencies when testing service interaction
-   ```php
-   $mock_dependency = $this->createMock(DependencyClass::class);
-   $mock_dependency->method('some_method')->willReturn('expected value');
-   $service = new TestedService($mock_dependency);
-   ```
+#### Services with WordPress Hooks
 
-2. **Controller Testing**: Mock service layer responses
-   ```php
-   $mock_service = $this->createMock(ExampleService::class);
-   $mock_service->method('process_data')
-       ->willReturn(ServiceResponse::success(['result' => 'data']));
-   $controller = new ExampleController($mock_service);
-   ```
+```php
+use DebugSuite\Interfaces\Hookable;
 
-3. **WordPress Function Mocking**: Use the provided wp-functions-mock.php for unit tests
+class AdminDashboardService implements Hookable {
+    public function __construct(
+        private SettingsService $settings,
+        private SecurityService $security,
+        private string $menu_slug = 'debug-suite'
+    ) {}
 
-4. **Container Testing**: Use the test container factory in TestCase
-   ```php
-   $container = $this->get_test_container();
-   $container->bind(Service::class, $mock_service);
-   ```
+    public function register_hooks(): void {
+        add_action('admin_menu', [$this, 'add_admin_menu']);
+        add_action('admin_init', [$this, 'init_settings']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
+    }
+
+    public function add_admin_menu(): void {
+        add_menu_page(
+            __('Debug Suite', 'debug-suite'),
+            __('Debug Suite', 'debug-suite'),
+            'manage_options',
+            $this->menu_slug,
+            [$this, 'render_dashboard']
+        );
+    }
+}
+
+// Registration with parameter injection
+$container->set(AdminDashboardService::class,
+    debug_suite_autowire_with_params(AdminDashboardService::class, [
+        'menu_slug' => 'my-debug-suite'
+    ])
+);
+```
+
+#### REST API Controllers with DI
+
+```php
+class LogsApiController extends RestController {
+    public function __construct(
+        private FileLogsService $logs_service,
+        private SecurityService $security,
+        private ValidationService $validator
+    ) {
+        parent::__construct();
+    }
+
+    public function register_routes(): void {
+        register_rest_route($this->namespace, '/logs', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_logs'],
+            'permission_callback' => [$this->security, 'can_view_logs'],
+            'args' => $this->validator->get_logs_args(),
+        ]);
+    }
+
+    public function get_logs(WP_REST_Request $request): WP_REST_Response|WP_Error {
+        $options = [
+            'limit' => $request->get_param('limit'),
+            'level' => $request->get_param('level'),
+            'search' => $request->get_param('search'),
+        ];
+
+        $result = $this->logs_service->get_log_entries($options);
+
+        return $result->is_failure()
+            ? new WP_Error($result->get_error_code(), $result->get_error_message())
+            : rest_ensure_response($result->to_array());
+    }
+}
+
+// Automatic registration with dependency injection
+$container->set(LogsApiController::class, $container->autowire(LogsApiController::class));
+```
+
+### 3. **Helper Function Usage Examples**
+
+```php
+// Quick service resolution
+$logger = debug_suite_resolve(LoggerInterface::class);
+
+// Container builder for complex setups
+$container = debug_suite_container_builder()
+    ->enable_autowiring(true)
+    ->add_definitions([
+        'database.host' => debug_suite_value('localhost'),
+        'database.port' => debug_suite_value(3306),
+        DatabaseInterface::class => debug_suite_autowire_env(MySQLDatabase::class, [
+            'development' => ['debug' => true],
+            'production' => ['debug' => false]
+        ]),
+        'logger' => debug_suite_factory(fn() => new FileLogger()),
+    ])
+    ->build();
+
+// Tagged service management
+$notifiers = debug_suite_tagged('notifiers');
+foreach ($notifiers as $notifier) {
+    $notifier->send($message);
+}
+
+// Quick autowiring with parameters
+$service = debug_suite_autowire_with_params(ApiService::class, [
+    'api_key' => $_ENV['API_KEY'],
+    'timeout' => 30,
+    'debug' => WP_DEBUG
+]);
+```
+
+These patterns provide comprehensive coverage for most real-world scenarios when using the Debug Suite Container System. Always prefer dependency injection over service location, use environment-specific configuration for different deployment stages, and leverage the Hookable interface for automatic WordPress integration.
