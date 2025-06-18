@@ -1,6 +1,6 @@
 <?php
 /**
- * Service result class for consistent service layer responses.
+ * Service response class for consistent service layer responses.
  *
  * @package DebugSuite
  */
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Result class for service layer operations.
+ * Response class for service layer operations.
  *
  * Provides a consistent way to return success/failure states with data
  * and error messages from service layer operations.
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @template T
  */
-final class ServiceResult {
+final class ServiceResponse {
 	/**
 	 * Whether the operation was successful.
 	 *
@@ -68,7 +68,7 @@ final class ServiceResult {
 	private array $context;
 
 	/**
-	 * Constructor for ServiceResult.
+	 * Constructor for ServiceResponse.
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
@@ -226,21 +226,21 @@ final class ServiceResult {
 	}
 
 	/**
-	 * Convert the result to an array suitable for API responses.
+	 * Convert the response to an array suitable for API responses.
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @return array<string, mixed>
 	 */
 	public function to_array(): array {
-		$result = [
+		$response = [
 			'success' => $this->success,
 		];
 
 		if ( $this->success ) {
-			$result['data'] = $this->data;
+			$response['data'] = $this->data;
 		} else {
-			$result['error'] = [
+			$response['error'] = [
 				'message' => $this->error_message,
 				'code'    => $this->error_code,
 				'context' => $this->context,
@@ -248,9 +248,9 @@ final class ServiceResult {
 		}
 
 		if ( ! empty( $this->context ) && $this->success ) {
-			$result['context'] = $this->context;
+			$response['context'] = $this->context;
 		}
 
-		return $result;
+		return $response;
 	}
 }

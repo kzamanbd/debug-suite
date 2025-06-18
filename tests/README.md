@@ -74,7 +74,7 @@ vendor/bin/phpunit --testsuite=integration
 ### Run Specific Test File
 
 ```bash
-vendor/bin/phpunit tests/Unit/Core/ServiceResultTest.php
+vendor/bin/phpunit tests/Unit/Core/ServiceResponseTest.php
 ```
 
 ### Run Tests Matching a Pattern
@@ -175,7 +175,7 @@ Base class for unit tests that provides:
 
 - Container management and reset
 - File and directory creation helpers
-- ServiceResult assertion methods
+- ServiceResponse assertion methods
 - Utility methods for testing
 
 ### DebugSuiteTestCase (Integration Tests)

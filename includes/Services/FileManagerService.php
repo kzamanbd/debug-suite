@@ -7,7 +7,7 @@
 
 namespace DebugSuite\Services;
 
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
@@ -119,19 +119,19 @@ class FileManagerService implements ServiceInterface {
 	 *
 	 * @param string $relative_path Path relative to WordPress root.
 	 * @param array  $options       Optional parameters.
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function get_directory_tree( string $relative_path = '', array $options = [] ): ServiceResult {
+	public function get_directory_tree( string $relative_path = '', array $options = [] ): ServiceResponse {
 		$safe_path = $this->sanitize_path( $relative_path );
 		$full_path = $this->base_path . $safe_path;
 
 		// Security and validation checks
 		if ( ! $this->is_path_safe( $full_path ) ) {
-			return ServiceResult::failure( __( 'Invalid path provided.', 'debug-suite' ), 'invalid_path' );
+			return ServiceResponse::failure( __( 'Invalid path provided.', 'debug-suite' ), 'invalid_path' );
 		}
 
 		if ( ! is_dir( $full_path ) ) {
-			return ServiceResult::failure( __( 'Directory not found.', 'debug-suite' ), 'directory_not_found' );
+			return ServiceResponse::failure( __( 'Directory not found.', 'debug-suite' ), 'directory_not_found' );
 		}
 
 		$finder = new Finder();
@@ -153,7 +153,7 @@ class FileManagerService implements ServiceInterface {
 
 		$tree = array_merge( $directories, $files );
 
-		return ServiceResult::success(
+		return ServiceResponse::success(
 			[
 				'tree' => $tree,
 				'path' => $relative_path,
@@ -165,33 +165,33 @@ class FileManagerService implements ServiceInterface {
 	 * Get file contents.
 	 *
 	 * @param string $relative_path Path relative to WordPress root.
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function get_file_contents( string $relative_path ): ServiceResult {
+	public function get_file_contents( string $relative_path ): ServiceResponse {
 		$safe_path = $this->sanitize_path( $relative_path );
 		$full_path = $this->base_path . $safe_path;
 
 		// Security and validation checks
 		if ( ! $this->is_path_safe( $full_path ) ) {
-			return ServiceResult::failure( __( 'Invalid path provided.', 'debug-suite' ), 'invalid_path' );
+			return ServiceResponse::failure( __( 'Invalid path provided.', 'debug-suite' ), 'invalid_path' );
 		}
 
 		if ( ! file_exists( $full_path ) ) {
-			return ServiceResult::failure( __( 'File not found.', 'debug-suite' ), 'file_not_found' );
+			return ServiceResponse::failure( __( 'File not found.', 'debug-suite' ), 'file_not_found' );
 		}
 
 		if ( ! is_file( $full_path ) ) {
-			return ServiceResult::failure( __( 'Path is not a file.', 'debug-suite' ), 'not_a_file' );
+			return ServiceResponse::failure( __( 'Path is not a file.', 'debug-suite' ), 'not_a_file' );
 		}
 
 		if ( ! is_readable( $full_path ) ) {
-			return ServiceResult::failure( __( 'File is not readable.', 'debug-suite' ), 'file_not_readable' );
+			return ServiceResponse::failure( __( 'File is not readable.', 'debug-suite' ), 'file_not_readable' );
 		}
 
 		$contents = file_get_contents( $full_path );
 		$metadata = $this->get_file_metadata( $full_path );
 
-		return ServiceResult::success(
+		return ServiceResponse::success(
 			[
 				'contents' => $contents,
 				'metadata' => $metadata,
@@ -206,19 +206,19 @@ class FileManagerService implements ServiceInterface {
 	 * @param string $relative_path Path relative to WordPress root.
 	 * @param string $contents      File contents.
 	 * @param array  $options       Save options.
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function save_file_contents( string $relative_path, string $contents, array $options = [] ): ServiceResult {
+	public function save_file_contents( string $relative_path, string $contents, array $options = [] ): ServiceResponse {
 		$safe_path = $this->sanitize_path( $relative_path );
 		$full_path = $this->base_path . $safe_path;
 
 		// Security and validation checks
 		if ( ! $this->is_path_safe( $full_path ) ) {
-			return ServiceResult::failure( __( 'Invalid path provided.', 'debug-suite' ), 'invalid_path' );
+			return ServiceResponse::failure( __( 'Invalid path provided.', 'debug-suite' ), 'invalid_path' );
 		}
 
 		if ( file_exists( $full_path ) && ! is_writable( $full_path ) ) {
-			return ServiceResult::failure( __( 'File is not writable.', 'debug-suite' ), 'file_not_writable' );
+			return ServiceResponse::failure( __( 'File is not writable.', 'debug-suite' ), 'file_not_writable' );
 		}
 
 		// Create backup if requested
@@ -233,10 +233,10 @@ class FileManagerService implements ServiceInterface {
 		// Write the file
 		$result = file_put_contents( $full_path, $contents );
 		if ( $result === false ) {
-			return ServiceResult::failure( __( 'Failed to save file.', 'debug-suite' ), 'file_save_failed' );
+			return ServiceResponse::failure( __( 'Failed to save file.', 'debug-suite' ), 'file_save_failed' );
 		}
 
-		return ServiceResult::success(
+		return ServiceResponse::success(
 			[
 				'bytes_written' => $result,
 				'backup_path' => $backup_path,
@@ -308,20 +308,20 @@ class FileManagerService implements ServiceInterface {
 	 * Create file backup.
 	 *
 	 * @param string $file_path Path to backup.
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	private function create_backup( string $file_path ): ServiceResult {
+	private function create_backup( string $file_path ): ServiceResponse {
 		if ( ! file_exists( $file_path ) ) {
-			return ServiceResult::failure( __( 'File does not exist for backup.', 'debug-suite' ), 'file_not_found' );
+			return ServiceResponse::failure( __( 'File does not exist for backup.', 'debug-suite' ), 'file_not_found' );
 		}
 
 		$backup_path = $file_path . '.backup.' . gmdate( 'Y-m-d-H-i-s' );
 		$result = copy( $file_path, $backup_path );
 
 		if ( ! $result ) {
-			return ServiceResult::failure( __( 'Failed to create backup.', 'debug-suite' ), 'backup_failed' );
+			return ServiceResponse::failure( __( 'Failed to create backup.', 'debug-suite' ), 'backup_failed' );
 		}
 
-		return ServiceResult::success( $backup_path );
+		return ServiceResponse::success( $backup_path );
 	}
 }

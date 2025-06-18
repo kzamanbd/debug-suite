@@ -7,7 +7,7 @@
 
 namespace DebugSuite\Services;
 
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -50,26 +50,26 @@ class SettingsService implements ServiceInterface {
 	 * Update debug settings in wp-config.php.
 	 *
 	 * @param array $settings The settings to update.
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function update_debug_settings( array $settings ): ServiceResult {
+	public function update_debug_settings( array $settings ): ServiceResponse {
 		// Validate input
 		if ( empty( $settings ) ) {
-			return ServiceResult::failure( __( 'No settings provided.', 'debug-suite' ), 'empty_settings' );
+			return ServiceResponse::failure( __( 'No settings provided.', 'debug-suite' ), 'empty_settings' );
 		}
 
 		if ( ! file_exists( $this->config_file_path ) ) {
-			return ServiceResult::failure( __( 'wp-config.php file not found.', 'debug-suite' ), 'config_file_not_found' );
+			return ServiceResponse::failure( __( 'wp-config.php file not found.', 'debug-suite' ), 'config_file_not_found' );
 		}
 
 		if ( ! is_writable( $this->config_file_path ) ) {
-			return ServiceResult::failure( __( 'wp-config.php file is not writable.', 'debug-suite' ), 'config_file_not_writable' );
+			return ServiceResponse::failure( __( 'wp-config.php file is not writable.', 'debug-suite' ), 'config_file_not_writable' );
 		}
 
 		// Validate settings
 		foreach ( $settings as $key => $value ) {
 			if ( ! array_key_exists( $key, $this->supported_constants ) ) {
-				return ServiceResult::failure(
+				return ServiceResponse::failure(
 					// translators: %s is the unsupported setting key.
 					sprintf( __( 'Unsupported setting: %s', 'debug-suite' ), $key ),
 					'invalid_setting'
@@ -77,7 +77,7 @@ class SettingsService implements ServiceInterface {
 			}
 
 			if ( ! in_array( $value, [ 'true', 'false' ], true ) ) {
-				return ServiceResult::failure(
+				return ServiceResponse::failure(
 					// translators: %s is the setting key that has an invalid value.
 					sprintf( __( 'Invalid value for %s. Must be "true" or "false".', 'debug-suite' ), $key ),
 					'invalid_value'
@@ -88,32 +88,32 @@ class SettingsService implements ServiceInterface {
 		// Read and update file
 		$content = file_get_contents( $this->config_file_path );
 		if ( $content === false ) {
-			return ServiceResult::failure( __( 'Failed to read wp-config.php file.', 'debug-suite' ), 'file_read_error' );
+			return ServiceResponse::failure( __( 'Failed to read wp-config.php file.', 'debug-suite' ), 'file_read_error' );
 		}
 
 		$updated_content = $this->update_constants( $content, $settings );
 
 		$result = file_put_contents( $this->config_file_path, $updated_content );
 		if ( $result === false ) {
-			return ServiceResult::failure( __( 'Failed to write wp-config.php file.', 'debug-suite' ), 'file_write_error' );
+			return ServiceResponse::failure( __( 'Failed to write wp-config.php file.', 'debug-suite' ), 'file_write_error' );
 		}
 
-		return ServiceResult::success( true );
+		return ServiceResponse::success( true );
 	}
 
 	/**
 	 * Get current debug settings from wp-config.php.
 	 *
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function get_current_debug_settings(): ServiceResult {
+	public function get_current_debug_settings(): ServiceResponse {
 		if ( ! file_exists( $this->config_file_path ) ) {
-			return ServiceResult::failure( __( 'wp-config.php file not found.', 'debug-suite' ), 'config_file_not_found' );
+			return ServiceResponse::failure( __( 'wp-config.php file not found.', 'debug-suite' ), 'config_file_not_found' );
 		}
 
 		$content = file_get_contents( $this->config_file_path );
 		if ( $content === false ) {
-			return ServiceResult::failure( __( 'Failed to read wp-config.php file.', 'debug-suite' ), 'file_read_error' );
+			return ServiceResponse::failure( __( 'Failed to read wp-config.php file.', 'debug-suite' ), 'file_read_error' );
 		}
 
 		$settings = [];
@@ -121,15 +121,15 @@ class SettingsService implements ServiceInterface {
 			$settings[ $constant ] = $this->extract_constant_value( $content, $constant, $default );
 		}
 
-		return ServiceResult::success( $settings );
+		return ServiceResponse::success( $settings );
 	}
 
 	/**
 	 * Reset debug settings to default values.
 	 *
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function reset_debug_settings(): ServiceResult {
+	public function reset_debug_settings(): ServiceResponse {
 		return $this->update_debug_settings( $this->supported_constants );
 	}
 

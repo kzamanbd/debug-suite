@@ -22,11 +22,11 @@ API Handling   Business Logic   File/DB Operations
 
 2. **Service Layer** (`/includes/Services/`)
    - Contains all business logic
-   - Returns consistent `ServiceResult` objects
+   - Returns consistent `ServiceResponse` objects
    - Handles validation, error handling, and data processing
    - **Testable and reusable**
 
-3. **ServiceResult Class** (`/includes/Core/ServiceResult.php`)
+3. **ServiceResponse Class** (`/includes/Core/ServiceResponse.php`)
    - Consistent response format for all services
    - Success/failure states with context data
    - Easy conversion to API responses
@@ -232,14 +232,14 @@ class FileLogsServiceTest extends TestCase {
 
 ```php
 class CustomFileLogsService extends FileLogsService {
-    public function get_log_entries(array $options = []): ServiceResult {
+    public function get_log_entries(array $options = []): ServiceResponse {
         // Add custom filtering logic
         $result = parent::get_log_entries($options);
         
         if ($result->is_success()) {
             $data = $result->get_data();
             $data['custom_field'] = $this->add_custom_processing($data['entries']);
-            return ServiceResult::success($data);
+            return ServiceResponse::success($data);
         }
         
         return $result;
@@ -255,7 +255,7 @@ The service layer architecture is designed to be highly testable without requiri
 
 1. **Isolated Unit Tests**: Services can be tested in isolation with mock dependencies
 2. **No WordPress Dependencies**: Unit tests don't require WordPress core functions
-3. **Predictable Results**: Services return consistent `ServiceResult` objects
+3. **Predictable Results**: Services return consistent `ServiceResponse` objects
 4. **Configurable Services**: Optional constructor parameters allow test configuration
 
 ### Service Unit Test Example
@@ -328,19 +328,19 @@ public function test_service_with_dependencies() {
 }
 ```
 
-### Testing ServiceResult
+### Testing ServiceResponse
 
-The `ServiceResult` class provides methods to check the success/failure state and access data:
+The `ServiceResponse` class provides methods to check the success/failure state and access data:
 
 ```php
 // Testing success results
-$result = ServiceResult::success(['key' => 'value']);
+$result = ServiceResponse::success(['key' => 'value']);
 $this->assertTrue($result->is_success());
 $this->assertFalse($result->is_failure());
 $this->assertEquals(['key' => 'value'], $result->get_data());
 
 // Testing failure results
-$result = ServiceResult::failure('Error message', 'error_code', ['context' => 'data']);
+$result = ServiceResponse::failure('Error message', 'error_code', ['context' => 'data']);
 $this->assertFalse($result->is_success());
 $this->assertTrue($result->is_failure());
 $this->assertEquals('Error message', $result->get_error_message());
@@ -356,13 +356,13 @@ For future services, follow this pattern:
 
 1. **Create Service Class**:
    - Implement `ServiceInterface`
-   - Return `ServiceResult` objects
+   - Return `ServiceResponse` objects
    - Handle all business logic
 
 2. **Update Controller**:
    - Inject service via constructor
    - Delegate to service methods
-   - Transform `ServiceResult` to REST response
+   - Transform `ServiceResponse` to REST response
 
 3. **Register with DI Container**:
    - Add to `ServicesServiceProvider`

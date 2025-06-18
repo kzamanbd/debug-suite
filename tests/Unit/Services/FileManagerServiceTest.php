@@ -11,7 +11,7 @@ namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Tests\Helpers\TestCase;
 use DebugSuite\Services\FileManagerService;
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 use ReflectionClass;
 
 /**
@@ -144,7 +144,7 @@ class FileManagerServiceTest extends TestCase {
 		$metadata = $method->invoke($this->service, $full_path);
 		
 		// Manually create the expected result
-		$success_result = ServiceResult::success([
+		$success_result = ServiceResponse::success([
 			'contents' => 'Test file 1 content',
 			'metadata' => $metadata,
 			'path' => 'test1.txt',

@@ -8,7 +8,7 @@
 namespace DebugSuite\Services;
 
 use DateTime;
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -40,20 +40,20 @@ class FileLogsService implements ServiceInterface {
 	 * Get log entries from the debug log file.
 	 *
 	 * @param array $options Parsing options (limit, level_filter).
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function get_log_entries( array $options = [] ): ServiceResult {
+	public function get_log_entries( array $options = [] ): ServiceResponse {
 		if ( ! file_exists( $this->log_file_path ) ) {
-			return ServiceResult::failure( __( 'Log file not found.', 'debug-suite' ), 'log_file_not_found' );
+			return ServiceResponse::failure( __( 'Log file not found.', 'debug-suite' ), 'log_file_not_found' );
 		}
 
 		if ( ! is_readable( $this->log_file_path ) ) {
-			return ServiceResult::failure( __( 'Log file is not readable.', 'debug-suite' ), 'log_file_not_readable' );
+			return ServiceResponse::failure( __( 'Log file is not readable.', 'debug-suite' ), 'log_file_not_readable' );
 		}
 
 		$entries = $this->parse_log_file( $options );
 
-		return ServiceResult::success(
+		return ServiceResponse::success(
 			[
 				'entries' => $entries,
 				'total' => count( $entries ),
@@ -65,41 +65,41 @@ class FileLogsService implements ServiceInterface {
 	/**
 	 * Clear the debug log file.
 	 *
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function clear_log_file(): ServiceResult {
+	public function clear_log_file(): ServiceResponse {
 		if ( ! file_exists( $this->log_file_path ) ) {
-			return ServiceResult::failure( __( 'Log file not found.', 'debug-suite' ), 'log_file_not_found' );
+			return ServiceResponse::failure( __( 'Log file not found.', 'debug-suite' ), 'log_file_not_found' );
 		}
 
 		if ( ! is_writable( $this->log_file_path ) ) {
-			return ServiceResult::failure( __( 'Log file is not writable.', 'debug-suite' ), 'log_file_not_writable' );
+			return ServiceResponse::failure( __( 'Log file is not writable.', 'debug-suite' ), 'log_file_not_writable' );
 		}
 
 		$result = file_put_contents( $this->log_file_path, '' );
 
 		if ( $result === false ) {
-			return ServiceResult::failure( __( 'Failed to clear log file.', 'debug-suite' ), 'log_clear_failed' );
+			return ServiceResponse::failure( __( 'Failed to clear log file.', 'debug-suite' ), 'log_clear_failed' );
 		}
 
-		return ServiceResult::success( true );
+		return ServiceResponse::success( true );
 	}
 
 	/**
 	 * Get log file statistics.
 	 *
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function get_log_file_stats(): ServiceResult {
+	public function get_log_file_stats(): ServiceResponse {
 		if ( ! file_exists( $this->log_file_path ) ) {
-			return ServiceResult::failure( __( 'Log file not found.', 'debug-suite' ), 'log_file_not_found' );
+			return ServiceResponse::failure( __( 'Log file not found.', 'debug-suite' ), 'log_file_not_found' );
 		}
 
 		$file_size = filesize( $this->log_file_path );
 		$entries = $this->parse_log_file();
 		$stats = $this->calculate_stats( $entries );
 
-		return ServiceResult::success(
+		return ServiceResponse::success(
 			[
 				'file_size' => $file_size,
 				'file_size_mb' => round( $file_size / 1024 / 1024, 2 ),

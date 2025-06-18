@@ -1,10 +1,12 @@
 import FileLogsSkeleton from '@/components/logs-skeleton';
+import Button from '@/components/ui/button';
 import SearchableSelect from '@/components/ui/searchable-select';
 import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { RefreshCwIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface LogEntry {
@@ -78,9 +80,11 @@ const FileLogs = () => {
                         onChange={(option) => setSelectedLevel(option?.value || 'administrator')}
                     />
 
-                    <button className="rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-300">
-                        {__('Clear Logs', 'debug-suite')}
-                    </button>
+                    <Button variant="light">{__('Clear Logs', 'debug-suite')}</Button>
+                    <Button variant="light" onClick={fetchLogs}>
+                        <RefreshCwIcon className="mr-2 inline-block h-4 w-4" />
+                        {__('Refresh', 'debug-suite')}
+                    </Button>
                 </div>
 
                 <div className="flex gap-3">

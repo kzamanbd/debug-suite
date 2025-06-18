@@ -1,7 +1,7 @@
 {
     "intelephense.environment.includePaths": ["../../../../"],
     "php.workspace.includePath": "../../../../",
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
     "phpcbf.standard": "${workspaceFolder}/phpcs.xml",
     "phpcbf.enable": true,
     "phpcbf.executablePath": "${workspaceFolder}/vendor/bin/phpcbf",
@@ -10,7 +10,8 @@
     "phpcbf.debug": false,
     "phpcs.enable": true,
     "[php]": {
-        "editor.defaultFormatter": "persoderlind.vscode-phpcbf"
+        "editor.defaultFormatter": "persoderlind.vscode-phpcbf",
+        "editor.formatOnSave": false
     },
     "[javascript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
@@ -35,15 +36,6 @@
         "source.fixAll.tslint": "always",
         "source.organizeImports": "explicit"
     },
-    "eslint.validate": [
-        "javascript",
-        "javascriptreact",
-        "typescript",
-        "typescriptreact"
-    ],
-    "cSpell.words": [
-        "ABSPATH",
-        "kses",
-        "phpunit"
-    ]
+    "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+    "cSpell.words": ["ABSPATH", "kses", "phpunit"]
 }

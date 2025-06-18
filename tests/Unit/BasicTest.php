@@ -42,8 +42,8 @@ class BasicTest extends TestCase {
 	 */
 	public function test_autoloader() {
 		$this->assertTrue( 
-			class_exists( 'DebugSuite\Core\ServiceResult' ), 
-			'ServiceResult class should be autoloadable'
+			class_exists( 'DebugSuite\Core\ServiceResponse' ), 
+			'ServiceResponse class should be autoloadable'
 		);
 		
 		$this->assertTrue( 

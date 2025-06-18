@@ -200,7 +200,7 @@ class TestCase extends YoastTestCase {
 	}
 	
 	/**
-	 * Assert that a ServiceResult is successful.
+	 * Assert that a ServiceResponse is successful.
 	 *
 	 * @param mixed  $result  Service result to check.
 	 * @param string $message Optional failure message.
@@ -209,12 +209,12 @@ class TestCase extends YoastTestCase {
 	protected function assert_service_result_success( $result, $message = '' ) {
 		$this->assertTrue(
 			$result->is_success(),
-			$message ?: 'Expected ServiceResult to be successful, but it failed with: ' . $result->get_error_message()
+			$message ?: 'Expected ServiceResponse to be successful, but it failed with: ' . $result->get_error_message()
 		);
 	}
 
 	/**
-	 * Assert that a ServiceResult is a failure.
+	 * Assert that a ServiceResponse is a failure.
 	 *
 	 * @param mixed  $result  Service result to check.
 	 * @param string $message Optional failure message.
@@ -223,12 +223,12 @@ class TestCase extends YoastTestCase {
 	protected function assert_service_result_failure( $result, $message = '' ) {
 		$this->assertTrue(
 			$result->is_failure(),
-			$message ?: 'Expected ServiceResult to be a failure, but it was successful'
+			$message ?: 'Expected ServiceResponse to be a failure, but it was successful'
 		);
 	}
 	
 	/**
-	 * Assert that a ServiceResult has a specific error code.
+	 * Assert that a ServiceResponse has a specific error code.
 	 *
 	 * @param mixed  $result        Service result to check.
 	 * @param string $expected_code Expected error code.

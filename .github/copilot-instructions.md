@@ -222,11 +222,11 @@ npm run lint
 
     - **Service Layer Location**: All business logic services are located in `DebugSuite\Services` namespace
     - **Service Interface**: All services implement `DebugSuite\Interfaces\ServiceInterface` marker interface
-    - **ServiceResult Pattern**: All service methods return `DebugSuite\Core\ServiceResult` objects for consistent error handling
+    - **ServiceResponse Pattern**: All service methods return `DebugSuite\Core\ServiceResponse` objects for consistent error handling
     - **Separation of Concerns**: REST controllers only handle HTTP requests/responses, services handle business logic
     - **Dependency Injection**: Services are registered as singletons in the PSR-11 container via `ServicesServiceProvider`
     - **Configuration Support**: Services accept configurable dependencies through container bindings (e.g., custom file paths)
-    - **Error Handling**: Use `ServiceResult::success($data)` and `ServiceResult::failure($message, $code)` for consistent responses
+    - **Error Handling**: Use `ServiceResponse::success($data)` and `ServiceResponse::failure($message, $code)` for consistent responses
     - **Service Registration**: Add new services to `ServicesServiceProvider::$provides` array and register in `register()` method
     - **Implemented Services**: `FileLogsService` (debug log operations), `SettingsService` (wp-config.php management), `FileManagerService` (file system operations)
     - **Service Dependencies**: Services accept optional constructor parameters for configuration (log file paths, base directories, config files)
@@ -259,7 +259,7 @@ When implementing new features in Debug Suite, follow the Service Layer Pattern 
 
 namespace DebugSuite\Services;
 
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -293,12 +293,12 @@ class ExampleService implements ServiceInterface {
 	 * Process input data.
 	 *
 	 * @param array $input Input data to process.
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function process_data( array $input ): ServiceResult {
+	public function process_data( array $input ): ServiceResponse {
 		// Validate required fields
 		if ( empty( $input['required_field'] ) ) {
-			return ServiceResult::failure(
+			return ServiceResponse::failure(
 				__( 'Required field is missing.', 'debug-suite' ),
 				'validation_error'
 			);
@@ -307,7 +307,7 @@ class ExampleService implements ServiceInterface {
 		// Process the data
 		$result = $this->do_business_logic( $input );
 
-		return ServiceResult::success([
+		return ServiceResponse::success([
 			'processed_data' => $result,
 			'timestamp'      => current_time( 'mysql' ),
 			'config_used'    => $this->config_path,
@@ -466,11 +466,11 @@ class ExampleController extends RestController {
   - `SettingsService`: wp-config.php management only
   - `FileManagerService`: File system operations only
 
-- **Return ServiceResult**: Always return `ServiceResult` objects, never throw exceptions to controllers
+- **Return ServiceResponse**: Always return `ServiceResponse` objects, never throw exceptions to controllers
   ```php
   // ✅ Good - From FileLogsService
   if ( ! file_exists( $this->log_file_path ) ) {
-      return ServiceResult::failure(
+      return ServiceResponse::failure(
           __( 'Debug log file not found.', 'debug-suite' ),
           'file_not_found',
           [ 'path' => $this->log_file_path ]
@@ -486,12 +486,12 @@ class ExampleController extends RestController {
 - **Validate Input**: Perform all business validation in the service layer
   ```php
   // Example from SettingsService
-  public function update_debug_settings( array $settings ): ServiceResult {
+  public function update_debug_settings( array $settings ): ServiceResponse {
       $valid_keys = [ 'WP_DEBUG', 'WP_DEBUG_LOG', 'WP_DEBUG_DISPLAY' ];
       
       foreach ( $settings as $key => $value ) {
           if ( ! in_array( $key, $valid_keys, true ) ) {
-              return ServiceResult::failure(
+              return ServiceResponse::failure(
                   sprintf( __( 'Invalid setting key: %s', 'debug-suite' ), $key ),
                   'invalid_setting',
                   [ 'key' => $key, 'valid_keys' => $valid_keys ]
@@ -522,9 +522,9 @@ class ExampleController extends RestController {
    *     @type bool $include_hidden Whether to include hidden files. Default false.
    *     @type int  $max_depth     Maximum directory depth. Default 3.
    * }
-   * @return ServiceResult Success with tree data or failure with error message.
+   * @return ServiceResponse Success with tree data or failure with error message.
    */
-  public function get_directory_tree( string $relative_path = '', array $options = [] ): ServiceResult
+  public function get_directory_tree( string $relative_path = '', array $options = [] ): ServiceResponse
   ```
 
 ### 3. **API Controller Best Practices**
@@ -577,10 +577,10 @@ class ExampleController extends RestController {
   ```
 
 - **Service Delegation**: Delegate all business logic to service layer
-- **Response Transformation**: Convert `ServiceResult` to appropriate HTTP responses
+- **Response Transformation**: Convert `ServiceResponse` to appropriate HTTP responses
   ```php
   // Helper method for consistent response transformation
-  private function transform_service_result( ServiceResult $result ): WP_REST_Response|WP_Error {
+  private function transform_service_result( ServiceResponse $result ): WP_REST_Response|WP_Error {
       if ( $result->is_failure() ) {
           $status_code = match( $result->get_error_code() ) {
               'validation_error' => 400,
@@ -940,7 +940,7 @@ class ExampleControllerTest extends DebugSuiteTestCase {
     public function test_process_request() {
         // Mock service response
         $this->service->method('process_data')
-            ->willReturn(ServiceResult::success(['key' => 'value']));
+            ->willReturn(ServiceResponse::success(['key' => 'value']));
             
         // Create request
         $request = new WP_REST_Request('POST', '/debug-suite/v1/example');
@@ -999,7 +999,7 @@ tests/install-wp-tests.sh wordpress_test root password localhost latest
    ```php
    $mock_service = $this->createMock(ExampleService::class);
    $mock_service->method('process_data')
-       ->willReturn(ServiceResult::success(['result' => 'data']));
+       ->willReturn(ServiceResponse::success(['result' => 'data']));
    $controller = new ExampleController($mock_service);
    ```
 

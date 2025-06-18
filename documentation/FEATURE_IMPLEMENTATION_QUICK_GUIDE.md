@@ -8,7 +8,7 @@ This document provides a step-by-step guide for implementing new features in the
 
 1. **Create Service Class** (`/includes/Services/`)
    - Implement `ServiceInterface`
-   - Return `ServiceResult` objects
+   - Return `ServiceResponse` objects
    - Accept configuration via constructor
    - Add comprehensive PHPDoc
 
@@ -21,7 +21,7 @@ This document provides a step-by-step guide for implementing new features in the
    - Extend `RestController` (which already implements `Hookable`)
    - Inject service via constructor
    - Handle only HTTP concerns
-   - Transform `ServiceResult` to REST responses
+   - Transform `ServiceResponse` to REST responses
 
 4. **Register Controller** (if new)
    - Add to `ServicesServiceProvider`'s `$provides` array
@@ -38,7 +38,7 @@ declare(strict_types=1);
 
 namespace DebugSuite\Services;
 
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 
 /**
@@ -63,13 +63,13 @@ class ExampleService implements ServiceInterface
      * Process data according to business rules.
      *
      * @param array $input Input data to process.
-     * @return ServiceResult Success with processed data or failure with error.
+     * @return ServiceResponse Success with processed data or failure with error.
      */
-    public function process_data(array $input): ServiceResult
+    public function process_data(array $input): ServiceResponse
     {
         // Input validation
         if (empty($input['required_field'])) {
-            return ServiceResult::failure(
+            return ServiceResponse::failure(
                 __('Required field is missing.', 'debug-suite'),
                 'validation_error',
                 ['field' => 'required_field']
@@ -80,13 +80,13 @@ class ExampleService implements ServiceInterface
             // Business logic
             $result = $this->perform_business_logic($input);
             
-            return ServiceResult::success([
+            return ServiceResponse::success([
                 'data' => $result,
                 'timestamp' => current_time('mysql'),
                 'config_used' => $this->config_path,
             ]);
         } catch (\Exception $e) {
-            return ServiceResult::failure(
+            return ServiceResponse::failure(
                 sprintf(__('Processing failed: %s', 'debug-suite'), $e->getMessage()),
                 'processing_error',
                 ['exception' => $e->getMessage(), 'input' => $input]
@@ -206,10 +206,10 @@ class ExampleController extends RestController
     /**
      * Transform service result to HTTP response.
      *
-     * @param ServiceResult $result The service result.
+     * @param ServiceResponse $result The service result.
      * @return WP_REST_Response|WP_Error Response object or error.
      */
-    private function transform_service_result(ServiceResult $result): WP_REST_Response|WP_Error
+    private function transform_service_result(ServiceResponse $result): WP_REST_Response|WP_Error
     {
         if ($result->is_failure()) {
             $status_code = match($result->get_error_code()) {
@@ -334,7 +334,7 @@ declare(strict_types=1);
 namespace DebugSuite\Tests\API;
 
 use DebugSuite\API\ExampleController;
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Services\ExampleService;
 use WP_REST_Request;
 use WP_UnitTestCase;
@@ -362,7 +362,7 @@ class ExampleControllerTest extends WP_UnitTestCase
             ->expects($this->once())
             ->method('process_data')
             ->with(['required_field' => 'test', 'optional_field' => null])
-            ->willReturn(ServiceResult::success(['processed' => true]));
+            ->willReturn(ServiceResponse::success(['processed' => true]));
 
         // Create request
         $request = new WP_REST_Request('POST');
@@ -382,7 +382,7 @@ class ExampleControllerTest extends WP_UnitTestCase
         $this->mock_service
             ->expects($this->once())
             ->method('process_data')
-            ->willReturn(ServiceResult::failure('Validation failed', 'validation_error'));
+            ->willReturn(ServiceResponse::failure('Validation failed', 'validation_error'));
 
         // Create request with missing required field
         $request = new WP_REST_Request('POST');
@@ -404,7 +404,7 @@ class ExampleControllerTest extends WP_UnitTestCase
 ```php
 // Validation errors
 if (!$this->is_valid_input($input)) {
-    return ServiceResult::failure(
+    return ServiceResponse::failure(
         __('Invalid input provided.', 'debug-suite'),
         'validation_error',
         ['input' => $input, 'requirements' => $this->get_requirements()]
@@ -413,7 +413,7 @@ if (!$this->is_valid_input($input)) {
 
 // File system errors
 if (!file_exists($file_path)) {
-    return ServiceResult::failure(
+    return ServiceResponse::failure(
         sprintf(__('File not found: %s', 'debug-suite'), $file_path),
         'file_not_found',
         ['path' => $file_path, 'checked_at' => current_time('mysql')]
@@ -424,7 +424,7 @@ if (!file_exists($file_path)) {
 try {
     $result = $this->dangerous_operation();
 } catch (\Exception $e) {
-    return ServiceResult::failure(
+    return ServiceResponse::failure(
         sprintf(__('Operation failed: %s', 'debug-suite'), $e->getMessage()),
         'operation_failed',
         ['exception' => $e->getMessage(), 'trace' => $e->getTraceAsString()]
@@ -452,7 +452,7 @@ private function get_status_code(string $error_code): int
 ## Best Practices Summary
 
 1. **Services are stateless** - No instance variables that change between method calls
-2. **Services return ServiceResult** - Never throw exceptions to controllers
+2. **Services return ServiceResponse** - Never throw exceptions to controllers
 3. **Controllers are thin** - Only HTTP request/response handling
 4. **Validate early** - Input validation at service entry points
 5. **Use dependency injection** - Accept dependencies via constructor

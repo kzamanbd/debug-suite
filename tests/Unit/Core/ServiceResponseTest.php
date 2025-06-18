@@ -1,60 +1,60 @@
 <?php
 /**
- * Unit tests for ServiceResult class.
+ * Unit tests for ServiceResponse class.
  *
  * @package DebugSuite\Tests\Unit\Core
  * @group core
- * @group service-result
+ * @group service-response
  */
 
 namespace DebugSuite\Tests\Unit\Core;
 
 use DebugSuite\Tests\Helpers\TestCase;
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 
 /**
- * Test ServiceResult functionality.
+ * Test ServiceResponse functionality.
  */
-class ServiceResultTest extends TestCase {
+class ServiceResponseTest extends TestCase {
 
 	/**
-	 * Test successful ServiceResult creation.
+	 * Test successful ServiceResponse creation.
 	 *
-	 * @covers \DebugSuite\Core\ServiceResult::success
-	 * @covers \DebugSuite\Core\ServiceResult::is_success
-	 * @covers \DebugSuite\Core\ServiceResult::is_failure
-	 * @covers \DebugSuite\Core\ServiceResult::get_data
+	 * @covers \DebugSuite\Core\ServiceResponse::success
+	 * @covers \DebugSuite\Core\ServiceResponse::is_success
+	 * @covers \DebugSuite\Core\ServiceResponse::is_failure
+	 * @covers \DebugSuite\Core\ServiceResponse::get_data
 	 */
 	public function test_successful_service_result() {
 		$data = [ 'key' => 'value' ];
-		$result = ServiceResult::success( $data );
+		$result = ServiceResponse::success( $data );
 		
-		$this->assertTrue( $result->is_success(), 'ServiceResult should be successful' );
-		$this->assertFalse( $result->is_failure(), 'ServiceResult should not be a failure' );
+		$this->assertTrue( $result->is_success(), 'ServiceResponse should be successful' );
+		$this->assertFalse( $result->is_failure(), 'ServiceResponse should not be a failure' );
 		$this->assertEquals( $data, $result->get_data(), 'Data should match what was passed in' );
 		$this->assertNull( $result->get_error_message(), 'Error message should be null for success' );
 		$this->assertNull( $result->get_error_code(), 'Error code should be null for success' );
 	}
 
 	/**
-	 * Test failed ServiceResult creation.
+	 * Test failed ServiceResponse creation.
 	 *
-	 * @covers \DebugSuite\Core\ServiceResult::failure
-	 * @covers \DebugSuite\Core\ServiceResult::is_success
-	 * @covers \DebugSuite\Core\ServiceResult::is_failure
-	 * @covers \DebugSuite\Core\ServiceResult::get_error_message
-	 * @covers \DebugSuite\Core\ServiceResult::get_error_code
-	 * @covers \DebugSuite\Core\ServiceResult::get_error_context
+	 * @covers \DebugSuite\Core\ServiceResponse::failure
+	 * @covers \DebugSuite\Core\ServiceResponse::is_success
+	 * @covers \DebugSuite\Core\ServiceResponse::is_failure
+	 * @covers \DebugSuite\Core\ServiceResponse::get_error_message
+	 * @covers \DebugSuite\Core\ServiceResponse::get_error_code
+	 * @covers \DebugSuite\Core\ServiceResponse::get_error_context
 	 */
 	public function test_failed_service_result() {
 		$message = 'Test error message';
 		$code = 'test_error';
 		$context = [ 'debug' => 'info' ];
 		
-		$result = ServiceResult::failure( $message, $code, $context );
+		$result = ServiceResponse::failure( $message, $code, $context );
 		
-		$this->assertFalse( $result->is_success(), 'ServiceResult should not be successful' );
-		$this->assertTrue( $result->is_failure(), 'ServiceResult should be a failure' );
+		$this->assertFalse( $result->is_success(), 'ServiceResponse should not be successful' );
+		$this->assertTrue( $result->is_failure(), 'ServiceResponse should be a failure' );
 		$this->assertEquals( $message, $result->get_error_message(), 'Error message should match' );
 		$this->assertEquals( $code, $result->get_error_code(), 'Error code should match' );
 		$this->assertEquals( $context, $result->get_error_context(), 'Error context should match' );
@@ -62,13 +62,13 @@ class ServiceResultTest extends TestCase {
 	}
 	
 	/**
-	 * Test converting ServiceResult to array.
+	 * Test converting ServiceResponse to array.
 	 *
-	 * @covers \DebugSuite\Core\ServiceResult::to_array
+	 * @covers \DebugSuite\Core\ServiceResponse::to_array
 	 */
 	public function test_to_array_success() {
 		$data = [ 'key' => 'value', 'nested' => ['foo' => 'bar'] ];
-		$result = ServiceResult::success( $data );
+		$result = ServiceResponse::success( $data );
 		
 		$expected = [
 			'success' => true,
@@ -79,16 +79,16 @@ class ServiceResultTest extends TestCase {
 	}
 	
 	/**
-	 * Test converting failed ServiceResult to array.
+	 * Test converting failed ServiceResponse to array.
 	 *
-	 * @covers \DebugSuite\Core\ServiceResult::to_array
+	 * @covers \DebugSuite\Core\ServiceResponse::to_array
 	 */
 	public function test_to_array_failure() {
 		$message = 'Test error message';
 		$code = 'test_error';
 		$context = [ 'debug' => 'info' ];
 		
-		$result = ServiceResult::failure( $message, $code, $context );
+		$result = ServiceResponse::failure( $message, $code, $context );
 		
 		$expected = [
 			'success' => false,
@@ -105,11 +105,11 @@ class ServiceResultTest extends TestCase {
 	/**
 	 * Test getting data with default.
 	 *
-	 * @covers \DebugSuite\Core\ServiceResult::get_data_or
+	 * @covers \DebugSuite\Core\ServiceResponse::get_data_or
 	 */
 	public function test_get_data_or_with_success() {
 		$data = ['status' => 'complete'];
-		$result = ServiceResult::success( $data );
+		$result = ServiceResponse::success( $data );
 		
 		$this->assertEquals($data, $result->get_data_or('default'), 'Should return data for success');
 	}
@@ -117,34 +117,34 @@ class ServiceResultTest extends TestCase {
 	/**
 	 * Test getting data with default when failure.
 	 *
-	 * @covers \DebugSuite\Core\ServiceResult::get_data_or
+	 * @covers \DebugSuite\Core\ServiceResponse::get_data_or
 	 */
 	public function test_get_data_or_with_failure() {
 		$default = 'default value';
-		$result = ServiceResult::failure( 'Error occurred', 'error_code' );
+		$result = ServiceResponse::failure( 'Error occurred', 'error_code' );
 		
 		$this->assertEquals($default, $result->get_data_or($default), 'Should return default for failure');
 	}
 	
 	/**
-	 * Test ServiceResult with empty data.
+	 * Test ServiceResponse with empty data.
 	 *
-	 * @covers \DebugSuite\Core\ServiceResult::success
+	 * @covers \DebugSuite\Core\ServiceResponse::success
 	 */
 	public function test_success_with_empty_data() {
-		$result = ServiceResult::success();
+		$result = ServiceResponse::success();
 		
 		$this->assertTrue( $result->is_success(), 'Should be successful with empty data' );
 		$this->assertNull( $result->get_data(), 'Data should be null when not provided' );
 	}
 
 	/**
-	 * Test ServiceResult with minimal failure data.
+	 * Test ServiceResponse with minimal failure data.
 	 *
-	 * @covers \DebugSuite\Core\ServiceResult::failure
+	 * @covers \DebugSuite\Core\ServiceResponse::failure
 	 */
 	public function test_failure_with_minimal_data() {
-		$result = ServiceResult::failure( 'Error' );
+		$result = ServiceResponse::failure( 'Error' );
 		
 		$this->assertTrue( $result->is_failure(), 'Should be a failure' );
 		$this->assertEquals( 'Error', $result->get_error_message(), 'Error message should match' );

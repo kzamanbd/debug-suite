@@ -9,7 +9,7 @@ namespace DebugSuite\Tests\Helpers;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -39,29 +39,29 @@ class MockFactory {
 	}
 
 	/**
-	 * Create a ServiceResult that returns success.
+	 * Create a ServiceResponse that returns success.
 	 *
 	 * @param array $data Optional data to return.
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
-	public function create_successful_service_result( array $data = [] ): ServiceResult {
-		return ServiceResult::success( $data );
+	public function create_successful_service_result( array $data = [] ): ServiceResponse {
+		return ServiceResponse::success( $data );
 	}
 
 	/**
-	 * Create a ServiceResult that returns failure.
+	 * Create a ServiceResponse that returns failure.
 	 *
 	 * @param string $error_message Error message.
 	 * @param string $error_code    Error code.
 	 * @param array  $context       Additional context.
-	 * @return ServiceResult
+	 * @return ServiceResponse
 	 */
 	public function create_failed_service_result( 
 		string $error_message = 'Test error', 
 		string $error_code = 'test_error',
 		array $context = []
-	): ServiceResult {
-		return ServiceResult::failure( $error_message, $error_code, $context );
+	): ServiceResponse {
+		return ServiceResponse::failure( $error_message, $error_code, $context );
 	}
 
 	/**
@@ -73,14 +73,14 @@ class MockFactory {
 		// Create a minimal implementation using anonymous class
 		return new class {
 			public function get_log_entries( array $options = [] ) {
-				return ServiceResult::success([
+				return ServiceResponse::success([
 					'entries' => [],
 					'total' => 0,
 				]);
 			}
 			
 			public function get_log_file_stats() {
-				return ServiceResult::success([
+				return ServiceResponse::success([
 					'size' => 0,
 					'modified' => current_time('mysql'),
 					'exists' => true,
@@ -88,7 +88,7 @@ class MockFactory {
 			}
 			
 			public function clear_log_file() {
-				return ServiceResult::success();
+				return ServiceResponse::success();
 			}
 		};
 	}
@@ -102,21 +102,21 @@ class MockFactory {
 		// Create a minimal implementation using anonymous class
 		return new class {
 			public function get_directory_tree( string $path = '', array $options = [] ) {
-				return ServiceResult::success([
+				return ServiceResponse::success([
 					'path' => $path,
 					'files' => [],
 				]);
 			}
 			
 			public function get_file_contents( string $path ) {
-				return ServiceResult::success([
+				return ServiceResponse::success([
 					'content' => '',
 					'path' => $path,
 				]);
 			}
 			
 			public function save_file_contents( string $path, string $content, array $options = [] ) {
-				return ServiceResult::success();
+				return ServiceResponse::success();
 			}
 		};
 	}
@@ -130,7 +130,7 @@ class MockFactory {
 		// Create a minimal implementation using anonymous class
 		return new class {
 			public function get_debug_settings() {
-				return ServiceResult::success([
+				return ServiceResponse::success([
 					'WP_DEBUG' => true,
 					'WP_DEBUG_LOG' => true,
 					'WP_DEBUG_DISPLAY' => false,
@@ -138,11 +138,11 @@ class MockFactory {
 			}
 			
 			public function update_debug_settings( array $settings ) {
-				return ServiceResult::success();
+				return ServiceResponse::success();
 			}
 			
 			public function reset_debug_settings() {
-				return ServiceResult::success();
+				return ServiceResponse::success();
 			}
 		};
 	}

@@ -19,7 +19,7 @@
 
 - **Controllers are thin**: Handle only HTTP request/response concerns
 - **Business logic in services**: All domain logic implemented in dedicated service classes
-- **Consistent error handling**: Services return `ServiceResult` objects, controllers transform to HTTP responses
+- **Consistent error handling**: Services return `ServiceResponse` objects, controllers transform to HTTP responses
 - **Required dependency injection**: Controllers receive service instances via required constructor parameters
 - **Strong typing**: All service dependencies are strongly typed and non-nullable
 
@@ -80,7 +80,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
     public function test_get_logs_endpoint() {
         // Mock service response
         $this->service->method('get_log_entries')
-            ->willReturn(ServiceResult::success(['logs' => []]));
+            ->willReturn(ServiceResponse::success(['logs' => []]));
         
         // Create and execute request
         $request = new WP_REST_Request('GET', '/debug-suite/v1/logs');
@@ -115,22 +115,22 @@ When testing controllers, the service layer is typically mocked to isolate contr
 ```php
 // Mock service response for success case
 $this->service->method('get_log_entries')
-    ->willReturn(ServiceResult::success(['data' => 'value']));
+    ->willReturn(ServiceResponse::success(['data' => 'value']));
 
 // Mock service response for error case
 $this->service->method('clear_logs')
-    ->willReturn(ServiceResult::failure('Error message', 'error_code'));
+    ->willReturn(ServiceResponse::failure('Error message', 'error_code'));
 ```
 
 ### Testing Response Transformation
 
-Controllers should transform `ServiceResult` objects into appropriate WordPress responses:
+Controllers should transform `ServiceResponse` objects into appropriate WordPress responses:
 
 ```php
 public function test_error_transformation() {
     // Mock service error
     $this->service->method('get_log_entries')
-        ->willReturn(ServiceResult::failure('Not found', 'not_found'));
+        ->willReturn(ServiceResponse::failure('Not found', 'not_found'));
     
     // Execute request
     $request = new WP_REST_Request('GET', '/debug-suite/v1/logs');

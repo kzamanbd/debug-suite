@@ -35,7 +35,7 @@ Create a new class in the `includes/Services` directory:
 
 namespace DebugSuite\Services;
 
-use DebugSuite\Core\ServiceResult;
+use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 use DebugSuite\Interfaces\Hookable;
 
@@ -43,8 +43,8 @@ class ExampleDebugService implements ServiceInterface, Hookable {
     private string $name = 'example';
     private string $description = 'Example debug service.';
 
-    public function get_debug_data(): ServiceResult {
-        return ServiceResult::success([
+    public function get_debug_data(): ServiceResponse {
+        return ServiceResponse::success([
             'example' => 'data'
         ]);
     }
@@ -89,7 +89,7 @@ $service_manager->register_providers([
 ## Best Practices with the New Architecture
 
 1. **Service Layer Pattern**: Follow the service layer pattern for separation of concerns
-2. **Return ServiceResult**: Services should return `ServiceResult` objects for consistent error handling
+2. **Return ServiceResponse**: Services should return `ServiceResponse` objects for consistent error handling
 3. **PSR-11 Container**: Use the PSR-11 container for dependency injection
 4. **Autowiring**: Take advantage of autowiring for automatic dependency resolution
 5. **Configuration**: Accept configuration through constructor parameters for testability
