@@ -14,6 +14,8 @@ use DebugSuite\Core\Container\Definitions\DefinitionInterface;
 use DebugSuite\Core\Container\Definitions\FactoryDefinition;
 use DebugSuite\Core\Container\Definitions\AutowiredDefinition;
 use DebugSuite\Core\Container\Definitions\ValueDefinition;
+use DebugSuite\Core\Container\Definitions\ConfigDefinition;
+use DebugSuite\Core\Container\Definitions\DecoratorDefinition;
 use ReflectionClass;
 use ReflectionException;
 
@@ -82,6 +84,15 @@ class Container implements ContainerInterface {
 	 * @var bool
 	 */
 	private bool $autowiring_enabled = true;
+
+	/**
+	 * Tagged services registry.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @var array<string, array<string>>
+	 */
+	private array $tagged_services = [];
 
 	/**
 	 * Private constructor to prevent direct instantiation.
@@ -214,6 +225,36 @@ class Container implements ContainerInterface {
 	 */
 	public function object( string $class_name ): AutowiredDefinition {
 		return new AutowiredDefinition( $class_name, true );
+	}
+
+	/**
+	 * Create a configuration definition.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param array $configurations Environment-specific configurations.
+	 * @param mixed $default_config Default configuration.
+	 * @param bool  $singleton      Whether this is a singleton.
+	 *
+	 * @return ConfigDefinition
+	 */
+	public function config( array $configurations = [], $default_config = null, bool $singleton = false ): ConfigDefinition {
+		return new ConfigDefinition( $configurations, $default_config, $singleton );
+	}
+
+	/**
+	 * Create a decorator definition.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $decorator_class   The decorator class name.
+	 * @param string $decorated_service The service to decorate.
+	 * @param bool   $singleton         Whether this is a singleton.
+	 *
+	 * @return DecoratorDefinition
+	 */
+	public function decorate( string $decorator_class, string $decorated_service, bool $singleton = false ): DecoratorDefinition {
+		return new DecoratorDefinition( $decorator_class, $decorated_service, $singleton );
 	}
 
 	/**
@@ -415,6 +456,106 @@ class Container implements ContainerInterface {
 	 */
 	public function is_autowiring_enabled(): bool {
 		return $this->autowiring_enabled;
+	}
+
+	/**
+	 * Tag a service with a specific tag.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $service_id The service identifier.
+	 * @param string $tag        The tag to apply.
+	 *
+	 * @return void
+	 */
+	public function tag( string $service_id, string $tag ): void {
+		if ( ! isset( $this->tagged_services[ $tag ] ) ) {
+			$this->tagged_services[ $tag ] = [];
+		}
+
+		if ( ! in_array( $service_id, $this->tagged_services[ $tag ], true ) ) {
+			$this->tagged_services[ $tag ][] = $service_id;
+		}
+	}
+
+	/**
+	 * Get all services tagged with a specific tag.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $tag The tag to search for.
+	 *
+	 * @return array<mixed> Array of resolved service instances.
+	 */
+	public function tagged( string $tag ): array {
+		if ( ! isset( $this->tagged_services[ $tag ] ) ) {
+			return [];
+		}
+
+		$services = [];
+		foreach ( $this->tagged_services[ $tag ] as $service_id ) {
+			if ( $this->has( $service_id ) ) {
+				$services[] = $this->resolve( $service_id );
+			}
+		}
+
+		return $services;
+	}
+
+	/**
+	 * Get all tags for a service.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $service_id The service identifier.
+	 *
+	 * @return array<string> Array of tags.
+	 */
+	public function get_tags( string $service_id ): array {
+		$tags = [];
+		foreach ( $this->tagged_services as $tag => $services ) {
+			if ( in_array( $service_id, $services, true ) ) {
+				$tags[] = $tag;
+			}
+		}
+
+		return $tags;
+	}
+
+	/**
+	 * Add multiple definitions from an array (PHP-DI style).
+	 *
+	 * Supports PHP-DI compatible definition arrays for bulk service configuration.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param array $definitions Associative array of service_id => definition pairs.
+	 *
+	 * @return void
+	 *
+	 * @example
+	 * ```php
+	 * $container->add_definitions([
+	 *     MyService::class => DI::autowire(),
+	 *     'config.debug' => DI::value(true),
+	 *     LoggerInterface::class => DI::factory(function() {
+	 *         return new FileLogger();
+	 *     })
+	 * ]);
+	 * ```
+	 */
+	public function add_definitions( array $definitions ): void {
+		foreach ( $definitions as $id => $definition ) {
+			if ( $definition instanceof DefinitionInterface ) {
+				$this->set( $id, $definition );
+			} elseif ( is_callable( $definition ) ) {
+				$this->set( $id, new FactoryDefinition( $definition ) );
+			} elseif ( is_string( $definition ) && class_exists( $definition ) ) {
+				$this->set( $id, new AutowiredDefinition( $definition ) );
+			} else {
+				$this->set( $id, new ValueDefinition( $definition ) );
+			}
+		}
 	}
 
 	/**

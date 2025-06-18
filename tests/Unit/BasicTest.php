@@ -50,5 +50,10 @@ class BasicTest extends TestCase {
 			class_exists( 'DebugSuite\Core\Container\Container' ),
 			'Container class should be autoloadable'
 		);
+		
+		$this->assertTrue( 
+			class_exists( 'DebugSuite\Core\Container\Definitions\AutowiredDefinition' ),
+			'AutowiredDefinition class should be autoloadable'
+		);
 	}
 }

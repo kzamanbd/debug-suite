@@ -151,11 +151,17 @@ npm run lint
 2. **PHP-DI Style Definition System**:
 
     - **AutowiredDefinition**: Use for automatic dependency resolution with reflection-based injection
+      - Advanced parameter injection with static overrides, dynamic callbacks, and environment-aware configuration
+      - Multiple parameter resolution strategies with priority-based fallback system
+      - Enhanced error messages with actionable suggestions for parameter resolution failures
+      - Convenience methods for bulk parameter setting and introspection
     - **FactoryDefinition**: Use for factory-based service creation with callable factories
     - **ValueDefinition**: Use for static values and configuration data
+    - **ConfigDefinition**: Use for environment-aware configuration management
+    - **DecoratorDefinition**: Use for service decoration patterns
     - **Definition Interface**: All definitions implement `DefinitionInterface` with `resolve()` method
     - **Singleton Support**: Definitions support both singleton and transient service lifetimes
-    - **Parameter Injection**: Support for constructor parameter injection in autowired definitions
+    - **Parameter Injection**: Comprehensive constructor parameter injection with multiple strategies
 
 3. **Enhanced Service Provider System**:
 
@@ -240,7 +246,92 @@ npm run lint
     - **Service Manager**: Use `debug_suite_service_manager()` to get service manager instance
     - **Main Instance**: Use `debug_suite()` to get main plugin instance
     - **DI Definitions**: Use helper functions like `debug_suite_autowire()`, `debug_suite_factory()` for creating definitions
+    - **Advanced Autowiring**: Use `debug_suite_autowire_with_params()` for quick parameter injection
+    - **Environment Autowiring**: Use `debug_suite_autowire_env()` for environment-specific service configuration
+    - **Configuration Management**: Use `debug_suite_config()` for environment-aware configuration
+    - **Service Decoration**: Use `debug_suite_decorate()` for decorator pattern implementation
+    - **Tagged Services**: Use `debug_suite_tagged()` to retrieve services by tag
     - **Legacy Compatibility**: All legacy helper functions remain functional for backward compatibility
+
+## Advanced Dependency Injection Patterns
+
+### AutowiredDefinition Parameter Injection
+
+The `AutowiredDefinition` class supports multiple parameter injection strategies with priority-based resolution:
+
+1. **Environment-Specific Parameters** (highest priority)
+   ```php
+   $definition = $container->autowire(DatabaseService::class)
+       ->environment_parameters('development', [
+           'host' => 'localhost',
+           'debug' => true
+       ])
+       ->environment_parameters('production', [
+           'host' => 'prod-db.example.com',
+           'debug' => false
+       ]);
+   ```
+
+2. **Dynamic Parameter Callbacks**
+   ```php
+   $definition = $container->autowire(EmailService::class)
+       ->constructor_parameter_callback('api_key', function($resolver) {
+           $config = $resolver(ConfigService::class);
+           return $config->get('email.api_key');
+       });
+   ```
+
+3. **Static Parameter Overrides**
+   ```php
+   // Single parameter
+   $definition = $container->autowire(LoggerService::class)
+       ->constructor_parameter('log_level', 'debug');
+   
+   // Multiple parameters
+   $definition = $container->autowire(LoggerService::class)
+       ->constructor_parameters([
+           'log_level' => 'debug',
+           'log_file' => '/var/log/app.log'
+       ]);
+   ```
+
+4. **Type-Based Dependency Injection** (automatic)
+5. **Default Parameter Values** (from constructor)
+6. **Enhanced Error Messages** (with actionable suggestions)
+
+### Environment-Aware Services
+
+Services automatically adapt to WordPress environment using:
+- `WP_ENVIRONMENT_TYPE` constant (WordPress 5.5+)
+- `WP_DEBUG` constant (fallback)
+- Default to 'production' if neither is set
+
+Supported environments: `development`, `staging`, `production`, `testing`
+
+### Convenience Helper Functions
+
+```php
+// Quick autowiring with parameters
+$definition = debug_suite_autowire_with_params(LoggerService::class, [
+    'log_level' => 'debug',
+    'log_file' => '/var/log/app.log'
+], true); // singleton
+
+// Environment-aware autowiring
+$definition = debug_suite_autowire_env(DatabaseService::class, [
+    'development' => ['host' => 'localhost', 'debug' => true],
+    'production' => ['host' => 'prod-db.com', 'debug' => false]
+], true); // singleton
+
+// Configuration management
+$config = debug_suite_config([
+    'development' => ['api_url' => 'https://dev-api.com'],
+    'production' => ['api_url' => 'https://api.com']
+]);
+
+// Service decoration
+$decorated = debug_suite_decorate(CachedEmailService::class, EmailService::class, true);
+```
 
 ## Feature Implementation Guidelines
 

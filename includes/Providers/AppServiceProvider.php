@@ -32,12 +32,28 @@ class AppServiceProvider extends AbstractServiceProvider {
 	];
 
 	public function register( Container $container ): void {
-		$container->singleton( FileLogsService::class, fn() => new FileLogsService() );
-		$container->singleton( FileManagerService::class, fn() => new FileManagerService() );
-		$container->singleton( SettingsService::class, fn() => new SettingsService() );
+		// Modern PHP-DI style definition array approach
+		$container->add_definitions(
+			[
+				// Services with simple autowiring
+				FileLogsService::class    => $container->object( FileLogsService::class ),
+				FileManagerService::class => $container->object( FileManagerService::class ),
+				SettingsService::class   => $container->object( SettingsService::class ),
 
-		$container->singleton( FileLogsController::class, fn( $c ) => new FileLogsController( $c->get( FileLogsService::class ) ) );
-		$container->singleton( FileManagerController::class, fn( $c ) => new FileManagerController( $c->get( FileManagerService::class ) ) );
-		$container->singleton( SettingsController::class, fn( $c ) => new SettingsController( $c->get( SettingsService::class ) ) );
+				// Controllers with dependency injection
+				FileLogsController::class    => $container->autowire( FileLogsController::class )->set_name( FileLogsController::class ),
+				FileManagerController::class => $container->autowire( FileManagerController::class )->set_name( FileManagerController::class ),
+				SettingsController::class   => $container->autowire( SettingsController::class )->set_name( SettingsController::class ),
+			]
+		);
+
+		// Alternative: Traditional singleton binding (keep for backward compatibility)
+		// $container->singleton( FileLogsService::class, fn() => new FileLogsService() );
+		// $container->singleton( FileManagerService::class, fn() => new FileManagerService() );
+		// $container->singleton( SettingsService::class, fn() => new SettingsService() );
+
+		// $container->singleton( FileLogsController::class, fn( $c ) => new FileLogsController( $c->get( FileLogsService::class ) ) );
+		// $container->singleton( FileManagerController::class, fn( $c ) => new FileManagerController( $c->get( FileManagerService::class ) ) );
+		// $container->singleton( SettingsController::class, fn( $c ) => new SettingsController( $c->get( SettingsService::class ) ) );
 	}
 }
