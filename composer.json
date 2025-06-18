@@ -57,6 +57,7 @@
         "phpstan": "php -d xdebug.mode=off -d display_errors=0 vendor/bin/phpstan analyse --level=5 --memory-limit=1G",
         "test": "vendor/bin/phpunit",
         "test:unit": "vendor/bin/phpunit --testsuite=unit",
+        "test:integration": "vendor/bin/phpunit --testsuite=integration",
         "test:coverage": "vendor/bin/phpunit --coverage-html=tests/coverage",
         "security:check": "vendor/bin/phpcs --standard=phpcs.xml --sniffs=WordPress.Security.EscapeOutput,WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput,WordPress.Security.PluginMenuSlug,WordPress.Security.SafeRedirect --report=summary",
         "wp-org:check": [
