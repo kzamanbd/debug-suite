@@ -46,14 +46,5 @@ class AppServiceProvider extends AbstractServiceProvider {
 				SettingsController::class   => $container->autowire( SettingsController::class )->set_name( SettingsController::class ),
 			]
 		);
-
-		// Alternative: Traditional singleton binding (keep for backward compatibility)
-		// $container->singleton( FileLogsService::class, fn() => new FileLogsService() );
-		// $container->singleton( FileManagerService::class, fn() => new FileManagerService() );
-		// $container->singleton( SettingsService::class, fn() => new SettingsService() );
-
-		// $container->singleton( FileLogsController::class, fn( $c ) => new FileLogsController( $c->get( FileLogsService::class ) ) );
-		// $container->singleton( FileManagerController::class, fn( $c ) => new FileManagerController( $c->get( FileManagerService::class ) ) );
-		// $container->singleton( SettingsController::class, fn( $c ) => new SettingsController( $c->get( SettingsService::class ) ) );
 	}
 }

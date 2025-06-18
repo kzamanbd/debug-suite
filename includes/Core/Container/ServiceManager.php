@@ -51,7 +51,7 @@ class ServiceManager {
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
-	 * @param Container $DI Container instance.
+	 * @param Container $container Container instance.
 	 */
 	public function __construct( Container $container ) {
 		$this->container = $container;

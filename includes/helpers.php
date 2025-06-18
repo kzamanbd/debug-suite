@@ -157,8 +157,9 @@ if ( ! function_exists( 'debug_suite_container_builder' ) ) {
 	/**
 	 * Create a new container builder instance.
 	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @return ContainerBuilder
-	 *@since DEBUG_SUITE_SINCE
 	 */
 	function debug_suite_container_builder(): ContainerBuilder {
 		return new ContainerBuilder();
@@ -169,10 +170,11 @@ if ( ! function_exists( 'debug_suite_date' ) ) {
 	/**
 	 * Format a timestamp into a localized date string.
 	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @param string $timestamp The timestamp to format.
 	 *
 	 * @return string Formatted date string.
-	 *@since DEBUG_SUITE_SINCE
 	 */
 	function debug_suite_date( string $timestamp ): string {
 		// Get a date format from WP settings (Settings > General)
@@ -186,12 +188,13 @@ if ( ! function_exists( 'debug_suite_config' ) ) {
 	/**
 	 * Create a configuration service definition.
 	 *
-	 * @param array $configurations Environment-specific configurations.
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param array      $configurations Environment-specific configurations.
 	 * @param mixed|null $default_config Default configuration.
-	 * @param bool  $singleton      Whether this is a singleton.
+	 * @param bool       $singleton      Whether this is a singleton.
 	 *
 	 * @return ConfigDefinition Configuration definition for the container.
-	 *@since DEBUG_SUITE_SINCE
 	 */
 	function debug_suite_config( array $configurations = [], mixed $default_config = null, bool $singleton = false ): ConfigDefinition {
 		return new ConfigDefinition( $configurations, $default_config, $singleton );

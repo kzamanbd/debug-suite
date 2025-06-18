@@ -1,96 +1,248 @@
-# Debug Providers Guide
+# Service Provider Patterns and Lifecycle Management
 
-> **DEPRECATED**: The Debug Provider system described in this document has been deprecated in favor of the PSR-11 DI Container system. Use the service provider pattern with the PSR-11 Container instead. This document is kept for historical purposes.
+This document explains the service provider system in Debug Suite, which is built on the PSR-11 compliant dependency injection container architecture.
 
-This document explains the legacy Debug Providers system in the Debug Suite plugin, which has been replaced by the PSR-11 compliant Dependency Injection container system.
+## Overview
 
-## What are Debug Providers?
+Service Providers in Debug Suite are responsible for:
 
-In the legacy architecture, Debug Providers were components that collected and provided specific types of debug information. Each provider focused on a particular aspect of WordPress, such as:
+- **Service Registration**: Binding services to the DI container
+- **Dependency Configuration**: Setting up service dependencies
+- **Lifecycle Management**: Managing service initialization and bootstrapping
+- **Hook Registration**: Automatically registering WordPress hooks for services
 
-- PHP configuration
-- WordPress constants
-- Database queries
-- Active plugins
-- Theme information
-- Server environment
-- Custom functionality
+## Core Service Provider Architecture
 
-## Current Architecture
+### AbstractServiceProvider
 
-The PSR-11 DI Container now handles all dependency management:
-
-1. **PSR-11 Container**: Use `DebugSuite\Core\Container\Container` for dependency injection
-2. **Service Providers**: Extend `DebugSuite\Core\Container\AbstractServiceProvider` for registering services
-3. **Hookable Interface**: Services can implement `Hookable` if they need to register WordPress hooks
-
-## Creating a Debug Service (Modern Approach)
-
-### Step 1: Create a Service Class
-
-Create a new class in the `includes/Services` directory:
+All service providers extend `DebugSuite\Core\Container\AbstractServiceProvider`:
 
 ```php
 <?php
 
-namespace DebugSuite\Services;
+namespace DebugSuite\Providers;
 
-use DebugSuite\Core\ServiceResponse;
-use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Interfaces\Hookable;
+use DebugSuite\Core\Container\AbstractServiceProvider;
+use DebugSuite\Core\Container\Container;
 
-class ExampleDebugService implements ServiceInterface, Hookable {
-    private string $name = 'example';
-    private string $description = 'Example debug service.';
+class ExampleServiceProvider extends AbstractServiceProvider
+{
+    /**
+     * Services provided by this provider.
+     *
+     * @var array<class-string>
+     */
+    protected array $provides = [
+        ExampleService::class,
+        ExampleController::class,
+    ];
 
-    public function get_debug_data(): ServiceResponse {
-        return ServiceResponse::success([
-            'example' => 'data'
-        ]);
+    /**
+     * Register services with the container.
+     *
+     * @param Container $container The DI container.
+     * @return void
+     */
+    public function register(Container $container): void
+    {
+        // Service registration logic
     }
 
-    public function register_hooks(): void {
-        // Register WordPress hooks if needed
+    /**
+     * Boot the service provider.
+     *
+     * @param Container $container The DI container.
+     * @return void
+     */
+    public function boot(Container $container): void
+    {
+        // Optional: Additional setup after all providers are registered
     }
 }
 ```
 
-### Step 2: Register the Service with the DI Container
+## Service Registration Patterns
 
-Register your service in a service provider's `register` method:
+### Simple Service Registration
 
 ```php
-use DebugSuite\Services\ExampleDebugService;
-
-public function register(Container $container): void {
-    $container->singleton(ExampleDebugService::class, fn() => new ExampleDebugService());
+public function register(Container $container): void
+{
+    // Basic singleton registration
+    $container->singleton(LoggerService::class, fn() => new LoggerService());
     
-    // Register controller using the service
-    $container->singleton(ExampleController::class, fn($c) => 
-        new ExampleController($c->get(ExampleDebugService::class))
+    // Service with dependencies
+    $container->singleton(EmailService::class, fn($c) => 
+        new EmailService($c->get(LoggerService::class))
     );
 }
 ```
 
-### Step 3: Add Your Service Provider to the Plugin
-
-In your plugin's main file (`debug-suite.php`), add your service provider to the list:
+### Advanced Registration with Definitions
 
 ```php
-$service_manager = new ServiceManager($container);
+public function register(Container $container): void
+{
+    // Using definition array approach
+    $container->add_definitions([
+        // Autowired services
+        DatabaseService::class => $container->autowire(DatabaseService::class),
+        CacheService::class    => $container->autowire(CacheService::class),
+        
+        // Factory-based services
+        LoggerInterface::class => $container->factory(function($c) {
+            return new FileLogger($c->get('config.log_path'));
+        }),
+        
+        // Configuration values
+        'config.log_path' => $container->value('/var/log/debug-suite.log'),
+        'config.debug'    => $container->value(WP_DEBUG),
+    ]);
+}
+```
+
+### Environment-Aware Registration
+
+```php
+public function register(Container $container): void
+{
+    // Environment-specific configuration
+    $container->set(ApiService::class,
+        debug_suite_autowire_env(ApiService::class, [
+            'development' => [
+                'base_url' => 'https://dev-api.example.com',
+                'debug' => true,
+                'timeout' => 30
+            ],
+            'production' => [
+                'base_url' => 'https://api.example.com',
+                'debug' => false,
+                'timeout' => 10
+            ]
+        ])
+    );
+}
+```
+
+## Current Service Providers
+
+### CoreServiceProvider
+
+Registers core WordPress integration services:
+
+```php
+protected array $provides = [
+    I18n::class,
+    Assets::class,
+    // Core services
+];
+```
+
+### AdminServiceProvider
+
+Registers admin-specific services:
+
+```php
+protected array $provides = [
+    Admin::class,
+    // Admin services
+];
+```
+
+### AppServiceProvider
+
+Registers application services and API controllers:
+
+```php
+protected array $provides = [
+    FileLogsService::class,
+    FileManagerService::class,
+    SettingsService::class,
+    FileLogsController::class,
+    FileManagerController::class,
+    SettingsController::class,
+];
+```
+
+### FrontendServiceProvider
+
+Registers frontend services:
+
+```php
+protected array $provides = [
+    Frontend::class,
+    // Frontend services
+];
+```
+
+## Service Manager Lifecycle
+
+The `ServiceManager` handles the provider lifecycle:
+
+### 1. Registration Phase
+
+```php
+$service_manager = debug_suite_service_manager();
 $service_manager->register_providers([
     CoreServiceProvider::class,
     AdminServiceProvider::class,
     FrontendServiceProvider::class,
-    ExampleServiceProvider::class, // Add your service provider here
+    AppServiceProvider::class,
 ]);
 ```
 
-## Best Practices with the New Architecture
+### 2. Boot Phase
 
-1. **Service Layer Pattern**: Follow the service layer pattern for separation of concerns
-2. **Return ServiceResponse**: Services should return `ServiceResponse` objects for consistent error handling
-3. **PSR-11 Container**: Use the PSR-11 container for dependency injection
-4. **Autowiring**: Take advantage of autowiring for automatic dependency resolution
-5. **Configuration**: Accept configuration through constructor parameters for testability
-6. **Documentation**: Fully document all public methods with PHPDoc
+```php
+// This automatically:
+// 1. Calls register() on all providers
+// 2. Calls boot() on all providers  
+// 3. Registers hooks for services implementing Hookable
+$service_manager->boot();
+```
+
+### 3. Hook Registration
+
+Services implementing `Hookable` get their hooks registered automatically:
+
+```php
+class ExampleService implements Hookable
+{
+    public function register_hooks(): void
+    {
+        add_action('init', [$this, 'initialize']);
+        add_filter('example_filter', [$this, 'filter_data']);
+    }
+}
+```
+
+## Best Practices
+
+1. **Provider Organization**: Group related services in the same provider
+2. **Dependency Declaration**: Always list provided services in `$provides` array
+3. **Registration Only**: Use `register()` for service registration, not initialization
+4. **Boot for Setup**: Use optional `boot()` method for post-registration setup
+5. **Hookable Services**: Implement `Hookable` for services needing WordPress hooks
+6. **Environment Awareness**: Use environment-specific configuration for different deployment stages
+
+## Testing Service Providers
+
+```php
+class ExampleServiceProviderTest extends DebugSuiteTestCase
+{
+    public function test_provides_services(): void
+    {
+        $provider = new ExampleServiceProvider();
+        $this->assertContains(ExampleService::class, $provider->provides());
+    }
+
+    public function test_registers_services(): void
+    {
+        $container = Container::get_instance();
+        $provider = new ExampleServiceProvider();
+        $provider->register($container);
+        
+        $this->assertTrue($container->has(ExampleService::class));
+    }
+}
+```
