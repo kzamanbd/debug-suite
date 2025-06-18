@@ -69,7 +69,7 @@ const FileLogs = () => {
     return (
         <>
             <p className="mb-6 text-gray-600">
-                {__('Welcome to the Error Logs section. Choose an option below to get started.', 'debug-suite')}
+                {__('Welcome to the Debug Log section. Choose an option below to get started.', 'debug-suite')}
             </p>
 
             <div className="mb-4 flex justify-between">
