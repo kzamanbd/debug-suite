@@ -168,3 +168,87 @@ if ( ! function_exists( 'wp_die' ) ) {
 		throw new \Exception( $message );
 	}
 }
+
+if ( ! function_exists( 'get_option' ) ) {
+	/**
+	 * Mock get_option function.
+	 *
+	 * @param string $option  Name of the option to retrieve.
+	 * @param mixed  $default Default value to return if option doesn't exist.
+	 * @return mixed
+	 */
+	function get_option( $option, $default = false ) {
+		$options = [
+			'date_format' => 'Y-m-d H:i:s',
+			'time_format' => 'H:i:s',
+		];
+		
+		return $options[$option] ?? $default;
+	}
+}
+
+if ( ! function_exists( 'wp_date' ) ) {
+	/**
+	 * Mock wp_date function.
+	 *
+	 * @param string       $format    PHP date format.
+	 * @param int|float    $timestamp Unix timestamp.
+	 * @param \DateTimeZone $timezone  Optional. Timezone to use.
+	 * @return string|false
+	 */
+	function wp_date( $format, $timestamp = null, $timezone = null ) {
+		return date( $format, $timestamp );
+	}
+}
+
+if ( ! function_exists( 'date_i18n' ) ) {
+	/**
+	 * Mock date_i18n function.
+	 *
+	 * @param string   $format    Format to display the date.
+	 * @param int|bool $timestamp Optional timestamp.
+	 * @param bool     $gmt       Optional. Whether to use GMT timezone.
+	 * @return string
+	 */
+	function date_i18n( $format, $timestamp = false, $gmt = false ) {
+		if ( ! $timestamp ) {
+			$timestamp = time();
+		}
+		return date( $format, $timestamp );
+	}
+}
+
+if ( ! function_exists( 'wp_list_sort' ) ) {
+	/**
+	 * Mock wp_list_sort function.
+	 *
+	 * @param array  $list    List to sort.
+	 * @param string $orderby Property to sort by.
+	 * @param string $order   Optional. Order direction. ASC or DESC.
+	 * @param string $type    Optional. Type of data.
+	 * @param bool   $preserve_keys Optional. Whether to preserve keys.
+	 * @return array Sorted array.
+	 */
+	function wp_list_sort( $list, $orderby, $order = 'ASC', $type = 'OBJECT', $preserve_keys = false ) {
+		usort( $list, function( $a, $b ) use ( $orderby ) {
+			if ( is_object( $a ) ) {
+				return strcasecmp( $a->{$orderby}, $b->{$orderby} );
+			} else {
+				return strcasecmp( $a[$orderby], $b[$orderby] );
+			}
+		});
+		return $list;
+	}
+}
+
+if ( ! function_exists( 'debug_suite_date' ) ) {
+	/**
+	 * Mock debug_suite_date function.
+	 *
+	 * @param int $timestamp Unix timestamp.
+	 * @return string
+	 */
+	function debug_suite_date( $timestamp ) {
+		return date( 'Y-m-d H:i:s', $timestamp );
+	}
+}

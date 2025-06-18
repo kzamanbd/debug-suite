@@ -188,7 +188,7 @@ class FileManagerService implements ServiceInterface {
 			return ServiceResult::failure( __( 'File is not readable.', 'debug-suite' ), 'file_not_readable' );
 		}
 
-		$contents = file_get_contents( $safe_path );
+		$contents = file_get_contents( $full_path );
 		$metadata = $this->get_file_metadata( $full_path );
 
 		return ServiceResult::success(
@@ -268,13 +268,20 @@ class FileManagerService implements ServiceInterface {
 	 */
 	private function is_path_safe( string $full_path ): bool {
 		$real_base = realpath( $this->base_path );
-		$real_path = realpath( $full_path );
-
-		if ( ! $real_base || ! $real_path ) {
+		
+		if ( ! $real_base ) {
 			return false;
 		}
-
-		return str_starts_with( $real_path, $real_base );
+		
+		if ( file_exists( $full_path ) ) {
+			// For existing paths, verify the resolved path starts with base path
+			$real_path = realpath( $full_path );
+			return $real_path && str_starts_with( $real_path, $real_base );
+		}
+		
+		// For new files, verify the parent directory is within allowed boundaries
+		$parent_dir = realpath( dirname( $full_path ) );
+		return $parent_dir && str_starts_with( $parent_dir, $real_base );
 	}
 
 	/**

@@ -14,6 +14,7 @@ use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\API\FileLogsController;
 use DebugSuite\Services\FileLogsService;
 use WP_REST_Request;
+use WP_REST_Server;
 
 /**
  * Test FileLogsController REST API endpoints.
@@ -51,7 +52,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 		
 		// Set up REST API
 		global $wp_rest_server;
-		$wp_rest_server = new \WP_REST_Server();
+		$wp_rest_server = new WP_REST_Server();
 		do_action( 'rest_api_init' );
 		
 		// Create service and controller

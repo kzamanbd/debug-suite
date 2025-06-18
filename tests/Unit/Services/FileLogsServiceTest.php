@@ -45,7 +45,7 @@ class FileLogsServiceTest extends TestCase {
 		$this->service = new FileLogsService();
 		
 		// Set the log file path using reflection since constructor doesn't accept parameters
-		$reflection = new \ReflectionClass($this->service);
+		$reflection = new ReflectionClass($this->service);
 		$property = $reflection->getProperty('log_file_path');
 		$property->setAccessible(true);
 		$property->setValue($this->service, $this->test_log_file);
@@ -103,7 +103,7 @@ EOT;
 		// Check each entry to verify it contains the expected content
 		$found_notice = false;
 		foreach ($data['entries'] as $entry) {
-			if (strpos($entry['message'], 'Undefined variable') !== false) {
+			if ( str_contains( $entry['message'], 'Undefined variable' ) ) {
 				$found_notice = true;
 				break;
 			}
@@ -196,7 +196,7 @@ EOT;
 		// Create log file with multiple entries
 		$log_content = '';
 		for ($i = 1; $i <= 10; $i++) {
-			$log_content .= "[18-Jun-2025 10:3{$i}:00 UTC] PHP Notice: Test message {$i}\n";
+			$log_content .= "[18-Jun-2025 10:3$i:00 UTC] PHP Notice: Test message $i\n";
 		}
 		
 		file_put_contents($this->test_log_file, $log_content);

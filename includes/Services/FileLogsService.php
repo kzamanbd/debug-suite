@@ -7,6 +7,7 @@
 
 namespace DebugSuite\Services;
 
+use DateTime;
 use DebugSuite\Core\ServiceResult;
 use DebugSuite\Interfaces\ServiceInterface;
 
@@ -125,13 +126,17 @@ class FileLogsService implements ServiceInterface {
 		$entries = [];
 		$limit = $options['limit'] ?? 1000;
 		$level_filter = $options['level_filter'] ?? null;
+		$date_format = get_option( 'date_format' ); // e.g., "F j, Y"
+		$time_format = get_option( 'time_format' );
+		// Combine both formats
+		$format = $date_format . ' ' . $time_format;
 
 		foreach ( $lines as $line ) {
 			if ( empty( trim( $line ) ) ) {
 				continue;
 			}
 
-			$entry = $this->parse_log_line( $line );
+			$entry = $this->parse_log_line( $line, $format );
 			if ( ! $entry ) {
 				continue;
 			}
@@ -142,34 +147,37 @@ class FileLogsService implements ServiceInterface {
 			}
 
 			$entries[] = $entry;
-
-			// Apply limit
-			if ( count( $entries ) >= $limit ) {
-				break;
-			}
+		}
+		$entries = array_reverse( $entries ); // Reverse to show latest entries first
+		// Limit the number of entries
+		if ( count( $entries ) > $limit ) {
+			$entries = array_slice( $entries, 0, $limit );
 		}
 
-		return array_reverse( $entries ); // Newest first
+		return $entries;
 	}
 
 	/**
 	 * Parse a single log line.
 	 *
 	 * @param string $line Log line to parse.
+	 * @param string $format Date format to use for timestamps.
 	 * @return array|null
 	 */
-	private function parse_log_line( string $line ): ?array {
+	private function parse_log_line( string $line, string $format ): ?array {
 		// Match WordPress log format: [timestamp] type: message
-		if ( ! preg_match( '/^\[(.*?)\]\s+(.*?):\s+(.*)$/', $line, $matches ) ) {
+		if ( ! preg_match( '/^\[(.*?)]\s+(.*?):\s+(.*)$/', $line, $matches ) ) {
 			return null;
 		}
 
 		$timestamp = $matches[1];
 		$type = trim( $matches[2] );
 		$message = trim( $matches[3] );
+		$date = DateTime::createFromFormat( 'd-M-Y H:i:s T', $timestamp );
+		// Get the format settings from WordPress
 
 		return [
-			'timestamp' => $timestamp,
+			'timestamp' => wp_date( $format, $date->getTimestamp() ),
 			'type' => $type,
 			'level' => $this->determine_level( $type ),
 			'message' => $message,
@@ -185,7 +193,7 @@ class FileLogsService implements ServiceInterface {
 	private function determine_level( string $type ): string {
 		$type_lower = strtolower( $type );
 
-		if ( str_contains( $type_lower, 'fatal' ) || strpos( $type_lower, 'error' ) !== false ) {
+		if ( str_contains( $type_lower, 'fatal' ) || str_contains( $type_lower, 'error' ) ) {
 			return 'error';
 		}
 		if ( str_contains( $type_lower, 'warning' ) ) {
