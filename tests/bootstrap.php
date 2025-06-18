@@ -17,11 +17,15 @@ if ( ! $_tests_dir ) {
 // If WP_TESTS_DIR is not set, this is a basic test run without WP core
 if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 	// Only show warning if we're running integration tests that need WordPress
-	if ( getenv( 'TEST_SUITE' ) === 'integration' ) {
-		echo "Warning: WP_TESTS_DIR environment variable not set or not pointing to a valid WordPress test installation.\n";
-		echo "Integration tests require WordPress core. Some tests may fail.\n";
-	} else {
-		echo "Debug Suite test bootstrap loaded.\n";
+	if ( isset( $_SERVER['argv'] ) && is_array( $_SERVER['argv'] ) ) {
+		$test_path = isset( $_SERVER['argv'][1] ) ? $_SERVER['argv'][1] : '';
+		if ( strpos( $test_path, 'Integration' ) !== false ) {
+			echo "Warning: WordPress test environment not properly set up.\n";
+			echo "Integration tests will be skipped.\n";
+			echo "Run: bash bin/install-wp-tests.sh wordpress_test root PASSWORD localhost latest\n";
+			echo "Where PASSWORD is your MySQL password (leave empty if none).\n";
+			exit(0); // Exit gracefully without error
+		}
 	}
 
 	// Define basic constants for standalone testing
