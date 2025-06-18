@@ -20,7 +20,13 @@ class CoreServiceProvider extends AbstractServiceProvider {
 	];
 
 	public function register( Container $container ): void {
-		$container->singleton( Assets::class, fn() => new Assets() );
-		$container->singleton( I18n::class, fn() => new I18n() );
+		// Modern PHP-DI style definition array approach
+		$container->add_definitions(
+			[
+				// Core services with object creation
+				Assets::class => $container->object( Assets::class ),
+				I18n::class   => $container->object( I18n::class ),
+			]
+		);
 	}
 }

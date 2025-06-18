@@ -18,6 +18,12 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	];
 
 	public function register( Container $container ): void {
-		$container->singleton( Admin::class, fn() => new Admin() );
+		// Modern PHP-DI style definition array approach
+		$container->add_definitions(
+			[
+				// Admin service with object creation
+				Admin::class => $container->object( Admin::class ),
+			]
+		);
 	}
 }
