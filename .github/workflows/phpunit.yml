@@ -9,7 +9,7 @@ jobs:
       matrix:
         php-versions: ['8.2']
         wp-versions: ['latest']
-    
+
     services:
       mysql:
         image: mysql:5.7
@@ -58,11 +58,10 @@ jobs:
 
       # Conditionally run integration tests if environment is set up correctly
       - name: Run Integration Tests
-      # TODO: Need to set up the environment for integration tests
+        # TODO: Need to set up the environment for integration tests
         run: |
-            echo "Integration tests are not set up yet. Skipping..."
+          echo "Integration tests are not set up yet. Skipping..."
         continue-on-error: true
-          
 
       - name: Generate Code Coverage Report
         run: |
