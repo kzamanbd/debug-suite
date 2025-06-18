@@ -184,7 +184,10 @@ EOT;
 		$result = $this->service->clear_log_file();
 		
 		$this->assert_service_result_success($result);
-		$this->assertEquals(0, filesize($this->test_log_file));
+		
+		// Check if file exists and is empty (size should be 0)
+		$this->assertTrue(file_exists($this->test_log_file), 'Log file should exist after clearing');
+		$this->assertEquals(0, filesize($this->test_log_file), 'Log file size should be exactly 0 bytes after clearing');
 	}
 
 	/**
