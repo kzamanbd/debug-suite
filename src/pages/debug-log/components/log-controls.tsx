@@ -137,12 +137,12 @@ const LogControls = ({
                         </p>
                     </div>
                     <div>
-                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                        <nav className="isolate inline-flex gap-2" aria-label="Pagination">
                             <Button
                                 variant="light"
                                 onClick={() => goToPage(currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
+                                className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                             >
                                 <span className="sr-only">{__('Previous', 'debug-suite')}</span>
                                 <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
@@ -160,11 +160,16 @@ const LogControls = ({
                                         index > 0 && array[index - 1] !== undefined && array[index - 1] < page - 1;
 
                                     return (
-                                        <div key={page}>
+                                        <div className="flex gap-2" key={page}>
                                             {showEllipsis && (
-                                                <span className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
+                                                <Button
+                                                    variant="light"
+                                                    className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
+                                                    disabled
+                                                    aria-label={__('More pages', 'debug-suite')}
+                                                >
                                                     ...
-                                                </span>
+                                                </Button>
                                             )}
                                             <Button
                                                 variant={page === currentPage ? 'primary' : 'light'}
@@ -185,7 +190,7 @@ const LogControls = ({
                                 variant="light"
                                 onClick={() => goToPage(currentPage + 1)}
                                 disabled={currentPage === totalPages}
-                                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
+                                className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                             >
                                 <span className="sr-only">{__('Next', 'debug-suite')}</span>
                                 <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />

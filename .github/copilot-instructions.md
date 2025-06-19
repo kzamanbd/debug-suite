@@ -96,6 +96,19 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     - Use consistent icon sizing (typically 16px or 24px)
     - Example: `import { FolderOpen, Settings, X } from 'lucide-react';`
 
+7. **UI Components**:
+
+    - **Use Headless UI for interactive components**: Prefer `@headlessui/react` components for dropdowns, modals, dialogs, and other interactive elements
+    - **Combobox for Dropdowns**: Use the custom `Combobox` component (built on Headless UI) for all dropdown selections instead of native selects
+    - **Accessibility First**: Always use Headless UI components which provide built-in accessibility features
+    - **Custom Components**: Build custom UI components in `src/components/ui/` following the established patterns
+    - **Component Examples**:
+        ```typescript
+        // ✅ Good - Use Headless UI Combobox
+        import Combobox from '@/components/ui/combobox';
+        <Combobox options={options} value={selected} onChange={setSelected} />
+        ```
+
 ## TypeScript and Build Configuration
 
 ### Project Configuration
@@ -114,6 +127,7 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     "@wordpress/element": "React components",
     "@wordpress/i18n": "Internationalization",
     "@wordpress/api-fetch": "API requests",
+    "@headlessui/react": "Headless UI components for accessibility",
     "lucide-react": "Icon library",
     "react-router-dom": "Routing",
     "clsx": "Class name utility",
@@ -977,3 +991,58 @@ const LogControls = ({
 - **Internal Organization**: Use internal helper functions, interfaces, and constants within component files
 - **Testing Strategy**: Test consolidated components as complete units rather than individual micro-pieces
 - **Documentation**: Provide comprehensive props documentation for consolidated components
+
+### UI Component Standards
+
+#### Dropdown/Select Components
+
+**Always use the custom Combobox component** built on Headless UI for all dropdown selections:
+
+```typescript
+import Combobox from '@/components/ui/combobox';
+
+// Basic usage
+<Combobox
+    options={[
+        { value: 'option1', label: 'Option 1' },
+        { value: 'option2', label: 'Option 2' }
+    ]}
+    value={selectedOption}
+    onChange={setSelectedOption}
+/>
+
+// With additional features
+<Combobox
+    options={options}
+    value={selected}
+    onChange={setSelected}
+    placeholder="Select an option..."
+    label="Choose option"
+    error={validationError}
+    isDisabled={loading}
+    className="min-w-[200px]"
+    formatOptionLabel={(option) => (
+        <div>
+            <div className="font-medium">{option.label}</div>
+            <div className="text-xs text-gray-500">{option.meta}</div>
+        </div>
+    )}
+/>
+```
+
+**Features:**
+
+- ✅ Full TypeScript support with typed options
+- ✅ Search/filter functionality built-in
+- ✅ Keyboard navigation (arrows, enter, escape)
+- ✅ Accessibility compliance (ARIA, screen readers)
+- ✅ Custom option rendering
+- ✅ Loading and disabled states
+- ✅ Error handling and validation
+- ✅ Consistent styling with design system
+
+**Do NOT use:**
+
+- ❌ Native HTML `<select>` elements (poor UX)
+- ❌ External libraries like `react-select` (removed from project)
+- ❌ Custom dropdown implementations without accessibility
