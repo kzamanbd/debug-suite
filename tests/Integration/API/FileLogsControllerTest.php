@@ -69,7 +69,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 	/**
 	 * Test get file logs endpoint without authentication.
 	 */
-	public function test_get_file_logs_without_auth() {
+	public function test_get_logs_without_auth() {
 		// Set current user to 0 (not logged in)
 		wp_set_current_user( 0 );
 		
@@ -82,7 +82,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 	/**
 	 * Test get file logs endpoint with insufficient permissions.
 	 */
-	public function test_get_file_logs_insufficient_permissions() {
+	public function test_get_logs_insufficient_permissions() {
 		// Create user without manage_options capability
 		$user_id = $this->factory->user->create();
 		wp_set_current_user( $user_id );
@@ -96,7 +96,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 	/**
 	 * Test get file logs endpoint with proper authentication.
 	 */
-	public function test_get_file_logs_with_auth() {
+	public function test_get_logs_with_auth() {
 		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs' );
 		$response = rest_get_server()->dispatch( $request );
 		
@@ -112,7 +112,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 	/**
 	 * Test get file logs with query parameters.
 	 */
-	public function test_get_file_logs_with_parameters() {
+	public function test_get_logs_with_parameters() {
 		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs' );
 		$request->set_param( 'limit', 10 );
 		$request->set_param( 'level', 'ERROR' );

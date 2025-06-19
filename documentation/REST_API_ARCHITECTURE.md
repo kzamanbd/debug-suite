@@ -134,7 +134,7 @@ public function test_error_transformation() {
     
     // Execute request
     $request = new WP_REST_Request('GET', '/debug-suite/v1/logs');
-    $response = $this->controller->get_file_logs($request);
+    $response = $this->controller->get_logs($request);
     
     // Verify WP_Error response
     $this->assertInstanceOf(WP_Error::class, $response);
