@@ -21,10 +21,10 @@ import { FolderOpen, Settings as SettingsIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const Settings = () => {
-    const [settings, setSettings] = useState(window.debugSuiteSettings);
+    const [settings, setSettings] = useState(window.debugSuite);
     const [hasChanges, setHasChanges] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const roles = window.debugSuiteSettings?.roles || {};
+    const roles = window.debugSuite?.roles || {};
     const fileManagerAccessOptions = Object.keys(roles).map((role) => ({
         label: roles[role].name,
         value: role
