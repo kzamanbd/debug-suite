@@ -4,8 +4,8 @@
  * @since 1.0.0
  */
 import Button from '@/components/ui/button';
+import Combobox from '@/components/ui/combobox';
 import InputField from '@/components/ui/input-field';
-import SearchableSelect from '@/components/ui/searchable-select';
 import { __ } from '@wordpress/i18n';
 import {
     ChevronDownIcon,
@@ -74,7 +74,7 @@ const LogControls = ({
             return { value: '', label: __('Loading...', 'debug-suite') };
         }
         if (!selectedFile || !logFiles.length) {
-            return { value: '', label: __('Select a log file', 'debug-suite') };
+            return null;
         }
         return {
             value: selectedFile,
@@ -202,18 +202,13 @@ const LogControls = ({
             {/* Header with file selector */}
             <div className="border-b border-gray-200 bg-white py-4">
                 <div className="flex items-center justify-between">
-                    <SearchableSelect
+                    <Combobox
                         options={filteredLogFiles}
                         value={selectedLogFile()}
                         onChange={(option) => onFileChange(option?.value || '')}
                         isDisabled={filesLoading}
                         className="min-w-[250px]"
-                        formatOptionLabel={(option: any) => (
-                            <div className="flex flex-col">
-                                <div className="text-sm font-medium">{option.label}</div>
-                                {option.meta && <div className="text-xs">{option.meta}</div>}
-                            </div>
-                        )}
+                        placeholder={__('Select a log file', 'debug-suite')}
                     />
                     <div className="flex items-center space-x-2">
                         <div className="relative">
@@ -245,12 +240,12 @@ const LogControls = ({
             <div className="border-b border-gray-200 bg-white py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <SearchableSelect
+                        <Combobox
                             options={levelOptions}
                             value={levelOptions.find((opt) => opt.value === filters.level) || levelOptions[0]}
                             onChange={(option) => onFiltersChange({ level: option?.value || '' })}
                         />
-                        <SearchableSelect
+                        <Combobox
                             options={sortOptions}
                             value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
                             onChange={(option) => onFiltersChange({ sortBy: option?.value || 'timestamp' })}
@@ -270,7 +265,7 @@ const LogControls = ({
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <SearchableSelect
+                        <Combobox
                             options={perPageOptions}
                             value={
                                 perPageOptions.find((opt) => opt.value === filters.perPage.toString()) ||

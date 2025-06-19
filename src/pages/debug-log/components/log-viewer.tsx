@@ -21,18 +21,18 @@ const LogViewer = ({ logs, loading, currentPage, perPage }: LogViewerProps) => {
     return (
         <div className="flex-1 overflow-y-auto bg-white">
             <table className="min-w-full divide-y divide-gray-200">
-                <thead className="sticky top-0 z-10 bg-gray-50">
+                <thead className="sticky top-0 bg-gray-50">
                     <tr>
-                        <th className="w-40 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <th className="w-40 px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                             {__('Date/Time', 'debug-suite')}
                         </th>
-                        <th className="w-24 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <th className="w-24 px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                             {__('Severity', 'debug-suite')}
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                             {__('Message', 'debug-suite')}
                         </th>
-                        <th className="w-12 px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <th className="w-12 px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">
                             {__('#', 'debug-suite')}
                         </th>
                     </tr>
@@ -65,10 +65,10 @@ const LogViewer = ({ logs, loading, currentPage, perPage }: LogViewerProps) => {
                                                     open && 'bg-gray-50'
                                                 )}
                                             >
-                                                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                                                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
                                                     {new Date(log.timestamp).toLocaleString()}
                                                 </td>
-                                                <td className="whitespace-nowrap px-6 py-4">
+                                                <td className="px-6 py-4 whitespace-nowrap">
                                                     <span
                                                         className={classNames(
                                                             'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
@@ -101,7 +101,7 @@ const LogViewer = ({ logs, loading, currentPage, perPage }: LogViewerProps) => {
                                                         )}
                                                     </DisclosureButton>
                                                 </td>
-                                                <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500">
+                                                <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-gray-500">
                                                     {entryNumber}
                                                 </td>
                                             </tr>
@@ -112,7 +112,7 @@ const LogViewer = ({ logs, loading, currentPage, perPage }: LogViewerProps) => {
                                                         className="border-t border-gray-100 bg-gray-50 px-6 py-4"
                                                     >
                                                         <div className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100">
-                                                            <pre className="whitespace-pre-wrap font-mono text-xs">
+                                                            <pre className="font-mono text-xs whitespace-pre-wrap">
                                                                 {log.stack_trace}
                                                             </pre>
                                                         </div>

@@ -7,11 +7,11 @@
  */
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
+import Combobox from '@/components/ui/combobox';
 import ContentTabs from '@/components/ui/content-tabs';
 import CustomSwitch from '@/components/ui/custom-switch';
 import InputField from '@/components/ui/input-field';
 import RadioButton from '@/components/ui/radio-button';
-import SearchableSelect from '@/components/ui/searchable-select';
 import { SettingsState } from '@/types';
 
 import apiFetch from '@wordpress/api-fetch';
@@ -104,7 +104,7 @@ const Settings = () => {
                         </p>
                     </div>
                     <div className="md:col-span-2">
-                        <SearchableSelect
+                        <Combobox
                             options={fileManagerAccessOptions}
                             value={
                                 fileManagerAccessOptions.find((opt) => opt.value === settings.fileManagerAccess) ||
