@@ -10,7 +10,7 @@ namespace DebugSuite\Tests\Unit\Core\Container;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\Exceptions\ContainerException;
 use DebugSuite\Core\Container\Exceptions\NotFoundException;
-use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
+use DebugSuite\Tests\Helpers\TestCase;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @group enhanced-features
  * @since DEBUG_SUITE_SINCE
  */
-class ContainerEnhancedTest extends DebugSuiteTestCase {
+class ContainerEnhancedTest extends TestCase {
 
 	/**
 	 * Container instance for testing.

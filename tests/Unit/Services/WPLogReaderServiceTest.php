@@ -8,7 +8,7 @@
 namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Services\DebugLog\WPLogReaderService;
-use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
+use DebugSuite\Tests\Helpers\TestCase;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @group services
  * @group wp-log-reader
  */
-class WPLogReaderServiceTest extends DebugSuiteTestCase {
+class WPLogReaderServiceTest extends TestCase {
 
 	/**
 	 * WP log reader service instance.
