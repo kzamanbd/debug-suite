@@ -11,10 +11,9 @@ import { ReactNode } from 'react';
  * @since 1.0.0
  */
 interface LayoutProps {
-    title?: string | JSX.Element;
     children: ReactNode;
     className?: string;
-    route?: DebugSuiteRoute;
+    route: DebugSuiteRoute;
 }
 
 /**
@@ -24,24 +23,31 @@ interface LayoutProps {
  *
  * @since 1.0.0
  */
-const Layout = ({ title, children, className = '' }: LayoutProps): JSX.Element => {
-    const LayoutTitle = () => {
-        if (!title) {
+const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element => {
+    const LayoutHeader = () => {
+        if (!route.title) {
             return null;
         }
         return (
             <div className="mb-4">
-                {typeof title === 'string' ? (
-                    <div className="text-2xl font-semibold text-gray-900 dark:text-white">{title}</div>
+                {typeof route.title === 'string' ? (
+                    <div className="text-2xl font-semibold text-gray-900 dark:text-white">{route.title}</div>
                 ) : (
-                    title
+                    route.title
                 )}
+                <div className="mt-2">
+                    {typeof route.description === 'string' ? (
+                        <div className="text-sm text-gray-600 dark:text-gray-400">{route.description}</div>
+                    ) : (
+                        route.description
+                    )}
+                </div>
             </div>
         );
     };
     return (
         <div className={classNames(className, 'mt-5 min-h-screen rounded-lg bg-white p-6')}>
-            <LayoutTitle />
+            <LayoutHeader />
             {/* Main content area */}
             <div>{children}</div>
         </div>

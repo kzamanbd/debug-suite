@@ -112,10 +112,6 @@ const ManageLogs = () => {
 
     return (
         <>
-            <p className="mb-6 text-gray-600">
-                {__("Manage your application's log files - clear, download, or archive them.", 'debug-suite')}
-            </p>
-
             <div className="flex justify-between">
                 <div className="flex flex-wrap gap-3">
                     <button

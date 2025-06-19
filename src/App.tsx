@@ -13,7 +13,7 @@ const App = () => {
         return {
             path: route.path,
             element: (
-                <Layout route={route} title={route.title}>
+                <Layout route={route}>
                     <ResolvedComponent />
                 </Layout>
             )

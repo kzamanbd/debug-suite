@@ -208,14 +208,16 @@ class FileLogsController extends RestController {
 		$total = $data['total'] ?? 0;
 		$total_pages = ceil( $total / $per_page );
 
-		return rest_ensure_response( [
-			'entries'      => $data['entries'] ?? [],
-			'total'        => $total,
-			'total_pages'  => $total_pages,
-			'current_page' => $page,
-			'per_page'     => $per_page,
-			'has_more'     => $page < $total_pages,
-		] );
+		return rest_ensure_response(
+			[
+				'entries'      => $data['entries'] ?? [],
+				'total'        => $total,
+				'total_pages'  => $total_pages,
+				'current_page' => $page,
+				'per_page'     => $per_page,
+				'has_more'     => $page < $total_pages,
+			]
+		);
 	}
 
 	public function clear_log_file( WP_REST_Request $request ): WP_REST_Response|WP_Error {
@@ -308,7 +310,7 @@ class FileLogsController extends RestController {
 	public function get_log_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		// Get common log file locations
 		$log_files = [];
-		
+
 		// Main debug.log
 		$debug_log = WP_CONTENT_DIR . '/debug.log';
 		if ( file_exists( $debug_log ) ) {
@@ -317,7 +319,7 @@ class FileLogsController extends RestController {
 				'path' => $debug_log,
 				'size' => size_format( filesize( $debug_log ) ),
 				'size_bytes' => filesize( $debug_log ),
-				'modified' => date( 'Y-m-d H:i:s', filemtime( $debug_log ) ),
+				'modified' => gmdate( 'Y-m-d H:i:s', filemtime( $debug_log ) ),
 				'type' => 'WordPress Debug',
 				'is_current' => true,
 			];
@@ -337,16 +339,18 @@ class FileLogsController extends RestController {
 					'path' => $path,
 					'size' => size_format( filesize( $path ) ),
 					'size_bytes' => filesize( $path ),
-					'modified' => date( 'Y-m-d H:i:s', filemtime( $path ) ),
+					'modified' => gmdate( 'Y-m-d H:i:s', filemtime( $path ) ),
 					'type' => $type,
 					'is_current' => false,
 				];
 			}
 		}
 
-		return rest_ensure_response( [
-			'files' => $log_files,
-			'current_file' => $debug_log,
-		] );
+		return rest_ensure_response(
+			[
+				'files' => $log_files,
+				'current_file' => $debug_log,
+			]
+		);
 	}
 }
