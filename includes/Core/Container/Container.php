@@ -229,7 +229,7 @@ class Container implements ContainerInterface {
 			// If there's a circular alias, treat as not found
 			return false;
 		}
-		
+
 		return isset( $this->definitions[ $resolved_id ] ) ||
 				isset( $this->bindings[ $resolved_id ] ) ||
 				isset( $this->instances[ $resolved_id ] ) ||
@@ -708,7 +708,7 @@ class Container implements ContainerInterface {
 			function () use ( $name ) {
 				// Check for circular dependencies early
 				$this->check_circular_dependency( $name );
-				
+
 				// Add to resolution stack
 				$this->resolving_stack[] = $name;
 
@@ -775,7 +775,7 @@ class Container implements ContainerInterface {
 					array_pop( $this->resolving_stack );
 					$error_message = $this->generate_enhanced_error_message( $name );
 					throw NotFoundException::for_identifier_with_message( esc_html( $name ), esc_html( $error_message ) );
-					
+
 				} catch ( \Exception $e ) {
 					array_pop( $this->resolving_stack );
 					throw $e;
@@ -1245,12 +1245,12 @@ class Container implements ContainerInterface {
 	 */
 	public function bind_interface( string $b_interface, string $implementation ): void {
 		$this->ensure_not_compiled();
-		
+
 		// Validate that the interface exists
 		if ( ! interface_exists( $b_interface ) ) {
 			throw new ContainerException( esc_html( "Interface $b_interface does not exist" ) );
 		}
-		
+
 		$this->interface_bindings[ $b_interface ] = $implementation;
 
 		if ( $this->debug_mode ) {
