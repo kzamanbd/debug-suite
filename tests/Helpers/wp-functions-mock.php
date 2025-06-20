@@ -252,3 +252,17 @@ if ( ! function_exists( 'debug_suite_date' ) ) {
 		return date( 'Y-m-d H:i:s', $timestamp );
 	}
 }
+
+if ( ! function_exists( 'wp_json_encode' ) ) {
+	/**
+	 * Mock wp_json_encode function.
+	 *
+	 * @param mixed $data Data to encode.
+	 * @param int   $options JSON encoding options.
+	 * @param int   $depth Maximum depth.
+	 * @return string
+	 */
+	function wp_json_encode( $data, $options = 0, $depth = 512 ) {
+		return json_encode( $data, $options, $depth );
+	}
+}

@@ -222,10 +222,20 @@ class Container implements ContainerInterface {
 	 * @return bool
 	 */
 	public function has( string $id ): bool {
-		return isset( $this->definitions[ $id ] ) ||
-			   isset( $this->bindings[ $id ] ) ||
-			   isset( $this->instances[ $id ] ) ||
-			   ( $this->autowiring_enabled && class_exists( $id ) );
+		// Try to resolve aliases, but don't throw on circular references
+		try {
+			$resolved_id = $this->resolve_alias( $id );
+		} catch ( ContainerException $e ) {
+			// If there's a circular alias, treat as not found
+			return false;
+		}
+		
+		return isset( $this->definitions[ $resolved_id ] ) ||
+				isset( $this->bindings[ $resolved_id ] ) ||
+				isset( $this->instances[ $resolved_id ] ) ||
+				isset( $this->aliases[ $id ] ) ||
+				isset( $this->interface_bindings[ $id ] ) ||
+				( $this->autowiring_enabled && class_exists( $resolved_id ) );
 	}
 
 	/**
@@ -449,7 +459,7 @@ class Container implements ContainerInterface {
 			if ( ! $reflection->hasMethod( '__construct' ) ) {
 				$this->constructor_cache[ $class_name ] = [];
 			} else {
-				$constructor = $reflection->getConstructor();
+				$constructor                            = $reflection->getConstructor();
 				$this->constructor_cache[ $class_name ] = $constructor ? $constructor->getParameters() : [];
 			}
 		}
@@ -696,64 +706,80 @@ class Container implements ContainerInterface {
 		return $this->profile_resolution(
 			$name,
 			function () use ( $name ) {
-				// Check interface bindings first
-				if ( isset( $this->interface_bindings[ $name ] ) ) {
-					$name = $this->interface_bindings[ $name ];
-				}
+				// Check for circular dependencies early
+				$this->check_circular_dependency( $name );
+				
+				// Add to resolution stack
+				$this->resolving_stack[] = $name;
 
-				// Check aliases
-				if ( isset( $this->aliases[ $name ] ) ) {
-					$name = $this->aliases[ $name ];
-				}
-
-				// Check if we have a cached singleton instance
-				if ( isset( $this->instances[ $name ] ) ) {
-					return $this->instances[ $name ];
-				}
-
-				// Check for definition first
-				if ( isset( $this->definitions[ $name ] ) ) {
-					$definition = $this->definitions[ $name ];
-					$instance   = $definition->resolve( [ $this, 'resolve' ] );
-
-					// Cache singleton instances
-					if ( $definition->is_singleton() ) {
-						$this->instances[ $name ] = $instance;
+				try {
+					// Check interface bindings first
+					if ( isset( $this->interface_bindings[ $name ] ) ) {
+						$name = $this->interface_bindings[ $name ];
 					}
 
-					return $instance;
-				}
+					// Resolve aliases (with circular detection)
+					$name = $this->resolve_alias( $name );
 
-				// Check for legacy binding
-				if ( isset( $this->bindings[ $name ] ) ) {
-					$binding  = $this->bindings[ $name ];
-					$resolver = $binding['resolver'];
-
-					// Resolve the service
-					if ( is_callable( $resolver ) ) {
-						$instance = $resolver( $this );
-					} elseif ( is_string( $resolver ) && class_exists( $resolver ) ) {
-						$instance = $this->auto_resolve( $resolver );
-					} else {
-						$instance = $resolver;
+					// Check if we have a cached singleton instance
+					if ( isset( $this->instances[ $name ] ) ) {
+						array_pop( $this->resolving_stack );
+						return $this->instances[ $name ];
 					}
 
-					// Cache singleton instances
-					if ( $binding['singleton'] ) {
-						$this->instances[ $name ] = $instance;
+					// Check for definition first
+					if ( isset( $this->definitions[ $name ] ) ) {
+						$definition = $this->definitions[ $name ];
+						$instance   = $definition->resolve( [ $this, 'resolve' ] );
+
+						// Cache singleton instances
+						if ( $definition->is_singleton() ) {
+							$this->instances[ $name ] = $instance;
+						}
+
+						array_pop( $this->resolving_stack );
+						return $instance;
 					}
 
-					return $instance;
-				}
+					// Check for legacy binding
+					if ( isset( $this->bindings[ $name ] ) ) {
+						$binding  = $this->bindings[ $name ];
+						$resolver = $binding['resolver'];
 
-				// Try to auto-resolve if enabled and it's a class name
-				if ( $this->autowiring_enabled && class_exists( $name ) ) {
-					return $this->auto_resolve( $name );
-				}
+						// Resolve the service
+						if ( is_callable( $resolver ) ) {
+							$instance = $resolver( $this );
+						} elseif ( is_string( $resolver ) && class_exists( $resolver ) ) {
+							$instance = $this->auto_resolve( $resolver );
+						} else {
+							$instance = $resolver;
+						}
 
-				// Generate enhanced error message
-				$error_message = $this->generate_enhanced_error_message( $name );
-				throw NotFoundException::for_identifier_with_message( esc_html( $name ), esc_html( $error_message ) );
+						// Cache singleton instances
+						if ( $binding['singleton'] ) {
+							$this->instances[ $name ] = $instance;
+						}
+
+						array_pop( $this->resolving_stack );
+						return $instance;
+					}
+
+					// Try to auto-resolve if enabled and it's a class name
+					if ( $this->autowiring_enabled && class_exists( $name ) ) {
+						$result = $this->auto_resolve_internal( $name );
+						array_pop( $this->resolving_stack );
+						return $result;
+					}
+
+					// Generate enhanced error message
+					array_pop( $this->resolving_stack );
+					$error_message = $this->generate_enhanced_error_message( $name );
+					throw NotFoundException::for_identifier_with_message( esc_html( $name ), esc_html( $error_message ) );
+					
+				} catch ( \Exception $e ) {
+					array_pop( $this->resolving_stack );
+					throw $e;
+				}
 			}
 		);
 	}
@@ -865,6 +891,93 @@ class Container implements ContainerInterface {
 		} catch ( ContainerException $e ) {
 			$this->record_resolution_time( $class_name, $start_time, false );
 			array_pop( $this->resolving_stack );
+			throw $e;
+		}
+	}
+
+	/**
+	 * Auto-resolve a class with dependency injection without managing resolution stack.
+	 * This is used internally when the stack is already managed by the caller.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $class_name The class name to auto-resolve.
+	 *
+	 * @return mixed The resolved instance.
+	 *
+	 * @throws ContainerException If the class cannot be auto-resolved.
+	 */
+	private function auto_resolve_internal( string $class_name ) {
+		$start_time = microtime( true );
+
+		try {
+			// Get reflection from cache or create new
+			$reflection = $this->get_cached_reflection( $class_name );
+
+			// If no constructor, just instantiate
+			if ( ! $reflection->hasMethod( '__construct' ) ) {
+				$instance = $reflection->newInstance();
+				$this->record_resolution_time( $class_name, $start_time, true );
+				return $instance;
+			}
+
+			// Get constructor parameters from cache or reflection
+			$parameters = $this->get_cached_constructor_parameters( $class_name, $reflection );
+
+			// If no parameters, just instantiate
+			if ( empty( $parameters ) ) {
+				$instance = $reflection->newInstance();
+				$this->record_resolution_time( $class_name, $start_time, true );
+				return $instance;
+			}
+
+			// Resolve constructor dependencies
+			$dependencies = [];
+			foreach ( $parameters as $parameter ) {
+				$type = $parameter->getType();
+				// @phpstan-ignore-next-line
+				if ( $type && ! $type->isBuiltin() ) {
+					// @phpstan-ignore-next-line
+					$dependency_class = $type->getName();
+					$dependencies[]   = $this->resolve( $dependency_class );
+				} elseif ( $parameter->isDefaultValueAvailable() ) {
+					$dependencies[] = $parameter->getDefaultValue();
+				} else {
+					$error_message = $this->build_enhanced_error_message(
+						$class_name,
+						"Cannot resolve parameter [{$parameter->getName()}]",
+						[
+							'parameter_name' => $parameter->getName(),
+							'parameter_type' => $type ? $type->getName() : 'mixed',
+							'has_default'    => $parameter->isDefaultValueAvailable(),
+							'is_optional'    => $parameter->isOptional(),
+							'resolution_stack' => $this->resolving_stack,
+						]
+					);
+					throw new ContainerException( $error_message );
+				}
+			}
+
+			$instance = $reflection->newInstanceArgs( $dependencies );
+			$this->record_resolution_time( $class_name, $start_time, true );
+
+			return $instance;
+
+		} catch ( ReflectionException $e ) {
+			$this->record_resolution_time( $class_name, $start_time, false );
+
+			$error_message = $this->build_enhanced_error_message(
+				$class_name,
+				'Cannot auto-resolve class: ' . $e->getMessage(),
+				[
+					'reflection_error' => $e->getMessage(),
+					'class_exists'     => class_exists( $class_name ),
+					'resolution_stack' => $this->resolving_stack,
+				]
+			);
+			throw new ContainerException( esc_html( $error_message ), 0 );
+		} catch ( ContainerException $e ) {
+			$this->record_resolution_time( $class_name, $start_time, false );
 			throw $e;
 		}
 	}
@@ -1123,19 +1236,25 @@ class Container implements ContainerInterface {
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
-	 * @param string $interface      The interface name.
+	 * @param string $b_interface      The interface name.
 	 * @param string $implementation The implementation class name.
 	 *
 	 * @return void
 	 *
-	 * @throws ContainerException If container is compiled.
+	 * @throws ContainerException If container is compiled or interface doesn't exist.
 	 */
-	public function bind_interface( string $interface, string $implementation ): void {
+	public function bind_interface( string $b_interface, string $implementation ): void {
 		$this->ensure_not_compiled();
-		$this->interface_bindings[ $interface ] = $implementation;
+		
+		// Validate that the interface exists
+		if ( ! interface_exists( $b_interface ) ) {
+			throw new ContainerException( esc_html( "Interface $b_interface does not exist" ) );
+		}
+		
+		$this->interface_bindings[ $b_interface ] = $implementation;
 
 		if ( $this->debug_mode ) {
-			error_log( "Debug Suite Container: Bound interface [$interface] to implementation [$implementation]." );
+			error_log( "Debug Suite Container: Bound interface [$b_interface] to implementation [$implementation]." );
 		}
 	}
 
@@ -1226,7 +1345,7 @@ class Container implements ContainerInterface {
 		$cache_hits        = count( $this->reflection_cache );
 
 		foreach ( $this->resolution_stats as $service => $stats ) {
-			$resolutions       = count( $stats['success'] ) + count( $stats['failure'] );
+			$resolutions        = count( $stats['success'] ) + count( $stats['failure'] );
 			$total_resolutions += $resolutions;
 			$total_time        += array_sum( $stats['success'] ) + array_sum( $stats['failure'] );
 		}
@@ -1251,9 +1370,9 @@ class Container implements ContainerInterface {
 	 * @return void
 	 */
 	public function clear_performance_data(): void {
-		$this->resolution_stats   = [];
-		$this->reflection_cache   = [];
-		$this->constructor_cache  = [];
+		$this->resolution_stats  = [];
+		$this->reflection_cache  = [];
+		$this->constructor_cache = [];
 
 		if ( $this->debug_mode ) {
 			error_log( 'Debug Suite Container: Performance data cleared.' );
