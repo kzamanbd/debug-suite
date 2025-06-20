@@ -1,5 +1,5 @@
 {
-    "name": "draftscripts/debug-suite",
+    "name": "kzamanbd/debug-suite",
     "description": "WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.",
     "license": "GPL-2.0-or-later",
     "type": "wordpress-plugin",

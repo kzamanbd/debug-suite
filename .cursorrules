@@ -1,0 +1,485 @@
+# Debug Suite WordPress Plugin - Cursor Rules
+
+You are an expert WordPress plugin developer working on the Debug Suite plugin, a sophisticated development toolkit with enterprise-grade architecture.
+
+## Project Overview
+
+Debug Suite is a WordPress plugin providing advanced debugging tools with:
+
+- **PSR-11 compliant dependency injection container** with PHP-DI compatibility
+- **Service Layer Pattern** architecture for business logic separation
+- **React/TypeScript frontend** with Tailwind CSS v4 and WordPress integration
+- **Modern PHP 8.2** features with strict typing and enterprise patterns
+
+## Core Architecture Principles
+
+### PSR-11 Dependency Injection Container System
+
+- Use `DebugSuite\Core\Container\Container` which implements `Psr\Container\ContainerInterface`
+- Support for `AutowiredDefinition`, `FactoryDefinition`, `ValueDefinition`, `ConfigDefinition`, `DecoratorDefinition`
+- Container uses singleton pattern accessible via `Container::get_instance()`
+- Service providers extend `AbstractServiceProvider` with registration and booting phases
+- Automatic hook registration for services implementing `Hookable` interface
+
+### Service Layer Pattern (Critical)
+
+- **ALL business logic** must be in services under `DebugSuite\Services` namespace
+- Services implement `ServiceInterface` marker interface
+- Services return `ServiceResponse` objects (`ServiceResponse::success($data)` or `ServiceResponse::failure($message, $code)`)
+- REST controllers only handle HTTP requests/responses, delegate to services
+- Services registered as singletons in DI container via service providers
+
+## PHP Backend Standards
+
+### PHP 8.2 Features & Type Safety
+
+```php
+// ✅ Use PHP 8.2 features
+- Union types: `string|null`, `array|false`
+- Named arguments in function calls
+- Constructor property promotion
+- Match expressions over switch
+- Readonly properties where appropriate
+- First-class callable syntax: `$callback = strlen(...)`
+- DNF (Disjunctive Normal Form) types
+
+// ✅ Strict typing requirements
+- Return type declarations for ALL methods and functions
+- Parameter type hints for ALL method and function parameters
+- Use nullable types: `?string` or `string|null`
+```
+
+### Naming Conventions (WordPress Standard)
+
+```php
+// ✅ Correct naming
+class MyServiceClass {}           // PascalCase for classes
+function my_function_name() {}    // snake_case for functions/methods
+$my_variable_name = 'value';      // snake_case for variables
+const MY_CONSTANT = 'value';      // SCREAMING_SNAKE_CASE for constants
+
+// ❌ Avoid camelCase for PHP functions/variables
+function myFunctionName() {}      // Wrong
+$myVariableName = 'value';        // Wrong
+```
+
+### Service Implementation Pattern
+
+```php
+<?php
+namespace DebugSuite\Services;
+
+use DebugSuite\Core\ServiceResponse;
+use DebugSuite\Interfaces\ServiceInterface;
+
+class ExampleService implements ServiceInterface {
+    
+    public function __construct(
+        private SomeDependency $dependency,
+        private ?string $config_value = null
+    ) {}
+    
+    public function process_data(array $input): ServiceResponse {
+        // Validate input
+        if (empty($input['required_field'])) {
+            return ServiceResponse::failure(
+                __('Required field is missing.', 'debug-suite'),
+                'validation_error'
+            );
+        }
+        
+        // Process business logic
+        $result = $this->do_business_logic($input);
+        
+        return ServiceResponse::success([
+            'data' => $result,
+            'timestamp' => current_time('mysql')
+        ]);
+    }
+}
+```
+
+### REST Controller Pattern
+
+```php
+<?php
+namespace DebugSuite\API;
+
+use DebugSuite\Services\ExampleService;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_Error;
+
+class ExampleController extends RestController {
+    
+    public function __construct(
+        private ExampleService $service
+    ) {}
+    
+    public function handle_request(WP_REST_Request $request): WP_REST_Response|WP_Error {
+        // Extract input
+        $input = [
+            'field' => $request->get_param('field')
+        ];
+        
+        // Delegate to service
+        $result = $this->service->process_data($input);
+        
+        // Transform to HTTP response
+        if ($result->is_failure()) {
+            return new WP_Error(
+                $result->get_error_code(),
+                $result->get_error_message(),
+                ['status' => 400]
+            );
+        }
+        
+        return rest_ensure_response($result->to_array());
+    }
+}
+```
+
+### Service Provider Registration
+
+```php
+class AppServiceProvider extends AbstractServiceProvider {
+    
+    protected array $provides = [
+        ExampleService::class,
+        ExampleController::class,
+    ];
+    
+    public function register(Container $container): void {
+        $container->add_definitions([
+            // Services with autowiring
+            ExampleService::class => $container->autowire(ExampleService::class),
+            
+            // Controllers with dependency injection
+            ExampleController::class => $container->autowire(ExampleController::class),
+        ]);
+    }
+}
+```
+
+### WordPress Hooks with Hookable Interface
+
+```php
+use DebugSuite\Interfaces\Hookable;
+
+class AdminService implements Hookable {
+    
+    public function register_hooks(): void {
+        add_action('admin_menu', [$this, 'add_admin_menu']);
+        add_action('admin_init', [$this, 'init_settings']);
+    }
+    
+    public function add_admin_menu(): void {
+        // Implementation
+    }
+}
+```
+
+## Frontend Standards (React/TypeScript)
+
+### TypeScript & React Requirements
+
+```typescript
+// ✅ Use TypeScript for all frontend components
+// ✅ Use @wordpress/element for React components
+// ✅ Functional components with hooks
+// ✅ Proper interface definitions
+
+interface ComponentProps {
+    data: LogEntry[];
+    onSelect: (id: string) => void;
+    isLoading?: boolean;
+}
+
+const MyComponent: React.FC<ComponentProps> = ({ data, onSelect, isLoading = false }) => {
+    // Implementation
+};
+```
+
+### Naming Conventions (JavaScript/TypeScript)
+
+```typescript
+// ✅ Frontend naming conventions
+const ComponentName = () => {};           // PascalCase for components
+const myVariableName = 'value';          // camelCase for variables/functions
+const handleButtonClick = () => {};      // camelCase for functions
+interface MyInterface {}                 // PascalCase for interfaces
+const useMyHook = () => {};             // camelCase starting with 'use' for hooks
+```
+
+### File Naming Conventions
+
+```md
+// ✅ Use kebab-case for files
+src/components/log-viewer.tsx           // Components
+src/hooks/use-log-entries.ts           // Hooks  
+src/utils/date-helpers.ts              // Utilities
+src/types/log-types.ts                 // Types
+```
+
+### Component Architecture - Consolidation Over Micro-Components
+
+```typescript
+// ✅ Prefer 2-3 substantial components (100-300 lines each)
+// ✅ Group related functionality logically:
+
+// log-viewer.tsx - Handles ALL display concerns
+const LogViewer = ({ logs, loading, pagination }: LogViewerProps) => {
+    // Table rendering, log details, expandable rows, formatting
+};
+
+// log-controls.tsx - Handles ALL control concerns  
+const LogControls = ({ filters, onFiltersChange, actions }: LogControlsProps) => {
+    // File selection, filtering, search, pagination, export, clear
+};
+
+// ❌ Avoid excessive micro-components:
+// log-entry.tsx, log-table.tsx, log-file-selector.tsx, etc.
+```
+
+### UI Component Standards
+
+#### Always Use Headless UI Components
+
+```typescript
+// ✅ Use custom Combobox for all dropdowns
+import Combobox from '@/components/ui/combobox';
+
+<Combobox
+    options={[
+        { value: 'option1', label: 'Option 1' },
+        { value: 'option2', label: 'Option 2' }
+    ]}
+    value={selectedOption}
+    onChange={setSelectedOption}
+    placeholder="Select option..."
+/>
+
+// ❌ Never use native <select> or other dropdown libraries
+```
+
+#### Icon Usage - Lucide React Only
+
+```typescript
+// ✅ Always use Lucide React icons
+import { FolderOpen, Settings, X, Check } from 'lucide-react';
+
+<FolderOpen size={16} className="text-primary" />
+
+// ❌ Never use inline SVG or other icon libraries
+```
+
+### Tailwind CSS v4 Standards
+
+```typescript
+// ✅ Use Tailwind CSS v4 with Oxide engine
+// ✅ ALWAYS use 'primary' color as brand color
+className="bg-primary text-primary-foreground hover:bg-primary/90"
+
+// ✅ Use classNames utility for conditional classes
+import { classNames } from '@/utils';
+
+className={classNames(
+    'base-classes',
+    isActive && 'active-classes',
+    hasError && 'error-classes'
+)}
+
+// ✅ Responsive design with breakpoints
+className="w-full md:w-1/2 lg:w-1/3"
+```
+
+### Internationalization
+
+```typescript
+// ✅ Use @wordpress/i18n for all user-facing strings
+import { __ } from '@wordpress/i18n';
+
+const message = __('Debug log cleared successfully', 'debug-suite');
+const contextual = _x('Settings', 'menu item', 'debug-suite');
+```
+
+## Directory Structure Standards
+
+```md
+includes/
+├── Services/                    # Business logic services
+│   ├── ServiceInterface.php    # Service marker interface
+│   ├── ExampleService.php      # Individual services
+│   └── DebugLog/               # Feature-specific services
+├── API/                        # REST controllers only
+│   ├── RestController.php      # Base controller
+│   └── ExampleController.php   # Individual controllers
+├── Providers/                  # Service providers
+│   └── AppServiceProvider.php  # Service registration
+└── Core/
+    ├── ServiceResponse.php     # Response wrapper
+    └── Container/              # DI container system
+
+src/
+├── pages/[feature-name]/       # Feature pages
+│   ├── index.tsx              # Main component
+│   ├── types.ts               # TypeScript types
+│   ├── hooks.ts               # Custom hooks
+│   └── components/            # Feature components
+│       ├── feature-viewer.tsx # Display component
+│       └── feature-controls.tsx # Controls component
+└── components/ui/             # Reusable UI components
+```
+
+## Helper Functions Usage
+
+### PHP Helpers
+
+```php
+// ✅ Use debug suite helpers
+$service = debug_suite_resolve(ExampleService::class);
+$container = debug_suite_container();
+
+// ✅ DI definition helpers
+$definition = debug_suite_autowire_with_params(LoggerService::class, [
+    'log_level' => 'debug'
+], true); // singleton
+
+// ✅ Environment-aware configuration
+$config = debug_suite_autowire_env(DatabaseService::class, [
+    'development' => ['debug' => true],
+    'production' => ['debug' => false]
+]);
+```
+
+## Error Handling Patterns
+
+### Service Layer Error Handling
+
+```php
+// ✅ Always return ServiceResponse, never throw exceptions to controllers
+if (!file_exists($file_path)) {
+    return ServiceResponse::failure(
+        __('File not found.', 'debug-suite'),
+        'file_not_found',
+        ['path' => $file_path] // Context data
+    );
+}
+
+// ✅ Success responses with data
+return ServiceResponse::success([
+    'data' => $processed_data,
+    'timestamp' => current_time('mysql')
+]);
+```
+
+### Frontend Error Handling
+
+```typescript
+// ✅ Handle API errors gracefully
+try {
+    const response = await apiClient.getData();
+    if (response.success) {
+        setData(response.data);
+    } else {
+        setError(response.message);
+    }
+} catch (error) {
+    setError(__('An unexpected error occurred', 'debug-suite'));
+}
+```
+
+## Testing Standards
+
+### PHP Unit Tests
+
+```php
+/**
+ * @covers \DebugSuite\Services\ExampleService
+ * @group services
+ * @group unit
+ */
+class ExampleServiceTest extends DebugSuiteTestCase {
+    
+    public function test_process_data_success(): void {
+        $service = new ExampleService();
+        $result = $service->process_data(['required_field' => 'value']);
+        
+        $this->assertTrue($result->is_success());
+        $this->assertArrayHasKey('data', $result->to_array());
+    }
+}
+```
+
+## Performance & Security
+
+### Security Practices
+
+```php
+// ✅ Always sanitize and validate input
+$safe_path = $this->sanitize_path($relative_path);
+if (!$this->is_path_safe($full_path)) {
+    return ServiceResponse::failure('Invalid path', 'invalid_path');
+}
+
+// ✅ Check permissions
+if (!current_user_can('manage_options')) {
+    return new WP_Error('permission_denied', 'Insufficient permissions');
+}
+```
+
+### Performance Optimization
+
+```php
+// ✅ Use container singleton pattern
+$container->singleton(ExpensiveService::class, fn() => new ExpensiveService());
+
+// ✅ Cache reflection for autowiring
+private array $reflection_cache = [];
+```
+
+## Documentation Requirements
+
+### PHPDoc Standards
+
+```php
+/**
+ * Process input data with validation and business logic.
+ *
+ * @param array $input {
+ *     Input data array.
+ *     @type string $required_field Required field description.
+ *     @type int    $optional_field Optional field description.
+ * }
+ * @return ServiceResponse Success with processed data or failure with error.
+ * 
+ * @since DEBUG_SUITE_SINCE
+ */
+public function process_data(array $input): ServiceResponse {
+    // Implementation
+}
+```
+
+## Key Reminders
+
+1. **Service Layer First**: All business logic goes in services, controllers are thin HTTP layers
+2. **Return ServiceResponse**: Services always return ServiceResponse, never throw exceptions to controllers  
+3. **Use DI Container**: Register services in providers, resolve via container
+4. **snake_case PHP**: Functions, methods, variables use snake_case (WordPress standard)
+5. **camelCase Frontend**: JavaScript/TypeScript uses camelCase
+6. **Consolidate Components**: Prefer substantial components over micro-components
+7. **Headless UI**: Use Headless UI components for accessibility
+8. **Lucide Icons**: Only use Lucide React icons
+9. **Primary Color**: Always use 'primary' as brand color in Tailwind
+10. **Type Everything**: Full TypeScript coverage, PHP 8.2 type hints everywhere
+
+Follow these rules consistently to maintain the enterprise-grade architecture and coding standards of the Debug Suite plugin.
+
+- Provide meaningful error messages for users
+
+## Documentation
+
+- Use comprehensive DocBlocks for all PHP classes and methods
+- Include JSDoc comments for TypeScript functions and components
+- Maintain README files for major components
+- Document API endpoints and their usage

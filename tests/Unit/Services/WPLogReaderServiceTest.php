@@ -8,7 +8,7 @@
 namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Services\DebugLog\WPLogReaderService;
-use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
+use DebugSuite\Tests\Helpers\TestCase;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @group services
  * @group wp-log-reader
  */
-class WPLogReaderServiceTest extends DebugSuiteTestCase {
+class WPLogReaderServiceTest extends TestCase {
 
 	/**
 	 * WP log reader service instance.
@@ -130,9 +130,13 @@ class WPLogReaderServiceTest extends DebugSuiteTestCase {
 		$this->assertTrue( $result->is_success() );
 		
 		$data = $result->get_data();
-		$this->assertArrayHasKey( 'data', $data );
-		$this->assertArrayHasKey( 'format', $data );
-		$this->assertEquals( 'json', $data['format'] );
+		// The export method returns 'content', 'filename', 'mime_type', 'size', 'entries'
+		$this->assertArrayHasKey( 'content', $data );
+		$this->assertArrayHasKey( 'mime_type', $data );
+		$this->assertEquals( 'application/json', $data['mime_type'] );
+		$this->assertArrayHasKey( 'filename', $data );
+		$this->assertArrayHasKey( 'size', $data );
+		$this->assertArrayHasKey( 'entries', $data );
 	}
 
 	/**
@@ -167,18 +171,37 @@ class WPLogReaderServiceTest extends DebugSuiteTestCase {
 		
 		file_put_contents( $this->test_log_file, $log_content );
 		
-		// Test filtering by error level
-		$result = $this->service->get_log_entries( [ 'level_filter' => 'error' ] );
+		// Test filtering by notice level (this should include notice, info, debug but not warning, error, critical)
+		// Level filtering works by severity: notice (5) includes all levels <= 5
+		$result = $this->service->get_log_entries( [ 'level' => 'notice' ] );
 		
 		$this->assertTrue( $result->is_success() );
 		
 		$data = $result->get_data();
 		$entries = $data['entries'];
 		
-		// Should only have error entries
-		foreach ( $entries as $entry ) {
-			$this->assertContains( $entry['level'], [ 'error', 'critical' ] );
-		}
+		$found_levels = array_map( function( $entry ) { return $entry['level']; }, $entries );
+		$unique_levels = array_unique($found_levels);
+		
+		// With notice level filter (5), we should get:
+		// - critical (2) ✓
+		// - warning (4) ✓  
+		// - notice (5) ✓
+		// So all three entries should be included
+		$this->assertContains( 'critical', $unique_levels, 'Should contain critical level. Found levels: ' . implode(', ', $unique_levels) );
+		$this->assertContains( 'warning', $unique_levels, 'Should contain warning level. Found levels: ' . implode(', ', $unique_levels) );
+		$this->assertContains( 'notice', $unique_levels, 'Should contain notice level. Found levels: ' . implode(', ', $unique_levels) );
+		
+		// Test with more restrictive filter (error level = 3)
+		$error_result = $this->service->get_log_entries( [ 'level' => 'error' ] );
+		$this->assertTrue( $error_result->is_success() );
+		$error_data = $error_result->get_data();
+		$error_levels = array_unique(array_map( function( $entry ) { return $entry['level']; }, $error_data['entries'] ));
+		
+		// Error level (3) should include critical (2) and exclude warning (4) and notice (5)
+		$this->assertContains( 'critical', $error_levels, 'Error filter should include critical' );
+		$this->assertNotContains( 'warning', $error_levels, 'Error filter should exclude warning' );
+		$this->assertNotContains( 'notice', $error_levels, 'Error filter should exclude notice' );
 	}
 
 	/**
