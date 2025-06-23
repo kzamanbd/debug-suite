@@ -110,15 +110,15 @@ class WPLogReaderService implements ServiceInterface {
 		}
 
 		try {
-			$raw_content = file_get_contents( $log_file );
-			if ( false === $raw_content ) {
+			$lines = file( $log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
+			if ( false === $lines ) {
 				return ServiceResponse::failure(
 					__( 'Failed to read log file.', 'debug-suite' ),
 					'read_error'
 				);
 			}
 
-			$entries = $this->parse_log_entries( $raw_content );
+			$entries = $this->parse_log_entries( $lines );
 			$filtered_entries = $this->filter_entries( $entries, $options );
 			$paginated_entries = $this->paginate_entries( $filtered_entries, $options );
 
@@ -142,237 +142,155 @@ class WPLogReaderService implements ServiceInterface {
 	}
 
 	/**
-	 * Parse raw log content into structured entries with stack trace detection.
+	 * Parse log lines into structured entries with improved efficiency.
 	 *
-	 * @param string $content Raw log content.
+	 * @param array $lines Array of log lines.
 	 * @return array
 	 */
-	private function parse_log_entries( string $content ): array {
+	private function parse_log_entries( array $lines ): array {
 		$entries = [];
-		$lines = explode( "\n", $content );
-		$current_entry = null;
-		$in_stack_trace = false;
-		$stack_trace_lines = [];
+		$entry = null;
 
 		foreach ( $lines as $line_number => $line ) {
-			$line = trim( $line );
-
-			if ( empty( $line ) ) {
-				continue;
-			}
-
 			// Check if this line starts a new log entry
-			$parsed_entry = $this->parse_log_line( $line );
-
-			if ( $parsed_entry ) {
+			if ( preg_match( '/^\[(.*?)] (.*?): (.*?)( in (.*?) on line (\d+))?$/', $line, $matches ) ) {
 				// Save previous entry if exists
-				if ( $current_entry ) {
-					if ( ! empty( $stack_trace_lines ) ) {
-						$current_entry['stack_trace'] = $this->parse_stack_trace( $stack_trace_lines );
-						$current_entry['has_stack_trace'] = true;
-					}
-					$entries[] = $current_entry;
+				if ( $entry ) {
+					$entries[] = $entry;
 				}
 
-				// Start new entry
-				$current_entry = $parsed_entry;
-				$current_entry['line_number'] = $line_number + 1;
-				$current_entry['has_stack_trace'] = false;
-				$in_stack_trace = false;
-				$stack_trace_lines = [];
-			} else { // phpcs:ignore
-				// This is a continuation line, check if it's part of a stack trace
-				if ( $current_entry ) {
-					if ( $this->is_stack_trace_line( $line ) ) {
-						if ( ! $in_stack_trace ) {
-							$in_stack_trace = true;
-						}
-						$stack_trace_lines[] = $line;
-					} else if ( $in_stack_trace && $this->is_stack_trace_continuation( $line ) ) {
-						// Continue collecting stack trace lines
-						$stack_trace_lines[] = $line;
-					} else {
-						// Regular continuation of the message
-						$current_entry['message'] .= "\n" . $line;
-						$in_stack_trace = false;
-					}
-				}
+				$type = trim( $matches[2] );
+				$level = $this->determine_log_level( $type );
+
+				$entry = [
+					'timestamp'        => $this->parse_timestamp( $matches[1] ),
+					'type'             => $type,
+					'level'            => $level,
+					'message'          => trim( $matches[3] ),
+					'file'             => $matches[5] ?? null,
+					'line'             => isset( $matches[6] ) ? (int) $matches[6] : null,
+					'stack_trace'      => '',
+					'has_stack_trace'  => false,
+					'line_number'      => $line_number + 1,
+					'raw_line'         => $line,
+				];
+			} elseif ( $entry ) {
+				// This is a continuation line (stack trace)
+				$entry['stack_trace'] .= $line . "\n";
+				$entry['has_stack_trace'] = true;
 			}
 		}
 
-		// Remember the last entry
-		if ( $current_entry ) {
-			if ( ! empty( $stack_trace_lines ) ) {
-				$current_entry['stack_trace'] = $this->parse_stack_trace( $stack_trace_lines );
-				$current_entry['has_stack_trace'] = true;
-			}
-			$entries[] = $current_entry;
+		// Add the last entry if exists
+		if ( $entry ) {
+			$entries[] = $entry;
 		}
 
-		return array_reverse( $entries ); // Most recent first
+		// Process stack traces and return most recent first
+		return array_reverse( array_map( [ $this, 'process_stack_trace' ], $entries ) );
 	}
 
 	/**
-	 * Parse a single log line into structured data.
+	 * Determine log level from error type.
 	 *
-	 * @param string $line Log line.
-	 * @return array|null
+	 * @param string $type Error type string.
+	 * @return string
 	 */
-	private function parse_log_line( string $line ): ?array {
-		// WordPress debug.log format: [DD-MMM-YYYY HH:MM:SS UTC] PHP Error: Message
-		$wordpress_pattern = '/^\[(\d{2}-[A-Za-z]{3}-\d{4}\s\d{2}:\d{2}:\d{2}\s[A-Z]{3})\]\s+(.*?):\s+(.*)$/';
+	private function determine_log_level( string $type ): string {
+		$type_lower = strtolower( $type );
 
-		// Standard log format: YYYY-MM-DD HH:MM:SS [LEVEL] Message
-		$standard_pattern = '/^(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})\s+\[([^\]]+)\]\s+(.*)$/';
-
-		// PHP error format: [DD-MMM-YYYY HH:MM:SS] PHP Error: Message
-		$php_error_pattern = '/^\[(\d{2}-[A-Za-z]{3}-\d{4}\s\d{2}:\d{2}:\d{2})\]\s+(.*?):\s+(.*)$/';
-
-		if ( preg_match( $wordpress_pattern, $line, $matches ) ) {
-			return [
-				'timestamp' => $this->parse_timestamp( $matches[1] ),
-				'level'     => $this->normalize_log_level( $matches[2] ),
-				'message'   => trim( $matches[3] ),
-				'raw_line'  => $line,
-			];
+		if ( str_contains( $type_lower, 'fatal' ) || 
+			 str_contains( $type_lower, 'parse error' ) || 
+			 str_contains( $type_lower, 'uncaught' ) ||
+			 str_contains( $type_lower, 'error' ) ) {
+			return 'error';
 		}
 
-		if ( preg_match( $standard_pattern, $line, $matches ) ) {
-			return [
-				'timestamp' => $matches[1],
-				'level'     => $this->normalize_log_level( $matches[2] ),
-				'message'   => trim( $matches[3] ),
-				'raw_line'  => $line,
-			];
+		if ( str_contains( $type_lower, 'warning' ) ) {
+			return 'warning';
 		}
 
-		if ( preg_match( $php_error_pattern, $line, $matches ) ) {
-			return [
-				'timestamp' => $this->parse_timestamp( $matches[1] ),
-				'level'     => $this->normalize_log_level( $matches[2] ),
-				'message'   => trim( $matches[3] ),
-				'raw_line'  => $line,
-			];
+		if ( str_contains( $type_lower, 'notice' ) ) {
+			return 'notice';
 		}
 
-		return null;
+		if ( str_contains( $type_lower, 'deprecated' ) ) {
+			return 'debug';
+		}
+
+		return 'info';
 	}
 
 	/**
-	 * Check if a line is part of a stack trace.
+	 * Process stack trace for an entry.
 	 *
-	 * @param string $line Line to check.
-	 * @return bool
+	 * @param array $entry Log entry.
+	 * @return array
 	 */
-	private function is_stack_trace_line( string $line ): bool {
-		// Common stack trace patterns
-		$patterns = [
-			'/^#\d+\s+/',                           // #0 /path/to/file.php(123): function()
-			'/^Stack trace:/',                      // Stack trace header
-			'/^\s*at\s+/',                         // at ClassName->method()
-			'/^\s*in\s+\/.*\.php:\d+/',            // in /path/file.php:123
-			'/^\s*thrown in\s+.*\.php on line\s+\d+/', // thrown in /path/file.php on line 123
-			'/^\s*Call to undefined/',             // Call to undefined function/method
-			'/^\s*Fatal error:/',                  // Fatal error messages
-			'/^\s*Warning:/',                      // Warning messages that might start traces
-			'/^\s*Notice:/',                       // Notice messages
-			'/^\s+thrown in\s+/',                  // Indented "thrown in" lines
+	private function process_stack_trace( array $entry ): array {
+		if ( empty( $entry['stack_trace'] ) ) {
+			return $entry;
+		}
+
+		$stack_trace_lines = array_filter( 
+			explode( "\n", trim( $entry['stack_trace'] ) ),
+			fn( $line ) => ! empty( trim( $line ) )
+		);
+
+		$entry['stack_trace'] = [
+			'raw_lines'   => $stack_trace_lines,
+			'frames'      => $this->parse_stack_trace_frames( $stack_trace_lines ),
+			'summary'     => implode( "\n", $stack_trace_lines ),
+			'frame_count' => count( $stack_trace_lines ),
 		];
 
-		foreach ( $patterns as $pattern ) {
-			if ( preg_match( $pattern, $line ) ) {
-				return true;
-			}
-		}
-
-		return false;
+		return $entry;
 	}
 
 	/**
-	 * Check if a line is a continuation of a stack trace.
-	 *
-	 * @param string $line Line to check.
-	 * @return bool
-	 */
-	private function is_stack_trace_continuation( string $line ): bool {
-		// Lines that are likely continuation of stack traces
-		$patterns = [
-			'/^\s+/',                    // Indented lines
-			'/^#\d+\s+/',               // Numbered stack trace entries
-			'/^\s*\[internal function\]/', // Internal function calls
-			'/^\s*{main}/',             // Main execution
-		];
-
-		foreach ( $patterns as $pattern ) {
-			if ( preg_match( $pattern, $line ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Parse stack trace lines into structured data.
+	 * Parse stack trace frames from lines.
 	 *
 	 * @param array $lines Stack trace lines.
 	 * @return array
 	 */
-	private function parse_stack_trace( array $lines ): array {
-		$stack_trace = [
-			'raw_lines' => $lines,
-			'frames'    => [],
-			'summary'   => '',
-		];
-
+	private function parse_stack_trace_frames( array $lines ): array {
 		$frames = [];
-		$summary_parts = [];
 
-		foreach ( $lines as $line ) {
+		foreach ( $lines as $index => $line ) {
 			$line = trim( $line );
-
-			// Parse numbered stack trace frames: #0 /path/file.php(123): function()
+			
+			// Try to parse numbered stack frames
 			if ( preg_match( '/^#(\d+)\s+(.+)$/', $line, $matches ) ) {
-				$frame_number = (int) $matches[1];
-				$frame_info = $matches[2];
-
 				$frame = [
-					'number' => $frame_number,
-					'raw'    => $frame_info,
+					'number' => (int) $matches[1],
+					'raw'    => $matches[2],
 				];
 
-				// Try to parse file, line, and function with improved patterns
-				if ( preg_match( '/^(.*?)\((\d+)\):\s*(.*)$/', $frame_info, $frame_matches ) ) {
-					$frame['file'] = $frame_matches[1];
-					$frame['line'] = (int) $frame_matches[2];
+				// Parse file, line, and function
+				if ( preg_match( '/^(.*?)\((\d+)\):\s*(.*)$/', $matches[2], $frame_matches ) ) {
+					$frame['file']     = $frame_matches[1];
+					$frame['line']     = (int) $frame_matches[2];
 					$frame['function'] = $frame_matches[3];
-				} elseif ( preg_match( '/^\[internal function\]:\s*(.*)$/', $frame_info, $frame_matches ) ) {
-					$frame['file'] = '[internal function]';
-					$frame['line'] = null;
-					$frame['function'] = $frame_matches[1];
-				} elseif ( preg_match( '/^{main}$/', $frame_info ) ) {
-					$frame['file'] = '{main}';
-					$frame['line'] = null;
-					$frame['function'] = '{main}';
 				} else {
-					// Fallback for any other format
-					$frame['function'] = $frame_info;
-					$frame['file'] = null;
-					$frame['line'] = null;
+					$frame['function'] = $matches[2];
+					$frame['file']     = null;
+					$frame['line']     = null;
 				}
 
 				$frames[] = $frame;
 			} else {
-				// Collect non-frame lines for summary
-				$summary_parts[] = $line;
+				// Generic frame for non-numbered lines
+				$frames[] = [
+					'number'   => $index,
+					'raw'      => $line,
+					'function' => $line,
+					'file'     => null,
+					'line'     => null,
+				];
 			}
 		}
 
-		$stack_trace['frames'] = $frames;
-		$stack_trace['summary'] = implode( "\n", $summary_parts );
-		$stack_trace['frame_count'] = count( $frames );
-
-		return $stack_trace;
+		return $frames;
 	}
 
 	/**
@@ -392,30 +310,6 @@ class WPLogReaderService implements ServiceInterface {
 		}
 
 		return $timestamp;
-	}
-
-	/**
-	 * Normalize log level names.
-	 *
-	 * @param string $level Raw level.
-	 * @return string
-	 */
-	private function normalize_log_level( string $level ): string {
-		$level = strtolower( trim( $level ) );
-
-		// Map common variations
-		$level_map = [
-			'php fatal error'    => 'critical',
-			'php warning'        => 'warning',
-			'php notice'         => 'notice',
-			'php parse error'    => 'critical',
-			'fatal error'        => 'critical',
-			'err'               => 'error',
-			'warn'              => 'warning',
-			'inf'               => 'info',
-		];
-
-		return $level_map[ $level ] ?? $level;
 	}
 
 	/**
