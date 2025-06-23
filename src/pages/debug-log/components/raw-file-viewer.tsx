@@ -134,7 +134,7 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
         <div
             ref={containerRef}
             className={classNames(
-                'flex flex-1 flex-col rounded-lg border bg-white',
+                'flex flex-1 flex-col overflow-hidden rounded-lg border bg-white',
                 isFullscreen && 'h-screen w-screen rounded-none'
             )}
         >
