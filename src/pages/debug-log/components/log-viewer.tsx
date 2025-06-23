@@ -113,7 +113,7 @@ const LogViewer = ({ logs, loading, currentPage, perPage }: LogViewerProps) => {
                                                     >
                                                         <div className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100">
                                                             <pre className="font-mono text-xs whitespace-pre-wrap">
-                                                                {log.stack_trace}
+                                                                {JSON.stringify(log.stack_trace, null, 2)}
                                                             </pre>
                                                         </div>
                                                     </td>
