@@ -190,11 +190,5 @@ export const useRawFileContent = (filePath?: string) => {
         }
     };
 
-    useEffect(() => {
-        if (filePath) {
-            fetchRawContent(filePath);
-        }
-    }, [filePath]);
-
     return { content, loading, refetch: () => fetchRawContent(filePath) };
 };

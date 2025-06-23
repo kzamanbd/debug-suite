@@ -3,7 +3,7 @@
  */
 import { DebugSuiteRoute } from '@/routing/routes';
 import { classNames } from '@/utils';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 /**
  * Props for the Layout component.
@@ -45,8 +45,16 @@ const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element =
             </div>
         );
     };
+
+    useEffect(() => {
+        // update the document title based on the route
+        if (route.title && typeof route.title === 'string') {
+            document.title = `${route.title} - Debug Suite`;
+        }
+    }, [route.path]);
+
     return (
-        <div className={classNames(className, 'mt-5 min-h-screen rounded-lg bg-white p-6')}>
+        <div className={classNames(className, 'mt-5 min-h-screen rounded-lg bg-white p-5')}>
             <LayoutHeader />
             {/* Main content area */}
             <div>{children}</div>

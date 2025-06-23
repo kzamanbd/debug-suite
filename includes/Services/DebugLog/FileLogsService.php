@@ -84,4 +84,121 @@ class FileLogsService implements ServiceInterface {
 	public function export_logs( array $options = [] ): ServiceResponse {
 		return $this->log_reader->export_logs( $options );
 	}
+
+	/**
+	 * Get paths to supported log files.
+	 *
+	 * @return array
+	 */
+
+	public function supported_log_files(): array {
+		return [
+			'apache_error_log' => $this->find_apache_log_file(),
+			'nginx_error_log' => $this->find_nginx_log_file(),
+			'redis_log' => $this->find_redis_log_file(),
+			'php_fpm_error_log' => $this->find_php_fpm_error_log(),
+		];
+	}
+
+	/**
+	 * Find the PHP-FPM error log file.
+	 *
+	 * @return string|null
+	 */
+	public function find_php_fpm_error_log(): ?string {
+		$candidates = [
+			'/var/log/php-fpm.log',
+			'/var/log/php/php-fpm.log',
+			'/opt/bitnami/php/var/log/php-fpm.log',
+		];
+
+		// Check common PHP-FPM log locations
+		$candidates = array_merge( $candidates, glob( '/var/log/php-fpm*.log' ) );
+		$candidates = array_merge( $candidates, glob( '/var/log/php*.log' ) );
+
+		foreach ( $candidates as $path ) {
+			if ( is_readable( $path ) ) {
+				return $path;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Find the Apache error log file.
+	 *
+	 * @return string|null
+	 */
+	public function find_apache_log_file(): ?string {
+		$candidates = [
+			'/var/log/apache2/error.log',
+			'/var/log/httpd/error_log',
+			'/usr/local/apache/logs/error_log',
+			'/opt/bitnami/apache2/logs/error_log',
+		];
+		foreach ( $candidates as $path ) {
+			if ( is_readable( $path ) ) {
+				return $path;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Find the Nginx error log file.
+	 *
+	 * @return string|null
+	 */
+	public function find_nginx_log_file(): ?string {
+		$candidates = [
+			'/var/log/nginx/error.log',
+			'/usr/local/nginx/logs/error.log',
+			'/opt/bitnami/nginx/logs/error.log',
+		];
+		foreach ( $candidates as $path ) {
+			if ( is_readable( $path ) ) {
+				return $path;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Find the Redis log file.
+	 *
+	 * @return string|null
+	 */
+	public function find_redis_log_file(): ?string {
+		$candidates = [
+			'/var/log/redis/redis-server.log',
+			'/var/log/redis.log',
+		];
+		foreach ( $candidates as $path ) {
+			if ( is_readable( $path ) ) {
+				return $path;
+			}
+		}
+
+		// Try parsing redis.conf if found
+		$config_paths = [
+			'/etc/redis/redis.conf',
+			'/usr/local/etc/redis/redis.conf',
+		];
+		foreach ( $config_paths as $conf ) {
+			if ( is_readable( $conf ) ) {
+				$lines = file( $conf );
+				foreach ( $lines as $line ) {
+					if ( preg_match( '/^logfile\s+(.+)$/', trim( $line ), $match ) ) {
+						$logfile = trim( $match[1] );
+						if ( is_readable( $logfile ) ) {
+							return $logfile;
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
 }

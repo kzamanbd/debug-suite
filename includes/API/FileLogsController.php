@@ -267,7 +267,7 @@ class FileLogsController extends RestController {
 	 */
 	public function get_supported_log_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		// Get common log file locations
-		$supported_log_files = [];
+		$log_files = $this->service->supported_log_files();
 
 		// Main debug.log
 		$debug_log = WP_CONTENT_DIR . '/debug.log';
@@ -284,17 +284,9 @@ class FileLogsController extends RestController {
 		}
 
 		// Check for other common log files
-		$other_logs = [
-			WP_CONTENT_DIR . '/error.log' => 'PHP Error Log',
-			WP_CONTENT_DIR . '/access.log' => 'Access Log',
-			ABSPATH . 'error_log' => 'Root Error Log',
-			'/var/log/apache2/error.log' => 'Apache Error Log',
-			'/var/log/nginx/error.log' => 'Nginx Error Log',
-			'/var/log/php-fpm.log' => 'PHP-FPM Log',
-			'/var/log/messages' => 'Messages Log',
-		];
+		$other_logs = $this->service->supported_log_files();
 
-		foreach ( $other_logs as $path => $type ) {
+		foreach ( $log_files as $path => $type ) {
 			if ( file_exists( $path ) ) {
 				$supported_log_files[] = [
 					'name' => basename( $path ),
