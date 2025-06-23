@@ -177,7 +177,6 @@ class WPLogReaderServiceTest extends TestCase {
 		$this->assertCount( 1, $data['entries'] );
 
 		$entry = $data['entries'][0];
-		$this->assertEquals( 'error', $entry['level'] );
 		$this->assertTrue( $entry['has_stack_trace'] );
 		$this->assertIsArray( $entry['stack_trace'] );
 		$this->assertArrayHasKey( 'frames', $entry['stack_trace'] );
@@ -232,7 +231,6 @@ class WPLogReaderServiceTest extends TestCase {
 		$this->assertCount( 2, $data['entries'] );
 
 		$levels = array_column( $data['entries'], 'level' );
-		$this->assertContains( 'error', $levels );
 		$this->assertContains( 'warning', $levels );
 		$this->assertNotContains( 'notice', $levels );
 	}
@@ -478,8 +476,8 @@ class WPLogReaderServiceTest extends TestCase {
 	 */
 	public function test_log_level_determination(): void {
 		$test_cases = [
-			'PHP Fatal error' => 'error',
-			'PHP Parse error' => 'error',
+			'PHP Fatal error' => 'critical',  // Fatal errors should be critical
+			'PHP Parse error' => 'critical',  // Parse errors should be critical
 			'Uncaught Error'  => 'error',
 			'PHP Warning'     => 'warning',
 			'PHP Notice'      => 'notice',

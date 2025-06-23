@@ -199,9 +199,14 @@ class WPLogReaderService implements ServiceInterface {
 	private function determine_log_level( string $type ): string {
 		$type_lower = strtolower( $type );
 
-		if ( str_contains( $type_lower, 'fatal' ) || 
-			 str_contains( $type_lower, 'parse error' ) || 
-			 str_contains( $type_lower, 'uncaught' ) ||
+		// Check for critical level errors first (fatal errors are critical)
+		if ( str_contains( $type_lower, 'fatal' ) ||
+			 str_contains( $type_lower, 'parse error' ) ) {
+			return 'critical';
+		}
+
+		// Check for regular errors
+		if ( str_contains( $type_lower, 'uncaught' ) ||
 			 str_contains( $type_lower, 'error' ) ) {
 			return 'error';
 		}
@@ -232,7 +237,7 @@ class WPLogReaderService implements ServiceInterface {
 			return $entry;
 		}
 
-		$stack_trace_lines = array_filter( 
+		$stack_trace_lines = array_filter(
 			explode( "\n", trim( $entry['stack_trace'] ) ),
 			fn( $line ) => ! empty( trim( $line ) )
 		);
@@ -258,7 +263,7 @@ class WPLogReaderService implements ServiceInterface {
 
 		foreach ( $lines as $index => $line ) {
 			$line = trim( $line );
-			
+
 			// Try to parse numbered stack frames
 			if ( preg_match( '/^#(\d+)\s+(.+)$/', $line, $matches ) ) {
 				$frame = [
