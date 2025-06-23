@@ -99,7 +99,6 @@ EOT;
 			// Set the config file path using reflection
 			$reflection = new ReflectionClass($this->service);
 			$property = $reflection->getProperty('config_file_path');
-			$property->setAccessible(true);
 			$property->setValue($this->service, $this->config_file);
 		}
 		

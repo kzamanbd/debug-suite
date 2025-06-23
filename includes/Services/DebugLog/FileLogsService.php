@@ -32,7 +32,8 @@ class FileLogsService implements ServiceInterface {
 	 * Constructor for FileLogsService.
 	 */
 	public function __construct() {
-		$this->log_reader = new WPLogReaderService();
+		$debug_log = WP_CONTENT_DIR . '/debug.log';
+		$this->log_reader = new WPLogReaderService( $debug_log );
 	}
 
 	/**

@@ -48,13 +48,11 @@ class FileLogsServiceTest extends TestCase {
 		// Set the log file path in the internal log reader using reflection
 		$reflection = new ReflectionClass($this->service);
 		$log_reader_property = $reflection->getProperty('log_reader');
-		$log_reader_property->setAccessible(true);
 		$log_reader = $log_reader_property->getValue($this->service);
 		
-		// Set the default_log_path in the WPLogReaderService
+		// Set the log_file_path in the WPLogReaderService
 		$reader_reflection = new ReflectionClass($log_reader);
-		$path_property = $reader_reflection->getProperty('default_log_path');
-		$path_property->setAccessible(true);
+		$path_property = $reader_reflection->getProperty('log_file_path');
 		$path_property->setValue($log_reader, $this->test_log_file);
 	}
 
@@ -133,13 +131,11 @@ EOT;
 		// Set the log file path in the internal log reader using reflection
 		$reflection = new ReflectionClass($service);
 		$log_reader_property = $reflection->getProperty('log_reader');
-		$log_reader_property->setAccessible(true);
 		$log_reader = $log_reader_property->getValue($service);
 		
-		// Set the default_log_path in the WPLogReaderService
+		// Set the log_file_path in the WPLogReaderService
 		$reader_reflection = new ReflectionClass($log_reader);
-		$path_property = $reader_reflection->getProperty('default_log_path');
-		$path_property->setAccessible(true);
+		$path_property = $reader_reflection->getProperty('log_file_path');
 		$path_property->setValue($log_reader, $non_existent_file);
 		
 		$result = $service->get_log_entries();

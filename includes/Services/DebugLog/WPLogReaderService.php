@@ -47,16 +47,15 @@ class WPLogReaderService implements ServiceInterface {
 	 *
 	 * @var string
 	 */
-	private string $default_log_path;
+	private string $log_file_path;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string|null $log_path Optional custom log file path.
+	 * @param string $log_path Optional custom log file path.
 	 */
-	public function __construct( ?string $log_path = null ) {
-		// TODO: clean up this constructor to use a more flexible configuration system.
-		$this->default_log_path = $log_path ?? WP_CONTENT_DIR . '/debug.log';
+	public function __construct( string $log_path ) {
+		$this->log_file_path = $log_path;
 	}
 
 	/**
@@ -91,7 +90,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	public function read_log_entries( array $options = [] ): ServiceResponse {
-		$log_file = $options['log_file'] ?? $this->default_log_path;
+		$log_file = $options['log_file'] ?? $this->log_file_path;
 
 		if ( ! file_exists( $log_file ) ) {
 			return ServiceResponse::failure(
@@ -543,7 +542,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	public function get_log_statistics( ?string $log_file = null ): ServiceResponse {
-		$log_file = $log_file ?? $this->default_log_path;
+		$log_file = $log_file ?? $this->log_file_path;
 
 		if ( ! file_exists( $log_file ) ) {
 			return ServiceResponse::failure(
@@ -600,7 +599,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	public function clear_log_file( ?string $log_file = null ): ServiceResponse {
-		$log_file = $log_file ?? $this->default_log_path;
+		$log_file = $log_file ?? $this->log_file_path;
 
 		if ( ! file_exists( $log_file ) ) {
 			return ServiceResponse::success(

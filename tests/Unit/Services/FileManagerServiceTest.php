@@ -56,7 +56,6 @@ class FileManagerServiceTest extends TestCase {
 		// Set the base path using reflection
 		$reflection = new ReflectionClass($this->service);
 		$property = $reflection->getProperty('base_path');
-		$property->setAccessible(true);
 		$property->setValue($this->service, $this->test_dir . '/');
 	}
 
@@ -138,8 +137,7 @@ class FileManagerServiceTest extends TestCase {
 		// Create a method that uses reflection to call the protected method
 		$reflection = new ReflectionClass(FileManagerService::class);
 		$method = $reflection->getMethod('get_file_metadata');
-		$method->setAccessible(true);
-		
+
 		$full_path = $this->test_dir . '/test1.txt';
 		$metadata = $method->invoke($this->service, $full_path);
 		
@@ -246,7 +244,6 @@ class FileManagerServiceTest extends TestCase {
 		// Get the actual base path used in the service
 		$reflection = new ReflectionClass($this->service);
 		$property = $reflection->getProperty('base_path');
-		$property->setAccessible(true);
 		$base_path = $property->getValue($this->service);
 		$this->assertNotEmpty($base_path, 'Base path is empty');
 		
