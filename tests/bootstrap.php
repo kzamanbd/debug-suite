@@ -8,10 +8,6 @@
  * @package DebugSuite\Tests
  */
 
-// Prevent direct access
-if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', dirname( __FILE__ ) . '/../../' );
-}
 
 // Set test environment constants
 define( 'DEBUG_SUITE_TESTING', true );
