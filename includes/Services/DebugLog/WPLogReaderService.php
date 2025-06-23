@@ -52,10 +52,10 @@ class WPLogReaderService implements ServiceInterface {
 	/**
 	 * Constructor.
 	 *
-	 * @param string $log_path Optional custom log file path.
+	 * Automatically sets the WordPress debug log file path.
 	 */
-	public function __construct( string $log_path ) {
-		$this->log_file_path = $log_path;
+	public function __construct() {
+		$this->log_file_path = WP_CONTENT_DIR . '/debug.log';
 	}
 
 	/**
@@ -86,7 +86,7 @@ class WPLogReaderService implements ServiceInterface {
 	 *     @type int    $limit      Number of entries to return.
 	 *     @type int    $offset     Offset for pagination.
 	 *     @type string $log_file   Custom log file path.
-	 * }
+	 *
 	 * @return ServiceResponse
 	 */
 	public function read_log_entries( array $options = [] ): ServiceResponse {
@@ -182,7 +182,7 @@ class WPLogReaderService implements ServiceInterface {
 	}
 
 	/**
-	 * Determine log level from error type.
+	 * Determine log level from an error type.
 	 *
 	 * @param string $type Error type string.
 	 * @return string

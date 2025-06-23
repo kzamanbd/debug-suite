@@ -10,6 +10,7 @@
 
 namespace DebugSuite\Tests\Integration\API;
 
+use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\API\FileLogsController;
 use DebugSuite\Services\DebugLog\FileLogsService;
@@ -54,9 +55,11 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 		global $wp_rest_server;
 		$wp_rest_server = new WP_REST_Server();
 		do_action( 'rest_api_init' );
+
+		$log_reader = new WPLogReaderService();
 		
 		// Create service and controller
-		$this->service = new FileLogsService();
+		$this->service = new FileLogsService( $log_reader );
 		$this->controller = new FileLogsController( $this->service );
 		
 		// Register routes

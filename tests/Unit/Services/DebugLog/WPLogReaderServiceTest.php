@@ -10,6 +10,7 @@ namespace DebugSuite\Tests\Unit\Services\DebugLog;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Tests\Helpers\TestCase;
+use ReflectionClass;
 
 
 /**
@@ -47,8 +48,11 @@ class WPLogReaderServiceTest extends TestCase {
 		// Create temporary log file
 		$this->temp_log_file = tempnam( sys_get_temp_dir(), 'debug_suite_test_' );
 		
-		// Initialize service with temporary log path
-		$this->service = new WPLogReaderService( $this->temp_log_file );
+		// Initialize service and set custom log path using reflection
+		$this->service = new WPLogReaderService();
+		$reflection = new ReflectionClass( $this->service );
+		$path_property = $reflection->getProperty( 'log_file_path' );
+		$path_property->setValue( $this->service, $this->temp_log_file );
 	}
 
 	/**
@@ -101,7 +105,10 @@ class WPLogReaderServiceTest extends TestCase {
 	public function test_read_log_entries_file_not_found(): void {
 		// Create a service with a non-existent file path
 		$non_existent_path = '/non/existent/path/debug.log';
-		$service = new WPLogReaderService( $non_existent_path );
+		$service = new WPLogReaderService();
+		$reflection = new \ReflectionClass( $service );
+		$path_property = $reflection->getProperty( 'log_file_path' );
+		$path_property->setValue( $service, $non_existent_path );
 		
 		$result = $service->read_log_entries();
 

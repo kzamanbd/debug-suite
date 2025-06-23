@@ -11,6 +11,7 @@ namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Tests\Helpers\TestCase;
 use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\DebugLog\WPLogReaderService;
 use ReflectionClass;
 
 /**
@@ -41,19 +42,14 @@ class FileLogsServiceTest extends TestCase {
 		// Create a temporary log file for testing
 		$this->test_log_file = $this->create_test_file('', '.log');
 		
-		// Create service instance with custom log file path
-		// FileLogsService now uses WPLogReaderService internally
-		$this->service = new FileLogsService();
+		// Create log reader service and set custom log file path using reflection
+		$log_reader = new WPLogReaderService();
+		$reflection = new \ReflectionClass( $log_reader );
+		$path_property = $reflection->getProperty( 'log_file_path' );
+		$path_property->setValue( $log_reader, $this->test_log_file );
 		
-		// Set the log file path in the internal log reader using reflection
-		$reflection = new ReflectionClass($this->service);
-		$log_reader_property = $reflection->getProperty('log_reader');
-		$log_reader = $log_reader_property->getValue($this->service);
-		
-		// Set the log_file_path in the WPLogReaderService
-		$reader_reflection = new ReflectionClass($log_reader);
-		$path_property = $reader_reflection->getProperty('log_file_path');
-		$path_property->setValue($log_reader, $this->test_log_file);
+		// Create service instance with dependency injection
+		$this->service = new FileLogsService( $log_reader );
 	}
 
 	/**
@@ -126,17 +122,15 @@ EOT;
 	public function test_get_log_entries_missing_file() {
 		// Create a service instance with a non-existent file path
 		$non_existent_file = '/path/to/nonexistent/debug.log';
-		$service = new FileLogsService();
 		
-		// Set the log file path in the internal log reader using reflection
-		$reflection = new ReflectionClass($service);
-		$log_reader_property = $reflection->getProperty('log_reader');
-		$log_reader = $log_reader_property->getValue($service);
+		// Create log reader service and set custom log file path using reflection
+		$log_reader = new WPLogReaderService();
+		$reflection = new \ReflectionClass( $log_reader );
+		$path_property = $reflection->getProperty( 'log_file_path' );
+		$path_property->setValue( $log_reader, $non_existent_file );
 		
-		// Set the log_file_path in the WPLogReaderService
-		$reader_reflection = new ReflectionClass($log_reader);
-		$path_property = $reader_reflection->getProperty('log_file_path');
-		$path_property->setValue($log_reader, $non_existent_file);
+		// Create service instance with dependency injection
+		$service = new FileLogsService( $log_reader );
 		
 		$result = $service->get_log_entries();
 		
