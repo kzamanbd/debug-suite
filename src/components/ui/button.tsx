@@ -43,7 +43,7 @@ const Button = ({
         type="button"
         data-variant={variant}
         className={classNames(
-            'inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+            'inline-flex items-center gap-1 rounded-lg px-4 py-2 font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
             variantClasses[variant],
             className
         )}

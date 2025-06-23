@@ -61,17 +61,3 @@ jobs:
         # TODO: Need to set up the environment for integration tests
         run: |
           echo "Integration tests are not set up yet. Skipping..."
-        continue-on-error: true
-
-      - name: Generate Code Coverage Report
-        run: |
-          mkdir -p build/logs
-          vendor/bin/phpunit --coverage-clover build/logs/clover.xml
-        continue-on-error: true
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./build/logs/clover.xml
-          fail_ci_if_error: false
-        continue-on-error: true
