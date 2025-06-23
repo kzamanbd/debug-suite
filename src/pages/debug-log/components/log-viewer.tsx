@@ -19,7 +19,7 @@ interface LogViewerProps {
 
 const LogViewer = ({ logs, loading, currentPage, perPage }: LogViewerProps) => {
     return (
-        <div className="flex-1 overflow-y-auto bg-white">
+        <div className="flex-1 overflow-y-auto rounded-lg border bg-white">
             <table className="min-w-full divide-y divide-gray-200">
                 <thead className="sticky top-0 bg-gray-50">
                     <tr>

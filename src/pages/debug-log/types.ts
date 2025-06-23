@@ -50,6 +50,15 @@ export interface LogFilters {
     perPage: number;
 }
 
+export type ViewMode = 'parsed' | 'raw';
+
+export interface RawFileContent {
+    content: string;
+    filename: string;
+    size: string;
+    last_modified: string;
+}
+
 export interface LogActions {
     onLevelChange: (level: string) => void;
     onSearchChange: (term: string) => void;

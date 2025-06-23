@@ -101,14 +101,6 @@ class WPLogReaderService implements ServiceInterface {
 			);
 		}
 
-		if ( ! is_readable( $log_file ) ) {
-			return ServiceResponse::failure(
-				__( 'Log file is not readable.', 'debug-suite' ),
-				'file_not_readable',
-				[ 'path' => $log_file ]
-			);
-		}
-
 		try {
 			$lines = file( $log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
 			if ( false === $lines ) {
@@ -616,14 +608,6 @@ class WPLogReaderService implements ServiceInterface {
 					'message' => __( 'Log file does not exist.', 'debug-suite' ),
 					'path'    => $log_file,
 				]
-			);
-		}
-
-		if ( ! is_writable( $log_file ) ) {
-			return ServiceResponse::failure(
-				__( 'Log file is not writable.', 'debug-suite' ),
-				'file_not_writable',
-				[ 'path' => $log_file ]
 			);
 		}
 

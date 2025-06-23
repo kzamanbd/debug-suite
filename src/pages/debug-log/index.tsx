@@ -3,11 +3,11 @@
  *
  * @since 1.0.0
  */
-import FileLogsSkeleton from '@/components/logs-skeleton';
+import FileLogsSkeleton from '@/pages/debug-log/components/logs-skeleton';
 import { useState } from '@wordpress/element';
-import { LogControls, LogViewer } from './components';
-import { useLogActions, useLogEntries, useLogFiles, useLogStats } from './hooks';
-import type { LogFilters } from './types';
+import { LogControls, LogViewer, RawFileViewer } from './components';
+import { useLogActions, useLogEntries, useLogFiles, useLogStats, useRawFileContent } from './hooks';
+import type { LogFilters, ViewMode } from './types';
 
 const FileLogs = () => {
     // Custom hooks for data management
@@ -15,8 +15,10 @@ const FileLogs = () => {
     const { logs, loading: logsLoading, fetchLogs, refetch: refetchLogs } = useLogEntries();
     const { stats, loading: statsLoading } = useLogStats();
     const { clearLogs, exportLogs, clearing } = useLogActions();
+    const { content: rawContent, loading: rawLoading, refetch: refetchRawContent } = useRawFileContent(selectedFile);
 
-    // Local state for filters
+    // Local state for view mode and filters
+    const [viewMode, setViewMode] = useState<ViewMode>('parsed');
     const [filters, setFilters] = useState<LogFilters>({
         level: '',
         search: '',
@@ -63,16 +65,25 @@ const FileLogs = () => {
         });
     };
 
-    // Handle refresh
+    // Handle refresh based on current view mode
     const handleRefresh = () => {
-        fetchLogs({
-            page: filters.page,
-            per_page: filters.perPage,
-            level_filter: filters.level,
-            search: filters.search,
-            sort_by: filters.sortBy,
-            sort_order: filters.sortOrder
-        });
+        if (viewMode === 'parsed') {
+            fetchLogs({
+                page: filters.page,
+                per_page: filters.perPage,
+                level_filter: filters.level,
+                search: filters.search,
+                sort_by: filters.sortBy,
+                sort_order: filters.sortOrder
+            });
+        } else {
+            refetchRawContent();
+        }
+    };
+
+    // Handle view mode change
+    const handleViewModeChange = (mode: ViewMode) => {
+        setViewMode(mode);
     };
 
     // Handle export with format selection
@@ -86,6 +97,8 @@ const FileLogs = () => {
                 logFiles={logFiles}
                 selectedFile={selectedFile}
                 onFileChange={setSelectedFile}
+                viewMode={viewMode}
+                onViewModeChange={handleViewModeChange}
                 filters={filters}
                 onFiltersChange={handleFilterChange}
                 currentPage={logs.current_page}
@@ -100,12 +113,16 @@ const FileLogs = () => {
                 filesLoading={filesLoading}
             />
 
-            <LogViewer
-                logs={logs.entries}
-                loading={logsLoading}
-                currentPage={logs.current_page}
-                perPage={logs.per_page}
-            />
+            {viewMode === 'parsed' ? (
+                <LogViewer
+                    logs={logs.entries}
+                    loading={logsLoading}
+                    currentPage={logs.current_page}
+                    perPage={logs.per_page}
+                />
+            ) : (
+                <RawFileViewer content={rawContent} loading={rawLoading} onRefresh={refetchRawContent} />
+            )}
         </div>
     );
 };

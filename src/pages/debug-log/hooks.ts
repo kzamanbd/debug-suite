@@ -5,7 +5,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
-import type { LogFile, LogResponse, LogStats } from './types';
+import type { LogFile, LogResponse, LogStats, RawFileContent } from './types';
 
 export const useLogFiles = () => {
     const [logFiles, setLogFiles] = useState<LogFile[]>([]);
@@ -163,4 +163,38 @@ export const useLogActions = () => {
     };
 
     return { clearLogs, exportLogs, clearing };
+};
+
+export const useRawFileContent = (filePath?: string) => {
+    const [content, setContent] = useState<RawFileContent | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    const fetchRawContent = async (path?: string) => {
+        if (!path) return;
+
+        try {
+            setLoading(true);
+            const params = new URLSearchParams();
+            params.append('file', path);
+
+            const response = await apiFetch<RawFileContent>({
+                path: `/debug-suite/v1/logs/raw?${params.toString()}`
+            });
+
+            setContent(response);
+        } catch (error) {
+            console.error('Error fetching raw file content:', error);
+            setContent(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (filePath) {
+            fetchRawContent(filePath);
+        }
+    }, [filePath]);
+
+    return { content, loading, refetch: () => fetchRawContent(filePath) };
 };

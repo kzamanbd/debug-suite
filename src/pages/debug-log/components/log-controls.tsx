@@ -6,6 +6,7 @@
 import Button from '@/components/ui/button';
 import Combobox from '@/components/ui/combobox';
 import InputField from '@/components/ui/input-field';
+import { classNames } from '@/utils';
 import { __ } from '@wordpress/i18n';
 import {
     ChevronDownIcon,
@@ -13,13 +14,15 @@ import {
     ChevronRightIcon,
     ChevronUpIcon,
     DownloadIcon,
+    EyeIcon,
+    FileTextIcon,
     RefreshCwIcon,
     SearchIcon,
     TrashIcon,
     XIcon
 } from 'lucide-react';
 import { levelOptions, perPageOptions, sortOptions } from '../constants';
-import type { LogFile, LogFilters } from '../types';
+import type { LogFile, LogFilters, ViewMode } from '../types';
 
 interface LogControlsProps {
     // File selection
@@ -27,11 +30,15 @@ interface LogControlsProps {
     selectedFile: string;
     onFileChange: (filePath: string) => void;
 
-    // Filters
+    // View mode
+    viewMode: ViewMode;
+    onViewModeChange: (mode: ViewMode) => void;
+
+    // Filters (only used in parsed mode)
     filters: LogFilters;
     onFiltersChange: (newFilters: Partial<LogFilters>) => void;
 
-    // Pagination
+    // Pagination (only used in parsed mode)
     currentPage: number;
     totalPages: number;
     totalEntries: number;
@@ -50,6 +57,8 @@ const LogControls = ({
     logFiles,
     selectedFile,
     onFileChange,
+    viewMode,
+    onViewModeChange,
     filters,
     onFiltersChange,
     currentPage,
@@ -114,7 +123,7 @@ const LogControls = ({
         const endEntry = Math.min(currentPage * perPage, totalEntries);
 
         return (
-            <div className="flex items-center justify-between border-t border-gray-200 bg-white py-3">
+            <div className="flex items-center justify-between border-gray-200 bg-white py-3">
                 <div className="flex flex-1 justify-between sm:hidden">
                     <Button variant="light" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
                         {__('Previous', 'debug-suite')}
@@ -174,11 +183,12 @@ const LogControls = ({
                                             <Button
                                                 variant={page === currentPage ? 'primary' : 'light'}
                                                 onClick={() => goToPage(page)}
-                                                className={`relative inline-flex items-center border px-4 py-2 text-sm font-medium ${
+                                                className={classNames(
+                                                    'relative inline-flex items-center border px-4 py-2 text-sm font-medium',
                                                     page === currentPage
                                                         ? 'border-primary-500 bg-primary-50 text-primary-600 z-10'
                                                         : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50'
-                                                }`}
+                                                )}
                                             >
                                                 {page}
                                             </Button>
@@ -203,37 +213,72 @@ const LogControls = ({
     };
 
     return (
-        <>
+        <div className="divide divide-y">
             {/* Header with file selector */}
-            <div className="border-b border-gray-200 bg-white py-4">
+            <div className="bg-white py-4">
                 <div className="flex items-center justify-between">
-                    <Combobox
-                        options={filteredLogFiles}
-                        value={selectedLogFile()}
-                        onChange={(option) => onFileChange(option?.value || '')}
-                        isDisabled={filesLoading}
-                        className="min-w-[250px]"
-                        placeholder={__('Select a log file', 'debug-suite')}
-                    />
+                    <div className="flex items-center space-x-4">
+                        <Combobox
+                            options={filteredLogFiles}
+                            value={selectedLogFile()}
+                            onChange={(option) => onFileChange(option?.value || '')}
+                            isDisabled={filesLoading}
+                            className="min-w-[250px]"
+                            placeholder={__('Select a log file', 'debug-suite')}
+                        />
+
+                        {/* View Mode Toggle */}
+                        <nav className="flex gap-x-0.5 rounded-lg bg-gray-100 p-0.5 md:gap-x-1 dark:bg-neutral-800">
+                            <button
+                                type="button"
+                                onClick={() => onViewModeChange('parsed')}
+                                className={classNames(
+                                    'flex items-center rounded-md border border-transparent px-1.5 py-2 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
+                                    viewMode === 'parsed'
+                                        ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
+                                        : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
+                                )}
+                            >
+                                <EyeIcon className="mr-1.5 h-3.5 w-3.5" />
+                                {__('Parsed', 'debug-suite')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onViewModeChange('raw')}
+                                className={classNames(
+                                    'flex items-center rounded-md border border-transparent px-1.5 py-2 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
+                                    viewMode === 'raw'
+                                        ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
+                                        : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
+                                )}
+                            >
+                                <FileTextIcon className="mr-1.5 h-3.5 w-3.5" />
+                                {__('Raw File', 'debug-suite')}
+                            </button>
+                        </nav>
+                    </div>
+
                     <div className="flex items-center space-x-2">
-                        <div className="relative">
-                            <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                            <InputField
-                                type="text"
-                                placeholder={__('Search in log...', 'debug-suite')}
-                                value={filters.search}
-                                onChange={(e) => onFiltersChange({ search: e.target.value })}
-                                className="w-64 pl-10"
-                            />
-                            {filters.search && (
-                                <button
-                                    onClick={clearSearch}
-                                    className="absolute top-1/2 right-3 -translate-y-1/2 transform"
-                                >
-                                    <XIcon className="h-4 w-4 text-gray-400" />
-                                </button>
-                            )}
-                        </div>
+                        {viewMode === 'parsed' && (
+                            <div className="relative">
+                                <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                                <InputField
+                                    type="text"
+                                    placeholder={__('Search in log...', 'debug-suite')}
+                                    value={filters.search}
+                                    onChange={(e) => onFiltersChange({ search: e.target.value })}
+                                    className="w-64 pl-10"
+                                />
+                                {filters.search && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="absolute top-1/2 right-3 -translate-y-1/2 transform"
+                                    >
+                                        <XIcon className="h-4 w-4 text-gray-400" />
+                                    </button>
+                                )}
+                            </div>
+                        )}
                         <Button variant="light" onClick={onRefresh}>
                             <RefreshCwIcon className="h-4 w-4" />
                         </Button>
@@ -241,62 +286,60 @@ const LogControls = ({
                 </div>
             </div>
 
-            {/* Filters and actions */}
-            <div className="border-b border-gray-200 bg-white py-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <Combobox
-                            options={levelOptions}
-                            value={levelOptions.find((opt) => opt.value === filters.level) || levelOptions[0]}
-                            onChange={(option) => onFiltersChange({ level: option?.value || '' })}
-                        />
-                        <Combobox
-                            options={sortOptions}
-                            value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
-                            onChange={(option) => onFiltersChange({ sortBy: option?.value || 'timestamp' })}
-                        />
-                        <Button variant="light" onClick={toggleSortOrder} className="flex items-center space-x-1">
-                            {filters.sortOrder === 'asc' ? (
-                                <ChevronUpIcon className="h-4 w-4" />
-                            ) : (
-                                <ChevronDownIcon className="h-4 w-4" />
-                            )}
-                            <span>
-                                {filters.sortOrder === 'asc'
-                                    ? __('Ascending', 'debug-suite')
-                                    : __('Descending', 'debug-suite')}
-                            </span>
-                        </Button>
-                    </div>
+            {/* Filters and actions - only show in parsed mode */}
+            {viewMode === 'parsed' && (
+                <div className="bg-white py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <Combobox
+                                options={levelOptions}
+                                value={levelOptions.find((opt) => opt.value === filters.level) || levelOptions[0]}
+                                onChange={(option) => onFiltersChange({ level: option?.value || '' })}
+                            />
+                            <Combobox
+                                options={sortOptions}
+                                value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
+                                onChange={(option) => onFiltersChange({ sortBy: option?.value || 'timestamp' })}
+                            />
+                            <Button variant="light" onClick={toggleSortOrder} className="flex items-center space-x-1">
+                                {filters.sortOrder === 'asc' ? (
+                                    <ChevronUpIcon className="h-4 w-4" />
+                                ) : (
+                                    <ChevronDownIcon className="h-4 w-4" />
+                                )}
+                                <span>
+                                    {filters.sortOrder === 'asc'
+                                        ? __('Ascending', 'debug-suite')
+                                        : __('Descending', 'debug-suite')}
+                                </span>
+                            </Button>
+                        </div>
 
-                    <div className="flex items-center space-x-2">
-                        <Combobox
-                            options={perPageOptions}
-                            value={
-                                perPageOptions.find((opt) => opt.value === filters.perPage.toString()) ||
-                                perPageOptions[1]
-                            }
-                            onChange={(option) => onFiltersChange({ perPage: parseInt(option?.value || '25') })}
-                        />
-                        <Button variant="light" onClick={() => onExport('json')}>
-                            <DownloadIcon className="mr-2 h-4 w-4" />
-                            {__('Export', 'debug-suite')}
-                        </Button>
-                        <Button variant="light" onClick={handleClear} disabled={clearing}>
-                            <TrashIcon className="mr-2 h-4 w-4" />
-                            {clearing ? __('Clearing...', 'debug-suite') : __('Clear', 'debug-suite')}
-                        </Button>
+                        <div className="flex items-center space-x-2">
+                            <Combobox
+                                options={perPageOptions}
+                                value={
+                                    perPageOptions.find((opt) => opt.value === filters.perPage.toString()) ||
+                                    perPageOptions[1]
+                                }
+                                onChange={(option) => onFiltersChange({ perPage: parseInt(option?.value || '25') })}
+                            />
+                            <Button variant="light" onClick={() => onExport('json')}>
+                                <DownloadIcon className="mr-2 h-4 w-4" />
+                                {__('Export', 'debug-suite')}
+                            </Button>
+                            <Button variant="light" onClick={handleClear} disabled={clearing}>
+                                <TrashIcon className="mr-2 h-4 w-4" />
+                                {clearing ? __('Clearing...', 'debug-suite') : __('Clear', 'debug-suite')}
+                            </Button>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Pagination (rendered at bottom by parent) */}
-            {totalPages > 1 && (
-                <div className="border-t border-gray-200">
-                    <RenderPagination />
                 </div>
             )}
-        </>
+
+            {/* Pagination (rendered at bottom by parent) - only show in parsed mode */}
+            {viewMode === 'parsed' && totalPages > 1 && <RenderPagination />}
+        </div>
     );
 };
 

@@ -82,17 +82,4 @@ class FileLogsService implements ServiceInterface {
 	public function export_logs( array $options = [] ): ServiceResponse {
 		return $this->log_reader->export_logs( $options );
 	}
-
-	/**
-	 * Get advanced log entries with enhanced filtering (new method).
-	 *
-	 * @param array $options Advanced filtering options.
-	 * @return ServiceResponse
-	 */
-	public function get_advanced_log_entries( array $options = [] ): ServiceResponse {
-		// Use higher default limit for advanced features
-		$options['limit'] = $options['limit'] ?? 1000;
-
-		return $this->log_reader->get_log_entries( $options );
-	}
 }

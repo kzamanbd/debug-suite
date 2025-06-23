@@ -93,7 +93,7 @@ class FileLogsController extends RestController {
 			'/' . $this->rest_base . '/files',
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_log_files' ],
+				'callback'            => [ $this, 'get_supported_log_files' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
 			]
 		);
@@ -145,37 +145,17 @@ class FileLogsController extends RestController {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/advanced',
+			'/' . $this->rest_base . '/raw',
 			[
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_advanced_logs' ],
+				'callback'            => [ $this, 'get_raw_file_content' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
 				'args'                => [
-					'limit' => [
-						'type'              => 'integer',
-						'default'           => 1000,
-						'minimum'           => 1,
-						'maximum'           => 10000,
-						'sanitize_callback' => 'absint',
-					],
-					'level_filter' => [
+					'file' => [
 						'type'              => 'string',
-						'enum'              => [ 'critical', 'error', 'warning', 'notice', 'info', 'debug' ],
+						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
-					],
-					'search' => [
-						'type'              => 'string',
-						'sanitize_callback' => 'sanitize_text_field',
-					],
-					'date_from' => [
-						'type'              => 'string',
-						'format'            => 'date',
-						'sanitize_callback' => 'sanitize_text_field',
-					],
-					'date_to' => [
-						'type'              => 'string',
-						'format'            => 'date',
-						'sanitize_callback' => 'sanitize_text_field',
+						'description'       => __( 'Log file path. If not provided, uses the current debug log file.', 'debug-suite' ),
 					],
 				],
 			]
@@ -280,41 +260,19 @@ class FileLogsController extends RestController {
 	}
 
 	/**
-	 * Get advanced log entries with enhanced filtering.
-	 *
-	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response|WP_Error
-	 */
-	public function get_advanced_logs( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$options = [
-			'limit'        => $request->get_param( 'limit' ) ?? 1000,
-			'level_filter' => $request->get_param( 'level_filter' ),
-			'search'       => $request->get_param( 'search' ),
-			'date_from'    => $request->get_param( 'date_from' ),
-			'date_to'      => $request->get_param( 'date_to' ),
-		];
-
-		$result = $this->service->get_advanced_log_entries( $options );
-
-		return $result->is_failure()
-			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
-			: rest_ensure_response( $result->get_data() );
-	}
-
-	/**
 	 * Get available log files for sidebar navigation.
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response|WP_Error
 	 */
-	public function get_log_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+	public function get_supported_log_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		// Get common log file locations
-		$log_files = [];
+		$supported_log_files = [];
 
 		// Main debug.log
 		$debug_log = WP_CONTENT_DIR . '/debug.log';
 		if ( file_exists( $debug_log ) ) {
-			$log_files[] = [
+			$supported_log_files[] = [
 				'name' => 'debug.log',
 				'path' => $debug_log,
 				'size' => size_format( filesize( $debug_log ) ),
@@ -330,11 +288,15 @@ class FileLogsController extends RestController {
 			WP_CONTENT_DIR . '/error.log' => 'PHP Error Log',
 			WP_CONTENT_DIR . '/access.log' => 'Access Log',
 			ABSPATH . 'error_log' => 'Root Error Log',
+			'/var/log/apache2/error.log' => 'Apache Error Log',
+			'/var/log/nginx/error.log' => 'Nginx Error Log',
+			'/var/log/php-fpm.log' => 'PHP-FPM Log',
+			'/var/log/messages' => 'Messages Log',
 		];
 
 		foreach ( $other_logs as $path => $type ) {
 			if ( file_exists( $path ) ) {
-				$log_files[] = [
+				$supported_log_files[] = [
 					'name' => basename( $path ),
 					'path' => $path,
 					'size' => size_format( filesize( $path ) ),
@@ -348,9 +310,111 @@ class FileLogsController extends RestController {
 
 		return rest_ensure_response(
 			[
-				'files' => $log_files,
+				'files' => $supported_log_files,
 				'current_file' => $debug_log,
 			]
 		);
+	}
+
+	/**
+	 * Get raw file content for the file viewer.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_raw_file_content( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$file_path = $request->get_param( 'file' );
+
+		// Default to main debug log if no file specified
+		if ( empty( $file_path ) ) {
+			$file_path = WP_CONTENT_DIR . '/debug.log';
+		}
+
+		// Security check: only allow reading from allowed directories
+		$allowed_paths = [
+			WP_CONTENT_DIR,
+			ABSPATH,
+		];
+
+		$real_path = realpath( $file_path );
+		$is_allowed = false;
+
+		foreach ( $allowed_paths as $allowed_path ) {
+			if ( str_starts_with( $real_path, realpath( $allowed_path ) ) ) {
+				$is_allowed = true;
+				break;
+			}
+		}
+
+		if ( ! $is_allowed ) {
+			return new WP_Error(
+				'file_access_denied',
+				__( 'Access to this file is not allowed for security reasons.', 'debug-suite' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		// Check if file exists
+		if ( ! file_exists( $file_path ) ) {
+			return new WP_Error(
+				'file_not_found',
+				__( 'The requested log file was not found.', 'debug-suite' ),
+				[ 'status' => 404 ]
+			);
+		}
+
+		// For large files, limit the content to avoid memory issues
+		$file_size = filesize( $file_path );
+		$max_size = 50 * 1024 * 1024; // 50MB limit
+
+		if ( $file_size > $max_size ) {
+			// Read only the last 10MB of the file
+			$content = $this->read_file_tail( $file_path, $max_size );
+			$truncated = true;
+		} else {
+			$content = file_get_contents( $file_path );
+			$truncated = false;
+		}
+
+		if ( $content === false ) {
+			return new WP_Error(
+				'file_read_error',
+				__( 'Failed to read the log file.', 'debug-suite' ),
+				[ 'status' => 500 ]
+			);
+		}
+
+		return rest_ensure_response(
+			[
+				'content' => $content,
+				'filename' => basename( $file_path ),
+				'size' => size_format( $file_size ),
+				'size_bytes' => $file_size,
+				'last_modified' => gmdate( 'Y-m-d H:i:s', filemtime( $file_path ) ),
+				'truncated' => $truncated,
+				'max_size_reached' => $file_size > $max_size,
+			]
+		);
+	}
+
+	/**
+	 * Read the tail of a large file efficiently.
+	 *
+	 * @param string $file_path The file path.
+	 * @param int    $bytes     Number of bytes to read from the end.
+	 * @return string|false
+	 */
+	private function read_file_tail( string $file_path, int $bytes ): false|string {
+		$handle = fopen( $file_path, 'rb' );
+		if ( ! $handle ) {
+			return false;
+		}
+
+		// Seek to the position we want to start reading from
+		fseek( $handle, -$bytes, SEEK_END );
+		$content = fread( $handle, $bytes );
+		fclose( $handle );
+
+		return $content;
 	}
 }
