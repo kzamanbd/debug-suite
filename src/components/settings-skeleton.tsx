@@ -23,7 +23,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
             {/* Settings Form Skeleton */}
             <div className="space-y-4 sm:space-y-6">
                 {/* File Manager Settings Skeleton */}
-                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
                     <div className="border-l-primary-500 bg-primary-50 dark:bg-primary-950 border-l-4 px-4 py-3 sm:px-6 sm:py-4">
                         <div className={skeleton('mb-2 h-6 w-64')}></div>
                         <div className={skeleton('h-4 w-40')}></div>
@@ -73,7 +73,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
                     </div>
                 </div>
                 {/* Debug Settings Skeleton */}
-                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
                     <div className="border-l-primary-500 bg-primary-50 dark:bg-primary-950 border-l-4 px-4 py-3 sm:px-6 sm:py-4">
                         <div className={skeleton('mb-2 h-6 w-64')}></div>
                         <div className={skeleton('h-4 w-40')}></div>
@@ -97,7 +97,7 @@ const SettingsSkeleton = ({ className = '' }: SettingsSkeletonProps): JSX.Elemen
                     </div>
                 </div>
                 {/* Action Buttons Skeleton */}
-                <div className="flex space-x-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6 dark:border-gray-700 dark:bg-gray-800">
+                <div className="flex space-x-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6 dark:border-gray-700 dark:bg-gray-800">
                     <div className={skeleton('h-10 w-40')}></div>
                     <div className={skeleton('h-10 w-40')}></div>
                 </div>

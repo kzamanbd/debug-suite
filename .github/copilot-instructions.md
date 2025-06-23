@@ -96,6 +96,19 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     - Use consistent icon sizing (typically 16px or 24px)
     - Example: `import { FolderOpen, Settings, X } from 'lucide-react';`
 
+7. **UI Components**:
+
+    - **Use Headless UI for interactive components**: Prefer `@headlessui/react` components for dropdowns, modals, dialogs, and other interactive elements
+    - **Combobox for Dropdowns**: Use the custom `Combobox` component (built on Headless UI) for all dropdown selections instead of native selects
+    - **Accessibility First**: Always use Headless UI components which provide built-in accessibility features
+    - **Custom Components**: Build custom UI components in `src/components/ui/` following the established patterns
+    - **Component Examples**:
+        ```typescript
+        // ✅ Good - Use Headless UI Combobox
+        import Combobox from '@/components/ui/combobox';
+        <Combobox options={options} value={selected} onChange={setSelected} />
+        ```
+
 ## TypeScript and Build Configuration
 
 ### Project Configuration
@@ -114,6 +127,7 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     "@wordpress/element": "React components",
     "@wordpress/i18n": "Internationalization",
     "@wordpress/api-fetch": "API requests",
+    "@headlessui/react": "Headless UI components for accessibility",
     "lucide-react": "Icon library",
     "react-router-dom": "Routing",
     "clsx": "Class name utility",
@@ -873,3 +887,162 @@ $service = debug_suite_autowire_with_params(ApiService::class, [
 ```
 
 These patterns provide comprehensive coverage for most real-world scenarios when using the Debug Suite Container System. Always prefer dependency injection over service location, use environment-specific configuration for different deployment stages, and leverage the Hookable interface for automatic WordPress integration.
+
+### Frontend Component Architecture Standards
+
+Following WordPress coding standards adapted for React/TypeScript development with a preference for consolidation over micro-components:
+
+#### File Naming Conventions
+
+- **Component files**: Use kebab-case naming (e.g., `log-viewer.tsx`, `log-controls.tsx`)
+- **Hook files**: Use kebab-case naming (e.g., `use-log-entries.ts`, `use-api-client.ts`)
+- **Utility files**: Use kebab-case naming (e.g., `date-helpers.ts`, `format-utils.ts`)
+- **Type definition files**: Use kebab-case naming (e.g., `log-types.ts`, `api-types.ts`)
+
+#### Component Structure Standards
+
+- **Component names**: PascalCase for React components (e.g., `LogViewer`, `LogControls`)
+- **Variable names**: camelCase for JavaScript/TypeScript variables (e.g., `logFiles`, `selectedFile`)
+- **Function names**: camelCase for JavaScript/TypeScript functions (e.g., `handleFileChange`, `fetchLogEntries`)
+- **Interface names**: PascalCase with descriptive suffixes (e.g., `LogViewerProps`, `LogEntry`)
+- **Hook names**: camelCase starting with "use" (e.g., `useLogFiles`, `useDebounce`)
+
+#### Directory Structure for Components
+
+```
+src/pages/[feature-name]/
+├── index.tsx                 # Main page component
+├── types.ts                  # TypeScript type definitions
+├── constants.ts              # Feature-specific constants
+├── hooks.ts                  # Custom hooks for the feature
+└── components/
+    ├── index.ts              # Barrel exports
+    ├── feature-viewer.tsx    # Consolidated view component
+    └── feature-controls.tsx  # Consolidated controls component
+```
+
+#### Component Architecture Principles - Consolidation SOP
+
+- **Favor Substantial Components over Micro-Components**: Prefer 2-3 well-structured components over many micro-level components
+- **Logical Grouping**: Group related functionality into cohesive components:
+    - **Viewer Components**: Handle display, tables, content rendering, and detail views
+    - **Controls Components**: Handle filtering, search, pagination, actions, and form controls
+- **Clear Separation of Concerns**: Each consolidated component should have a distinct purpose
+- **Single Responsibility per Consolidated Component**: Each component handles one major UI domain
+- **Props Interface**: Every component has a comprehensive typed Props interface
+- **Barrel Exports**: Use index.ts files for clean import paths
+- **Composition over Inheritance**: Favor composition patterns within consolidated components
+- **Data Flow**: Props down, events up pattern maintained across consolidated components
+- **Custom Hooks**: Extract complex data logic into reusable hooks
+- **TypeScript First**: Full type coverage for all components and data flows
+- **Internal Component Structure**: Within consolidated components, use internal helper functions rather than breaking into separate files
+- **Maintainability Focus**: Optimize for long-term maintainability rather than micro-level modularity
+
+#### Consolidated Component Examples
+
+**Good: Two Substantial Components**
+
+```typescript
+// log-viewer.tsx - Handles all display concerns
+const LogViewer = ({ logs, loading, currentPage, perPage }: LogViewerProps) => {
+    // Table rendering, log entry details, expandable rows, etc.
+};
+
+// log-controls.tsx - Handles all control concerns
+const LogControls = ({
+    filters,
+    onFiltersChange,
+    logFiles,
+    selectedFile,
+    onFileChange,
+    pagination,
+    actions
+}: LogControlsProps) => {
+    // File selection, filtering, search, pagination, export, clear actions
+};
+```
+
+**Avoid: Excessive Micro-Components**
+
+```typescript
+// ❌ Too granular - creates maintenance overhead
+-log -
+    entry.tsx -
+    log -
+    table.tsx -
+    log -
+    file -
+    selector.tsx -
+    log -
+    filters -
+    bar.tsx -
+    log -
+    pagination.tsx -
+    log -
+    stats -
+    footer.tsx;
+```
+
+#### Implementation Guidelines
+
+- **Start with Consolidation**: When creating new features, begin with 2-3 consolidated components
+- **Refactor Micro-Components**: When encountering micro-component patterns, consolidate them into substantial components
+- **Component Size**: Each component should be 100-300 lines, focusing on cohesive functionality
+- **Internal Organization**: Use internal helper functions, interfaces, and constants within component files
+- **Testing Strategy**: Test consolidated components as complete units rather than individual micro-pieces
+- **Documentation**: Provide comprehensive props documentation for consolidated components
+
+### UI Component Standards
+
+#### Dropdown/Select Components
+
+**Always use the custom Combobox component** built on Headless UI for all dropdown selections:
+
+```typescript
+import Combobox from '@/components/ui/combobox';
+
+// Basic usage
+<Combobox
+    options={[
+        { value: 'option1', label: 'Option 1' },
+        { value: 'option2', label: 'Option 2' }
+    ]}
+    value={selectedOption}
+    onChange={setSelectedOption}
+/>
+
+// With additional features
+<Combobox
+    options={options}
+    value={selected}
+    onChange={setSelected}
+    placeholder="Select an option..."
+    label="Choose option"
+    error={validationError}
+    isDisabled={loading}
+    className="min-w-[200px]"
+    formatOptionLabel={(option) => (
+        <div>
+            <div className="font-medium">{option.label}</div>
+            <div className="text-xs text-gray-500">{option.meta}</div>
+        </div>
+    )}
+/>
+```
+
+**Features:**
+
+- ✅ Full TypeScript support with typed options
+- ✅ Search/filter functionality built-in
+- ✅ Keyboard navigation (arrows, enter, escape)
+- ✅ Accessibility compliance (ARIA, screen readers)
+- ✅ Custom option rendering
+- ✅ Loading and disabled states
+- ✅ Error handling and validation
+- ✅ Consistent styling with design system
+
+**Do NOT use:**
+
+- ❌ Native HTML `<select>` elements (poor UX)
+- ❌ External libraries like `react-select` (removed from project)
+- ❌ Custom dropdown implementations without accessibility

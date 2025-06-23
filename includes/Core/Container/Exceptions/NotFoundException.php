@@ -31,4 +31,18 @@ class NotFoundException extends ContainerException implements NotFoundExceptionI
 	public static function for_identifier( string $id ): static {
 		return new static( "Service [{$id}] not found in container." );
 	}
+
+	/**
+	 * Create a not found exception for a service identifier with custom message.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $id      The service identifier that was not found.
+	 * @param string $message Custom error message with additional context.
+	 *
+	 * @return static
+	 */
+	public static function for_identifier_with_message( string $id, string $message ): static {
+		return new static( "Service [{$id}] not found in container: {$message}" );
+	}
 }

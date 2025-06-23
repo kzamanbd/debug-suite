@@ -66,7 +66,6 @@ EOT;
 		// Set the config file path using reflection
 		$reflection = new ReflectionClass($this->service);
 		$property = $reflection->getProperty('config_file_path');
-		$property->setAccessible(true);
 		$property->setValue($this->service, $this->config_file);
 	}
 
@@ -231,7 +230,6 @@ EOT;
 		// Set the config file path to a non-existent file
 		$reflection = new ReflectionClass($this->service);
 		$property = $reflection->getProperty('config_file_path');
-		$property->setAccessible(true);
 		$property->setValue($this->service, '/path/to/nonexistent/wp-config.php');
 		
 		$result = $this->service->get_current_debug_settings();

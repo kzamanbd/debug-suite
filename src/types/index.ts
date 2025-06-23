@@ -1,5 +1,3 @@
-import { Hooks } from '@wordpress/i18n';
-
 export interface IFile {
     name: string;
     type: string;
@@ -29,10 +27,7 @@ export interface SettingsState {
 // global window type
 declare global {
     interface Window {
-        wp: {
-            hooks: Hooks;
-        };
-        debugSuiteSettings: SettingsState & {
+        debugSuite: SettingsState & {
             roles: Record<string, { name: string }>;
             [key: string]: string | boolean | Record<string, { name: string }> | undefined;
         };

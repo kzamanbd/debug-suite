@@ -12,7 +12,7 @@ const NotFound = (): JSX.Element => {
         <div
             className={classNames(
                 'flex h-screen flex-col items-center justify-center py-12',
-                'mx-auto max-w-lg rounded-xl bg-white text-center dark:bg-gray-900'
+                'mx-auto max-w-lg rounded-lg bg-white text-center dark:bg-gray-900'
             )}
         >
             <div className="mb-6">

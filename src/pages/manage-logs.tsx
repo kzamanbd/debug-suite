@@ -112,10 +112,6 @@ const ManageLogs = () => {
 
     return (
         <>
-            <p className="mb-6 text-gray-600">
-                {__("Manage your application's log files - clear, download, or archive them.", 'debug-suite')}
-            </p>
-
             <div className="flex justify-between">
                 <div className="flex flex-wrap gap-3">
                     <button
@@ -160,7 +156,7 @@ const ManageLogs = () => {
                 {__('files', 'debug-suite')}
             </p>
 
-            <div className="mb-8 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow">
+            <div className="mb-8 overflow-x-auto rounded-lg border border-gray-200 bg-white shadow">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -232,7 +228,7 @@ const ManageLogs = () => {
                 </table>
             </div>
 
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-6">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
                     {__('Log Management Settings', 'debug-suite')}
                 </h3>

@@ -137,6 +137,7 @@ class Admin implements Hookable {
 			},
 			$wp_roles->roles
 		);
+		$favicon   = DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png';
 		$constants = [
 			'wpDebug'        => WP_DEBUG,
 			'wpDebugLog'     => WP_DEBUG_LOG,
@@ -144,6 +145,7 @@ class Admin implements Hookable {
 			'publicRootPath' => ABSPATH,
 			'filesUrl'       => content_url(),
 			'roles'          => $roles,
+			'favicon'       => $favicon,
 		];
 		$settings  = get_option( 'debug_suite_settings', [] );
 		$settings  = array_merge( $constants, $settings );
@@ -152,7 +154,7 @@ class Admin implements Hookable {
 		wp_enqueue_style( 'debug-suite-admin' );
 		wp_localize_script(
 			'debug-suite-admin',
-			'debugSuiteSettings',
+			'debugSuite',
 			$settings
 		);
 	}

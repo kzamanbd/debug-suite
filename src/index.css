@@ -65,19 +65,6 @@
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant hover (&:hover);
 
-.react-select__input:focus {
-    box-shadow: 0 0 0 transparent !important;
-}
-.react-select__value-container {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-.react-select__value-container,
-.react-select__input-container {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-
 div[data-headlessui-state='open'][role='dialog'] {
     z-index: 99999 !important;
 }

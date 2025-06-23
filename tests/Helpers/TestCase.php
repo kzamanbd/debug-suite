@@ -9,6 +9,7 @@ namespace DebugSuite\Tests\Helpers;
 
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
+use ReflectionClass;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase as YoastTestCase;
 
 /**
@@ -81,10 +82,9 @@ class TestCase extends YoastTestCase {
 	protected function reset_container() {
 		// Reset container singleton if it exists
 		if ( class_exists( 'DebugSuite\Core\Container\Container' ) ) {
-			$reflection = new \ReflectionClass( Container::class );
+			$reflection = new ReflectionClass( Container::class );
 			if ( $reflection->hasProperty( 'instance' ) ) {
 				$instance_property = $reflection->getProperty( 'instance' );
-				$instance_property->setAccessible( true );
 				$instance_property->setValue( null, null );
 			}
 		}

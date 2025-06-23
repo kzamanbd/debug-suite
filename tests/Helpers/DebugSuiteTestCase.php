@@ -124,7 +124,6 @@ class DebugSuiteTestCase extends WP_UnitTestCase {
 		$reflection = new ReflectionClass( Container::class );
 		if ( $reflection->hasProperty( 'instance' ) ) {
 			$instance_property = $reflection->getProperty( 'instance' );
-			$instance_property->setAccessible( true );
 			$instance_property->setValue( null, null );
 		}
 		
