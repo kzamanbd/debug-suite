@@ -109,6 +109,7 @@ const Combobox = ({
                 <ComboboxOptions
                     anchor="bottom"
                     transition
+                    modal={false}
                     className={classNames(
                         'w-[var(--input-width)] rounded-lg border border-gray-200 bg-white p-1 shadow-lg [--anchor-gap:4px] empty:invisible',
                         'transition duration-100 ease-in data-leave:data-closed:scale-95 data-leave:data-closed:opacity-0'
@@ -123,7 +124,7 @@ const Combobox = ({
                             <ComboboxOption
                                 key={option.value}
                                 value={option}
-                                className="group data-focus:bg-primary-50 data-focus:text-primary-900 flex cursor-default items-center gap-2 rounded-md px-3 py-2 select-none"
+                                className="group data-focus:bg-primary-50 data-focus:text-primary-900 flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 select-none"
                             >
                                 <CheckIcon className="text-primary-600 invisible size-4 group-data-selected:visible" />
                                 <div className="min-w-0 flex-1">{renderOption(option)}</div>

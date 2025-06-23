@@ -137,7 +137,7 @@ class Admin implements Hookable {
 			},
 			$wp_roles->roles
 		);
-		$favicon   = DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.svg.png';
+		$favicon   = DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png';
 		$constants = [
 			'wpDebug'        => WP_DEBUG,
 			'wpDebugLog'     => WP_DEBUG_LOG,
