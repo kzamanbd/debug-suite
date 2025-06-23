@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @group enhanced-features
  * @since DEBUG_SUITE_SINCE
  */
-class ContainerEnhancedTest extends TestCase {
+class ContainerTest extends TestCase {
 
 	/**
 	 * Container instance for testing.
