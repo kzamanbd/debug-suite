@@ -266,9 +266,7 @@ class FileLogsController extends RestController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_supported_log_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		// Get common log file locations
-		$log_files = $this->service->supported_log_files();
-
+		$supported_log_files = [];
 		// Main debug.log
 		$debug_log = WP_CONTENT_DIR . '/debug.log';
 		if ( file_exists( $debug_log ) ) {
@@ -284,7 +282,7 @@ class FileLogsController extends RestController {
 		}
 
 		// Check for other common log files
-		$other_logs = $this->service->supported_log_files();
+		$log_files = $this->service->supported_log_files();
 
 		foreach ( $log_files as $path => $type ) {
 			if ( file_exists( $path ) ) {

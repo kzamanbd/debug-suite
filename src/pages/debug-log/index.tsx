@@ -6,14 +6,13 @@
 import FileLogsSkeleton from '@/pages/debug-log/components/logs-skeleton';
 import { useState } from '@wordpress/element';
 import { LogControls, LogViewer, RawFileViewer } from './components';
-import { useLogActions, useLogEntries, useLogFiles, useLogStats, useRawFileContent } from './hooks';
+import { useLogActions, useLogEntries, useLogFiles, useRawFileContent } from './hooks';
 import type { LogFilters, ViewMode } from './types';
 
 const FileLogs = () => {
     // Custom hooks for data management
     const { logFiles, selectedFile, setSelectedFile, loading: filesLoading } = useLogFiles();
     const { logs, loading: logsLoading, fetchLogs, refetch: refetchLogs } = useLogEntries();
-    const { stats, loading: statsLoading } = useLogStats();
     const { clearLogs, exportLogs, clearing } = useLogActions();
     const { content: rawContent, loading: rawLoading, refetch: refetchRawContent } = useRawFileContent(selectedFile);
 
@@ -29,7 +28,7 @@ const FileLogs = () => {
     });
 
     // Show skeleton while initial data loads
-    if (filesLoading || statsLoading) {
+    if (filesLoading) {
         return <FileLogsSkeleton />;
     }
 
