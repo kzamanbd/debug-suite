@@ -1046,3 +1046,313 @@ import Combobox from '@/components/ui/combobox';
 - ❌ Native HTML `<select>` elements (poor UX)
 - ❌ External libraries like `react-select` (removed from project)
 - ❌ Custom dropdown implementations without accessibility
+
+## Advanced Frontend Architecture SOPs
+
+### Client-Side Filtering Standard Operating Procedures
+
+Debug Suite implements **client-side filtering** for optimal performance and real-time user experience. Follow these SOPs for consistent filtering implementation across all data-heavy components.
+
+#### SOP 1: Client-Side Filtering Hook Pattern
+
+**Implementation Standard:**
+```typescript
+export const useDataEntries = () => {
+    const [allData, setAllData] = useState<DataEntry[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [filters, setFilters] = useState<DataFilters>({
+        search: '',
+        category: '',
+        sortBy: 'timestamp',
+        sortOrder: 'desc',
+        perPage: 100
+    });
+
+    // Debounce search input to improve performance (300ms standard)
+    const debouncedSearch = useDebounce(filters.search, 300);
+
+    // Fetch all data once without server-side filtering
+    const fetchAllData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const apiPath = addQueryArgs('/debug-suite/v1/endpoint', {
+                per_page: 10000, // High limit to get all data
+                page: 1
+            });
+            
+            const response = await apiFetch<DataResponse>({
+                path: apiPath
+            });
+            
+            setAllData(response.entries);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setAllData([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Apply client-side filtering with debounced search
+    const filteredData = useMemo(() => {
+        const filtersWithDebouncedSearch = {
+            ...filters,
+            search: debouncedSearch
+        };
+        return filterDataEntries(allData, filtersWithDebouncedSearch);
+    }, [allData, filters.category, filters.sortBy, filters.sortOrder, debouncedSearch]);
+
+    // Update filters with automatic pagination reset
+    const updateFilters = useCallback((newFilters: Partial<DataFilters>) => {
+        setFilters(prev => ({
+            ...prev,
+            ...newFilters,
+            // Reset pagination when filters change (except perPage)
+            ...(Object.keys(newFilters).some(key => key !== 'perPage') ? { perPage: 100 } : {})
+        }));
+    }, []);
+
+    return {
+        data: filteredData.slice(0, filters.perPage),
+        allData: filteredData,
+        loading,
+        totalEntries: filteredData.length,
+        filters,
+        updateFilters,
+        refetch: fetchAllData
+    };
+};
+```
+
+#### SOP 2: Client-Side Filter Function Pattern
+
+**Filtering Implementation Standard:**
+```typescript
+const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[] => {
+    let filtered = [...data];
+
+    // Category/Level filtering
+    if (filters.category && filters.category !== 'all') {
+        filtered = filtered.filter(item => item.category === filters.category);
+    }
+
+    // Search filtering (message, file, category)
+    if (filters.search && filters.search.trim()) {
+        const searchTerm = filters.search.toLowerCase().trim();
+        filtered = filtered.filter(item => 
+            item.message.toLowerCase().includes(searchTerm) ||
+            (item.file && item.file.toLowerCase().includes(searchTerm)) ||
+            item.category.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    // Sorting with type-specific logic
+    filtered.sort((a, b) => {
+        let aValue: any, bValue: any;
+
+        switch (filters.sortBy) {
+            case 'category':
+                // Define hierarchy for categorical sorting
+                const categoryOrder = { 'critical': 6, 'error': 5, 'warning': 4, 'notice': 3, 'info': 2, 'debug': 1 };
+                aValue = categoryOrder[a.category] || 0;
+                bValue = categoryOrder[b.category] || 0;
+                break;
+            case 'message':
+                aValue = a.message.toLowerCase();
+                bValue = b.message.toLowerCase();
+                break;
+            case 'file':
+                aValue = (a.file || '').toLowerCase();
+                bValue = (b.file || '').toLowerCase();
+                break;
+            case 'timestamp':
+            default:
+                aValue = new Date(a.timestamp).getTime();
+                bValue = new Date(b.timestamp).getTime();
+                break;
+        }
+
+        if (filters.sortOrder === 'asc') {
+            return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+        } else {
+            return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+        }
+    });
+
+    return filtered;
+};
+```
+
+#### SOP 3: Real-Time Filtering UI Feedback
+
+**UI Implementation Standard:**
+```tsx
+// Show filtered vs total count when filters are active
+<div className="text-sm text-gray-600">
+    {filters.search || filters.category ? (
+        <>
+            {__('Showing:', 'debug-suite')}{' '}
+            <span className="font-medium text-primary">{totalEntries}</span>
+            {filters.search && (
+                <span className="ml-1 text-xs text-gray-500">
+                    ({__('filtered', 'debug-suite')})
+                </span>
+            )}
+        </>
+    ) : (
+        <>
+            {__('Total entries:', 'debug-suite')}{' '}
+            <span className="font-medium">{totalEntries}</span>
+        </>
+    )}
+</div>
+
+// Debounced search input with clear button
+<div className="relative">
+    <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+    <InputField
+        type="text"
+        placeholder={__('Search...', 'debug-suite')}
+        value={filters.search}
+        onChange={(e) => updateFilters({ search: e.target.value })}
+        className="w-full pl-10"
+    />
+    {filters.search && (
+        <button
+            onClick={() => updateFilters({ search: '' })}
+            className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
+            title={__('Clear search', 'debug-suite')}
+        >
+            <XIcon className="h-4 w-4" />
+        </button>
+    )}
+</div>
+```
+
+### URL Parameter Handling SOPs
+
+Debug Suite follows **WordPress URL standards** using `@wordpress/url` for all API endpoint construction and parameter handling.
+
+#### SOP 4: WordPress URL Construction Standard
+
+**Always use `addQueryArgs` from `@wordpress/url` instead of manual URL construction:**
+
+```typescript
+import { addQueryArgs } from '@wordpress/url';
+
+// ✅ Correct - WordPress standard
+const apiPath = addQueryArgs('/debug-suite/v1/endpoint', {
+    param1: value1,
+    param2: value2,
+    file: filePath // Automatic encoding
+});
+
+const response = await apiFetch({
+    path: apiPath
+});
+
+// ❌ Incorrect - Manual construction
+const apiPath = `/debug-suite/v1/endpoint?param1=${value1}&param2=${encodeURIComponent(value2)}`;
+const apiPath = `/debug-suite/v1/endpoint?${params.toString()}`;
+```
+
+#### SOP 5: API Endpoint URL Construction Patterns
+
+**Standard patterns for different API scenarios:**
+
+```typescript
+// Single parameter
+const apiPath = addQueryArgs('/debug-suite/v1/logs', {
+    per_page: 1000
+});
+
+// Multiple parameters with optional values
+const apiPath = addQueryArgs('/debug-suite/v1/logs', {
+    per_page: perPage,
+    level_filter: level || undefined, // Handles empty strings automatically
+    search: searchTerm,
+    sort_by: sortBy,
+    sort_order: sortOrder
+});
+
+// File path parameters (automatic encoding)
+const apiPath = addQueryArgs('/debug-suite/v1/files', {
+    path: filePath || '' // Safe handling of empty paths
+});
+
+// Export with format and limits
+const apiPath = addQueryArgs('/debug-suite/v1/logs/export', {
+    format,
+    limit: 1000
+});
+```
+
+#### SOP 6: Parameter Encoding and Safety
+
+**`addQueryArgs` provides automatic safety features:**
+
+- **Automatic URL Encoding**: Handles special characters, spaces, and Unicode automatically
+- **Type Safety**: Works with strings, numbers, booleans, and undefined values
+- **Empty Parameter Handling**: Filters out undefined/null values automatically
+- **WordPress Compliance**: Follows WordPress coding standards and best practices
+- **Security**: Prevents URL injection vulnerabilities through proper encoding
+
+```typescript
+// Handles complex parameters safely
+const apiPath = addQueryArgs('/debug-suite/v1/search', {
+    query: 'user input with spaces & special chars',
+    file_path: '/path/to/file with spaces.log',
+    limit: 100,
+    debug: true,
+    optional_param: undefined // Automatically filtered out
+});
+```
+
+### Performance Optimization SOPs
+
+#### SOP 7: Debounced Search Implementation
+
+**Standard debounce timing and implementation:**
+
+```typescript
+// Use 300ms debounce for search inputs (optimal balance)
+const debouncedSearch = useDebounce(filters.search, 300);
+
+// Custom debounce hook (if not available in utils)
+const useDebounce = (value: string, delay: number) => {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return debouncedValue;
+};
+```
+
+#### SOP 8: Memoization Patterns for Filtering
+
+**Use precise dependency arrays for optimal re-renders:**
+
+```typescript
+// Precise memoization - only recalculate when necessary
+const filteredData = useMemo(() => {
+    return filterDataEntries(allData, {
+        ...filters,
+        search: debouncedSearch
+    });
+}, [allData, filters.category, filters.sortBy, filters.sortOrder, debouncedSearch]);
+
+// Avoid - over-memoization with entire filter object
+const filteredData = useMemo(() => {
+    return filterDataEntries(allData, filters);
+}, [allData, filters]); // Causes unnecessary re-renders when search changes
+```
+
+These SOPs ensure consistent, performant, and WordPress-compliant implementation of filtering and URL handling across all Debug Suite components.
