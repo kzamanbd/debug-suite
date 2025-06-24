@@ -68,3 +68,15 @@
 div[data-headlessui-state='open'][role='dialog'] {
     z-index: 99999 !important;
 }
+.simplebar-scrollbar:before {
+    width: 4px;
+    background: #e2e8f0;
+}
+/* Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}

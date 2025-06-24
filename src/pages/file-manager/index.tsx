@@ -15,6 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { FolderPlus, HardDrive, MoreVertical, Upload } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import SimpleBar from 'simplebar-react';
 import FileDetailSkeleton from './components/detail-skeleton';
 import FileEditor from './components/file-editor';
 import FileIcon from './components/file-icon';
@@ -230,19 +231,19 @@ const FileManager = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="h-[500px] overflow-y-auto">
+                        <SimpleBar className="h-[600px] overflow-y-auto">
                             <ul className="p-4">
                                 {files.map((file) => (
                                     <FileTree key={file.path} file={file} action={fetchNestedFiles} />
                                 ))}
                             </ul>
-                        </div>
+                        </SimpleBar>
                     )}
                 </div>
                 <div className="col-span-5 border-l dark:border-gray-800">
                     {detailLoading ? <FileDetailSkeleton /> : null}
                     {selectedFiles.length && !detailLoading ? (
-                        <div className="h-[500px] overflow-y-auto">
+                        <SimpleBar className="h-[600px] overflow-y-auto">
                             <table className="w-full overflow-hidden rounded-lg border border-gray-200 text-left dark:border-gray-700">
                                 <thead>
                                     <tr className="bg-gray-50 text-xs font-semibold text-gray-500 uppercase dark:bg-gray-800 dark:text-gray-300">
@@ -334,7 +335,7 @@ const FileManager = () => {
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                        </SimpleBar>
                     ) : null}
                 </div>
             </div>
