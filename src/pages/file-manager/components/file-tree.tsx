@@ -5,14 +5,14 @@
  *
  * @since 1.0.0
  */
-import { IFile } from '@/types';
+import { ItemTree } from '@/types';
 import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import FileIcon from './file-icon';
 
 interface TreeProps {
-    file: IFile;
-    action: (file: IFile) => void;
+    file: ItemTree;
+    action: (file: ItemTree) => void;
     className?: string;
 }
 
@@ -70,7 +70,7 @@ const FileTree = ({ file, action, className = '' }: TreeProps) => {
 
     // For directories with children, render with Disclosure
     return (
-        <Disclosure as="li" className={classNames('mb-1', className)}>
+        <Disclosure as="li" className={classNames('mb-1', className)} defaultOpen={hasChildren}>
             {({ open }) => (
                 <>
                     <DisclosureButton className="w-full focus:outline-none">
@@ -109,7 +109,7 @@ const FileTree = ({ file, action, className = '' }: TreeProps) => {
                     </DisclosureButton>
                     <DisclosurePanel
                         as="ul"
-                        className="ml-2 origin-top border-l border-gray-100 pl-4 transition-all duration-200 ease-out data-[closed]:-translate-y-4 data-[closed]:opacity-0 dark:border-gray-800"
+                        className="mt-2 ml-2 origin-top border-l border-gray-100 pl-4 transition-all duration-200 ease-out data-[closed]:-translate-y-4 data-[closed]:opacity-0 dark:border-gray-800"
                     >
                         {file.children.map((child) => (
                             <FileTree key={child.path} file={child} action={action} />

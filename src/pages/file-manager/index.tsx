@@ -9,7 +9,7 @@ import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 import InputField from '@/components/ui/input-field';
-import { IFile } from '@/types';
+import { ItemTree } from '@/types';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
@@ -23,11 +23,11 @@ import FileTree from './components/file-tree';
 import FileTreeSkeleton from './components/tree-skeleton';
 
 const FileManager = () => {
-    const [files, setFiles] = useState<IFile[]>([]);
+    const [files, setFiles] = useState<ItemTree[]>([]);
     const [openEditor, setOpenEditor] = useState(false);
     const [fileContent, setFileContent] = useState('');
     const [fileName, setFileName] = useState('');
-    const [selectedFiles, setSelectedFiles] = useState<IFile[]>([]);
+    const [selectedFiles, setSelectedFiles] = useState<ItemTree[]>([]);
     const [initialLoading, setInitialLoading] = useState(false);
     const [detailLoading, setDetailLoading] = useState(false);
     const [loadingFileContent, setLoadingFileContent] = useState(false);
@@ -36,7 +36,7 @@ const FileManager = () => {
     const fetchFiles = async (path?: string) => {
         // Fetch files from the server
         return apiFetch<{
-            tree: IFile[];
+            tree: ItemTree[];
         }>({
             path: `/debug-suite/v1/files?path=${encodeURIComponent(path || '')}`
         });
@@ -51,7 +51,7 @@ const FileManager = () => {
         });
     };
 
-    const fetchNestedFiles = async (file: IFile) => {
+    const fetchNestedFiles = async (file: ItemTree) => {
         if (file.type === 'file') {
             fileEditHandler(file);
             return;
@@ -104,7 +104,7 @@ const FileManager = () => {
         }
     }, []);
 
-    const fileEditHandler = async (file: IFile) => {
+    const fileEditHandler = async (file: ItemTree) => {
         toggleEditor();
         setFileName(file.name);
         setLoadingFileContent(true);
@@ -124,7 +124,7 @@ const FileManager = () => {
 
     const checkedItems = selectedFiles.filter((file) => file.checked);
 
-    const checkedItem = (file: IFile, e: React.ChangeEvent<HTMLInputElement>) => {
+    const checkedItem = (file: ItemTree, e: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedFiles(
             selectedFiles.map((item) => {
                 if (item.path === file.path) {
@@ -187,12 +187,12 @@ const FileManager = () => {
                                 xmlns="http://www.w3.org/2000/svg"
                                 aria-hidden="true"
                             >
-                                <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
+                                <path d="M6 13L10 3" stroke="currentColor" strokeLinecap="round"></path>
                             </svg>
                         )}
                     </div>
                     {breadcrumb.map((item, index) => (
-                        <div className="inline-flex items-center">
+                        <div key={index} className="inline-flex items-center">
                             <button
                                 type="button"
                                 className="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-hidden dark:text-neutral-500 dark:hover:text-blue-500 dark:focus:text-blue-500"
@@ -209,7 +209,7 @@ const FileManager = () => {
                                         xmlns="http://www.w3.org/2000/svg"
                                         aria-hidden="true"
                                     >
-                                        <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
+                                        <path d="M6 13L10 3" stroke="currentColor" strokeLinecap="round"></path>
                                     </svg>
                                 )}
                             </button>

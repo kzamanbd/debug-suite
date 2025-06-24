@@ -1,4 +1,4 @@
-export interface IFile {
+export interface ItemTree {
     name: string;
     type: string;
     path: string;
@@ -6,7 +6,7 @@ export interface IFile {
     checked: boolean;
     modified_at: string;
     expanded: boolean;
-    children: IFile[];
+    children: ItemTree[];
 }
 
 export interface SettingsState {

@@ -57,6 +57,9 @@
         h6 {
             @apply m-0 text-base font-semibold;
         }
+        p {
+            @apply m-0 p-0;
+        }
     }
 }
 
