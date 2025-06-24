@@ -192,13 +192,13 @@ const LogControls = ({
                                     options={levelOptions}
                                     value={levelOptions.find((opt) => opt.value === filters.level) || levelOptions[0]}
                                     onChange={(option) => onFiltersChange({ level: option?.value || '' })}
-                                    className="w-full sm:w-auto sm:min-w-[120px]"
+                                    className="w-[120px]"
                                 />
                                 <Combobox
                                     options={sortOptions}
                                     value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
                                     onChange={(option) => onFiltersChange({ sortBy: option?.value || 'timestamp' })}
-                                    className="w-full sm:w-auto sm:min-w-[140px]"
+                                    className="w-[130px]"
                                 />
                                 <Button
                                     onClick={toggleSortOrder}
@@ -232,7 +232,7 @@ const LogControls = ({
                                     perPageOptions[1]
                                 }
                                 onChange={(option) => onFiltersChange({ perPage: parseInt(option?.value || '25') })}
-                                className="w-full sm:w-auto sm:min-w-[80px]"
+                                className="w-[150px]"
                             />
 
                             {/* Export Listbox */}

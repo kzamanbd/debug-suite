@@ -62,11 +62,11 @@ const Listbox = ({
             return formatOptionLabel(option);
         }
         return (
-            <div className="flex items-center gap-2">
-                {option.icon && <span className="text-sm">{option.icon}</span>}
-                <div className="flex flex-1 flex-col">
-                    <div className="text-sm font-medium">{option.label}</div>
-                    {option.meta && <div className="text-xs text-gray-500">{option.meta}</div>}
+            <div className="flex min-w-0 items-center gap-2">
+                {option.icon && <span className="flex-shrink-0 text-sm">{option.icon}</span>}
+                <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="truncate text-sm font-medium">{option.label}</div>
+                    {option.meta && <div className="truncate text-xs text-gray-500">{option.meta}</div>}
                 </div>
             </div>
         );
@@ -100,7 +100,7 @@ const Listbox = ({
                         transition
                         modal={false}
                         className={classNames(
-                            'w-[var(--button-width)] rounded-lg border border-gray-200 bg-white p-1 shadow-lg [--anchor-gap:4px] empty:invisible',
+                            'w-fit min-w-[var(--button-width)] rounded-lg border border-gray-200 bg-white p-1 shadow-lg [--anchor-gap:4px] empty:invisible',
                             'transition duration-100 ease-in data-leave:data-closed:scale-95 data-leave:data-closed:opacity-0',
                             'z-50'
                         )}
