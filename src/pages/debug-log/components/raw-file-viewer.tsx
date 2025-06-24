@@ -116,12 +116,20 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
         };
     }, [isFullscreen]);
 
+    if (loading && !content) {
+        return (
+            <div className="flex flex-1 items-center justify-center bg-white">
+                <p className="text-sm text-gray-500">{__('Loading...', 'debug-suite')}</p>
+            </div>
+        );
+    }
+
     if (!content) {
         return (
             <div className="flex flex-1 items-center justify-center bg-white">
                 <div className="text-center">
                     <p className="text-sm text-gray-500">{__('No file content available.', 'debug-suite')}</p>
-                    <Button variant="light" onClick={onRefresh} className="mt-4">
+                    <Button onClick={onRefresh} className="mt-4">
                         <RefreshCwIcon className="mr-2 h-4 w-4" />
                         {__('Retry', 'debug-suite')}
                     </Button>
@@ -142,19 +150,18 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
             <div className="rounded-t-lg border-b border-gray-200 bg-gray-50 px-4 py-3">
                 <div className="flex items-center justify-between">
                     <p className="text-xs text-gray-500">
-                        {content.size} • {__('Modified:', 'debug-suite')}{' '}
-                        {new Date(content.last_modified).toLocaleString()}
+                        {content.size} • {__('Modified:', 'debug-suite')} {content.last_modified}
                     </p>
                     <div className="flex items-center space-x-2">
-                        <Button variant="light" onClick={handleCopy} disabled={copying}>
+                        <Button onClick={handleCopy} disabled={copying}>
                             <CopyIcon className="mr-2 h-4 w-4" />
                             {copying ? __('Copied!', 'debug-suite') : __('Copy', 'debug-suite')}
                         </Button>
-                        <Button variant="light" onClick={handleDownload}>
+                        <Button onClick={handleDownload}>
                             <DownloadIcon className="mr-2 h-4 w-4" />
                             {__('Download', 'debug-suite')}
                         </Button>
-                        <Button variant="light" onClick={toggleFullscreen}>
+                        <Button onClick={toggleFullscreen}>
                             {isFullscreen ? (
                                 <>
                                     <Minimize2Icon className="mr-2 h-4 w-4" />

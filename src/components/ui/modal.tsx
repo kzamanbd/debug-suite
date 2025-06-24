@@ -1,64 +1,73 @@
 import { classNames } from '@/utils';
-import { Dialog, DialogBackdrop, Transition, TransitionChild } from '@headlessui/react';
+import { Dialog, DialogBackdrop, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import React, { Fragment, HTMLAttributes } from 'react';
 
 export type ModalProps = {
     children: React.ReactNode;
     className?: string;
     open: boolean;
+    fullScreen?: boolean;
     showXButton?: boolean;
     onClose: () => void;
 } & HTMLAttributes<HTMLDivElement>;
 
-const Modal = ({ children, showXButton = true, className, open, onClose }: ModalProps) => {
+const Modal = ({ children, showXButton = true, className, open, fullScreen = false, onClose }: ModalProps) => {
     return (
-        <>
-            <Transition appear show={open} as={Fragment}>
-                <Dialog as="div" className="fixed inset-0 z-[99999] overflow-auto" onClose={onClose}>
-                    <div className="flex min-h-screen justify-center p-4 text-center">
-                        <TransitionChild
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <DialogBackdrop className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
-                        </TransitionChild>
+        <Transition appear show={open} as={Fragment}>
+            <Dialog as="div" className="relative z-[99999]" onClose={onClose}>
+                {/* Backdrop with fade transition */}
+                <TransitionChild
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <DialogBackdrop className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
+                </TransitionChild>
 
-                        <TransitionChild
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 scale-95"
-                            enterTo="opacity-100 scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 scale-100"
-                            leaveTo="opacity-0 scale-95"
+                {/* Full-screen container to center the panel */}
+                <div
+                    className={classNames(
+                        'fixed inset-0 flex w-screen',
+                        fullScreen ? '' : 'items-center justify-center p-4'
+                    )}
+                >
+                    {/* Panel with scale and fade transition */}
+                    <TransitionChild
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                    >
+                        <DialogPanel
+                            className={classNames(
+                                fullScreen
+                                    ? 'h-full w-full bg-white'
+                                    : 'relative w-full max-w-md transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all',
+                                className
+                            )}
                         >
-                            <div
-                                className={classNames(
-                                    'relative inline-block w-full transform self-center rounded bg-white text-left shadow-xl transition-all',
-                                    className
-                                )}
-                            >
-                                {children}
-                                {showXButton && (
-                                    <button
-                                        type="button"
-                                        onClick={onClose}
-                                        className="rounded-primary absolute top-2 right-2 p-1.5 text-sm text-gray-500 transition-colors duration-150 outline-none hover:text-gray-700 focus:outline-none"
-                                    >
-                                        &#10005;
-                                    </button>
-                                )}
-                            </div>
-                        </TransitionChild>
-                    </div>
-                </Dialog>
-            </Transition>
-        </>
+                            {children}
+                            {showXButton && (
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="absolute top-2 right-2 rounded-lg p-1.5 text-sm text-gray-500 transition-colors duration-150 outline-none hover:text-gray-700 focus:outline-none"
+                                >
+                                    &#10005;
+                                </button>
+                            )}
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
+            </Dialog>
+        </Transition>
     );
 };
 

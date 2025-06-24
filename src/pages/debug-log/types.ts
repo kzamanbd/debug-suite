@@ -46,8 +46,13 @@ export interface LogFilters {
     search: string;
     sortBy: string;
     sortOrder: string;
-    page: number;
     perPage: number;
+}
+
+export interface InfiniteScrollState {
+    page: number;
+    hasMore: boolean;
+    isLoadingMore: boolean;
 }
 
 export type ViewMode = 'parsed' | 'raw';
@@ -63,9 +68,9 @@ export interface LogActions {
     onLevelChange: (level: string) => void;
     onSearchChange: (term: string) => void;
     onSortChange: (sortBy: string, sortOrder: string) => void;
-    onPageChange: (page: number) => void;
     onPerPageChange: (perPage: number) => void;
     onRefresh: () => void;
     onClear: () => void;
     onExport: (format: 'json' | 'csv' | 'txt') => void;
+    onLoadMore: () => void;
 }

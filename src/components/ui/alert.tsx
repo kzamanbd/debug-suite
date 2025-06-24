@@ -9,7 +9,7 @@ import { classNames } from '@/utils';
 import { useState } from '@wordpress/element';
 import { ReactNode } from 'react';
 
-export type AlertVariant = 'primary' | 'success' | 'danger' | 'light';
+export type AlertVariant = 'primary' | 'success' | 'danger' | 'warning' | 'default' | 'info';
 
 interface AlertProps {
     children: ReactNode;
@@ -23,7 +23,9 @@ const variantClasses: Record<AlertVariant, string> = {
     primary: 'bg-primary-50 text-primary-800 border-primary-200',
     success: 'bg-green-50 text-green-800 border-green-200',
     danger: 'bg-red-50 text-red-800 border-red-200',
-    light: 'bg-gray-50 text-gray-800 border-gray-200'
+    warning: 'bg-yellow-50 text-yellow-800 border-yellow-200',
+    default: 'bg-gray-50 text-gray-800 border-gray-200',
+    info: 'bg-blue-50 text-blue-800 border-blue-200'
 };
 
 const Alert = ({ children, variant = 'primary', className = '', dismissible = false, onClose }: AlertProps) => {

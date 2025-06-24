@@ -1,4 +1,4 @@
-export interface IFile {
+export interface ItemTree {
     name: string;
     type: string;
     path: string;
@@ -6,7 +6,7 @@ export interface IFile {
     checked: boolean;
     modified_at: string;
     expanded: boolean;
-    children: IFile[];
+    children: ItemTree[];
 }
 
 export interface SettingsState {
@@ -18,16 +18,18 @@ export interface SettingsState {
     hideHtaccess: boolean;
     logQueries: boolean;
     logErrors: boolean;
-    wpDebug: boolean;
-    wpDebugLog: boolean;
-    wpDebugDisplay: boolean;
-    [key: string]: string | boolean | Record<string, { name: string }>;
 }
 
 // global window type
 declare global {
     interface Window {
         debugSuite: SettingsState & {
+            wpDebug: boolean;
+            wpDebugLog: boolean;
+            wpDebugDisplay: boolean;
+            wpVersion: string;
+            phpVersion: string;
+            favicon: string;
             roles: Record<string, { name: string }>;
             [key: string]: string | boolean | Record<string, { name: string }> | undefined;
         };

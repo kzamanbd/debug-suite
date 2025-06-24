@@ -1,35 +1,20 @@
-/**
- * External dependencies
- */
 import { DebugSuiteRoute } from '@/routing/routes';
 import { classNames } from '@/utils';
 import { ReactNode, useEffect } from 'react';
 
-/**
- * Props for the Layout component.
- *
- * @since 1.0.0
- */
 interface LayoutProps {
     children: ReactNode;
     className?: string;
     route: DebugSuiteRoute;
 }
 
-/**
- * Layout component.
- *
- * Provides a consistent page layout with a title and content area.
- *
- * @since 1.0.0
- */
-const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element => {
-    const LayoutHeader = () => {
-        if (!route.title) {
-            return null;
-        }
-        return (
-            <div className="mb-4">
+const LayoutHeader = ({ route }: { route: DebugSuiteRoute }) => {
+    if (!route.title) {
+        return null;
+    }
+    return (
+        <div className="mb-4 flex items-center justify-between">
+            <div>
                 {typeof route.title === 'string' ? (
                     <div className="text-2xl font-semibold text-gray-900 dark:text-white">{route.title}</div>
                 ) : (
@@ -43,9 +28,11 @@ const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element =
                     )}
                 </div>
             </div>
-        );
-    };
+        </div>
+    );
+};
 
+const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element => {
     useEffect(() => {
         // update the document title based on the route
         if (route.title && typeof route.title === 'string') {
@@ -55,7 +42,7 @@ const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element =
 
     return (
         <div className={classNames(className, 'mt-5 min-h-screen rounded-lg bg-white p-5')}>
-            <LayoutHeader />
+            <LayoutHeader route={route} />
             {/* Main content area */}
             <div>{children}</div>
         </div>

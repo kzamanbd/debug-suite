@@ -540,4 +540,176 @@ class WPLogReaderServiceTest extends TestCase {
 		$numbered_frames = array_filter( $frames, fn( $frame ) => isset( $frame['number'] ) && is_int( $frame['number'] ) );
 		$this->assertGreaterThan( 0, count( $numbered_frames ) );
 	}
+
+	/**
+	 * Test reading log entries with HTML content and complex messages.
+	 *
+	 * @covers \DebugSuite\Services\DebugLog\WPLogReaderService::read_log_entries
+	 * @covers \DebugSuite\Services\DebugLog\WPLogReaderService::parse_log_entries
+	 * @group services
+	 * @group unit
+	 */
+	public function test_read_log_entries_with_html_content(): void {
+		// Create test log content with HTML and complex formatting (real-world example)
+		$log_content = '[24-Jun-2025 12:16:40 UTC] PHP Deprecated:  Creation of dynamic property WC_Bookings_Google_Calendar_Connection::$redirect_uri_custom is deprecated in /Users/kzaman/Herd/dokan/wp-content/plugins/woocommerce-bookings/includes/class-wc-bookings-google-calendar-connection.php on line 128
+[24-Jun-2025 12:16:40 UTC] PHP Notice:  Function _load_textdomain_just_in_time was called <strong>incorrectly</strong>. Translation loading for the <code>woocommerce-bookings</code> domain was triggered too early. This is usually an indicator for some code in the plugin or theme running too early. Translations should be loaded at the <code>init</code> action or later. Please see <a href="https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/">Debugging in WordPress</a> for more information. (This message was added in version 6.7.0.) in /Users/kzaman/Herd/dokan/wp-includes/functions.php on line 6121
+[24-Jun-2025 12:16:40 UTC] PHP Deprecated:  Creation of dynamic property WC_Bookings_Google_Calendar_Connection::$client_id is deprecated in /Users/kzaman/Herd/dokan/wp-content/plugins/woocommerce-bookings/includes/class-wc-bookings-google-calendar-connection.php on line 131';
+
+		$this->create_log_file( $log_content );
+
+		$result = $this->service->read_log_entries();
+
+		$this->assertTrue( $result->is_success() );
+
+		$data = $result->get_data();
+		$this->assertCount( 3, $data['entries'] );
+
+		// Test first entry (simple deprecated warning)
+		$first_entry = $data['entries'][2]; // Reversed order (most recent first)
+		$this->assertEquals( 'PHP Deprecated', $first_entry['type'] );
+		$this->assertEquals( 'debug', $first_entry['level'] );
+		$this->assertStringContainsString( 'Creation of dynamic property', $first_entry['message'] );
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-content/plugins/woocommerce-bookings/includes/class-wc-bookings-google-calendar-connection.php', $first_entry['file'] );
+		$this->assertEquals( 128, $first_entry['line'] );
+
+		// Test second entry (complex HTML content) - this is the critical test
+		$html_entry = $data['entries'][1]; // Reversed order
+		$this->assertEquals( 'PHP Notice', $html_entry['type'] );
+		$this->assertEquals( 'notice', $html_entry['level'] );
+		
+		// Verify complete HTML content is preserved
+		$this->assertStringContainsString( '<strong>incorrectly</strong>', $html_entry['message'] );
+		$this->assertStringContainsString( '<code>woocommerce-bookings</code>', $html_entry['message'] );
+		$this->assertStringContainsString( '<a href="https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/">Debugging in WordPress</a>', $html_entry['message'] );
+		$this->assertStringContainsString( 'This message was added in version 6.7.0.', $html_entry['message'] );
+		
+		// Verify file and line information is extracted correctly despite HTML content
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-includes/functions.php', $html_entry['file'] );
+		$this->assertEquals( 6121, $html_entry['line'] );
+
+		// Test third entry
+		$third_entry = $data['entries'][0]; // Reversed order (most recent first)
+		$this->assertEquals( 'PHP Deprecated', $third_entry['type'] );
+		$this->assertEquals( 'debug', $third_entry['level'] );
+		$this->assertStringContainsString( 'client_id is deprecated', $third_entry['message'] );
+		$this->assertEquals( 131, $third_entry['line'] );
+
+		// Verify no content was lost
+		$total_original_length = strlen( $log_content );
+		$total_parsed_length = array_sum( array_map( fn( $entry ) => strlen( $entry['raw_line'] ), $data['entries'] ) );
+		
+		// The parsed content should contain most of the original content 
+		// (allowing for small differences due to processing)
+		$this->assertGreaterThan( $total_original_length * 0.95, $total_parsed_length );
+	}
+
+	/**
+	 * Test reading log entries with diverse formats and complex content.
+	 *
+	 * @covers \DebugSuite\Services\DebugLog\WPLogReaderService::read_log_entries
+	 * @covers \DebugSuite\Services\DebugLog\WPLogReaderService::parse_log_entries
+	 * @covers \DebugSuite\Services\DebugLog\WPLogReaderService::determine_type_from_content
+	 * @group services
+	 * @group unit
+	 */
+	public function test_read_log_entries_with_diverse_formats(): void {
+		// Create test log content with all the diverse formats from real-world logs
+		$log_content = '[23-Jun-2025 08:06:59 UTC] E_WARNING: Trying to access array offset on null in /Users/kzaman/Herd/dokan/wp-content/plugins/dokan-lite/includes/Order/VendorBalanceUpdateHandler.php on line 169
+[23-Jun-2025 08:12:02 UTC] Array
+(
+    [paypal_marketplace] => 1
+    [net_refund_amount] => 45
+    [reversed_admin_fee] => 5
+    [reversed_gateway_fee] => 0
+    [total_refunded_amount] => 100
+    [paypal_refund_id] => 8HM50612WW0503112
+    [refund_order_id] => 793
+)
+[23-Jun-2025 08:26:01 UTC] E_USER_DEPRECATED: Hook woocommerce_rest_api_option_permissions is deprecated since version 6.3.0 with no alternative available. in /Users/kzaman/Herd/dokan/wp-includes/functions.php on line 6121
+[23-Jun-2025 15:31:53 UTC] Automatic updates starting...
+[23-Jun-2025 15:32:41 UTC] \'###### wp_scraping_result_start:a59e616268ca21b065d06fcbc656f023 ######
+true
+###### wp_scraping_result_end:a59e616268ca21b065d06fcbc656f023 ######
+\'
+[23-Jun-2025 16:26:36 UTC] Cron reschedule event error for hook: action_scheduler_run_queue, Error code: could_not_set, Error message: The cron event list could not be saved., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}
+[23-Jun-2025 17:39:18 UTC] EXCEPTION: Cannot resolve parameter [log_path] for class [DebugSuite\Services\DebugLog\WPLogReaderService]. No type hint, default value, or explicit binding provided. Suggestions: Use -&gt;constructor_parameter(&#039;log_path&#039;, $value), Use -&gt;constructor_parameter_callback(&#039;log_path&#039;, $callback), Add a default value to the parameter in the constructor. in /Users/kzaman/Herd/dokan/wp-content/plugins/debug-suite/includes/Core/Container/Definitions/AutowiredDefinition.php on line 393';
+
+		$this->create_log_file( $log_content );
+
+		$result = $this->service->read_log_entries();
+
+		$this->assertTrue( $result->is_success() );
+
+		$data = $result->get_data();
+		$this->assertCount( 7, $data['entries'] );
+
+		// Test E_WARNING entry (standard format)
+		$warning_entry = $data['entries'][6]; // Reversed order (most recent first)
+		$this->assertEquals( 'E_WARNING', $warning_entry['type'] );
+		$this->assertEquals( 'warning', $warning_entry['level'] );
+		$this->assertStringContainsString( 'Trying to access array offset on null', $warning_entry['message'] );
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-content/plugins/dokan-lite/includes/Order/VendorBalanceUpdateHandler.php', $warning_entry['file'] );
+		$this->assertEquals( 169, $warning_entry['line'] );
+
+		// Test Array dump entry (no colon format)
+		$array_entry = $data['entries'][5];
+		$this->assertEquals( 'Array Dump', $array_entry['type'] );
+		$this->assertEquals( 'debug', $array_entry['level'] );
+		$this->assertStringContainsString( 'Array', $array_entry['message'] );
+		$this->assertStringContainsString( '[paypal_marketplace] => 1', $array_entry['message'] );
+		$this->assertStringContainsString( '[net_refund_amount] => 45', $array_entry['message'] );
+		$this->assertNull( $array_entry['file'] );
+		$this->assertNull( $array_entry['line'] );
+
+		// Test E_USER_DEPRECATED entry
+		$deprecated_entry = $data['entries'][4];
+		$this->assertEquals( 'E_USER_DEPRECATED', $deprecated_entry['type'] );
+		$this->assertEquals( 'debug', $deprecated_entry['level'] );
+		$this->assertStringContainsString( 'Hook woocommerce_rest_api_option_permissions is deprecated', $deprecated_entry['message'] );
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-includes/functions.php', $deprecated_entry['file'] );
+		$this->assertEquals( 6121, $deprecated_entry['line'] );
+
+		// Test simple status message (no colon format)
+		$update_entry = $data['entries'][3];
+		$this->assertEquals( 'System Update', $update_entry['type'] );
+		$this->assertEquals( 'info', $update_entry['level'] );
+		$this->assertEquals( 'Automatic updates starting...', $update_entry['message'] );
+		$this->assertNull( $update_entry['file'] );
+		$this->assertNull( $update_entry['line'] );
+
+		// Test scraping result with complex multiline format
+		$scraping_entry = $data['entries'][2];
+		$this->assertEquals( 'Scraping Result', $scraping_entry['type'] );
+		$this->assertEquals( 'debug', $scraping_entry['level'] );
+		$this->assertStringContainsString( 'wp_scraping_result_start', $scraping_entry['message'] );
+		$this->assertStringContainsString( 'true', $scraping_entry['message'] );
+		$this->assertStringContainsString( 'wp_scraping_result_end', $scraping_entry['message'] );
+
+		// Test cron event with JSON data
+		$cron_entry = $data['entries'][1];
+		$this->assertEquals( 'Cron Event', $cron_entry['type'] );
+		$this->assertEquals( 'warning', $cron_entry['level'] );
+		$this->assertStringContainsString( 'Cron reschedule event error', $cron_entry['message'] );
+		$this->assertStringContainsString( 'action_scheduler_run_queue', $cron_entry['message'] );
+		$this->assertStringContainsString( '{"schedule":"every_minute"', $cron_entry['message'] );
+
+		// Test EXCEPTION with HTML entities
+		$exception_entry = $data['entries'][0]; // Most recent
+		$this->assertEquals( 'EXCEPTION', $exception_entry['type'] );
+		$this->assertEquals( 'error', $exception_entry['level'] );
+		$this->assertStringContainsString( 'Cannot resolve parameter', $exception_entry['message'] );
+		$this->assertStringContainsString( 'log_path', $exception_entry['message'] );
+		$this->assertStringContainsString( '&gt;', $exception_entry['message'] ); // HTML entities preserved
+		$this->assertStringContainsString( '&#039;', $exception_entry['message'] ); // HTML entities preserved
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-content/plugins/debug-suite/includes/Core/Container/Definitions/AutowiredDefinition.php', $exception_entry['file'] );
+		$this->assertEquals( 393, $exception_entry['line'] );
+
+		// Verify all entries have proper timestamps
+		foreach ( $data['entries'] as $entry ) {
+			$this->assertMatchesRegularExpression( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $entry['timestamp'] );
+			$this->assertNotEmpty( $entry['type'] );
+			$this->assertNotEmpty( $entry['level'] );
+			$this->assertGreaterThan( 0, $entry['line_number'] );
+		}
+	}
 }

@@ -144,31 +144,91 @@ class WPLogReaderService implements ServiceInterface {
 
 		foreach ( $lines as $line_number => $line ) {
 			// Check if this line starts a new log entry
-			if ( preg_match( '/^\[(.*?)] (.*?): (.*?)( in (.*?) on line (\d+))?$/', $line, $matches ) ) {
+			// Enhanced regex to handle multiple log formats
+			if ( preg_match( '/^\[(.*?)\]\s+(.*)$/', $line, $matches ) ) {
 				// Save previous entry if exists
 				if ( $entry ) {
 					$entries[] = $entry;
 				}
 
-				$type = trim( $matches[2] );
+				$timestamp = $matches[1];
+				$content = trim( $matches[2] );
+
+				// Determine type and message based on content format
+				$type = '';
+				$message = '';
+				$file = null;
+				$line_info = null;
+
+				// Pattern 1: Standard error format (TYPE: message)
+				if ( preg_match( '/^([^:]+):\s+(.*)$/', $content, $type_matches ) ) {
+					$potential_type = trim( $type_matches[1] );
+					$potential_message = trim( $type_matches[2] );
+
+					// Check if this looks like a real error type or just content with colons
+					if ( $this->is_standard_error_type( $potential_type ) ) {
+						$type = $potential_type;
+						$message = $potential_message;
+					} else {
+						// This is content with colons, treat as a simple message
+						$type = $this->determine_type_from_content( $content );
+						$message = $content;
+					}
+				} else {
+					// Pattern 2: Simple message without type (like "Array", "Automatic updates starting...")
+					$type = $this->determine_type_from_content( $content );
+					$message = $content;
+				}
+
+				// Extract file and line information from the message if present
+				if ( preg_match( '/^(.*?)\s+in\s+(\/[^\s]+)\s+on\s+line\s+(\d+)$/', $message, $file_matches ) ) {
+					$message = trim( $file_matches[1] );
+					$file = $file_matches[2];
+					$line_info = (int) $file_matches[3];
+				}
+
 				$level = $this->determine_log_level( $type );
 
 				$entry = [
-					'timestamp'        => $this->parse_timestamp( $matches[1] ),
+					'timestamp'        => $this->parse_timestamp( $timestamp ),
 					'type'             => $type,
 					'level'            => $level,
-					'message'          => trim( $matches[3] ),
-					'file'             => $matches[5] ?? null,
-					'line'             => isset( $matches[6] ) ? (int) $matches[6] : null,
+					'message'          => $message,
+					'file'             => $file,
+					'line'             => $line_info,
 					'stack_trace'      => '',
 					'has_stack_trace'  => false,
 					'line_number'      => $line_number + 1,
 					'raw_line'         => $line,
 				];
 			} elseif ( $entry ) {
-				// This is a continuation line (stack trace)
-				$entry['stack_trace'] .= $line . "\n";
-				$entry['has_stack_trace'] = true;
+				// This is a continuation line (could be multiline message, array dump, or stack trace)
+				$trimmed_line = trim( $line );
+
+				// Check if this line looks like a stack trace
+				if ( preg_match( '/^#\d+/', $trimmed_line ) ||
+						str_contains( $trimmed_line, 'Stack trace:' ) ||
+						str_contains( $trimmed_line, 'thrown in' ) ) {
+					$entry['stack_trace'] .= $line . "\n";
+					$entry['has_stack_trace'] = true;
+				} else {
+					// This is likely a continuation of the message (array content, multiline text, etc.)
+					if ( ! empty( $trimmed_line ) ) {
+						// For array dumps and multiline content, preserve formatting
+						if ( str_contains( $trimmed_line, '=>' ) ||
+							 str_contains( $trimmed_line, '(' ) ||
+							 str_contains( $trimmed_line, ')' ) ||
+							 str_starts_with( $trimmed_line, '[' ) ||
+							 str_starts_with( $trimmed_line, '#' ) ) {
+							// Preserve array/object structure formatting
+							$entry['message'] .= "\n" . $trimmed_line;
+						} else {
+							// Regular continuation text
+							$entry['message'] .= ' ' . $trimmed_line;
+						}
+					}
+					$entry['raw_line'] .= "\n" . $line;
+				}
 			}
 		}
 
@@ -182,9 +242,57 @@ class WPLogReaderService implements ServiceInterface {
 	}
 
 	/**
+	 * Determine the type from content when no explicit type is provided.
+	 *
+	 * @param string $content The content to analyze.
+	 *
+	 * @return string The determined type.
+	 */
+	private function determine_type_from_content( string $content ): string {
+		$content_lower = strtolower( $content );
+
+		// Check for specific patterns
+		if ( str_starts_with( $content, 'Array' ) ) {
+			return 'Array Dump';
+		}
+
+		if ( str_contains( $content_lower, 'automatic update' ) ) {
+			return 'System Update';
+		}
+
+		if ( str_contains( $content_lower, 'cron' ) ) {
+			return 'Cron Event';
+		}
+
+		if ( str_contains( $content_lower, 'exception' ) ) {
+			return 'Exception';
+		}
+
+		if ( str_contains( $content_lower, 'scraping' ) ) {
+			return 'Scraping Result';
+		}
+
+		if ( str_contains( $content_lower, 'error' ) ) {
+			return 'Error';
+		}
+
+		if ( str_contains( $content_lower, 'warning' ) ) {
+			return 'Warning';
+		}
+
+		if ( str_contains( $content_lower, 'notice' ) ) {
+			return 'Notice';
+		}
+
+		// Default to 'Info' for unrecognized content
+		return 'Info';
+	}
+
+	/**
 	 * Determine log level from an error type.
 	 *
 	 * @param string $type Error type string.
+	 *
 	 * @return string
 	 */
 	private function determine_log_level( string $type ): string {
@@ -198,7 +306,8 @@ class WPLogReaderService implements ServiceInterface {
 
 		// Check for regular errors
 		if ( str_contains( $type_lower, 'uncaught' ) ||
-			 str_contains( $type_lower, 'error' ) ) {
+			 str_contains( $type_lower, 'error' ) ||
+			 str_contains( $type_lower, 'exception' ) ) {
 			return 'error';
 		}
 
@@ -214,6 +323,23 @@ class WPLogReaderService implements ServiceInterface {
 			return 'debug';
 		}
 
+		// Special handling for our custom identified types
+		if ( str_contains( $type_lower, 'cron' ) ) {
+			return 'warning'; // Cron events are often warnings when they fail
+		}
+
+		if ( str_contains( $type_lower, 'array dump' ) ) {
+			return 'debug'; // Array dumps are debug information
+		}
+
+		if ( str_contains( $type_lower, 'system update' ) ) {
+			return 'info'; // System updates are informational
+		}
+
+		if ( str_contains( $type_lower, 'scraping' ) ) {
+			return 'debug'; // Scraping results are debug information
+		}
+
 		return 'info';
 	}
 
@@ -221,6 +347,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * Process stack trace for an entry.
 	 *
 	 * @param array $entry Log entry.
+	 *
 	 * @return array
 	 */
 	private function process_stack_trace( array $entry ): array {
@@ -234,7 +361,7 @@ class WPLogReaderService implements ServiceInterface {
 		);
 
 		$entry['stack_trace'] = [
-			'raw_lines'   => $stack_trace_lines,
+			'stack_trace_lines'   => $stack_trace_lines,
 			'frames'      => $this->parse_stack_trace_frames( $stack_trace_lines ),
 			'summary'     => implode( "\n", $stack_trace_lines ),
 			'frame_count' => count( $stack_trace_lines ),
@@ -247,6 +374,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * Parse stack trace frames from lines.
 	 *
 	 * @param array $lines Stack trace lines.
+	 *
 	 * @return array
 	 */
 	private function parse_stack_trace_frames( array $lines ): array {
@@ -293,6 +421,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * Parse WordPress timestamp format.
 	 *
 	 * @param string $timestamp WordPress timestamp.
+	 *
 	 * @return string
 	 */
 	private function parse_timestamp( string $timestamp ): string {
@@ -674,5 +803,39 @@ class WPLogReaderService implements ServiceInterface {
 		$bytes /= pow( 1024, $pow );
 
 		return round( $bytes, 2 ) . ' ' . $units[ $pow ];
+	}
+
+	/**
+	 * Check if a type string looks like a standard error type.
+	 *
+	 * @param string $type The type string to check.
+	 * @return bool True if it looks like a standard error type, false otherwise.
+	 */
+	private function is_standard_error_type( string $type ): bool {
+		$standard_types = [
+			'PHP Fatal error',
+			'PHP Parse error',
+			'PHP Warning',
+			'PHP Notice',
+			'PHP Deprecated',
+			'E_ERROR',
+			'E_WARNING',
+			'E_PARSE',
+			'E_NOTICE',
+			'E_CORE_ERROR',
+			'E_CORE_WARNING',
+			'E_COMPILE_ERROR',
+			'E_COMPILE_WARNING',
+			'E_USER_ERROR',
+			'E_USER_WARNING',
+			'E_USER_NOTICE',
+			'E_USER_DEPRECATED',
+			'E_STRICT',
+			'E_RECOVERABLE_ERROR',
+			'E_DEPRECATED',
+			'EXCEPTION',
+		];
+
+		return in_array( $type, $standard_types, true );
 	}
 }

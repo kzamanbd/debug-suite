@@ -51,9 +51,6 @@ class FileLogsService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	public function get_log_entries( array $options = [] ): ServiceResponse {
-		// Set default limit for backward compatibility
-		$options['limit'] = $options['limit'] ?? 100;
-
 		return $this->log_reader->get_log_entries( $options );
 	}
 
@@ -93,10 +90,10 @@ class FileLogsService implements ServiceInterface {
 
 	public function supported_log_files(): array {
 		return [
-			'apache_error_log' => $this->find_apache_log_file(),
-			'nginx_error_log' => $this->find_nginx_log_file(),
-			'redis_log' => $this->find_redis_log_file(),
-			'php_fpm_error_log' => $this->find_php_fpm_error_log(),
+			$this->find_apache_log_file(),
+			$this->find_nginx_log_file(),
+			$this->find_redis_log_file(),
+			$this->find_php_fpm_error_log(),
 		];
 	}
 

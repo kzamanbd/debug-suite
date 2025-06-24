@@ -33,13 +33,12 @@
     <arg name="warning-severity" value="6"/>
 
     <!-- WordPress Core Standards -->
+    <rule ref="WordPress" />
     <rule ref="WordPress-Core">
         <!-- Exclude inline comment punctuation rule -->
         <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar"/>
         <exclude name="Generic.Functions.CallTimePassByReference"/>
     </rule>
-    <rule ref="WordPress-Docs"/>
-    <rule ref="WordPress-Extra"/>
 
     <!-- WordPress.org CRITICAL Requirements -->
 

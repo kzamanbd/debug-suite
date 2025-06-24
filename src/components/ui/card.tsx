@@ -12,7 +12,7 @@ const Card = ({ className, children, clickable, onClick, ...rest }: CardProps) =
     return (
         <div
             className={classNames(
-                'w-full rounded border transition-all duration-300',
+                'w-full rounded-lg border transition-all duration-300',
                 clickable && 'cursor-pointer hover:shadow-lg',
                 className
             )}

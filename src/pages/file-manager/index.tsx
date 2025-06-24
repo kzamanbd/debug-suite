@@ -9,12 +9,14 @@ import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 import InputField from '@/components/ui/input-field';
-import { IFile } from '@/types';
+import { ItemTree } from '@/types';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 import { FolderPlus, HardDrive, MoreVertical, Upload } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import SimpleBar from 'simplebar-react';
 import FileDetailSkeleton from './components/detail-skeleton';
 import FileEditor from './components/file-editor';
 import FileIcon from './components/file-icon';
@@ -22,11 +24,11 @@ import FileTree from './components/file-tree';
 import FileTreeSkeleton from './components/tree-skeleton';
 
 const FileManager = () => {
-    const [files, setFiles] = useState<IFile[]>([]);
+    const [files, setFiles] = useState<ItemTree[]>([]);
     const [openEditor, setOpenEditor] = useState(false);
     const [fileContent, setFileContent] = useState('');
     const [fileName, setFileName] = useState('');
-    const [selectedFiles, setSelectedFiles] = useState<IFile[]>([]);
+    const [selectedFiles, setSelectedFiles] = useState<ItemTree[]>([]);
     const [initialLoading, setInitialLoading] = useState(false);
     const [detailLoading, setDetailLoading] = useState(false);
     const [loadingFileContent, setLoadingFileContent] = useState(false);
@@ -34,23 +36,31 @@ const FileManager = () => {
 
     const fetchFiles = async (path?: string) => {
         // Fetch files from the server
+        const apiPath = addQueryArgs('/debug-suite/v1/files', {
+            path: path || ''
+        });
+
         return apiFetch<{
-            tree: IFile[];
+            tree: ItemTree[];
         }>({
-            path: `/debug-suite/v1/files?path=${encodeURIComponent(path || '')}`
+            path: apiPath
         });
     };
 
     const fetchFileContent = async (path: string) => {
+        const apiPath = addQueryArgs('/debug-suite/v1/files/content', {
+            path: path || ''
+        });
+
         return apiFetch<{
             contents: string;
             extension: string;
         }>({
-            path: `/debug-suite/v1/files/content?path=${encodeURIComponent(path || '')}`
+            path: apiPath
         });
     };
 
-    const fetchNestedFiles = async (file: IFile) => {
+    const fetchNestedFiles = async (file: ItemTree) => {
         if (file.type === 'file') {
             fileEditHandler(file);
             return;
@@ -103,7 +113,7 @@ const FileManager = () => {
         }
     }, []);
 
-    const fileEditHandler = async (file: IFile) => {
+    const fileEditHandler = async (file: ItemTree) => {
         toggleEditor();
         setFileName(file.name);
         setLoadingFileContent(true);
@@ -123,7 +133,7 @@ const FileManager = () => {
 
     const checkedItems = selectedFiles.filter((file) => file.checked);
 
-    const checkedItem = (file: IFile, e: React.ChangeEvent<HTMLInputElement>) => {
+    const checkedItem = (file: ItemTree, e: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedFiles(
             selectedFiles.map((item) => {
                 if (item.path === file.path) {
@@ -154,7 +164,7 @@ const FileManager = () => {
                     className="md:w-1/3 dark:bg-gray-800 dark:text-white"
                 />
                 <div className="flex flex-wrap gap-2 md:space-x-4">
-                    <Button variant="light" aria-label={__('Create new folder', 'debug-suite')}>
+                    <Button aria-label={__('Create new folder', 'debug-suite')}>
                         <FolderPlus size={16} />
                         <span>{__('New Folder', 'debug-suite')}</span>
                     </Button>
@@ -186,12 +196,12 @@ const FileManager = () => {
                                 xmlns="http://www.w3.org/2000/svg"
                                 aria-hidden="true"
                             >
-                                <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
+                                <path d="M6 13L10 3" stroke="currentColor" strokeLinecap="round"></path>
                             </svg>
                         )}
                     </div>
                     {breadcrumb.map((item, index) => (
-                        <div className="inline-flex items-center">
+                        <div key={index} className="inline-flex items-center">
                             <button
                                 type="button"
                                 className="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-hidden dark:text-neutral-500 dark:hover:text-blue-500 dark:focus:text-blue-500"
@@ -208,7 +218,7 @@ const FileManager = () => {
                                         xmlns="http://www.w3.org/2000/svg"
                                         aria-hidden="true"
                                     >
-                                        <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
+                                        <path d="M6 13L10 3" stroke="currentColor" strokeLinecap="round"></path>
                                     </svg>
                                 )}
                             </button>
@@ -230,19 +240,19 @@ const FileManager = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="h-[500px] overflow-y-auto">
+                        <SimpleBar className="h-[600px] overflow-y-auto">
                             <ul className="p-4">
                                 {files.map((file) => (
                                     <FileTree key={file.path} file={file} action={fetchNestedFiles} />
                                 ))}
                             </ul>
-                        </div>
+                        </SimpleBar>
                     )}
                 </div>
                 <div className="col-span-5 border-l dark:border-gray-800">
                     {detailLoading ? <FileDetailSkeleton /> : null}
                     {selectedFiles.length && !detailLoading ? (
-                        <div className="h-[500px] overflow-y-auto">
+                        <SimpleBar className="h-[600px] overflow-y-auto">
                             <table className="w-full overflow-hidden rounded-lg border border-gray-200 text-left dark:border-gray-700">
                                 <thead>
                                     <tr className="bg-gray-50 text-xs font-semibold text-gray-500 uppercase dark:bg-gray-800 dark:text-gray-300">
@@ -334,7 +344,7 @@ const FileManager = () => {
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                        </SimpleBar>
                     ) : null}
                 </div>
             </div>
