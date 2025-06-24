@@ -125,14 +125,10 @@ const LogControls = ({
         return (
             <div className="flex items-center justify-between border-gray-200 bg-white py-3">
                 <div className="flex flex-1 justify-between sm:hidden">
-                    <Button variant="light" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
+                    <Button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
                         {__('Previous', 'debug-suite')}
                     </Button>
-                    <Button
-                        variant="light"
-                        onClick={() => goToPage(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                    >
+                    <Button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>
                         {__('Next', 'debug-suite')}
                     </Button>
                 </div>
@@ -148,7 +144,6 @@ const LogControls = ({
                     <div>
                         <nav className="isolate inline-flex gap-2" aria-label="Pagination">
                             <Button
-                                variant="light"
                                 onClick={() => goToPage(currentPage - 1)}
                                 disabled={currentPage === 1}
                                 className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
@@ -172,7 +167,6 @@ const LogControls = ({
                                         <div className="flex gap-2" key={page}>
                                             {showEllipsis && (
                                                 <Button
-                                                    variant="light"
                                                     className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                                                     disabled
                                                     aria-label={__('More pages', 'debug-suite')}
@@ -181,7 +175,7 @@ const LogControls = ({
                                                 </Button>
                                             )}
                                             <Button
-                                                variant={page === currentPage ? 'primary' : 'light'}
+                                                variant={page === currentPage ? 'primary' : 'default'}
                                                 onClick={() => goToPage(page)}
                                                 className={classNames(
                                                     'relative inline-flex items-center border px-4 py-2 text-sm font-medium',
@@ -197,7 +191,6 @@ const LogControls = ({
                                 })}
 
                             <Button
-                                variant="light"
                                 onClick={() => goToPage(currentPage + 1)}
                                 disabled={currentPage === totalPages}
                                 className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
@@ -279,7 +272,7 @@ const LogControls = ({
                                 )}
                             </div>
                         )}
-                        <Button variant="light" onClick={onRefresh}>
+                        <Button onClick={onRefresh}>
                             <RefreshCwIcon className="h-4 w-4" />
                         </Button>
                     </div>
@@ -301,7 +294,7 @@ const LogControls = ({
                                 value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
                                 onChange={(option) => onFiltersChange({ sortBy: option?.value || 'timestamp' })}
                             />
-                            <Button variant="light" onClick={toggleSortOrder} className="flex items-center space-x-1">
+                            <Button onClick={toggleSortOrder} className="flex items-center space-x-1">
                                 {filters.sortOrder === 'asc' ? (
                                     <ChevronUpIcon className="h-4 w-4" />
                                 ) : (
@@ -324,11 +317,11 @@ const LogControls = ({
                                 }
                                 onChange={(option) => onFiltersChange({ perPage: parseInt(option?.value || '25') })}
                             />
-                            <Button variant="light" onClick={() => onExport('json')}>
+                            <Button onClick={() => onExport('json')}>
                                 <DownloadIcon className="mr-2 h-4 w-4" />
                                 {__('Export', 'debug-suite')}
                             </Button>
-                            <Button variant="light" onClick={handleClear} disabled={clearing}>
+                            <Button onClick={handleClear} disabled={clearing}>
                                 <TrashIcon className="mr-2 h-4 w-4" />
                                 {clearing ? __('Clearing...', 'debug-suite') : __('Clear', 'debug-suite')}
                             </Button>

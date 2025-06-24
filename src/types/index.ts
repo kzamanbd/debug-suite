@@ -18,16 +18,18 @@ export interface SettingsState {
     hideHtaccess: boolean;
     logQueries: boolean;
     logErrors: boolean;
-    wpDebug: boolean;
-    wpDebugLog: boolean;
-    wpDebugDisplay: boolean;
-    [key: string]: string | boolean | Record<string, { name: string }>;
 }
 
 // global window type
 declare global {
     interface Window {
         debugSuite: SettingsState & {
+            wpDebug: boolean;
+            wpDebugLog: boolean;
+            wpDebugDisplay: boolean;
+            wpVersion: string;
+            phpVersion: string;
+            favicon: string;
             roles: Record<string, { name: string }>;
             [key: string]: string | boolean | Record<string, { name: string }> | undefined;
         };

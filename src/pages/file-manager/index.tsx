@@ -154,7 +154,7 @@ const FileManager = () => {
                     className="md:w-1/3 dark:bg-gray-800 dark:text-white"
                 />
                 <div className="flex flex-wrap gap-2 md:space-x-4">
-                    <Button variant="light" aria-label={__('Create new folder', 'debug-suite')}>
+                    <Button aria-label={__('Create new folder', 'debug-suite')}>
                         <FolderPlus size={16} />
                         <span>{__('New Folder', 'debug-suite')}</span>
                     </Button>

@@ -13,7 +13,7 @@ domReady(() => {
         const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
         existingIcons.forEach((icon) => icon.parentNode?.removeChild(icon));
 
-        const faviconUrl = window.debugSuite.favicon.toString();
+        const faviconUrl = window.debugSuite.favicon;
         // Create new link
         const link = document.createElement('link');
         link.rel = 'icon';

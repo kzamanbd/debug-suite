@@ -141,6 +141,8 @@ class Admin implements Hookable {
 			'filesUrl'       => content_url(),
 			'roles'          => $roles,
 			'favicon'       => $favicon,
+			'wpVersion'      => get_bloginfo( 'version' ),
+			'phpVersion'     => phpversion(),
 		];
 		$settings  = get_option( 'debug_suite_settings', [] );
 		$settings  = array_merge( $constants, $settings );

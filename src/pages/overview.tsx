@@ -2,7 +2,6 @@ import Alert from '@/components/ui/alert';
 import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
-import { SettingsState } from '@/types';
 
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
@@ -36,13 +35,6 @@ interface DashboardStats {
         levels: Record<string, number>;
         last_modified: number;
     };
-    container: {
-        total_resolutions: number;
-        average_time: number;
-        cache_hits: number;
-        services_resolved: number;
-        is_compiled: boolean;
-    };
     system: {
         wp_debug: boolean;
         wp_debug_log: boolean;
@@ -66,13 +58,47 @@ interface SlowQuery {
     source: string;
 }
 
+// Mock slow queries data (replace with real API later)
+const mockSlowQueries: SlowQuery[] = [
+    {
+        query: 'SELECT * FROM wp_posts WHERE post_status = "publish" ORDER BY post_date DESC',
+        execution_time: 2.45,
+        calls: 12,
+        source: 'wp-includes/query.php:3421'
+    },
+    {
+        query: 'SELECT COUNT(*) FROM wp_comments WHERE comment_approved = "1"',
+        execution_time: 1.89,
+        calls: 8,
+        source: 'wp-includes/comment.php:892'
+    },
+    {
+        query: 'SELECT * FROM wp_options WHERE autoload = "yes"',
+        execution_time: 1.67,
+        calls: 45,
+        source: 'wp-includes/option.php:174'
+    },
+    {
+        query: 'SELECT meta_value FROM wp_postmeta WHERE post_id IN (...)',
+        execution_time: 1.23,
+        calls: 23,
+        source: 'wp-includes/meta.php:567'
+    },
+    {
+        query: 'SELECT * FROM wp_users WHERE user_login = %s',
+        execution_time: 0.98,
+        calls: 5,
+        source: 'wp-includes/user.php:245'
+    }
+];
+
 const Overview = () => {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [topErrors, setTopErrors] = useState<TopError[]>([]);
     const [slowQueries, setSlowQueries] = useState<SlowQuery[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const settings = window.debugSuite as SettingsState;
+    const settings = window.debugSuite;
 
     const fetchDashboardData = async (showRefreshToast = false) => {
         try {
@@ -108,55 +134,14 @@ const Overview = () => {
                 .sort((a, b) => b.count - a.count)
                 .slice(0, 5);
 
-            // Mock slow queries data (replace with real API later)
-            const mockSlowQueries: SlowQuery[] = [
-                {
-                    query: 'SELECT * FROM wp_posts WHERE post_status = "publish" ORDER BY post_date DESC',
-                    execution_time: 2.45,
-                    calls: 12,
-                    source: 'wp-includes/query.php:3421'
-                },
-                {
-                    query: 'SELECT COUNT(*) FROM wp_comments WHERE comment_approved = "1"',
-                    execution_time: 1.89,
-                    calls: 8,
-                    source: 'wp-includes/comment.php:892'
-                },
-                {
-                    query: 'SELECT * FROM wp_options WHERE autoload = "yes"',
-                    execution_time: 1.67,
-                    calls: 45,
-                    source: 'wp-includes/option.php:174'
-                },
-                {
-                    query: 'SELECT meta_value FROM wp_postmeta WHERE post_id IN (...)',
-                    execution_time: 1.23,
-                    calls: 23,
-                    source: 'wp-includes/meta.php:567'
-                },
-                {
-                    query: 'SELECT * FROM wp_users WHERE user_login = %s',
-                    execution_time: 0.98,
-                    calls: 5,
-                    source: 'wp-includes/user.php:245'
-                }
-            ];
-
             setStats({
                 logs: logStats,
-                container: {
-                    total_resolutions: 0,
-                    average_time: 0,
-                    cache_hits: 0,
-                    services_resolved: 0,
-                    is_compiled: true
-                },
                 system: {
-                    wp_debug: settings.wpDebug || false,
-                    wp_debug_log: settings.wpDebugLog || false,
-                    wp_debug_display: settings.wpDebugDisplay || false,
-                    php_version: '8.2.0', // This would come from PHP in real implementation
-                    wp_version: '6.4.0' // This would come from WordPress in real implementation
+                    wp_debug: settings.wpDebug,
+                    wp_debug_log: settings.wpDebugLog,
+                    wp_debug_display: settings.wpDebugDisplay,
+                    php_version: settings.phpVersion,
+                    wp_version: settings.wpVersion
                 }
             });
 
@@ -244,7 +229,6 @@ const Overview = () => {
             <div className="flex items-center justify-between">
                 <Button
                     onClick={() => fetchDashboardData(true)}
-                    variant="light"
                     className="flex items-center gap-2"
                     disabled={refreshing}
                 >
@@ -362,13 +346,13 @@ const Overview = () => {
                                 <span className="text-gray-600 dark:text-gray-400">
                                     {__('PHP Version', 'debug-suite')}
                                 </span>
-                                <span className="font-medium">{stats.system.php_version}</span>
+                                <Badge variant="info">{stats.system.php_version}</Badge>
                             </div>
                             <div className="mt-2 flex items-center justify-between text-sm">
                                 <span className="text-gray-600 dark:text-gray-400">
                                     {__('WordPress Version', 'debug-suite')}
                                 </span>
-                                <span className="font-medium">{stats.system.wp_version}</span>
+                                <Badge variant="info">{stats.system.wp_version}</Badge>
                             </div>
                         </div>
                     </div>
@@ -383,7 +367,7 @@ const Overview = () => {
                                 {__('Top Recent Errors', 'debug-suite')}
                             </h3>
                         </div>
-                        <Button variant="light" size="sm" className="flex items-center gap-1">
+                        <Button size="sm" className="flex items-center gap-1">
                             <ExternalLink className="h-3 w-3" />
                             {__('View All', 'debug-suite')}
                         </Button>
@@ -430,7 +414,7 @@ const Overview = () => {
                             {__('Top 5 Slowest Queries', 'debug-suite')}
                         </h3>
                     </div>
-                    <Button variant="light" className="flex items-center gap-1 text-sm">
+                    <Button className="flex items-center gap-1 text-sm">
                         <ExternalLink className="h-3 w-3" />
                         {__('View All', 'debug-suite')}
                     </Button>
@@ -502,15 +486,15 @@ const Overview = () => {
                     </h3>
                 </div>
                 <div className="flex flex-wrap gap-4">
-                    <Button variant="light">
+                    <Button>
                         <FileText className="h-5 w-5" />
                         <span>{__('View Debug Logs', 'debug-suite')}</span>
                     </Button>
-                    <Button variant="light">
+                    <Button>
                         <Settings className="h-5 w-5" />
                         <span>{__('Debug Settings', 'debug-suite')}</span>
                     </Button>
-                    <Button variant="light">
+                    <Button>
                         <Database className="h-5 w-5" />
                         <span>{__('File Manager', 'debug-suite')}</span>
                     </Button>
