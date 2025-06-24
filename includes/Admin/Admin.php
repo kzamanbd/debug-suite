@@ -77,11 +77,6 @@ class Admin implements Hookable {
 			$capability,
 			'admin.php?page=' . $slug . '#file-manager',
 		];
-		$submenu[ $slug ][] = [
-			__( 'Manage Logs', 'debug-suite' ),
-			$capability,
-			'admin.php?page=' . $slug . '#file-logs/manage',
-		];
 	}
 
 	/**
