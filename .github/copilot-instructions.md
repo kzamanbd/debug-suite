@@ -21,7 +21,7 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 
 ### PHP Backend
 
-1. **PHP Version**: Use PHP 8.2 features including:
+1. **PHP Version**: Use PHP 8.1 features including:
 
     - Union types
     - Named arguments

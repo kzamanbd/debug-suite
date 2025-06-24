@@ -9,7 +9,7 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 - **PSR-11 compliant dependency injection container** with PHP-DI compatibility
 - **Service Layer Pattern** architecture for business logic separation
 - **React/TypeScript frontend** with Tailwind CSS v4 and WordPress integration
-- **Modern PHP 8.2** features with strict typing and enterprise patterns
+- **Modern PHP 8.1** features with strict typing and enterprise patterns
 
 ## Core Architecture Principles
 
@@ -31,10 +31,10 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 
 ## PHP Backend Standards
 
-### PHP 8.2 Features & Type Safety
+### PHP 8.1 Features & Type Safety
 
 ```php
-// ✅ Use PHP 8.2 features
+// ✅ Use PHP 8.1 features
 - Union types: `string|null`, `array|false`
 - Named arguments in function calls
 - Constructor property promotion
@@ -471,7 +471,7 @@ public function process_data(array $input): ServiceResponse {
 7. **Headless UI**: Use Headless UI components for accessibility
 8. **Lucide Icons**: Only use Lucide React icons
 9. **Primary Color**: Always use 'primary' as brand color in Tailwind
-10. **Type Everything**: Full TypeScript coverage, PHP 8.2 type hints everywhere
+10. **Type Everything**: Full TypeScript coverage, PHP 8.1 type hints everywhere
 
 Follow these rules consistently to maintain the enterprise-grade architecture and coding standards of the Debug Suite plugin.
 

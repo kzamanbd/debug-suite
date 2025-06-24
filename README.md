@@ -59,7 +59,7 @@ This section provides essential information for developing and extending the Deb
 
 ### Prerequisites
 
-- PHP 8.2 or higher
+- PHP 8.1 or higher
 - Node.js (v18+ recommended)
 - pnpm (preferred) or npm/yarn
 - Composer
@@ -133,3 +133,8 @@ This section provides essential information for developing and extending the Deb
 - Document all new features and update the README.
 
 For more details, see the `/docs` directory and inline code comments.
+
+## Requirements
+
+- WordPress 5.7 or higher
+- PHP 8.1 or higher
