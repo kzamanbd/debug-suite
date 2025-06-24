@@ -17,6 +17,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     loading?: boolean;
     spinnerClassName?: string;
     className?: string;
+    size?: string;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -26,13 +27,20 @@ const variantClasses: Record<ButtonVariant, string> = {
     light: 'bg-gray-100 text-gray-800 hover:bg-gray-200'
 };
 
+const sizeClasses: Record<string, string> = {
+    sm: 'px-2 py-1 text-xs',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base'
+};
+
 const Spinner = ({ className = '' }: { className?: string }) => (
     <Loader2 className={classNames('h-5 w-5 animate-spin text-white', className)} />
 );
 
 const Button = ({
     children,
-    variant = 'primary',
+    size = 'md',
+    variant = 'light',
     loading = false,
     spinnerClassName = '',
     className = '',
@@ -42,9 +50,11 @@ const Button = ({
     <button
         type="button"
         data-variant={variant}
+        data-size={size}
         className={classNames(
-            'inline-flex items-center gap-1 rounded-lg px-4 py-2 font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+            'inline-flex items-center gap-1 rounded-lg font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
             variantClasses[variant],
+            sizeClasses[size],
             className
         )}
         disabled={loading || disabled}

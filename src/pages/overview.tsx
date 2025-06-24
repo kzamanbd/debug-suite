@@ -1,351 +1,665 @@
-/**
- * Settings page for Debug Suite plugin.
- *
- * Modernized design with improved layout, spacing, and accessibility.
- *
- * @since 1.0.0
- */
+import Alert from '@/components/ui/alert';
+import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
-import Combobox from '@/components/ui/combobox';
-import ContentTabs from '@/components/ui/content-tabs';
-import CustomSwitch from '@/components/ui/custom-switch';
-import InputField from '@/components/ui/input-field';
-import RadioButton from '@/components/ui/radio-button';
 import { SettingsState } from '@/types';
 
 import apiFetch from '@wordpress/api-fetch';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { FolderOpen, Settings as SettingsIcon } from 'lucide-react';
+import {
+    Activity,
+    AlertCircle,
+    AlertTriangle,
+    BookOpen,
+    Bug,
+    CheckCircle,
+    Clock,
+    Database,
+    ExternalLink,
+    FileText,
+    HardDrive,
+    HelpCircle,
+    MessageSquare,
+    RefreshCw,
+    Settings,
+    Timer,
+    Zap
+} from 'lucide-react';
 import { toast } from 'react-toastify';
 
+interface DashboardStats {
+    logs: {
+        total_entries: number;
+        recent_errors: number;
+        file_size_human: string;
+        levels: Record<string, number>;
+        last_modified: number;
+    };
+    container: {
+        total_resolutions: number;
+        average_time: number;
+        cache_hits: number;
+        services_resolved: number;
+        is_compiled: boolean;
+    };
+    system: {
+        wp_debug: boolean;
+        wp_debug_log: boolean;
+        wp_debug_display: boolean;
+        php_version: string;
+        wp_version: string;
+    };
+}
+
+interface TopError {
+    message: string;
+    count: number;
+    level: string;
+    last_seen: string;
+}
+
+interface SlowQuery {
+    query: string;
+    execution_time: number;
+    calls: number;
+    source: string;
+}
+
 const Overview = () => {
-    const [settings, setSettings] = useState(window.debugSuite);
-    const [hasChanges, setHasChanges] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
-    const roles = window.debugSuite?.roles || {};
-    const fileManagerAccessOptions = Object.keys(roles).map((role) => ({
-        label: roles[role].name,
-        value: role
-    }));
+    const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [topErrors, setTopErrors] = useState<TopError[]>([]);
+    const [slowQueries, setSlowQueries] = useState<SlowQuery[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const settings = window.debugSuite as SettingsState;
 
-    const handleInputChange = (field: keyof SettingsState, value: string | boolean) => {
-        setSettings((prevSettings) => ({
-            ...prevSettings,
-            [field]: value
-        }));
-        setHasChanges(true);
-    };
-
-    const forceBooleanString = (value: boolean | string): string => {
-        if (value === true || value === 'true' || value === '1') {
-            return 'true';
-        }
-        if (value === false || value === 'false' || value === '0') {
-            return 'false';
-        }
-        if (!value) {
-            return 'false';
-        }
-        return value.toString();
-    };
-
-    const handleSave = async () => {
-        if (!hasChanges) {
-            toast.info(__('No changes to save.', 'debug-suite'));
-            return;
-        }
+    const fetchDashboardData = async (showRefreshToast = false) => {
         try {
-            setIsSaving(true);
-            await apiFetch({
-                path: '/debug-suite/v1/settings',
-                method: 'POST',
-                data: {
-                    debug: forceBooleanString(settings.wpDebug),
-                    debug_log: forceBooleanString(settings.wpDebugLog),
-                    debug_display: forceBooleanString(settings.wpDebugDisplay)
+            setRefreshing(true);
+
+            // Fetch log stats
+            const logStats = await apiFetch<DashboardStats['logs']>({
+                path: '/debug-suite/v1/logs/stats'
+            });
+
+            // Fetch recent log entries to analyze top errors
+            const recentLogs = await apiFetch<{
+                entries: Array<{ message: string; level: string; timestamp: string }>;
+            }>({
+                path: '/debug-suite/v1/logs?per_page=10&level_filter=error'
+            });
+
+            // Process top errors
+            const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
+            recentLogs.entries.forEach((entry) => {
+                const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
+                if (!errorCounts[message]) {
+                    errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
+                }
+                errorCounts[message].count++;
+                if (entry.timestamp > errorCounts[message].last_seen) {
+                    errorCounts[message].last_seen = entry.timestamp;
                 }
             });
-            toast.success(__('Settings saved successfully!'));
+
+            const topErrorsList = Object.keys(errorCounts)
+                .map((message) => ({ message, ...errorCounts[message] }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+
+            // Mock slow queries data (replace with real API later)
+            const mockSlowQueries: SlowQuery[] = [
+                {
+                    query: 'SELECT * FROM wp_posts WHERE post_status = "publish" ORDER BY post_date DESC',
+                    execution_time: 2.45,
+                    calls: 12,
+                    source: 'wp-includes/query.php:3421'
+                },
+                {
+                    query: 'SELECT COUNT(*) FROM wp_comments WHERE comment_approved = "1"',
+                    execution_time: 1.89,
+                    calls: 8,
+                    source: 'wp-includes/comment.php:892'
+                },
+                {
+                    query: 'SELECT * FROM wp_options WHERE autoload = "yes"',
+                    execution_time: 1.67,
+                    calls: 45,
+                    source: 'wp-includes/option.php:174'
+                },
+                {
+                    query: 'SELECT meta_value FROM wp_postmeta WHERE post_id IN (...)',
+                    execution_time: 1.23,
+                    calls: 23,
+                    source: 'wp-includes/meta.php:567'
+                },
+                {
+                    query: 'SELECT * FROM wp_users WHERE user_login = %s',
+                    execution_time: 0.98,
+                    calls: 5,
+                    source: 'wp-includes/user.php:245'
+                }
+            ];
+
+            setStats({
+                logs: logStats,
+                container: {
+                    total_resolutions: 0,
+                    average_time: 0,
+                    cache_hits: 0,
+                    services_resolved: 0,
+                    is_compiled: true
+                },
+                system: {
+                    wp_debug: settings.wpDebug || false,
+                    wp_debug_log: settings.wpDebugLog || false,
+                    wp_debug_display: settings.wpDebugDisplay || false,
+                    php_version: '8.2.0', // This would come from PHP in real implementation
+                    wp_version: '6.4.0' // This would come from WordPress in real implementation
+                }
+            });
+
+            setTopErrors(topErrorsList);
+            setSlowQueries(mockSlowQueries);
+
+            if (showRefreshToast) {
+                toast.success(__('Dashboard data refreshed', 'debug-suite'));
+            }
         } catch (error) {
-            toast.error(__('Failed to save settings. Please try again.', 'debug-suite'));
+            console.error('Error fetching dashboard data:', error);
+            toast.error(__('Failed to load dashboard data', 'debug-suite'));
         } finally {
-            setHasChanges(false);
-            setIsSaving(false);
+            setLoading(false);
+            setRefreshing(false);
         }
     };
 
-    const handleReset = () => {
-        setHasChanges(false);
+    useEffect(() => {
+        fetchDashboardData();
+    }, []);
+
+    const getStatusIcon = (enabled: boolean) => {
+        return enabled ? (
+            <CheckCircle className="h-4 w-4 text-green-500" />
+        ) : (
+            <AlertCircle className="h-4 w-4 text-gray-400" />
+        );
     };
 
-    // Compact File Manager Tab
-    const fileManagerTab = (
-        <Card className="rounded-lg border-0 bg-white/90 p-0 shadow-md dark:bg-gray-900/80">
-            <div className="border-primary-100 from-primary-100 via-primary-50 rounded-t-lg border-b bg-gradient-to-r to-white px-4 py-3">
-                <h2 className="text-primary-900 dark:text-primary-200 flex items-center gap-2 text-lg font-semibold">
-                    <FolderOpen className="text-primary-600 h-5 w-5" />
-                    {__('File Manager Configuration', 'debug-suite')}
-                </h2>
-                <p className="text-primary-700 dark:text-primary-300 mt-1 text-xs">
-                    {__('Control access and behavior of the file manager', 'debug-suite')}
-                </p>
-            </div>
-            <div className="space-y-4 px-4 py-4">
-                {/* File Manager Access */}
-                <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-3">
-                    <div>
-                        <label className="mb-0.5 block text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('Who can access File Manager?', 'debug-suite')}
-                        </label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('Select user roles that can access the file manager', 'debug-suite')}
-                        </p>
-                    </div>
-                    <div className="md:col-span-2">
-                        <Combobox
-                            options={fileManagerAccessOptions}
-                            value={
-                                fileManagerAccessOptions.find((opt) => opt.value === settings.fileManagerAccess) ||
-                                fileManagerAccessOptions[0]
-                            }
-                            onChange={(option) =>
-                                handleInputChange('fileManagerAccess', option?.value || 'administrator')
-                            }
-                        />
-                    </div>
-                </div>
-                {/* Public Root Path */}
-                <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-3">
-                    <div>
-                        <label className="mb-0.5 block text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('Public Root Path', 'debug-suite')}
-                        </label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('The root directory for file operations', 'debug-suite')}
-                        </p>
-                    </div>
-                    <div className="md:col-span-2">
-                        <InputField
-                            type="text"
-                            value={settings.publicRootPath}
-                            onChange={(e) => handleInputChange('publicRootPath', e.target.value)}
-                            placeholder={__('/wp-content/uploads/', 'debug-suite')}
-                        />
-                    </div>
-                </div>
-                {/* Files URL */}
-                <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-3">
-                    <div>
-                        <label className="mb-0.5 block text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('Files URL', 'debug-suite')}
-                        </label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('Base URL for accessing uploaded files', 'debug-suite')}
-                        </p>
-                    </div>
-                    <div className="md:col-span-2">
-                        <InputField
-                            type="url"
-                            value={settings.filesUrl}
-                            onChange={(e) => handleInputChange('filesUrl', e.target.value)}
-                            placeholder={__('https://example.com/wp-content/uploads/', 'debug-suite')}
-                        />
-                    </div>
-                </div>
-                {/* Default View Type */}
-                <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-3">
-                    <div>
-                        <label className="mb-0.5 block text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('Default View Type', 'debug-suite')}
-                        </label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('How files are displayed by default', 'debug-suite')}
-                        </p>
-                    </div>
-                    <div className="flex gap-3 md:col-span-2">
-                        <RadioButton
-                            label={__('Grid View', 'debug-suite')}
-                            name="viewType"
-                            value="grid"
-                            checked={settings.defaultViewType === 'grid'}
-                            onChange={(e) => handleInputChange('defaultViewType', e.target.value)}
-                        />
-                        <RadioButton
-                            label={__('List View', 'debug-suite')}
-                            name="viewType"
-                            value="list"
-                            checked={settings.defaultViewType === 'list'}
-                            onChange={(e) => handleInputChange('defaultViewType', e.target.value)}
-                        />
-                    </div>
-                </div>
-                {/* Toggle Options */}
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    <div className="space-y-3">
-                        <h4 className="mb-1 text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('File Operations', 'debug-suite')}
-                        </h4>
-                        <label className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
-                            <div>
-                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {__('Enable Trash', 'debug-suite')}
-                                </span>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {__('Move deleted files to trash instead of permanent deletion', 'debug-suite')}
-                                </p>
-                            </div>
-                            <CustomSwitch
-                                checked={settings.enableTrash}
-                                onChange={(e) => handleInputChange('enableTrash', e.currentTarget.checked)}
-                                id="custom_switch_checkbox_enableTrash"
-                            />
-                        </label>
-                        <label className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
-                            <div>
-                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {__('Hide .htaccess Files', 'debug-suite')}
-                                </span>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {__('Hide system files from the file manager', 'debug-suite')}
-                                </p>
-                            </div>
-                            <CustomSwitch
-                                checked={settings.hideHtaccess}
-                                onChange={(e) => handleInputChange('hideHtaccess', e.currentTarget.checked)}
-                                id="custom_switch_checkbox_hideHtaccess"
-                            />
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </Card>
-    );
+    const getErrorLevelColor = (level: string) => {
+        switch (level.toLowerCase()) {
+            case 'error':
+            case 'fatal':
+                return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+            case 'warning':
+                return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+            case 'notice':
+                return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+            default:
+                return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+        }
+    };
 
-    // Compact Debug Tab
-    const debugTab = (
-        <Card className="rounded-lg border-0 bg-white/90 p-0 shadow-md dark:bg-gray-900/80">
-            <div className="border-primary-100 from-primary-100 via-primary-50 rounded-t-lg border-b bg-gradient-to-r to-white px-4 py-3">
-                <h2 className="text-primary-900 dark:text-primary-200 flex items-center gap-2 text-lg font-semibold">
-                    <SettingsIcon className="text-primary-600 h-5 w-5" />
-                    {__('Debug Configuration', 'debug-suite')}
-                </h2>
-                <p className="text-primary-700 dark:text-primary-300 mt-1 text-xs">
-                    {__('Configure debugging and logging options', 'debug-suite')}
-                </p>
+    if (loading) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <div className="h-8 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+                        <div className="mt-2 h-4 w-96 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    {[...Array(4)].map((_, i) => (
+                        <div key={i} className="h-32 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+                    ))}
+                </div>
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    {[...Array(2)].map((_, i) => (
+                        <div key={i} className="h-96 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+                    ))}
+                </div>
             </div>
-            <div className="space-y-4 px-4 py-4">
-                <label className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
-                    <div>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('Enable WP Debug', 'debug-suite')}
-                        </span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('Enable WordPress debug mode', 'debug-suite')}
-                        </p>
-                    </div>
-                    <CustomSwitch
-                        checked={settings.wpDebug}
-                        onChange={(e) => handleInputChange('wpDebug', e.currentTarget.checked)}
-                        id="custom_switch_checkbox_wpDebug"
-                    />
-                </label>
-                <label className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
-                    <div>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('Enable WP Debug Log', 'debug-suite')}
-                        </span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('Enable WordPress debug log', 'debug-suite')}
-                        </p>
-                    </div>
-                    <CustomSwitch
-                        checked={settings.wpDebugLog}
-                        onChange={(e) => handleInputChange('wpDebugLog', e.currentTarget.checked)}
-                        id="custom_switch_checkbox_wpDebugLog"
-                    />
-                </label>
-                <label className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
-                    <div>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('Enable WP Debug Display', 'debug-suite')}
-                        </span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('Enable WordPress debug mode', 'debug-suite')}
-                        </p>
-                    </div>
-                    <CustomSwitch
-                        checked={settings.wpDebugDisplay}
-                        onChange={(e) => handleInputChange('wpDebugDisplay', e.currentTarget.checked)}
-                        id="custom_switch_checkbox_wpDebugDisplay"
-                    />
-                </label>
-                <label className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
-                    <div>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('Log Database Queries', 'debug-suite')}
-                        </span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('Record all database queries for analysis', 'debug-suite')}
-                        </p>
-                    </div>
-                    <CustomSwitch
-                        checked={settings.logQueries}
-                        onChange={(e) => handleInputChange('logQueries', e.currentTarget.checked)}
-                        id="custom_switch_checkbox_logQueries"
-                    />
-                </label>
-                <label className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
-                    <div>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {__('Log PHP Errors', 'debug-suite')}
-                        </span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('Capture and log PHP errors and warnings', 'debug-suite')}
-                        </p>
-                    </div>
-                    <CustomSwitch
-                        checked={settings.logErrors}
-                        onChange={(e) => handleInputChange('logErrors', e.currentTarget.checked)}
-                        id="custom_switch_checkbox_logErrors"
-                    />
-                </label>
-            </div>
-        </Card>
-    );
+        );
+    }
+
+    if (!stats) {
+        return (
+            <Alert variant="danger" className="mx-auto mt-8 max-w-md">
+                <AlertCircle className="h-4 w-4" />
+                <div>
+                    <h3 className="font-semibold">{__('Unable to load dashboard', 'debug-suite')}</h3>
+                    <p className="mt-1 text-sm">
+                        {__('There was an error loading the dashboard data. Please refresh the page.', 'debug-suite')}
+                    </p>
+                </div>
+            </Alert>
+        );
+    }
 
     return (
-        <>
+        <div className="space-y-6">
             {/* Header */}
-            <div className="mb-4">
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {__('Configure your debug suite and file manager preferences', 'debug-suite')}
-                </p>
+            <div className="flex items-center justify-between">
+                <Button
+                    onClick={() => fetchDashboardData(true)}
+                    variant="light"
+                    className="flex items-center gap-2"
+                    disabled={refreshing}
+                >
+                    <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                    {__('Refresh', 'debug-suite')}
+                </Button>
             </div>
-            <ContentTabs
-                tabs={[
-                    { key: 'file', label: __('File Manager', 'debug-suite'), content: fileManagerTab },
-                    { key: 'debug', label: __('Debug', 'debug-suite'), content: debugTab }
-                ]}
-            />
-            {/* Floating Action Button */}
-            <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center justify-center">
-                <div className="flex gap-2 rounded-full bg-white/90 p-2 shadow-lg dark:bg-gray-900/90">
-                    <Button onClick={handleReset} variant="light" className="rounded-full">
-                        {__('Reset to Defaults', 'debug-suite')}
-                    </Button>
-                    <Button
-                        onClick={handleSave}
-                        disabled={!hasChanges || isSaving}
-                        variant="primary"
-                        className="rounded-full"
-                    >
-                        {__('Save Changes', 'debug-suite')}
+
+            {/* Quick Stats Cards */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {/* Total Log Entries */}
+                <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 dark:border-blue-800 dark:from-blue-900/20 dark:to-blue-800/20">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                                {__('Total Log Entries', 'debug-suite')}
+                            </p>
+                            <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                                {stats.logs.total_entries.toLocaleString()}
+                            </p>
+                        </div>
+                        <FileText className="h-8 w-8 text-blue-500" />
+                    </div>
+                </Card>
+
+                {/* Recent Errors */}
+                <Card className="border-red-200 bg-gradient-to-br from-red-50 to-red-100 p-6 dark:border-red-800 dark:from-red-900/20 dark:to-red-800/20">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                                {__('Recent Errors (24h)', 'debug-suite')}
+                            </p>
+                            <p className="text-2xl font-bold text-red-900 dark:text-red-100">
+                                {stats.logs.recent_errors}
+                            </p>
+                        </div>
+                        <AlertTriangle className="h-8 w-8 text-red-500" />
+                    </div>
+                </Card>
+
+                {/* Log File Size */}
+                <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-6 dark:border-purple-800 dark:from-purple-900/20 dark:to-purple-800/20">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                                {__('Log File Size', 'debug-suite')}
+                            </p>
+                            <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                                {stats.logs.file_size_human}
+                            </p>
+                        </div>
+                        <HardDrive className="h-8 w-8 text-purple-500" />
+                    </div>
+                </Card>
+
+                {/* System Status */}
+                <Card className="border-green-200 bg-gradient-to-br from-green-50 to-green-100 p-6 dark:border-green-800 dark:from-green-900/20 dark:to-green-800/20">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                                {__('Debug Status', 'debug-suite')}
+                            </p>
+                            <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                                {stats.system.wp_debug ? __('Active', 'debug-suite') : __('Inactive', 'debug-suite')}
+                            </p>
+                        </div>
+                        <Activity className="h-8 w-8 text-green-500" />
+                    </div>
+                </Card>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {/* System Configuration */}
+                <Card className="p-6">
+                    <div className="mb-4 flex items-center gap-2">
+                        <Settings className="text-primary h-5 w-5" />
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {__('System Configuration', 'debug-suite')}
+                        </h3>
+                    </div>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                            <div className="flex items-center gap-2">
+                                {getStatusIcon(stats.system.wp_debug)}
+                                <span className="text-sm font-medium">{__('WP Debug', 'debug-suite')}</span>
+                            </div>
+                            <Badge variant={stats.system.wp_debug ? 'success' : 'default'}>
+                                {stats.system.wp_debug ? __('Enabled', 'debug-suite') : __('Disabled', 'debug-suite')}
+                            </Badge>
+                        </div>
+                        <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                            <div className="flex items-center gap-2">
+                                {getStatusIcon(stats.system.wp_debug_log)}
+                                <span className="text-sm font-medium">{__('WP Debug Log', 'debug-suite')}</span>
+                            </div>
+                            <Badge variant={stats.system.wp_debug_log ? 'success' : 'default'}>
+                                {stats.system.wp_debug_log
+                                    ? __('Enabled', 'debug-suite')
+                                    : __('Disabled', 'debug-suite')}
+                            </Badge>
+                        </div>
+                        <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                            <div className="flex items-center gap-2">
+                                {getStatusIcon(stats.system.wp_debug_display)}
+                                <span className="text-sm font-medium">{__('WP Debug Display', 'debug-suite')}</span>
+                            </div>
+                            <Badge variant={stats.system.wp_debug_display ? 'warning' : 'default'}>
+                                {stats.system.wp_debug_display
+                                    ? __('Enabled', 'debug-suite')
+                                    : __('Disabled', 'debug-suite')}
+                            </Badge>
+                        </div>
+                        <div className="border-t border-gray-200 pt-4 dark:border-gray-700">
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400">
+                                    {__('PHP Version', 'debug-suite')}
+                                </span>
+                                <span className="font-medium">{stats.system.php_version}</span>
+                            </div>
+                            <div className="mt-2 flex items-center justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400">
+                                    {__('WordPress Version', 'debug-suite')}
+                                </span>
+                                <span className="font-medium">{stats.system.wp_version}</span>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Top Errors */}
+                <Card className="p-6">
+                    <div className="mb-4 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Bug className="text-primary h-5 w-5" />
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                {__('Top Recent Errors', 'debug-suite')}
+                            </h3>
+                        </div>
+                        <Button variant="light" size="sm" className="flex items-center gap-1">
+                            <ExternalLink className="h-3 w-3" />
+                            {__('View All', 'debug-suite')}
+                        </Button>
+                    </div>
+                    <div className="space-y-3">
+                        {topErrors.length > 0 ? (
+                            topErrors.map((error, index) => (
+                                <div key={index} className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                                                {error.message}
+                                            </p>
+                                            <div className="mt-1 flex items-center gap-2">
+                                                <Badge className={`text-xs ${getErrorLevelColor(error.level)}`}>
+                                                    {error.level.toUpperCase()}
+                                                </Badge>
+                                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                    {__('Count:', 'debug-suite')} {error.count}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="py-8 text-center">
+                                <CheckCircle className="mx-auto mb-3 h-12 w-12 text-green-500" />
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {__('No recent errors found', 'debug-suite')}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </Card>
+            </div>
+
+            {/* Top 5 Slowest Queries */}
+            <Card className="p-6">
+                <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Timer className="text-primary h-5 w-5" />
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {__('Top 5 Slowest Queries', 'debug-suite')}
+                        </h3>
+                    </div>
+                    <Button variant="light" className="flex items-center gap-1 text-sm">
+                        <ExternalLink className="h-3 w-3" />
+                        {__('View All', 'debug-suite')}
                     </Button>
                 </div>
+                <div className="space-y-3">
+                    {slowQueries.length > 0 ? (
+                        slowQueries.map((query, index) => (
+                            <div key={index} className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="mb-2 flex items-center gap-2">
+                                            <span className="bg-primary flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold text-white">
+                                                {index + 1}
+                                            </span>
+                                            <Badge
+                                                variant={
+                                                    query.execution_time > 2
+                                                        ? 'danger'
+                                                        : query.execution_time > 1
+                                                          ? 'warning'
+                                                          : 'success'
+                                                }
+                                                className="text-xs"
+                                            >
+                                                {query.execution_time.toFixed(2)}s
+                                            </Badge>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                {query.calls} {__('calls', 'debug-suite')}
+                                            </span>
+                                        </div>
+                                        <code className="block truncate font-mono text-sm text-gray-800 dark:text-gray-200">
+                                            {query.query}
+                                        </code>
+                                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            {__('Source:', 'debug-suite')} {query.source}
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-col items-end text-right">
+                                        <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
+                                            <Clock className="h-3 w-3" />
+                                            <span className="text-sm font-medium">
+                                                {(query.execution_time * query.calls).toFixed(2)}s
+                                            </span>
+                                        </div>
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                                            {__('total time', 'debug-suite')}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="py-8 text-center">
+                            <CheckCircle className="mx-auto mb-3 h-12 w-12 text-green-500" />
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {__('No slow queries detected', 'debug-suite')}
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card className="p-6">
+                <div className="mb-4 flex items-center gap-2">
+                    <Zap className="text-primary h-5 w-5" />
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {__('Quick Actions', 'debug-suite')}
+                    </h3>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                    <Button variant="light">
+                        <FileText className="h-5 w-5" />
+                        <span>{__('View Debug Logs', 'debug-suite')}</span>
+                    </Button>
+                    <Button variant="light">
+                        <Settings className="h-5 w-5" />
+                        <span>{__('Debug Settings', 'debug-suite')}</span>
+                    </Button>
+                    <Button variant="light">
+                        <Database className="h-5 w-5" />
+                        <span>{__('File Manager', 'debug-suite')}</span>
+                    </Button>
+                </div>
+            </Card>
+
+            {/* Help & Resources */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <Card className="p-6">
+                    <div className="mb-4 flex items-center gap-2">
+                        <BookOpen className="text-primary h-5 w-5" />
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {__('Documentation', 'debug-suite')}
+                        </h3>
+                    </div>
+                    <div className="space-y-3">
+                        <a
+                            href="#"
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                                    <BookOpen className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                                        {__('Getting Started Guide', 'debug-suite')}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {__('Learn the basics of Debug Suite', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <ExternalLink className="h-4 w-4 text-gray-400" />
+                        </a>
+
+                        <a
+                            href="#"
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400">
+                                    <CheckCircle className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                                        {__('Best Practices', 'debug-suite')}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {__('WordPress debugging tips and tricks', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <ExternalLink className="h-4 w-4 text-gray-400" />
+                        </a>
+
+                        <a
+                            href="#"
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400">
+                                    <Zap className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                                        {__('Performance Optimization', 'debug-suite')}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {__('Speed up your WordPress site', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <ExternalLink className="h-4 w-4 text-gray-400" />
+                        </a>
+                    </div>
+                </Card>
+
+                <Card className="p-6">
+                    <div className="mb-4 flex items-center gap-2">
+                        <HelpCircle className="text-primary h-5 w-5" />
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {__('Support & Community', 'debug-suite')}
+                        </h3>
+                    </div>
+                    <div className="space-y-3">
+                        <a
+                            href="#"
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400">
+                                    <MessageSquare className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                                        {__('Community Forum', 'debug-suite')}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {__('Get help from the community', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <ExternalLink className="h-4 w-4 text-gray-400" />
+                        </a>
+
+                        <a
+                            href="#"
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400">
+                                    <AlertTriangle className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                                        {__('Report Bug', 'debug-suite')}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {__('Found an issue? Let us know', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <ExternalLink className="h-4 w-4 text-gray-400" />
+                        </a>
+
+                        <a
+                            href="#"
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400">
+                                    <Zap className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                                        {__('Feature Request', 'debug-suite')}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {__('Suggest new features', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <ExternalLink className="h-4 w-4 text-gray-400" />
+                        </a>
+                    </div>
+                </Card>
             </div>
-        </>
+        </div>
     );
 };
 

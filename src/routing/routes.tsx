@@ -19,7 +19,7 @@ const routes: DebugSuiteRoute[] = [
     {
         id: 'overview',
         title: __('Overview', 'debug-suite'),
-        description: __('Overview of your debug suite settings.', 'debug-suite'),
+        description: __('Monitor your WordPress debug activity and system performance.', 'debug-suite'),
         path: '/',
         element: <Overview />
     },
@@ -31,18 +31,18 @@ const routes: DebugSuiteRoute[] = [
         element: <DebugLog />
     },
     {
-        id: 'file-logs-manage',
-        title: __('Manage File Logs', 'debug-suite'),
-        description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
-        path: '/file-logs/manage',
-        element: <ManageLogs />
-    },
-    {
         id: 'file-manager',
         title: __('File Manager', 'debug-suite'),
         description: __('Manage files and directories on your server.', 'debug-suite'),
         path: '/file-manager',
         element: <FileManager />
+    },
+    {
+        id: 'file-logs-manage',
+        title: __('Manage File Logs', 'debug-suite'),
+        description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
+        path: '/file-logs/manage',
+        element: <ManageLogs />
     },
     {
         id: 'not-found',
