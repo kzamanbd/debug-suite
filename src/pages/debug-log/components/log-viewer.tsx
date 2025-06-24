@@ -66,7 +66,7 @@ const LogViewer = ({ logs, loading, currentPage, perPage }: LogViewerProps) => {
                                                 )}
                                             >
                                                 <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
-                                                    {new Date(log.timestamp).toLocaleString()}
+                                                    {log.timestamp}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span

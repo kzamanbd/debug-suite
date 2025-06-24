@@ -75,7 +75,7 @@ const LogControls = ({
     const filteredLogFiles = logFiles.map((file) => ({
         value: file.path,
         label: file.name,
-        meta: `${file.type} • ${file.size} • Modified: ${new Date(file.modified).toLocaleDateString()}`
+        meta: `${file.type} • ${file.size} • Modified: ${file.modified}`
     }));
 
     const selectedLogFile = () => {

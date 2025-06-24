@@ -20,7 +20,7 @@ import { __ } from '@wordpress/i18n';
 import { FolderOpen, Settings as SettingsIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-const Settings = () => {
+const Overview = () => {
     const [settings, setSettings] = useState(window.debugSuite);
     const [hasChanges, setHasChanges] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -349,4 +349,4 @@ const Settings = () => {
     );
 };
 
-export default Settings;
+export default Overview;

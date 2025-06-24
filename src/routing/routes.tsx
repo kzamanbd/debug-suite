@@ -2,7 +2,7 @@ import DebugLog from '@/pages/debug-log';
 import FileManager from '@/pages/file-manager';
 import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
-import Settings from '@/pages/overview-settings';
+import Overview from '@/pages/overview';
 import { __ } from '@wordpress/i18n';
 import { ReactNode } from 'react';
 
@@ -17,11 +17,11 @@ export type DebugSuiteRoute = {
 };
 const routes: DebugSuiteRoute[] = [
     {
-        id: 'debug-suite-settings',
-        title: __('Settings', 'debug-suite'),
-        description: __('Configure your debug suite settings.', 'debug-suite'),
+        id: 'overview',
+        title: __('Overview', 'debug-suite'),
+        description: __('Overview of your debug suite settings.', 'debug-suite'),
         path: '/',
-        element: <Settings />
+        element: <Overview />
     },
     {
         id: 'debug-log',
