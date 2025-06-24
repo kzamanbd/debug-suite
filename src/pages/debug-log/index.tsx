@@ -17,41 +17,25 @@ const FileLogs = () => {
         loading: logsLoading,
         infiniteState,
         totalEntries,
-        fetchLogs,
+        filters,
+        updateFilters,
         loadMore,
         refetch: refetchLogs
     } = useLogEntries();
     const { clearLogs, exportLogs, clearing } = useLogActions();
     const { content: rawContent, loading: rawLoading, refetch: refetchRawContent } = useRawFileContent(selectedFile);
 
-    // Local state for view mode and filters
+    // Local state for view mode only
     const [viewMode, setViewMode] = useState<ViewMode>('parsed');
-    const [filters, setFilters] = useState<LogFilters>({
-        level: '',
-        search: '',
-        sortBy: 'timestamp',
-        sortOrder: 'desc',
-        perPage: 100
-    });
 
     // Show skeleton while initial data loads
     if (filesLoading) {
         return <FileLogsSkeleton />;
     }
 
-    // Handle filter changes
+    // Handle filter changes - now uses client-side filtering
     const handleFilterChange = (newFilters: Partial<LogFilters>) => {
-        const updatedFilters = { ...filters, ...newFilters };
-        setFilters(updatedFilters);
-
-        // Trigger API call with updated filters
-        fetchLogs({
-            per_page: updatedFilters.perPage,
-            level_filter: updatedFilters.level,
-            search: updatedFilters.search,
-            sort_by: updatedFilters.sortBy,
-            sort_order: updatedFilters.sortOrder
-        });
+        updateFilters(newFilters);
     };
 
     // Handle refresh based on current view mode

@@ -167,9 +167,10 @@ const LogControls = ({
                                 {filters.search && (
                                     <button
                                         onClick={clearSearch}
-                                        className="absolute top-1/2 right-3 -translate-y-1/2 transform"
+                                        className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
+                                        title={__('Clear search', 'debug-suite')}
                                     >
-                                        <XIcon className="h-4 w-4 text-gray-400" />
+                                        <XIcon className="h-4 w-4" />
                                     </button>
                                 )}
                             </div>
@@ -219,8 +220,22 @@ const LogControls = ({
 
                             {/* Total entries display */}
                             <div className="order-first text-sm text-gray-600 sm:order-none">
-                                {__('Total entries:', 'debug-suite')}{' '}
-                                <span className="font-medium">{totalEntries}</span>
+                                {filters.search || filters.level ? (
+                                    <>
+                                        {__('Showing:', 'debug-suite')}{' '}
+                                        <span className="text-primary font-medium">{totalEntries}</span>
+                                        {filters.search && (
+                                            <span className="ml-1 text-xs text-gray-500">
+                                                ({__('filtered', 'debug-suite')})
+                                            </span>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        {__('Total entries:', 'debug-suite')}{' '}
+                                        <span className="font-medium">{totalEntries}</span>
+                                    </>
+                                )}
                             </div>
                         </div>
 
