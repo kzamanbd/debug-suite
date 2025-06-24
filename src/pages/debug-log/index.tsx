@@ -3,9 +3,9 @@
  *
  * @since 1.0.0
  */
-import FileLogsSkeleton from '@/pages/debug-log/components/logs-skeleton';
 import { useState } from '@wordpress/element';
 import { LogControls, LogViewer, RawFileViewer } from './components';
+import FileLogsSkeleton from './components/logs-skeleton';
 import { useLogActions, useLogEntries, useLogFiles, useRawFileContent } from './hooks';
 import type { LogFilters, ViewMode } from './types';
 

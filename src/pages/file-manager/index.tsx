@@ -13,6 +13,7 @@ import { ItemTree } from '@/types';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 import { FolderPlus, HardDrive, MoreVertical, Upload } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import SimpleBar from 'simplebar-react';
@@ -35,19 +36,27 @@ const FileManager = () => {
 
     const fetchFiles = async (path?: string) => {
         // Fetch files from the server
+        const apiPath = addQueryArgs('/debug-suite/v1/files', {
+            path: path || ''
+        });
+
         return apiFetch<{
             tree: ItemTree[];
         }>({
-            path: `/debug-suite/v1/files?path=${encodeURIComponent(path || '')}`
+            path: apiPath
         });
     };
 
     const fetchFileContent = async (path: string) => {
+        const apiPath = addQueryArgs('/debug-suite/v1/files/content', {
+            path: path || ''
+        });
+
         return apiFetch<{
             contents: string;
             extension: string;
         }>({
-            path: `/debug-suite/v1/files/content?path=${encodeURIComponent(path || '')}`
+            path: apiPath
         });
     };
 

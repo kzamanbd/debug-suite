@@ -6,6 +6,7 @@ import Card from '@/components/ui/card';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 import {
     Activity,
     AlertCircle,
@@ -110,10 +111,15 @@ const Overview = () => {
             });
 
             // Fetch recent log entries to analyze top errors
+            const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
+                per_page: 10,
+                level_filter: 'error'
+            });
+
             const recentLogs = await apiFetch<{
                 entries: Array<{ message: string; level: string; timestamp: string }>;
             }>({
-                path: '/debug-suite/v1/logs?per_page=10&level_filter=error'
+                path: recentLogsPath
             });
 
             // Process top errors

@@ -6,6 +6,7 @@
 import { useDebounce } from '@/utils/use-debounce';
 import apiFetch from '@wordpress/api-fetch';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 import type {
     InfiniteScrollState,
     LogEntry,
@@ -121,8 +122,13 @@ export const useLogEntries = () => {
             setLoading(true);
 
             // Fetch all logs with a high limit to get everything
+            const apiPath = addQueryArgs('/debug-suite/v1/logs', {
+                per_page: 10000,
+                page: 1
+            });
+
             const response = await apiFetch<LogResponse>({
-                path: '/debug-suite/v1/logs?per_page=10000&page=1'
+                path: apiPath
             });
 
             setAllLogs(response.entries);
@@ -254,12 +260,17 @@ export const useLogActions = () => {
 
     const exportLogs = async (format: 'json' | 'csv' | 'txt') => {
         try {
+            const apiPath = addQueryArgs('/debug-suite/v1/logs/export', {
+                format,
+                limit: 1000
+            });
+
             const response = await apiFetch<{
                 data: string;
                 filename: string;
                 format: string;
             }>({
-                path: `/debug-suite/v1/logs/export?format=${format}&limit=1000`
+                path: apiPath
             });
 
             // Create download
@@ -292,11 +303,12 @@ export const useRawFileContent = (filePath?: string) => {
 
         try {
             setLoading(true);
-            const params = new URLSearchParams();
-            params.append('file', path);
+            const apiPath = addQueryArgs('/debug-suite/v1/logs/raw', {
+                file: path
+            });
 
             const response = await apiFetch<RawFileContent>({
-                path: `/debug-suite/v1/logs/raw?${params.toString()}`
+                path: apiPath
             });
 
             setContent(response);
