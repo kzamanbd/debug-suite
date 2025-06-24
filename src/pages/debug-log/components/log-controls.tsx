@@ -6,12 +6,11 @@
 import Button from '@/components/ui/button';
 import Combobox from '@/components/ui/combobox';
 import InputField from '@/components/ui/input-field';
+import Listbox from '@/components/ui/listbox';
 import { classNames } from '@/utils';
 import { __ } from '@wordpress/i18n';
 import {
     ChevronDownIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
     ChevronUpIcon,
     DownloadIcon,
     EyeIcon,
@@ -21,7 +20,7 @@ import {
     TrashIcon,
     XIcon
 } from 'lucide-react';
-import { levelOptions, perPageOptions, sortOptions } from '../constants';
+import { exportOptions, levelOptions, perPageOptions, sortOptions } from '../constants';
 import type { LogFile, LogFilters, ViewMode } from '../types';
 
 interface LogControlsProps {
@@ -38,12 +37,8 @@ interface LogControlsProps {
     filters: LogFilters;
     onFiltersChange: (newFilters: Partial<LogFilters>) => void;
 
-    // Pagination (only used in parsed mode)
-    currentPage: number;
-    totalPages: number;
+    // Data stats
     totalEntries: number;
-    perPage: number;
-    onPageChange: (page: number) => void;
 
     // Actions
     onRefresh: () => void;
@@ -61,11 +56,7 @@ const LogControls = ({
     onViewModeChange,
     filters,
     onFiltersChange,
-    currentPage,
-    totalPages,
     totalEntries,
-    perPage,
-    onPageChange,
     onRefresh,
     onClear,
     onExport,
@@ -109,119 +100,30 @@ const LogControls = ({
         }
     };
 
-    // Pagination helpers
-    const goToPage = (page: number) => {
-        if (page >= 1 && page <= totalPages) {
-            onPageChange(page);
+    const handleExport = (format: string) => {
+        if (!format) {
+            return;
         }
-    };
-
-    const RenderPagination = () => {
-        if (totalPages <= 1) return null;
-
-        const startEntry = (currentPage - 1) * perPage + 1;
-        const endEntry = Math.min(currentPage * perPage, totalEntries);
-
-        return (
-            <div className="flex items-center justify-between border-gray-200 bg-white py-3">
-                <div className="flex flex-1 justify-between sm:hidden">
-                    <Button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
-                        {__('Previous', 'debug-suite')}
-                    </Button>
-                    <Button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>
-                        {__('Next', 'debug-suite')}
-                    </Button>
-                </div>
-                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                    <div>
-                        <p className="text-sm text-gray-700">
-                            {__('Showing', 'debug-suite')} <span className="font-medium">{startEntry}</span>{' '}
-                            {__('to', 'debug-suite')} <span className="font-medium">{endEntry}</span>{' '}
-                            {__('of', 'debug-suite')} <span className="font-medium">{totalEntries}</span>{' '}
-                            {__('results', 'debug-suite')}
-                        </p>
-                    </div>
-                    <div>
-                        <nav className="isolate inline-flex gap-2" aria-label="Pagination">
-                            <Button
-                                onClick={() => goToPage(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                            >
-                                <span className="sr-only">{__('Previous', 'debug-suite')}</span>
-                                <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-                            </Button>
-
-                            {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                .filter((page) => {
-                                    if (totalPages <= 7) return true;
-                                    if (page === 1 || page === totalPages) return true;
-                                    if (page >= currentPage - 1 && page <= currentPage + 1) return true;
-                                    return false;
-                                })
-                                .map((page, index, array) => {
-                                    const showEllipsis =
-                                        index > 0 && array[index - 1] !== undefined && array[index - 1] < page - 1;
-
-                                    return (
-                                        <div className="flex gap-2" key={page}>
-                                            {showEllipsis && (
-                                                <Button
-                                                    className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                                                    disabled
-                                                    aria-label={__('More pages', 'debug-suite')}
-                                                >
-                                                    ...
-                                                </Button>
-                                            )}
-                                            <Button
-                                                variant={page === currentPage ? 'primary' : 'default'}
-                                                onClick={() => goToPage(page)}
-                                                className={classNames(
-                                                    'relative inline-flex items-center border px-4 py-2 text-sm font-medium',
-                                                    page === currentPage
-                                                        ? 'border-primary-500 bg-primary-50 text-primary-600 z-10'
-                                                        : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50'
-                                                )}
-                                            >
-                                                {page}
-                                            </Button>
-                                        </div>
-                                    );
-                                })}
-
-                            <Button
-                                onClick={() => goToPage(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                                className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
-                            >
-                                <span className="sr-only">{__('Next', 'debug-suite')}</span>
-                                <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-                            </Button>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        );
+        onExport(format as 'json' | 'csv' | 'txt');
     };
 
     return (
         <div className="divide divide-y">
             {/* Header with file selector */}
             <div className="bg-white py-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
+                <div className="flex flex-col flex-wrap gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                         <Combobox
                             options={filteredLogFiles}
                             value={selectedLogFile()}
                             onChange={(option) => onFileChange(option?.value || '')}
                             isDisabled={filesLoading}
-                            className="min-w-[250px]"
+                            className="w-full sm:min-w-[200px] md:min-w-[220px] lg:min-w-[250px]"
                             placeholder={__('Select a log file', 'debug-suite')}
                         />
 
                         {/* View Mode Toggle */}
-                        <nav className="flex gap-x-0.5 rounded-lg bg-gray-100 p-0.5 md:gap-x-1 dark:bg-neutral-800">
+                        <nav className="flex w-full gap-x-0.5 rounded-lg bg-gray-100 p-0.5 md:gap-x-1 dark:bg-neutral-800">
                             <button
                                 type="button"
                                 onClick={() => onViewModeChange('parsed')}
@@ -232,8 +134,8 @@ const LogControls = ({
                                         : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
                                 )}
                             >
-                                <EyeIcon className="mr-1.5 h-3.5 w-3.5" />
-                                {__('Parsed', 'debug-suite')}
+                                <EyeIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
+                                <span className="hidden sm:inline">{__('Parsed', 'debug-suite')}</span>
                             </button>
                             <button
                                 type="button"
@@ -245,22 +147,22 @@ const LogControls = ({
                                         : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
                                 )}
                             >
-                                <FileTextIcon className="mr-1.5 h-3.5 w-3.5" />
-                                {__('Raw File', 'debug-suite')}
+                                <FileTextIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
+                                <span className="hidden sm:inline">{__('Raw File', 'debug-suite')}</span>
                             </button>
                         </nav>
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2 md:gap-3">
                         {viewMode === 'parsed' && (
-                            <div className="relative">
+                            <div className="relative flex-1 md:flex-none">
                                 <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                                 <InputField
                                     type="text"
                                     placeholder={__('Search in log...', 'debug-suite')}
                                     value={filters.search}
                                     onChange={(e) => onFiltersChange({ search: e.target.value })}
-                                    className="w-64 pl-10"
+                                    className="w-full pl-10 md:w-48 lg:w-64"
                                 />
                                 {filters.search && (
                                     <button
@@ -272,8 +174,9 @@ const LogControls = ({
                                 )}
                             </div>
                         )}
-                        <Button onClick={onRefresh}>
+                        <Button onClick={onRefresh} className="shrink-0">
                             <RefreshCwIcon className="h-4 w-4" />
+                            <span className="ml-2 hidden md:inline">{__('Refresh', 'debug-suite')}</span>
                         </Button>
                     </div>
                 </div>
@@ -282,33 +185,46 @@ const LogControls = ({
             {/* Filters and actions - only show in parsed mode */}
             {viewMode === 'parsed' && (
                 <div className="bg-white py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                            <Combobox
-                                options={levelOptions}
-                                value={levelOptions.find((opt) => opt.value === filters.level) || levelOptions[0]}
-                                onChange={(option) => onFiltersChange({ level: option?.value || '' })}
-                            />
-                            <Combobox
-                                options={sortOptions}
-                                value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
-                                onChange={(option) => onFiltersChange({ sortBy: option?.value || 'timestamp' })}
-                            />
-                            <Button onClick={toggleSortOrder} className="flex items-center space-x-1">
-                                {filters.sortOrder === 'asc' ? (
-                                    <ChevronUpIcon className="h-4 w-4" />
-                                ) : (
-                                    <ChevronDownIcon className="h-4 w-4" />
-                                )}
-                                <span>
-                                    {filters.sortOrder === 'asc'
-                                        ? __('Ascending', 'debug-suite')
-                                        : __('Descending', 'debug-suite')}
-                                </span>
-                            </Button>
+                    <div className="flex flex-col flex-wrap gap-4 md:gap-3 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:gap-4">
+                                <Combobox
+                                    options={levelOptions}
+                                    value={levelOptions.find((opt) => opt.value === filters.level) || levelOptions[0]}
+                                    onChange={(option) => onFiltersChange({ level: option?.value || '' })}
+                                    className="w-full sm:w-auto sm:min-w-[120px]"
+                                />
+                                <Combobox
+                                    options={sortOptions}
+                                    value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
+                                    onChange={(option) => onFiltersChange({ sortBy: option?.value || 'timestamp' })}
+                                    className="w-full sm:w-auto sm:min-w-[140px]"
+                                />
+                                <Button
+                                    onClick={toggleSortOrder}
+                                    className="flex items-center justify-center gap-1 md:gap-1.5"
+                                >
+                                    {filters.sortOrder === 'asc' ? (
+                                        <ChevronUpIcon className="h-4 w-4" />
+                                    ) : (
+                                        <ChevronDownIcon className="h-4 w-4" />
+                                    )}
+                                    <span className="hidden md:inline">
+                                        {filters.sortOrder === 'asc'
+                                            ? __('Ascending', 'debug-suite')
+                                            : __('Descending', 'debug-suite')}
+                                    </span>
+                                </Button>
+                            </div>
+
+                            {/* Total entries display */}
+                            <div className="order-first text-sm text-gray-600 sm:order-none">
+                                {__('Total entries:', 'debug-suite')}{' '}
+                                <span className="font-medium">{totalEntries}</span>
+                            </div>
                         </div>
 
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 md:gap-3">
                             <Combobox
                                 options={perPageOptions}
                                 value={
@@ -316,22 +232,32 @@ const LogControls = ({
                                     perPageOptions[1]
                                 }
                                 onChange={(option) => onFiltersChange({ perPage: parseInt(option?.value || '25') })}
+                                className="w-full sm:w-auto sm:min-w-[80px]"
                             />
-                            <Button onClick={() => onExport('json')}>
-                                <DownloadIcon className="mr-2 h-4 w-4" />
-                                {__('Export', 'debug-suite')}
-                            </Button>
-                            <Button onClick={handleClear} disabled={clearing}>
+
+                            {/* Export Listbox */}
+                            <Listbox
+                                options={exportOptions}
+                                onChange={(option) => handleExport(option?.value || 'json')}
+                                formatButtonLabel={() => (
+                                    <div className="flex items-center">
+                                        <DownloadIcon className="mr-2 h-4 w-4" />
+                                        <span className="hidden md:inline">{__('Export', 'debug-suite')}</span>
+                                    </div>
+                                )}
+                                placeholder={__('Export', 'debug-suite')}
+                            />
+
+                            <Button onClick={handleClear} disabled={clearing} className="w-full sm:w-auto">
                                 <TrashIcon className="mr-2 h-4 w-4" />
-                                {clearing ? __('Clearing...', 'debug-suite') : __('Clear', 'debug-suite')}
+                                <span className="hidden md:inline">
+                                    {clearing ? __('Clearing...', 'debug-suite') : __('Clear', 'debug-suite')}
+                                </span>
                             </Button>
                         </div>
                     </div>
                 </div>
             )}
-
-            {/* Pagination (rendered at bottom by parent) - only show in parsed mode */}
-            {viewMode === 'parsed' && totalPages > 1 && <RenderPagination />}
         </div>
     );
 };

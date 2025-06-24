@@ -4,8 +4,8 @@
  * @since 1.0.0
  */
 import apiFetch from '@wordpress/api-fetch';
-import { useEffect, useState } from '@wordpress/element';
-import type { LogFile, LogResponse, LogStats, RawFileContent } from './types';
+import { useCallback, useEffect, useState } from '@wordpress/element';
+import type { InfiniteScrollState, LogFile, LogResponse, LogStats, RawFileContent } from './types';
 
 export const useLogFiles = () => {
     const [logFiles, setLogFiles] = useState<LogFile[]>([]);
@@ -16,7 +16,7 @@ export const useLogFiles = () => {
         try {
             setLoading(true);
             const response = await apiFetch<{ files: LogFile[]; current_file: string }>({
-                path: '/debug-suite/v1/logs/files'
+                path: '/debug-suite/v1/logs/supported-files'
             });
             setLogFiles(response.files);
             setSelectedFile(response.current_file);
@@ -35,60 +35,117 @@ export const useLogFiles = () => {
 };
 
 export const useLogEntries = () => {
-    const [logs, setLogs] = useState<LogResponse>({
-        entries: [],
-        total: 0,
-        total_pages: 1,
-        current_page: 1,
-        per_page: 25,
-        has_more: false
+    const [allLogs, setAllLogs] = useState<LogResponse['entries']>([]);
+    const [infiniteState, setInfiniteState] = useState<InfiniteScrollState>({
+        page: 1,
+        hasMore: true,
+        isLoadingMore: false
     });
     const [loading, setLoading] = useState(true);
-
-    const fetchLogs = async (filters?: {
-        page?: number;
-        per_page?: number;
+    const [totalEntries, setTotalEntries] = useState(0);
+    const [currentFilters, setCurrentFilters] = useState<{
         level_filter?: string;
         search?: string;
         sort_by?: string;
         sort_order?: string;
-    }) => {
-        try {
-            setLoading(true);
-            const params = new URLSearchParams();
+        per_page?: number;
+    }>({});
 
-            if (filters?.page !== undefined) params.append('page', filters.page.toString());
-            if (filters?.per_page !== undefined) params.append('per_page', filters.per_page.toString());
-            if (filters?.level_filter) params.append('level_filter', filters.level_filter);
-            if (filters?.search) params.append('search', filters.search);
-            if (filters?.sort_by) params.append('sort_by', filters.sort_by);
-            if (filters?.sort_order) params.append('sort_order', filters.sort_order);
+    const fetchLogs = useCallback(
+        async (
+            filters?: {
+                page?: number;
+                per_page?: number;
+                level_filter?: string;
+                search?: string;
+                sort_by?: string;
+                sort_order?: string;
+            },
+            append = false
+        ) => {
+            try {
+                if (!append) {
+                    setLoading(true);
+                } else {
+                    setInfiniteState((prev) => ({ ...prev, isLoadingMore: true }));
+                }
 
-            const response = await apiFetch<LogResponse>({
-                path: `/debug-suite/v1/logs?${params.toString()}`
-            });
+                const params = new URLSearchParams();
+                const page = filters?.page || 1;
 
-            setLogs(response);
-        } catch (error) {
-            console.error('Error fetching logs:', error);
-            setLogs({
-                entries: [],
-                total: 0,
-                total_pages: 1,
-                current_page: 1,
-                per_page: 25,
-                has_more: false
-            });
-        } finally {
-            setLoading(false);
+                params.append('page', page.toString());
+                if (filters?.per_page !== undefined) params.append('per_page', filters.per_page.toString());
+                if (filters?.level_filter) params.append('level_filter', filters.level_filter);
+                if (filters?.search) params.append('search', filters.search);
+                if (filters?.sort_by) params.append('sort_by', filters.sort_by);
+                if (filters?.sort_order) params.append('sort_order', filters.sort_order);
+
+                const response = await apiFetch<LogResponse>({
+                    path: `/debug-suite/v1/logs?${params.toString()}`
+                });
+
+                if (append) {
+                    setAllLogs((prevLogs) => [...prevLogs, ...response.entries]);
+                } else {
+                    setAllLogs(response.entries);
+                    setCurrentFilters(filters || {});
+                }
+
+                setTotalEntries(response.total);
+                setInfiniteState((prev) => ({
+                    ...prev,
+                    page: response.current_page,
+                    hasMore: response.has_more,
+                    isLoadingMore: false
+                }));
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+                if (!append) {
+                    setAllLogs([]);
+                    setTotalEntries(0);
+                }
+                setInfiniteState((prev) => ({
+                    ...prev,
+                    hasMore: false,
+                    isLoadingMore: false
+                }));
+            } finally {
+                setLoading(false);
+            }
+        },
+        []
+    );
+
+    const loadMore = useCallback(() => {
+        if (infiniteState.hasMore && !infiniteState.isLoadingMore) {
+            const nextPage = infiniteState.page + 1;
+            fetchLogs({ ...currentFilters, page: nextPage }, true);
         }
-    };
+    }, [infiniteState.hasMore, infiniteState.isLoadingMore, infiniteState.page, currentFilters, fetchLogs]);
+
+    const refetch = useCallback(() => {
+        setInfiniteState({ page: 1, hasMore: true, isLoadingMore: false });
+        setAllLogs([]);
+        fetchLogs(currentFilters, false);
+    }, [currentFilters, fetchLogs]);
 
     useEffect(() => {
         fetchLogs();
-    }, []);
+    }, [fetchLogs]);
 
-    return { logs, loading, fetchLogs, refetch: () => fetchLogs() };
+    return {
+        logs: allLogs,
+        loading,
+        infiniteState,
+        totalEntries,
+        fetchLogs: (filters?: any) => {
+            setInfiniteState({ page: 1, hasMore: true, isLoadingMore: false });
+            setAllLogs([]);
+            fetchLogs(filters, false);
+        },
+        loadMore,
+        refetch
+    };
 };
 
 export const useLogStats = () => {

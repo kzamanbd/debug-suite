@@ -12,7 +12,15 @@ import type { LogFilters, ViewMode } from './types';
 const FileLogs = () => {
     // Custom hooks for data management
     const { logFiles, selectedFile, setSelectedFile, loading: filesLoading } = useLogFiles();
-    const { logs, loading: logsLoading, fetchLogs, refetch: refetchLogs } = useLogEntries();
+    const {
+        logs,
+        loading: logsLoading,
+        infiniteState,
+        totalEntries,
+        fetchLogs,
+        loadMore,
+        refetch: refetchLogs
+    } = useLogEntries();
     const { clearLogs, exportLogs, clearing } = useLogActions();
     const { content: rawContent, loading: rawLoading, refetch: refetchRawContent } = useRawFileContent(selectedFile);
 
@@ -23,8 +31,7 @@ const FileLogs = () => {
         search: '',
         sortBy: 'timestamp',
         sortOrder: 'desc',
-        page: 1,
-        perPage: 25
+        perPage: 100
     });
 
     // Show skeleton while initial data loads
@@ -34,28 +41,11 @@ const FileLogs = () => {
 
     // Handle filter changes
     const handleFilterChange = (newFilters: Partial<LogFilters>) => {
-        const updatedFilters = { ...filters, ...newFilters, page: 1 };
+        const updatedFilters = { ...filters, ...newFilters };
         setFilters(updatedFilters);
 
         // Trigger API call with updated filters
         fetchLogs({
-            page: updatedFilters.page,
-            per_page: updatedFilters.perPage,
-            level_filter: updatedFilters.level,
-            search: updatedFilters.search,
-            sort_by: updatedFilters.sortBy,
-            sort_order: updatedFilters.sortOrder
-        });
-    };
-
-    // Handle pagination
-    const handlePageChange = (page: number) => {
-        const updatedFilters = { ...filters, page };
-        setFilters(updatedFilters);
-
-        // Trigger API call with updated page
-        fetchLogs({
-            page: updatedFilters.page,
             per_page: updatedFilters.perPage,
             level_filter: updatedFilters.level,
             search: updatedFilters.search,
@@ -67,14 +57,7 @@ const FileLogs = () => {
     // Handle refresh based on current view mode
     const handleRefresh = () => {
         if (viewMode === 'parsed') {
-            fetchLogs({
-                page: filters.page,
-                per_page: filters.perPage,
-                level_filter: filters.level,
-                search: filters.search,
-                sort_by: filters.sortBy,
-                sort_order: filters.sortOrder
-            });
+            refetchLogs();
         } else {
             refetchRawContent();
         }
@@ -106,11 +89,7 @@ const FileLogs = () => {
                 onViewModeChange={handleViewModeChange}
                 filters={filters}
                 onFiltersChange={handleFilterChange}
-                currentPage={logs.current_page}
-                totalPages={logs.total_pages}
-                totalEntries={logs.total}
-                perPage={logs.per_page}
-                onPageChange={handlePageChange}
+                totalEntries={totalEntries}
                 onRefresh={handleRefresh}
                 onClear={clearLogs}
                 onExport={handleExport}
@@ -119,12 +98,7 @@ const FileLogs = () => {
             />
 
             {viewMode === 'parsed' ? (
-                <LogViewer
-                    logs={logs.entries}
-                    loading={logsLoading}
-                    currentPage={logs.current_page}
-                    perPage={logs.per_page}
-                />
+                <LogViewer logs={logs} loading={logsLoading} infiniteState={infiniteState} onLoadMore={loadMore} />
             ) : (
                 <RawFileViewer content={rawContent} loading={rawLoading} onRefresh={refetchRawContent} />
             )}

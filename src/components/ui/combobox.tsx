@@ -13,7 +13,7 @@ import {
     ComboboxOptions,
     Combobox as HeadlessCombobox
 } from '@headlessui/react';
-import { CheckIcon, ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, Square, SquareCheck } from 'lucide-react';
 import { useState } from 'react';
 
 interface Option {
@@ -126,7 +126,11 @@ const Combobox = ({
                                 value={option}
                                 className="group data-focus:bg-primary-50 data-focus:text-primary-900 flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 select-none"
                             >
-                                <CheckIcon className="text-primary-600 invisible size-4 group-data-selected:visible" />
+                                {value?.value === option.value ? (
+                                    <SquareCheck className="text-primary-600 size-4" />
+                                ) : (
+                                    <Square className="text-primary-600 size-4" />
+                                )}
                                 <div className="min-w-0 flex-1">{renderOption(option)}</div>
                             </ComboboxOption>
                         ))

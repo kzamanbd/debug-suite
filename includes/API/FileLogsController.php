@@ -48,9 +48,9 @@ class FileLogsController extends RestController {
 					],
 					'per_page' => [
 						'type'              => 'integer',
-						'default'           => 25,
+						'default'           => 100,
 						'minimum'           => 1,
-						'maximum'           => 100,
+						'maximum'           => 1000,
 						'sanitize_callback' => 'absint',
 					],
 					'level_filter' => [
@@ -90,7 +90,7 @@ class FileLogsController extends RestController {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/files',
+			'/' . $this->rest_base . '/supported-files',
 			[
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_supported_log_files' ],
@@ -164,7 +164,7 @@ class FileLogsController extends RestController {
 
 	public function get_logs( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$page = (int) ( $request->get_param( 'page' ) ?? 1 );
-		$per_page = (int) ( $request->get_param( 'per_page' ) ?? 25 );
+		$per_page = (int) ( $request->get_param( 'per_page' ) ?? 100 );
 		$offset = ( $page - 1 ) * $per_page;
 
 		$options = [
@@ -282,25 +282,16 @@ class FileLogsController extends RestController {
 		}
 
 		// Check for other common log files
-		$log_files = $this->service->supported_log_files();
-
-		foreach ( $log_files as $path => $type ) {
-			if ( file_exists( $path ) ) {
-				$supported_log_files[] = [
-					'name' => basename( $path ),
-					'path' => $path,
-					'size' => size_format( filesize( $path ) ),
-					'size_bytes' => filesize( $path ),
-					'modified' => gmdate( 'Y-m-d H:i:s', filemtime( $path ) ),
-					'type' => $type,
-					'is_current' => false,
-				];
+		$log_files = array_filter(
+			$this->service->supported_log_files(),
+			function ( $file ) {
+				return ! empty( $file['path'] );
 			}
-		}
+		);
 
 		return rest_ensure_response(
 			[
-				'files' => $supported_log_files,
+				'files' => array_merge( $supported_log_files, $log_files ),
 				'current_file' => $debug_log,
 			]
 		);
