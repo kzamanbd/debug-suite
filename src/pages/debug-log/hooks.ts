@@ -37,6 +37,7 @@ export const useLogFiles = () => {
         }
     };
 
+    // Fetch log files on component mount
     useEffect(() => {
         fetchLogFiles();
     }, []);
@@ -198,9 +199,25 @@ export const useLogEntries = () => {
         fetchAllLogs();
     }, [fetchAllLogs]);
 
+    // Fetch all logs on component mount
     useEffect(() => {
         fetchAllLogs();
     }, [fetchAllLogs]);
+
+    // Handle visibility change to refetch logs when tab becomes visible
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                refetch();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [refetch]);
 
     return {
         logs: paginatedLogs,
@@ -233,6 +250,7 @@ export const useLogStats = () => {
         }
     };
 
+    // Fetch stats on component mount
     useEffect(() => {
         fetchStats();
     }, []);
