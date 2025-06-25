@@ -25,11 +25,11 @@ export const useLogFiles = () => {
     const fetchLogFiles = async () => {
         try {
             setLoading(true);
-            const response = await apiFetch<{ files: LogFile[]; current_file: string }>({
+            const response = await apiFetch<{ files: LogFile[] }>({
                 path: '/debug-suite/v1/logs/supported-files'
             });
             setLogFiles(response.files);
-            setSelectedFile(response.current_file);
+            setSelectedFile(response.files[0].path);
         } catch (error) {
             console.error('Error fetching log files:', error);
         } finally {

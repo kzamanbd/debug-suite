@@ -266,33 +266,12 @@ class FileLogsController extends RestController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_supported_log_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$supported_log_files = [];
-		// Main debug.log
-		$debug_log = WP_CONTENT_DIR . '/debug.log';
-		if ( file_exists( $debug_log ) ) {
-			$supported_log_files[] = [
-				'name' => 'debug.log',
-				'path' => $debug_log,
-				'size' => size_format( filesize( $debug_log ) ),
-				'size_bytes' => filesize( $debug_log ),
-				'modified' => gmdate( 'Y-m-d H:i:s', filemtime( $debug_log ) ),
-				'type' => 'WordPress Debug',
-				'is_current' => true,
-			];
-		}
-
-		// Check for other common log files
-		$log_files = array_filter(
-			$this->service->supported_log_files(),
-			function ( $file ) {
-				return ! empty( $file['path'] );
-			}
-		);
+		$supported_log_files = $this->service->supported_log_files();
 
 		return rest_ensure_response(
 			[
-				'files' => array_merge( $supported_log_files, $log_files ),
-				'current_file' => $debug_log,
+				'files' => $supported_log_files,
+				'count' => count( $supported_log_files ),
 			]
 		);
 	}
