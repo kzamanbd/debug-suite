@@ -24,6 +24,12 @@
         </exclude>
     </coverage>
 
+    <logging>
+        <junit outputFile="tests/reports/junit.xml"/>
+        <testdoxHtml outputFile="tests/reports/testdox.html"/>
+        <testdoxText outputFile="tests/reports/testdox.txt"/>
+    </logging>
+
     <php>
         <const name="WP_TESTS_PHPUNIT_POLYFILLS_PATH" value="./vendor/yoast/phpunit-polyfills" />
         <env name="WP_TESTS_DIR" value="/tmp/wordpress-tests-lib" />

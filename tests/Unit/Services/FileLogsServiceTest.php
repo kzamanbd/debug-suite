@@ -128,12 +128,15 @@ EOT;
 		
 		// Create log reader service and set custom log file path using reflection
 		$log_reader = new WPLogReaderService();
-		$reflection = new \ReflectionClass( $log_reader );
+		$reflection = new ReflectionClass( $log_reader );
 		$path_property = $reflection->getProperty( 'log_file_path' );
 		$path_property->setValue( $log_reader, $non_existent_file );
 		
 		// Create service instance with dependency injection
-		$service = new FileLogsService( $log_reader );
+		$service = new FileLogsService();
+		$service_reflection = new ReflectionClass( $service );
+		$log_reader_property = $service_reflection->getProperty( 'log_reader' );
+		$log_reader_property->setValue( $service, $log_reader );
 		
 		$result = $service->get_log_entries();
 		

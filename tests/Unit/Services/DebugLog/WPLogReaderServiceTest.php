@@ -106,7 +106,7 @@ class WPLogReaderServiceTest extends TestCase {
 		// Create a service with a non-existent file path
 		$non_existent_path = '/non/existent/path/debug.log';
 		$service = new WPLogReaderService();
-		$reflection = new \ReflectionClass( $service );
+		$reflection = new ReflectionClass( $service );
 		$path_property = $reflection->getProperty( 'log_file_path' );
 		$path_property->setValue( $service, $non_existent_path );
 		
