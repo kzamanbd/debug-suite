@@ -9,7 +9,7 @@ import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 import InputField from '@/components/ui/input-field';
-import { ItemTree } from '@/types';
+import type { ItemTree } from '@/types';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
@@ -26,7 +26,7 @@ import FileTreeSkeleton from './components/tree-skeleton';
 const FileManager = () => {
     const [files, setFiles] = useState<ItemTree[]>([]);
     const [openEditor, setOpenEditor] = useState(false);
-    const [fileContent, setFileContent] = useState('');
+    const [fileContents, setFileContents] = useState('');
     const [fileName, setFileName] = useState('');
     const [selectedFiles, setSelectedFiles] = useState<ItemTree[]>([]);
     const [initialLoading, setInitialLoading] = useState(false);
@@ -34,10 +34,10 @@ const FileManager = () => {
     const [loadingFileContent, setLoadingFileContent] = useState(false);
     const [breadcrumb, setBreadcrumb] = useState<string[]>([]);
 
-    const fetchFiles = async (path?: string) => {
+    const fetchFiles = async (path = '') => {
         // Fetch files from the server
         const apiPath = addQueryArgs('/debug-suite/v1/files', {
-            path: path || ''
+            path
         });
 
         return apiFetch<{
@@ -47,9 +47,9 @@ const FileManager = () => {
         });
     };
 
-    const fetchFileContent = async (path: string) => {
+    const fetchFileContents = async (path = '') => {
         const apiPath = addQueryArgs('/debug-suite/v1/files/content', {
-            path: path || ''
+            path
         });
 
         return apiFetch<{
@@ -62,10 +62,9 @@ const FileManager = () => {
 
     const fetchNestedFiles = async (file: ItemTree) => {
         if (file.type === 'file') {
-            fileEditHandler(file);
+            void fileEditHandler(file);
             return;
         }
-        console.log('fetchNestedFiles', file.path);
         const data = file.path.split('/').map((item) => {
             return item.trim();
         });
@@ -77,15 +76,15 @@ const FileManager = () => {
         try {
             setDetailLoading(true);
             const response = await fetchFiles(file.path);
-            file.children.push(...response.tree);
-            setSelectedFiles(file.children);
+            file.children?.push(...response.tree);
+            setSelectedFiles(file.children || []);
             setDetailLoading(false);
         } catch (err) {
             console.error(err);
         }
     };
 
-    const breadcrumbClickHandler = async (index?: number) => {
+    const breadcrumbClickHandler = (index?: number) => {
         let path = '';
         if (index) {
             const data = breadcrumb.slice(0, index + 1);
@@ -95,7 +94,7 @@ const FileManager = () => {
             setBreadcrumb([]);
             setInitialLoading(true);
         }
-        fetchInitialFile(path);
+        void fetchInitialFile(path);
         setDetailLoading(true);
     };
 
@@ -117,15 +116,15 @@ const FileManager = () => {
         toggleEditor();
         setFileName(file.name);
         setLoadingFileContent(true);
-        const response = await fetchFileContent(file.path);
-        setFileContent(response.contents);
+        const response = await fetchFileContents(file.path);
+        setFileContents(response.contents);
         setLoadingFileContent(false);
     };
 
     const toggleEditor = () => {
         setOpenEditor(!openEditor);
         if (!openEditor) {
-            setFileContent('');
+            setFileContents('');
         }
     };
 
@@ -150,9 +149,9 @@ const FileManager = () => {
 
     useEffect(() => {
         setInitialLoading(true);
-        fetchInitialFile();
+        void fetchInitialFile();
         setDetailLoading(true);
-    }, []);
+    }, [fetchInitialFile]);
 
     return (
         <Card className={classNames('p-4 shadow-xs dark:bg-gray-900')}>
@@ -352,7 +351,7 @@ const FileManager = () => {
                 open={openEditor}
                 loading={loadingFileContent}
                 toggle={toggleEditor}
-                fileContent={fileContent}
+                value={fileContents}
                 fileName={fileName}
             />
         </Card>

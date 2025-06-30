@@ -1,8 +1,9 @@
-import { RouterProvider, createHashRouter } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
 import Layout from './components/layout';
 import { withRouter } from './routing';
-import routes, { DebugSuiteRoute } from './routing/routes';
+import type { DebugSuiteRoute } from './routing/routes';
+import routes from './routing/routes';
 import { mutationObserver } from './utils';
 
 const App = () => {

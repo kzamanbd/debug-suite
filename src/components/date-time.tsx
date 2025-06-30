@@ -4,7 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 interface DateTimeProps {
     date: string;
-    defaultDate?: any;
+    defaultDate?: string;
     localTime?: boolean;
 }
 

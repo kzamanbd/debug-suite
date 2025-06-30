@@ -7,7 +7,7 @@
  */
 import { classNames } from '@/utils';
 import { useState } from '@wordpress/element';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type AlertVariant = 'primary' | 'success' | 'danger' | 'warning' | 'default' | 'info';
 
