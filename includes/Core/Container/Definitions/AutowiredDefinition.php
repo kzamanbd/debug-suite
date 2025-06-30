@@ -15,25 +15,7 @@ use DebugSuite\Core\Container\Exceptions\ContainerException;
 /**
  * Autowired definition for advanced dependency injection.
  *
- * Provides comprehensive autowiring capabilities with multiple parameter injection strategies:
- *
- * **Core Features:**
- * - Automatic constructor dependency resolution via reflection
- * - Manual parameter overrides for specific constructor arguments
- * - Dynamic parameter callbacks with container resolver access
- * - Environment-aware parameter configuration (development/production/testing)
- * - Fluent method chaining for configuration
- * - Singleton and transient service lifetime support
- *
- * **Parameter Resolution Priority:**
- * 1. Environment-specific parameters (highest priority)
- * 2. Dynamic parameter callbacks
- * 3. Static parameter overrides
- * 4. Type-based dependency injection
- * 5. Default parameter values
- * 6. Container exception (if none above match)
- *
- * Follows autowiring pattern with WordPress-specific enhancements.
+ * Provides comprehensive autowiring capabilities with multiple parameter injection strategies.
  *
  * @since DEBUG_SUITE_SINCE
  *
