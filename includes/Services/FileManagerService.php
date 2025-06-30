@@ -106,8 +106,13 @@ class FileManagerService implements ServiceInterface {
 			return filesize( $path );
 		}
 
-		// if os is Unix-based or macOS, then use the du command
-		if ( PHP_OS_FAMILY === 'Darwin' || PHP_OS_FAMILY === 'Linux' ) {
+		// Use platform-specific du command
+		if ( PHP_OS_FAMILY === 'Darwin' ) {
+			// macOS doesn't support -b, use -k and convert to bytes
+			$size_kb = (int) shell_exec( "du -sk $path | awk '{print $1}'" );
+			return $size_kb * 1024;
+		} elseif ( PHP_OS_FAMILY === 'Linux' ) {
+			// Linux supports -b for bytes
 			return (int) shell_exec( "du -sb $path | awk '{print $1}'" );
 		}
 

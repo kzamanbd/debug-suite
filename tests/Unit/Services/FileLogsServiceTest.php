@@ -44,12 +44,15 @@ class FileLogsServiceTest extends TestCase {
 		
 		// Create log reader service and set custom log file path using reflection
 		$log_reader = new WPLogReaderService();
-		$reflection = new \ReflectionClass( $log_reader );
+		$reflection = new ReflectionClass( $log_reader );
 		$path_property = $reflection->getProperty( 'log_file_path' );
 		$path_property->setValue( $log_reader, $this->test_log_file );
 		
 		// Create service instance with dependency injection
-		$this->service = new FileLogsService( $log_reader );
+		$this->service = new FileLogsService();
+		$reflection = new ReflectionClass( $this->service );
+		$log_reader_property = $reflection->getProperty( 'log_reader' );
+		$log_reader_property->setValue( $this->service, $log_reader );
 	}
 
 	/**

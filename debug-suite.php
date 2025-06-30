@@ -193,9 +193,15 @@ final class DebugSuite {
 	 * @return void
 	 */
 	public function define_constants(): void {
-		define( 'DEBUG_SUITE_VERSION', $this->version );
-		define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-		define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		if ( ! defined( 'DEBUG_SUITE_VERSION' ) ) {
+			define( 'DEBUG_SUITE_VERSION', $this->version );
+		}
+		if ( ! defined( 'DEBUG_SUITE_PLUGIN_DIR' ) ) {
+			define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+		}
+		if ( ! defined( 'DEBUG_SUITE_PLUGIN_URL' ) ) {
+			define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		}
 	}
 
 	/**
