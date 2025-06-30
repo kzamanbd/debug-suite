@@ -1,6 +1,6 @@
 <?php
 /**
- * Interface for classes that register WordPress hooks with PSR-11 DI integration.
+ * Interface for classes that register WordPress hooks with DI integration.
  *
  * @package DebugSuite
  */

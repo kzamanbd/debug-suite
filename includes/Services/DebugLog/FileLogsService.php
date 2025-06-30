@@ -30,12 +30,26 @@ class FileLogsService implements ServiceInterface {
 	private WPLogReaderService $log_reader;
 
 	/**
-	 * Constructor for FileLogsService.
+	 * Maximum number of log entries to process.
 	 *
-	 * @param WPLogReaderService $log_reader The log reader service.
+	 * @var int
 	 */
-	public function __construct( WPLogReaderService $log_reader ) {
-		$this->log_reader = $log_reader;
+	private int $max_entries;
+
+	/**
+	 * Default log file path.
+	 *
+	 * @var string
+	 */
+	private string $log_file_path;
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->log_reader     = new WPLogReaderService();
+		$this->log_file_path  = WP_CONTENT_DIR . '/debug.log';
+		$this->max_entries    = 1000;
 	}
 
 	/**

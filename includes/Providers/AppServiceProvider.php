@@ -1,6 +1,6 @@
 <?php
 /**
- * Services service provider for Debug Suite.
+ * Application service provider for Debug Suite.
  *
  * @package DebugSuite
  */
@@ -34,21 +34,19 @@ class AppServiceProvider extends AbstractServiceProvider {
 	];
 
 	public function register( Container $container ): void {
-		// Modern PHP-DI style definition array approach
+		// Simple service registration - merged from ServicesServiceProvider
 		$container->add_definitions(
 			[
-				// Advanced log reader service (foundation service)
+				// Core services as singletons
 				WPLogReaderService::class => $container->object( WPLogReaderService::class ),
-
-				// Enhanced services with dependency injection
-				FileLogsService::class    => $container->autowire( FileLogsService::class )->set_name( FileLogsService::class ),
+				FileLogsService::class    => $container->object( FileLogsService::class ),
 				FileManagerService::class => $container->object( FileManagerService::class ),
 				SettingsService::class   => $container->object( SettingsService::class ),
 
-				// Controllers with dependency injection
-				FileLogsController::class    => $container->autowire( FileLogsController::class )->set_name( FileLogsController::class ),
-				FileManagerController::class => $container->autowire( FileManagerController::class )->set_name( FileManagerController::class ),
-				SettingsController::class   => $container->autowire( SettingsController::class )->set_name( SettingsController::class ),
+				// REST API Controllers with automatic dependency injection
+				FileLogsController::class    => $container->autowire( FileLogsController::class ),
+				FileManagerController::class => $container->autowire( FileManagerController::class ),
+				SettingsController::class   => $container->autowire( SettingsController::class ),
 			]
 		);
 	}

@@ -11,7 +11,7 @@ namespace DebugSuite\Core\Container\Definitions;
  * Base definition interface for dependency injection definitions.
  *
  * Defines the contract for all dependency injection definition types.
- * This follows PHP-DI's definition pattern for flexible service configuration.
+ * This follows a definition pattern for flexible service configuration.
  *
  * @since DEBUG_SUITE_SINCE
  */

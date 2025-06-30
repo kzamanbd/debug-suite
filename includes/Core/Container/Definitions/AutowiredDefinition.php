@@ -33,9 +33,12 @@ use DebugSuite\Core\Container\Exceptions\ContainerException;
  * 5. Default parameter values
  * 6. Container exception (if none above match)
  *
- * Follows PHP-DI's autowiring pattern with WordPress-specific enhancements.
+ * Follows autowiring pattern with WordPress-specific enhancements.
  *
  * @since DEBUG_SUITE_SINCE
+ *
+ * @internal This class is for internal container use only.
+ *           Use $container->object() and $container->autowire() in service providers instead.
  */
 class AutowiredDefinition implements DefinitionInterface {
 

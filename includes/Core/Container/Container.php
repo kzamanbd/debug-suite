@@ -1,6 +1,6 @@
 <?php
 /**
- * PSR-11 compliant dependency injection container with PHP-DI features.
+ * Dependency injection container with advanced features.
  *
  * @package DebugSuite
  */
@@ -19,13 +19,14 @@ use DebugSuite\Core\Container\Definitions\DecoratorDefinition;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
+use Throwable;
 
 /**
- * PSR-11 compliant dependency injection container with PHP-DI features.
+ * Dependency injection container with advanced features.
  *
  * Provides a singleton container implementation for dependency injection
  * with support for service binding, singleton management, automatic
- * dependency resolution using reflection, and PHP-DI style definitions.
+ * dependency resolution using reflection, and service definitions.
  *
  * @since DEBUG_SUITE_SINCE
  */
@@ -197,7 +198,7 @@ class Container implements ContainerInterface {
 	}
 
 	/**
-	 * PSR-11: Finds an entry of the container by its identifier and returns it.
+	 * Finds an entry of the container by its identifier and returns it.
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
@@ -206,14 +207,14 @@ class Container implements ContainerInterface {
 	 * @return mixed Entry.
 	 *
 	 * @throws NotFoundException  No entry was found for this identifier.
-	 * @throws ContainerException Error while retrieving the entry.
+	 * @throws ContainerException|Throwable Error while retrieving the entry.
 	 */
-	public function get( string $id ) {
+	public function get( string $id ): mixed {
 		return $this->resolve( $id );
 	}
 
 	/**
-	 * PSR-11: Returns true if the container can return an entry for the given identifier.
+	 * Returns true if the container can return an entry for the given identifier.
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
@@ -301,7 +302,7 @@ class Container implements ContainerInterface {
 	 *
 	 * @return ValueDefinition
 	 */
-	public function value( $value ): ValueDefinition {
+	public function value( mixed $value ): ValueDefinition {
 		return new ValueDefinition( $value );
 	}
 
@@ -389,12 +390,13 @@ class Container implements ContainerInterface {
 	 * Convenience method for binding a service as a singleton.
 	 * Equivalent to calling bind() with singleton parameter set to true.
 	 *
+	 * @param string $name Service name/identifier.
+	 * @param mixed $resolver Resolver function or class name.
+	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
-	 * @param string $name Service name/identifier.
-	 * @param mixed  $resolver Resolver function or class name.
-	 *
 	 * @return void
+	 * @throws ContainerException If container is compiled.
 	 */
 	public function singleton( string $name, $resolver ): void {
 		$this->bind( $name, $resolver, true );
@@ -558,7 +560,7 @@ class Container implements ContainerInterface {
 	 *
 	 * @return mixed The resolved service.
 	 *
-	 * @throws \Throwable If service resolution fails.
+	 * @throws Throwable If service resolution fails.
 	 */
 	private function profile_resolution( string $service, callable $resolver ) {
 		$start = microtime( true );
@@ -581,7 +583,7 @@ class Container implements ContainerInterface {
 			}
 
 			return $result;
-		} catch ( \Throwable $e ) {
+		} catch ( Throwable $e ) {
 			$time = microtime( true ) - $start;
 
 			if ( ! isset( $this->resolution_stats[ $service ] ) ) {
@@ -637,11 +639,11 @@ class Container implements ContainerInterface {
 	 * @since DEBUG_SUITE_SINCE
 	 *
 	 * @param string          $service  The service that failed to resolve.
-	 * @param \Throwable|null $previous Previous exception if any.
+	 * @param Throwable|null $previous Previous exception if any.
 	 *
 	 * @return string Enhanced error message.
 	 */
-	private function generate_enhanced_error_message( string $service, ?\Throwable $previous = null ): string {
+	private function generate_enhanced_error_message( string $service, ?Throwable $previous = null ): string {
 		$message = "Failed to resolve service: $service";
 
 		if ( ! empty( $this->resolving_stack ) ) {
@@ -693,14 +695,14 @@ class Container implements ContainerInterface {
 	 * Handles singleton caching, automatic dependency injection through reflection,
 	 * circular dependency detection, and performance profiling.
 	 *
-	 * @since DEBUG_SUITE_SINCE
-	 *
 	 * @param string $name Service name/identifier.
 	 *
 	 * @return mixed The resolved service instance.
 	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
 	 * @throws NotFoundException  If service not found.
-	 * @throws ContainerException If service cannot be resolved.
+	 * @throws ContainerException|Throwable If service cannot be resolved.
 	 */
 	public function resolve( string $name ) {
 		return $this->profile_resolution(
@@ -829,7 +831,6 @@ class Container implements ContainerInterface {
 				array_pop( $this->resolving_stack );
 				return $instance;
 			}
-
 			// Get constructor parameters from cache or reflection
 			$parameters = $this->get_cached_constructor_parameters( $class_name, $reflection );
 
@@ -842,31 +843,7 @@ class Container implements ContainerInterface {
 			}
 
 			// Resolve constructor dependencies
-			$dependencies = [];
-			foreach ( $parameters as $parameter ) {
-				$type = $parameter->getType();
-				// @phpstan-ignore-next-line
-				if ( $type && ! $type->isBuiltin() ) {
-					// @phpstan-ignore-next-line
-					$dependency_class = $type->getName();
-					$dependencies[]   = $this->resolve( $dependency_class );
-				} elseif ( $parameter->isDefaultValueAvailable() ) {
-					$dependencies[] = $parameter->getDefaultValue();
-				} else {
-					$error_message = $this->build_enhanced_error_message(
-						$class_name,
-						"Cannot resolve parameter [{$parameter->getName()}]",
-						[
-							'parameter_name' => $parameter->getName(),
-							'parameter_type' => $type ? $type->getName() : 'mixed',
-							'has_default'    => $parameter->isDefaultValueAvailable(),
-							'is_optional'    => $parameter->isOptional(),
-							'resolution_stack' => $this->resolving_stack,
-						]
-					);
-					throw new ContainerException( $error_message );
-				}
-			}
+			$dependencies = $this->resolve_constructor_dependencies( $class_name, $parameters );
 
 			$instance = $reflection->newInstanceArgs( $dependencies );
 			$this->record_resolution_time( $class_name, $start_time, true );
@@ -932,31 +909,7 @@ class Container implements ContainerInterface {
 			}
 
 			// Resolve constructor dependencies
-			$dependencies = [];
-			foreach ( $parameters as $parameter ) {
-				$type = $parameter->getType();
-				// @phpstan-ignore-next-line
-				if ( $type && ! $type->isBuiltin() ) {
-					// @phpstan-ignore-next-line
-					$dependency_class = $type->getName();
-					$dependencies[]   = $this->resolve( $dependency_class );
-				} elseif ( $parameter->isDefaultValueAvailable() ) {
-					$dependencies[] = $parameter->getDefaultValue();
-				} else {
-					$error_message = $this->build_enhanced_error_message(
-						$class_name,
-						"Cannot resolve parameter [{$parameter->getName()}]",
-						[
-							'parameter_name' => $parameter->getName(),
-							'parameter_type' => $type ? $type->getName() : 'mixed',
-							'has_default'    => $parameter->isDefaultValueAvailable(),
-							'is_optional'    => $parameter->isOptional(),
-							'resolution_stack' => $this->resolving_stack,
-						]
-					);
-					throw new ContainerException( $error_message );
-				}
-			}
+			$dependencies = $this->resolve_constructor_dependencies( $class_name, $parameters );
 
 			$instance = $reflection->newInstanceArgs( $dependencies );
 			$this->record_resolution_time( $class_name, $start_time, true );
@@ -1071,9 +1024,9 @@ class Container implements ContainerInterface {
 	}
 
 	/**
-	 * Add multiple definitions from an array (PHP-DI style).
+	 * Add multiple definitions from an array.
 	 *
-	 * Supports PHP-DI compatible definition arrays for bulk service configuration.
+	 * Supports compatible definition arrays for bulk service configuration.
 	 *
 	 * @since DEBUG_SUITE_SINCE
 	 *
@@ -1377,5 +1330,47 @@ class Container implements ContainerInterface {
 		if ( $this->debug_mode ) {
 			error_log( 'Debug Suite Container: Performance data cleared.' );
 		}
+	}
+
+	/**
+	 * Resolve constructor dependencies for a class.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string                      $class_name The class name being resolved.
+	 * @param array<ReflectionParameter> $parameters The constructor parameters.
+	 *
+	 * @return array<mixed> The resolved dependencies.
+	 *
+	 * @throws ContainerException If a parameter cannot be resolved.
+	 */
+	private function resolve_constructor_dependencies( string $class_name, array $parameters ): array {
+		$dependencies = [];
+		foreach ( $parameters as $parameter ) {
+			$type = $parameter->getType();
+			// @phpstan-ignore-next-line
+			if ( $type && ! $type->isBuiltin() ) {
+				// @phpstan-ignore-next-line
+				$dependency_class = $type->getName();
+				$dependencies[]   = $this->resolve( $dependency_class );
+			} elseif ( $parameter->isDefaultValueAvailable() ) {
+				$dependencies[] = $parameter->getDefaultValue();
+			} else {
+				$error_message = $this->build_enhanced_error_message(
+					$class_name,
+					"Cannot resolve parameter [{$parameter->getName()}]",
+					[
+						'parameter_name' => $parameter->getName(),
+						'parameter_type' => $type ? $type->getName() : 'mixed',
+						'has_default'    => $parameter->isDefaultValueAvailable(),
+						'is_optional'    => $parameter->isOptional(),
+						'resolution_stack' => $this->resolving_stack,
+					]
+				);
+				throw new ContainerException( esc_html( $error_message ) );
+			}
+		}
+
+		return $dependencies;
 	}
 }

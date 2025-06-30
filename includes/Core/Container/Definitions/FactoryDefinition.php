@@ -11,7 +11,7 @@ namespace DebugSuite\Core\Container\Definitions;
  * Factory definition for dependency injection.
  *
  * Represents a factory callable that will be invoked to create an instance.
- * Follow PHP-DI's factory pattern for flexible object creation.
+ * Follow factory pattern for flexible object creation.
  *
  * @since DEBUG_SUITE_SINCE
  */

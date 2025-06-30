@@ -1,22 +1,9 @@
 <?php
 
-/**
- * Assets management for Debug Suite with PSR-11 DI Container support.
- *
- * @package DebugSuite
- */
-
 namespace DebugSuite\Core;
 
 use DebugSuite\Interfaces\Hookable;
 
-/**
- * Assets registration and management for Debug Suite.
- *
- * Handles registration and enqueuing of stylesheets and JavaScript files.
- *
- * @since DEBUG_SUITE_SINCE
- */
 class Assets implements Hookable {
 
 	/**

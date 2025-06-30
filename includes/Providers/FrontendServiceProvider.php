@@ -18,10 +18,9 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 	];
 
 	public function register( Container $container ): void {
-		// Modern PHP-DI style definition array approach
+		// Simple frontend service registration
 		$container->add_definitions(
 			[
-				// Frontend service with object creation
 				Frontend::class => $container->object( Frontend::class ),
 			]
 		);

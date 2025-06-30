@@ -46,8 +46,8 @@ The remaining documentation files focus on specialized WordPress integration pat
 
 ### Container System (in Copilot Instructions)
 
-- PSR-11 compliance with proper exception handling
-- Advanced autowiring with multiple parameter injection strategies
+- Simple service registration with object() and autowire() methods
+- Automatic service resolution with dependency injection
 - Environment-aware service configuration
 - Service decoration patterns
 - Tagged services for event systems

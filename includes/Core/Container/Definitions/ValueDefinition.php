@@ -3,6 +3,9 @@
  * Value definition for dependency injection.
  *
  * @package DebugSuite
+ *
+ * @internal This class is for internal container use only.
+ *           Use $container->object() and $container->autowire() instead.
  */
 
 namespace DebugSuite\Core\Container\Definitions;
@@ -11,9 +14,12 @@ namespace DebugSuite\Core\Container\Definitions;
  * Value definition for dependency injection.
  *
  * Represents a static value that will be returned directly.
- * Follow PHP-DI's value pattern for simple value injection.
+ * Follow value pattern for simple value injection.
  *
  * @since DEBUG_SUITE_SINCE
+ *
+ * @internal This class is for internal container use only.
+ *           Use $container->object() and $container->autowire() in service providers instead.
  */
 class ValueDefinition implements DefinitionInterface {
 

@@ -13,7 +13,7 @@ use DebugSuite\Core\Container\Definitions\DefinitionInterface;
  * Container builder for configuring and creating DI Containers.
  *
  * Provides a fluent interface for configuring dependency injection containers
- * with PHP-DI compatible features and configuration options.
+ * with compatible features and configuration options.
  *
  * @since DEBUG_SUITE_SINCE
  */

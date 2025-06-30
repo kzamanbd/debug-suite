@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Internationalization functionality for Debug Suite with PSR-11 DI support.
+ * Internationalization functionality for Debug Suite with DI support.
  *
  * @package DebugSuite
  */

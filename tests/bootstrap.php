@@ -10,8 +10,12 @@
 
 
 // Set test environment constants
-define( 'DEBUG_SUITE_TESTING', true );
-define( 'DEBUG_SUITE_TEST_DIR', __DIR__ );
+if( ! defined( 'DEBUG_SUITE_TESTING' ) ) {
+	define( 'DEBUG_SUITE_TESTING', true );
+}
+if( ! defined( 'DEBUG_SUITE_TEST_DIR' ) ) {
+	define( 'DEBUG_SUITE_TEST_DIR', __DIR__ );
+}
 if ( ! defined( 'DEBUG_SUITE_PLUGIN_DIR' ) ) {
 	define( 'DEBUG_SUITE_PLUGIN_DIR', dirname( __DIR__ ) );
 }

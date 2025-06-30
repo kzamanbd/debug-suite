@@ -1,6 +1,6 @@
 <?php
 /**
- * Frontend-specific functionality for Debug Suite with PSR-11 DI integration.
+ * Frontend-specific functionality for Debug Suite with DI integration.
  *
  * @package DebugSuite
  */

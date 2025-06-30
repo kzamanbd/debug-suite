@@ -50,12 +50,26 @@ class WPLogReaderService implements ServiceInterface {
 	private string $log_file_path;
 
 	/**
-	 * Constructor.
+	 * Buffer size for reading log files.
 	 *
-	 * Automatically sets the WordPress debug log file path.
+	 * @var int
+	 */
+	private int $buffer_size;
+
+	/**
+	 * Debug mode flag.
+	 *
+	 * @var bool
+	 */
+	private bool $debug_mode;
+
+	/**
+	 * Constructor.
 	 */
 	public function __construct() {
 		$this->log_file_path = WP_CONTENT_DIR . '/debug.log';
+		$this->buffer_size   = 1000;
+		$this->debug_mode    = false;
 	}
 
 	/**

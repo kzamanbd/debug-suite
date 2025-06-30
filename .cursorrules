@@ -6,17 +6,17 @@ You are an expert WordPress plugin developer working on the Debug Suite plugin, 
 
 Debug Suite is a WordPress plugin providing advanced debugging tools with:
 
-- **PSR-11 compliant dependency injection container** with PHP-DI compatibility
+- **Dependency injection container** system
 - **Service Layer Pattern** architecture for business logic separation
 - **React/TypeScript frontend** with Tailwind CSS v4 and WordPress integration
 - **Modern PHP 8.2** features with strict typing and enterprise patterns
 
 ## Core Architecture Principles
 
-### PSR-11 Dependency Injection Container System
+### Dependency Injection Container System
 
-- Use `DebugSuite\Core\Container\Container` which implements `Psr\Container\ContainerInterface`
-- Support for `AutowiredDefinition`, `FactoryDefinition`, `ValueDefinition`, `ConfigDefinition`, `DecoratorDefinition`
+- Use `DebugSuite\Core\Container\Container` for service management
+- Support for simple object and autowired service registration
 - Container uses singleton pattern accessible via `Container::get_instance()`
 - Service providers extend `AbstractServiceProvider` with registration and booting phases
 - Automatic hook registration for services implementing `Hookable` interface
@@ -27,7 +27,7 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 - Services implement `ServiceInterface` marker interface
 - Services return `ServiceResponse` objects (`ServiceResponse::success($data)` or `ServiceResponse::failure($message, $code)`)
 - REST controllers only handle HTTP requests/responses, delegate to services
-- Services registered as singletons in DI container via service providers
+- Services registered as singletons in the container via service providers
 
 ## PHP Backend Standards
 
@@ -318,7 +318,7 @@ includes/
 │   └── AppServiceProvider.php  # Service registration
 └── Core/
     ├── ServiceResponse.php     # Response wrapper
-    └── Container/              # DI container system
+    └── Container/              # Container system
 
 src/
 ├── pages/[feature-name]/       # Feature pages
@@ -339,17 +339,6 @@ src/
 // ✅ Use debug suite helpers
 $service = debug_suite_resolve(ExampleService::class);
 $container = debug_suite_container();
-
-// ✅ DI definition helpers
-$definition = debug_suite_autowire_with_params(LoggerService::class, [
-    'log_level' => 'debug'
-], true); // singleton
-
-// ✅ Environment-aware configuration
-$config = debug_suite_autowire_env(DatabaseService::class, [
-    'development' => ['debug' => true],
-    'production' => ['debug' => false]
-]);
 ```
 
 ## Error Handling Patterns
@@ -464,7 +453,7 @@ public function process_data(array $input): ServiceResponse {
 
 1. **Service Layer First**: All business logic goes in services, controllers are thin HTTP layers
 2. **Return ServiceResponse**: Services always return ServiceResponse, never throw exceptions to controllers  
-3. **Use DI Container**: Register services in providers, resolve via container
+3. **Use Container**: Register services in providers, resolve via container
 4. **snake_case PHP**: Functions, methods, variables use snake_case (WordPress standard)
 5. **camelCase Frontend**: JavaScript/TypeScript uses camelCase
 6. **Consolidate Components**: Prefer substantial components over micro-components
@@ -486,6 +475,7 @@ Debug Suite implements **client-side filtering** for optimal performance and rea
 #### SOP 1: Client-Side Filtering Hook Pattern
 
 **Implementation Standard:**
+
 ```typescript
 export const useDataEntries = () => {
     const [allData, setAllData] = useState<DataEntry[]>([]);
