@@ -63,8 +63,7 @@ const LogControls = ({
 }: LogControlsProps) => {
     const filteredLogFiles = logFiles.map((file) => ({
         value: file.path,
-        label: file.name,
-        meta: `${file.type} • ${file.size} • Modified: ${file.modified}`
+        label: file.name
     }));
 
     const selectedLogFile = () => {
@@ -76,8 +75,7 @@ const LogControls = ({
         }
         return {
             value: selectedFile,
-            label: logFiles.find((f) => f.path === selectedFile)?.name || 'debug.log',
-            meta: `${logFiles.find((f) => f.path === selectedFile)?.type || 'WordPress Debug'} • ${logFiles.find((f) => f.path === selectedFile)?.size || '0 B'}`
+            label: logFiles.find((f) => f.path === selectedFile)?.name || 'debug.log'
         };
     };
 
@@ -198,16 +196,7 @@ const LogControls = ({
                                     onChange={(option) => onFiltersChange({ sortBy: option?.value || '' })}
                                     className="w-[150px]"
                                 />
-                                <button
-                                    onClick={toggleSortOrder}
-                                    className="focus:ring-primary-500 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none"
-                                >
-                                    {filters.sortOrder === 'asc' ? (
-                                        <ChevronUpIcon className="h-4 w-4" />
-                                    ) : (
-                                        <ChevronDownIcon className="h-4 w-4" />
-                                    )}
-                                </button>
+
                                 <SearchableSelect
                                     options={perPageOptions}
                                     value={
@@ -219,6 +208,9 @@ const LogControls = ({
                                     }
                                     className="w-[150px]"
                                 />
+                                <Button className="p-2" onClick={toggleSortOrder}>
+                                    {filters.sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                </Button>
                             </div>
 
                             {/* Total entries display */}

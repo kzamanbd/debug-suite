@@ -25,7 +25,7 @@ const variantClasses: Record<ButtonVariant, string> = {
     success: 'bg-green-600 text-white hover:bg-green-700',
     danger: 'bg-red-600 text-white hover:bg-red-700',
     warning: 'bg-yellow-600 text-white hover:bg-yellow-700',
-    default: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
+    default: 'bg-white text-gray-800 hover:bg-gray-50 hover:text-gray-900',
     info: 'bg-blue-600 text-white hover:bg-blue-700'
 };
 
@@ -54,7 +54,7 @@ const Button = ({
         data-size={size}
         data-variant={variant}
         className={classNames(
-            'inline-flex items-center gap-1 rounded-lg font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+            'flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-sm font-medium dark:border-gray-700',
             variantClasses[variant],
             sizeClasses[size],
             className

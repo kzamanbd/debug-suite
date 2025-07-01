@@ -58,7 +58,7 @@ const SearchableSelect = ({
         }
 
         return (
-            <div title={option.label} className="w-[calc(100%-1px)] truncate text-sm font-medium">
+            <div title={option.label} className="w-[var(--input-width)] truncate text-sm font-medium">
                 {option.label}
             </div>
         );
