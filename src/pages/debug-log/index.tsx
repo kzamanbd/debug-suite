@@ -79,6 +79,8 @@ const FileLogs = () => {
                 onExport={handleExport}
                 clearing={clearing}
                 filesLoading={filesLoading}
+                rawContent={rawContent}
+                loading={logsLoading || rawLoading}
             />
 
             {viewMode === 'parsed' ? (

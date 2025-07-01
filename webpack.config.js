@@ -1,5 +1,6 @@
 const defaults = require('@wordpress/scripts/config/webpack.config');
 const path = require('path');
+const webpack = require('webpack');
 
 const entries = {
     'debug-suite-admin': './src/index.tsx'
@@ -20,6 +21,12 @@ module.exports = {
             '@': path.resolve(__dirname, 'src')
         }
     },
+    plugins: [
+        ...defaults.plugins,
+        new webpack.DefinePlugin({
+            'process': {}
+        })
+    ],
     externals: {
         react: 'React',
         'react-dom': 'ReactDOM'

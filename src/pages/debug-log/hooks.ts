@@ -69,7 +69,7 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
 
     // Sort the entries
     filtered.sort((a, b) => {
-        let aValue: any, bValue: any;
+        let aValue: string | number, bValue: string | number;
         const levelOrder = { critical: 6, error: 5, warning: 4, notice: 3, info: 2, debug: 1 };
         switch (filters.sortBy) {
             case 'level':
@@ -148,7 +148,7 @@ export const useLogEntries = () => {
             search: debouncedSearch
         };
         return filterLogEntries(allLogs, filtersWithDebouncedSearch);
-    }, [allLogs, filters.level, filters.sortBy, filters.sortOrder, debouncedSearch]);
+    }, [allLogs, filters, debouncedSearch]);
 
     // Paginated logs for display
     const paginatedLogs = useMemo(() => {

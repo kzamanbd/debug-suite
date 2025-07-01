@@ -20,7 +20,7 @@ export interface SelectProps
     extends Omit<Props<Option, false, GroupBase<Option>>, 'classNames' | 'value' | 'onChange'> {
     options: Option[];
     value?: Option | null;
-    onChange: (option: Option | null) => void;
+    onChange?: (option: Option | null) => void;
     placeholder?: string;
     label?: string;
     error?: string;
@@ -74,7 +74,7 @@ const SearchableSelect = ({
                 options={options}
                 value={value}
                 className="w-full"
-                onChange={(newValue) => onChange(newValue)}
+                onChange={onChange}
                 placeholder={placeholder}
                 formatOptionLabel={renderOptionLabel}
                 classNames={{

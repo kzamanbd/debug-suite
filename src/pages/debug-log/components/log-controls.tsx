@@ -7,10 +7,13 @@ import Button from '@/components/ui/button';
 import SearchableSelect from '@/components/ui/select';
 import InputField from '@/components/ui/text-input';
 import { classNames } from '@/utils';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
     ChevronDownIcon,
     ChevronUpIcon,
+    CopyIcon,
+    DownloadIcon,
     EyeIcon,
     FileTextIcon,
     RefreshCwIcon,
@@ -19,7 +22,7 @@ import {
     XIcon
 } from 'lucide-react';
 import { exportOptions, levelOptions, perPageOptions, sortOptions } from '../constants';
-import type { LogFile, LogFilters, ViewMode } from '../types';
+import type { LogFile, LogFilters, RawFileContent, ViewMode } from '../types';
 
 interface LogControlsProps {
     // File selection
@@ -44,6 +47,10 @@ interface LogControlsProps {
     onExport: (format: 'json' | 'csv' | 'txt') => void;
     clearing: boolean;
     filesLoading?: boolean;
+    loading?: boolean;
+
+    // Raw file content (only used in raw mode)
+    rawContent?: RawFileContent | null;
 }
 
 const LogControls = ({
@@ -59,11 +66,16 @@ const LogControls = ({
     onClear,
     onExport,
     clearing,
-    filesLoading = false
+    filesLoading = false,
+    rawContent,
+    loading = false
 }: LogControlsProps) => {
+    const [copying, setCopying] = useState(false);
+
     const filteredLogFiles = logFiles.map((file) => ({
         value: file.path,
-        label: file.name
+        label: file.name,
+        ...file
     }));
 
     const selectedLogFile = () => {
@@ -101,6 +113,37 @@ const LogControls = ({
             return;
         }
         onExport(format as 'json' | 'csv' | 'txt');
+    };
+
+    const handleCopy = async () => {
+        if (!rawContent?.content) return;
+
+        try {
+            setCopying(true);
+            await navigator.clipboard.writeText(rawContent.content);
+
+            // Show temporary success feedback
+            setTimeout(() => {
+                setCopying(false);
+            }, 2000);
+        } catch (error) {
+            console.error('Failed to copy content:', error);
+            setCopying(false);
+        }
+    };
+
+    const handleDownload = () => {
+        if (!rawContent) return;
+
+        const blob = new Blob([rawContent.content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = rawContent.filename || 'debug.log';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     return (
@@ -171,8 +214,20 @@ const LogControls = ({
                                 )}
                             </div>
                         )}
-                        <Button onClick={onRefresh} className="shrink-0">
-                            <RefreshCwIcon className="h-4 w-4" />
+                        {viewMode === 'raw' && rawContent && (
+                            <>
+                                <Button onClick={handleCopy} disabled={copying}>
+                                    <CopyIcon className="mr-2 h-4 w-4" />
+                                    {copying ? __('Copied!', 'debug-suite') : __('Copy', 'debug-suite')}
+                                </Button>
+                                <Button onClick={handleDownload}>
+                                    <DownloadIcon className="mr-2 h-4 w-4" />
+                                    {__('Download', 'debug-suite')}
+                                </Button>
+                            </>
+                        )}
+                        <Button onClick={onRefresh} className="shrink-0" disabled={loading}>
+                            <RefreshCwIcon className={classNames('h-4 w-4', loading && 'animate-spin')} />
                             <span className="ml-2 hidden md:inline">{__('Refresh', 'debug-suite')}</span>
                         </Button>
                     </div>
