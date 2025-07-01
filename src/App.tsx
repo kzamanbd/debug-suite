@@ -45,14 +45,13 @@ const App = () => {
         <>
             <RouterProvider router={router} />
             <ToastContainer
+                rtl={false}
                 position="bottom-center"
                 autoClose={5000}
                 hideProgressBar
                 newestOnTop={false}
                 closeOnClick={false}
-                rtl={false}
                 pauseOnFocusLoss
-                draggable
                 pauseOnHover
                 theme="light"
                 transition={Slide}

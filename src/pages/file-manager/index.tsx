@@ -8,7 +8,7 @@
 import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
-import InputField from '@/components/ui/input-field';
+import TextInput from '@/components/ui/text-input';
 import type { ItemTree } from '@/types';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
@@ -157,7 +157,7 @@ const FileManager = () => {
         <Card className={classNames('p-4 shadow-xs dark:bg-gray-900')}>
             {/* <!-- Search and Action Buttons --> */}
             <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                <InputField
+                <TextInput
                     type="text"
                     placeholder={__('Search Files & Folders', 'debug-suite')}
                     className="md:w-1/3 dark:bg-gray-800 dark:text-white"

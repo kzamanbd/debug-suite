@@ -4,15 +4,13 @@
  * @since 1.0.0
  */
 import Button from '@/components/ui/button';
-import Combobox from '@/components/ui/combobox';
-import InputField from '@/components/ui/input-field';
-import Listbox from '@/components/ui/listbox';
+import SearchableSelect from '@/components/ui/select';
+import InputField from '@/components/ui/text-input';
 import { classNames } from '@/utils';
 import { __ } from '@wordpress/i18n';
 import {
     ChevronDownIcon,
     ChevronUpIcon,
-    DownloadIcon,
     EyeIcon,
     FileTextIcon,
     RefreshCwIcon,
@@ -113,17 +111,17 @@ const LogControls = ({
             <div className="bg-white py-4">
                 <div className="flex flex-col flex-wrap gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                        <Combobox
+                        <SearchableSelect
                             options={filteredLogFiles}
                             value={selectedLogFile()}
                             onChange={(option) => onFileChange(option?.value || '')}
                             isDisabled={filesLoading}
-                            className="w-full sm:min-w-[200px] md:min-w-[220px] lg:min-w-[250px]"
+                            className="w-56"
                             placeholder={__('Select a log file', 'debug-suite')}
                         />
 
                         {/* View Mode Toggle */}
-                        <nav className="flex w-full gap-x-0.5 rounded-lg bg-gray-100 p-0.5 md:gap-x-1 dark:bg-neutral-800">
+                        <nav className="flex gap-x-0.5 rounded-lg bg-gray-100 p-0.5 md:gap-x-1 dark:bg-neutral-800">
                             <button
                                 type="button"
                                 onClick={() => onViewModeChange('parsed')}
@@ -189,33 +187,38 @@ const LogControls = ({
                     <div className="flex flex-col flex-wrap gap-4 md:gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:gap-4">
-                                <Combobox
+                                <SearchableSelect
                                     options={levelOptions}
                                     value={levelOptions.find((opt) => opt.value === filters.level) || levelOptions[0]}
                                     onChange={(option) => onFiltersChange({ level: option?.value || '' })}
-                                    className="w-[150px]"
                                 />
-                                <Combobox
+                                <SearchableSelect
                                     options={sortOptions}
                                     value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
-                                    onChange={(option) => onFiltersChange({ sortBy: option?.value || 'timestamp' })}
+                                    onChange={(option) => onFiltersChange({ sortBy: option?.value || '' })}
                                     className="w-[150px]"
                                 />
-                                <Button
+                                <button
                                     onClick={toggleSortOrder}
-                                    className="flex items-center justify-center gap-1 md:gap-1.5"
+                                    className="focus:ring-primary-500 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none"
                                 >
                                     {filters.sortOrder === 'asc' ? (
                                         <ChevronUpIcon className="h-4 w-4" />
                                     ) : (
                                         <ChevronDownIcon className="h-4 w-4" />
                                     )}
-                                    <span className="hidden md:inline">
-                                        {filters.sortOrder === 'asc'
-                                            ? __('Ascending', 'debug-suite')
-                                            : __('Descending', 'debug-suite')}
-                                    </span>
-                                </Button>
+                                </button>
+                                <SearchableSelect
+                                    options={perPageOptions}
+                                    value={
+                                        perPageOptions.find((opt) => opt.value === filters.perPage.toString()) ||
+                                        perPageOptions[0]
+                                    }
+                                    onChange={(option) =>
+                                        onFiltersChange({ perPage: parseInt(option?.value || '100', 10) })
+                                    }
+                                    className="w-[150px]"
+                                />
                             </div>
 
                             {/* Total entries display */}
@@ -239,36 +242,17 @@ const LogControls = ({
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 md:gap-3">
-                            <Combobox
-                                options={perPageOptions}
-                                value={
-                                    perPageOptions.find((opt) => opt.value === filters.perPage.toString()) ||
-                                    perPageOptions[1]
-                                }
-                                onChange={(option) => onFiltersChange({ perPage: parseInt(option?.value || '25') })}
-                                className="w-[150px]"
-                            />
-
-                            {/* Export Listbox */}
-                            <Listbox
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <SearchableSelect
                                 options={exportOptions}
-                                onChange={(option) => handleExport(option?.value || 'json')}
-                                formatButtonLabel={() => (
-                                    <div className="flex items-center">
-                                        <DownloadIcon className="mr-2 h-4 w-4" />
-                                        <span className="hidden md:inline">{__('Export', 'debug-suite')}</span>
-                                    </div>
-                                )}
-                                placeholder={__('Export', 'debug-suite')}
+                                value={null}
+                                onChange={(option) => handleExport(option?.value || '')}
+                                placeholder={__('Export as...', 'debug-suite')}
                                 className="w-[150px]"
                             />
-
-                            <Button onClick={handleClear} disabled={clearing} className="w-full sm:w-auto">
-                                <TrashIcon className="mr-2 h-4 w-4" />
-                                <span className="hidden md:inline">
-                                    {clearing ? __('Clearing...', 'debug-suite') : __('Clear', 'debug-suite')}
-                                </span>
+                            <Button onClick={handleClear} variant="danger" disabled={clearing} className="shrink-0">
+                                <TrashIcon className="h-4 w-4" />
+                                <span className="ml-2 hidden md:inline">{__('Clear Log', 'debug-suite')}</span>
                             </Button>
                         </div>
                     </div>

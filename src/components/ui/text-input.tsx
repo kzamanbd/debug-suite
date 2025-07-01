@@ -1,5 +1,5 @@
 /**
- * InputField component for Debug Suite UI.
+ * TextInput component for Debug Suite UI.
  *
  * Standard text input with label and error support.
  *
@@ -8,7 +8,7 @@
 import { classNames } from '@/utils';
 import type { InputHTMLAttributes } from 'react';
 
-interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
     className?: string;
@@ -16,7 +16,7 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const randomId = () => `input-${Math.random().toString(36).slice(2, 9)}`;
 
-const InputField = ({ label, error, className = '', ...props }: InputFieldProps) => {
+const TextInput = ({ label, error, className = '', ...props }: TextInputProps) => {
     const id = props.id || randomId();
     return (
         <>
@@ -39,4 +39,4 @@ const InputField = ({ label, error, className = '', ...props }: InputFieldProps)
     );
 };
 
-export default InputField;
+export default TextInput;

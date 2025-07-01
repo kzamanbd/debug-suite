@@ -4,14 +4,14 @@ import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
 import { __ } from '@wordpress/i18n';
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 export interface DebugSuiteRoute {
     id: string;
     title?: string | ReactNode;
     description?: string | ReactNode;
     path: string;
-    element: ReactNode;
+    element: ReactElement;
     className?: string;
     icon?: string;
 }

@@ -1109,7 +1109,7 @@ const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[]
 // Debounced search input with clear button
 <div className="relative">
     <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-    <InputField
+    <TextInput
         type="text"
         placeholder={__('Search...', 'debug-suite')}
         value={filters.search}
