@@ -214,7 +214,7 @@ class ExampleControllerTest extends DebugSuiteTestCase {
         $this->assertInstanceOf(WP_Error::class, $response);
         
         // Test with admin privileges
-        $user_id = $this->factory->user->create(['role' => 'administrator']);
+        $user_id = $this->factory()->user->create(['role' => 'administrator']);
         wp_set_current_user($user_id);
         $response = $this->controller->permissions_check($request);
         $this->assertTrue($response);

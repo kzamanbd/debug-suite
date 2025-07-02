@@ -100,7 +100,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
         $this->assertEquals(401, $response->get_status());
         
         // Test authorized access
-        $user_id = $this->factory->user->create(['role' => 'administrator']);
+        $user_id = $this->factory()->user->create(['role' => 'administrator']);
         wp_set_current_user($user_id);
         $response = rest_get_server()->dispatch($request);
         $this->assertNotEquals(401, $response->get_status());
