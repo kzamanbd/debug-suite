@@ -1,23 +1,18 @@
-/**
- * Button component for Debug Suite UI.
- *
- * Supports loading state, spinner, and variants (primary, success, danger, light).
- *
- * @since 1.0.0
- */
 import { classNames } from '@/utils';
 import { Loader2 } from 'lucide-react';
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 
 export type ButtonVariant = 'primary' | 'success' | 'danger' | 'warning' | 'default' | 'info';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonOwnProps<T extends ElementType> {
+    as?: T;
     children: ReactNode;
     variant?: ButtonVariant;
     loading?: boolean;
     spinnerClassName?: string;
     className?: string;
-    size?: string;
+    size?: keyof typeof sizeClasses;
+    disabled?: boolean;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -29,7 +24,7 @@ const variantClasses: Record<ButtonVariant, string> = {
     info: 'bg-blue-600 text-white hover:bg-blue-700'
 };
 
-const sizeClasses: Record<string, string> = {
+const sizeClasses = {
     sm: 'px-2 py-1 text-xs',
     md: 'px-4 py-2 text-sm',
     lg: 'px-6 py-3 text-base'
@@ -39,7 +34,11 @@ const Spinner = ({ className = '' }: { className?: string }) => (
     <Loader2 className={classNames('h-5 w-5 animate-spin text-white', className)} />
 );
 
-const Button = ({
+type PolymorphicComponentProps<T extends ElementType> = ButtonOwnProps<T> &
+    Omit<ComponentPropsWithoutRef<T>, keyof ButtonOwnProps<T>>;
+
+const Button = <T extends ElementType = 'button'>({
+    as,
     children,
     size = 'md',
     variant = 'default',
@@ -48,23 +47,28 @@ const Button = ({
     className = '',
     disabled,
     ...props
-}: ButtonProps) => (
-    <button
-        type="button"
-        data-size={size}
-        data-variant={variant}
-        className={classNames(
-            'flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-sm font-medium dark:border-gray-700',
-            variantClasses[variant],
-            sizeClasses[size],
-            className
-        )}
-        disabled={loading || disabled}
-        {...props}
-    >
-        {loading && <Spinner className={spinnerClassName} />}
-        {children}
-    </button>
-);
+}: PolymorphicComponentProps<T>) => {
+    const Component = as || 'button';
+    const isButton = Component === 'button';
+
+    return (
+        <Component
+            data-size={size}
+            data-variant={variant}
+            className={classNames(
+                'flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-sm font-medium dark:border-gray-700',
+                variantClasses[variant],
+                sizeClasses[size],
+                className
+            )}
+            disabled={isButton ? loading || disabled : undefined}
+            aria-disabled={loading || disabled}
+            {...props}
+        >
+            {loading && <Spinner className={spinnerClassName} />}
+            {children}
+        </Component>
+    );
+};
 
 export default Button;

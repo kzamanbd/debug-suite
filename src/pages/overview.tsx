@@ -26,6 +26,7 @@ import {
     Timer,
     Zap
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 interface DashboardStats {
@@ -127,8 +128,7 @@ const Overview = () => {
                 const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
                 recentLogs.entries.forEach((entry) => {
                     const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
-                    // eslint-disable-next-line
-                    if (errorCounts[message]) {
+                    if (typeof errorCounts[message] === 'undefined') {
                         errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
                     }
                     errorCounts[message].count++;
@@ -416,7 +416,7 @@ const Overview = () => {
             </div>
 
             {/* Top 5 Slowest Queries */}
-            <Card className="p-6">
+            <Card className="hidden p-6">
                 <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Timer className="text-primary h-5 w-5" />
@@ -496,15 +496,15 @@ const Overview = () => {
                     </h3>
                 </div>
                 <div className="flex flex-wrap gap-4">
-                    <Button>
+                    <Button as={Link} to="/debug-log">
                         <FileText className="h-5 w-5" />
                         <span>{__('View Debug Logs', 'debug-suite')}</span>
                     </Button>
-                    <Button>
+                    <Button as={Link} to="/debug-settings">
                         <Settings className="h-5 w-5" />
                         <span>{__('Debug Settings', 'debug-suite')}</span>
                     </Button>
-                    <Button>
+                    <Button as={Link} to="/file-manager">
                         <Database className="h-5 w-5" />
                         <span>{__('File Manager', 'debug-suite')}</span>
                     </Button>
