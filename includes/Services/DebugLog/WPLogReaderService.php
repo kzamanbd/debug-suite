@@ -593,7 +593,7 @@ class WPLogReaderService implements ServiceInterface {
 	 */
 	private function validate_date( string $date ): string {
 		$timestamp = strtotime( $date );
-		return $timestamp ? date( 'Y-m-d', $timestamp ) : '1970-01-01';
+		return $timestamp ? gmdate( 'Y-m-d', $timestamp ) : '1970-01-01';
 	}
 
 	/**
