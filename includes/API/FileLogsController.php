@@ -285,96 +285,25 @@ class FileLogsController extends RestController {
 	public function get_raw_file_content( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$file_path = $request->get_param( 'file' );
 
-		// Default to main debug log if no file specified
-		if ( empty( $file_path ) ) {
-			$file_path = WP_CONTENT_DIR . '/debug.log';
-		}
+		// Delegate to service
+		$result = $this->service->get_raw_file_content( $file_path );
 
-		// Security check: only allow reading from allowed directories
-		$allowed_paths = [
-			WP_CONTENT_DIR,
-			ABSPATH,
-		];
+		// Transform service result to HTTP response
+		if ( $result->is_failure() ) {
+			$status_code = match( $result->get_error_code() ) {
+				'file_access_denied' => 403,
+				'file_not_found'     => 404,
+				'no_file_path'       => 400,
+				default              => 500
+			};
 
-		$real_path = realpath( $file_path );
-		$is_allowed = false;
-
-		foreach ( $allowed_paths as $allowed_path ) {
-			if ( str_starts_with( $real_path, realpath( $allowed_path ) ) ) {
-				$is_allowed = true;
-				break;
-			}
-		}
-
-		if ( ! $is_allowed ) {
 			return new WP_Error(
-				'file_access_denied',
-				__( 'Access to this file is not allowed for security reasons.', 'debug-suite' ),
-				[ 'status' => 403 ]
+				$result->get_error_code(),
+				$result->get_error_message(),
+				[ 'status' => $status_code ]
 			);
 		}
 
-		// Check if file exists
-		if ( ! file_exists( $file_path ) ) {
-			return new WP_Error(
-				'file_not_found',
-				__( 'The requested log file was not found.', 'debug-suite' ),
-				[ 'status' => 404 ]
-			);
-		}
-
-		// For large files, limit the content to avoid memory issues
-		$file_size = filesize( $file_path );
-		$max_size = 50 * 1024 * 1024; // 50MB limit
-
-		if ( $file_size > $max_size ) {
-			// Read only the last 10MB of the file
-			$content = $this->read_file_tail( $file_path, $max_size );
-			$truncated = true;
-		} else {
-			$content = file_get_contents( $file_path );
-			$truncated = false;
-		}
-
-		if ( $content === false ) {
-			return new WP_Error(
-				'file_read_error',
-				__( 'Failed to read the log file.', 'debug-suite' ),
-				[ 'status' => 500 ]
-			);
-		}
-
-		return rest_ensure_response(
-			[
-				'content' => $content,
-				'filename' => basename( $file_path ),
-				'size' => size_format( $file_size ),
-				'size_bytes' => $file_size,
-				'last_modified' => gmdate( 'Y-m-d H:i:s', filemtime( $file_path ) ),
-				'truncated' => $truncated,
-				'max_size_reached' => $file_size > $max_size,
-			]
-		);
-	}
-
-	/**
-	 * Read the tail of a large file efficiently.
-	 *
-	 * @param string $file_path The file path.
-	 * @param int    $bytes     Number of bytes to read from the end.
-	 * @return string|false
-	 */
-	private function read_file_tail( string $file_path, int $bytes ): false|string {
-		$handle = fopen( $file_path, 'rb' );
-		if ( ! $handle ) {
-			return false;
-		}
-
-		// Seek to the position we want to start reading from
-		fseek( $handle, -$bytes, SEEK_END );
-		$content = fread( $handle, $bytes );
-		fclose( $handle );
-
-		return $content;
-	}
+		return rest_ensure_response( $result->get_data() );
+}
 }

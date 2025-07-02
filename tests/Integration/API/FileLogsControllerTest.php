@@ -56,10 +56,8 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 		$wp_rest_server = new WP_REST_Server();
 		do_action( 'rest_api_init' );
 
-		$log_reader = new WPLogReaderService();
-		
-		// Create service and controller
-		$this->service = new FileLogsService( $log_reader );
+		// Create service and controller (FileLogsService has no constructor parameters)
+		$this->service = new FileLogsService();
 		$this->controller = new FileLogsController( $this->service );
 		
 		// Register routes
@@ -200,5 +198,164 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 		// Test without authentication
 		wp_set_current_user( 0 );
 		$this->assertFalse( $this->controller->permissions_check( $request ) );
+	}
+
+	/**
+	 * Test get raw file content endpoint.
+	 */
+	public function test_get_raw_file_content(): void {
+		// Create a test log file
+		$test_log_file = WP_CONTENT_DIR . '/test-debug.log';
+		$test_content = "Test log content\n[2025-07-02 10:30:00] Test log entry\n";
+		file_put_contents( $test_log_file, $test_content );
+
+		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs/raw' );
+		$request->set_param( 'file', $test_log_file );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertArrayHasKey( 'content', $data );
+		$this->assertArrayHasKey( 'filename', $data );
+		$this->assertArrayHasKey( 'size', $data );
+		$this->assertArrayHasKey( 'size_bytes', $data );
+		$this->assertArrayHasKey( 'last_modified', $data );
+		$this->assertArrayHasKey( 'truncated', $data );
+		$this->assertArrayHasKey( 'max_size_reached', $data );
+
+		$this->assertEquals( $test_content, $data['content'] );
+		$this->assertEquals( 'test-debug.log', $data['filename'] );
+		$this->assertFalse( $data['truncated'] );
+
+		// Cleanup
+		unlink( $test_log_file );
+	}
+
+	/**
+	 * Test get raw file content with non-existent file.
+	 */
+	public function test_get_raw_file_content_file_not_found(): void {
+		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs/raw' );
+		$request->set_param( 'file', '/path/to/non/existent/file.log' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertEquals( 404, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertEquals( 'file_not_found', $data['code'] );
+		$this->assertStringContainsString( 'not found', $data['message'] );
+	}
+
+	/**
+	 * Test get raw file content with unreadable file.
+	 */
+	public function test_get_raw_file_content_access_denied(): void {
+		// Create a test file and make it unreadable
+		$test_log_file = WP_CONTENT_DIR . '/unreadable.log';
+		file_put_contents( $test_log_file, 'test content' );
+		chmod( $test_log_file, 0000 );
+
+		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs/raw' );
+		$request->set_param( 'file', $test_log_file );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertEquals( 403, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertEquals( 'file_access_denied', $data['code'] );
+		$this->assertStringContainsString( 'Access to this file is not allowed', $data['message'] );
+
+		// Cleanup - restore permissions first
+		chmod( $test_log_file, 0644 );
+		unlink( $test_log_file );
+	}
+
+	/**
+	 * Test get raw file content without file parameter (uses default debug log).
+	 */
+	public function test_get_raw_file_content_default_log(): void {
+		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs/raw' );
+		$response = rest_get_server()->dispatch( $request );
+
+		// Should either succeed (if debug log exists) or fail with appropriate error
+		$this->assertContains( $response->get_status(), [ 200, 400, 404, 500 ] );
+
+		if ( $response->get_status() === 200 ) {
+			$data = $response->get_data();
+			$this->assertArrayHasKey( 'content', $data );
+		}
+	}
+
+	/**
+	 * Test get raw file content endpoint without authentication.
+	 */
+	public function test_get_raw_file_content_without_auth(): void {
+		wp_set_current_user( 0 );
+
+		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs/raw' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertEquals( 401, $response->get_status() );
+	}
+
+	/**
+	 * Test get raw file content endpoint with insufficient permissions.
+	 */
+	public function test_get_raw_file_content_insufficient_permissions(): void {
+		$user_id = $this->factory()->user->create();
+		wp_set_current_user( $user_id );
+
+		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs/raw' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertEquals( 403, $response->get_status() );
+	}
+
+	/**
+	 * Test get raw file content response structure.
+	 */
+	public function test_get_raw_file_content_response_structure(): void {
+		// Create a small test file
+		$test_log_file = WP_CONTENT_DIR . '/structure-test.log';
+		$test_content = "Test content for structure validation";
+		file_put_contents( $test_log_file, $test_content );
+
+		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs/raw' );
+		$request->set_param( 'file', $test_log_file );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$data = $response->get_data();
+
+		// Verify all expected keys are present
+		$expected_keys = [
+			'content',
+			'filename',
+			'size',
+			'size_bytes',
+			'last_modified',
+			'truncated',
+			'max_size_reached',
+			'max_size_limit',
+		];
+
+		foreach ( $expected_keys as $key ) {
+			$this->assertArrayHasKey( $key, $data, "Missing key: $key" );
+		}
+
+		// Verify data types
+		$this->assertIsString( $data['content'] );
+		$this->assertIsString( $data['filename'] );
+		$this->assertIsString( $data['size'] );
+		$this->assertIsInt( $data['size_bytes'] );
+		$this->assertIsString( $data['last_modified'] );
+		$this->assertIsBool( $data['truncated'] );
+		$this->assertIsBool( $data['max_size_reached'] );
+		$this->assertIsInt( $data['max_size_limit'] );
+
+		// Cleanup
+		unlink( $test_log_file );
 	}
 }
