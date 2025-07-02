@@ -56,13 +56,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-${{ matrix.php-versions }}-composer-
 
-      # Cache Node modules
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
       # Cache WordPress test suite
       - name: Cache WordPress test suite
         uses: actions/cache@v4
@@ -80,9 +73,7 @@ jobs:
             phpunit-cache-
 
       - name: Install dependencies
-        run: |
-          composer install --prefer-dist --no-progress
-          npm ci
+        run: composer install --prefer-dist --no-progress
 
       - name: Install required system packages
         run: sudo apt-get update && sudo apt-get install -y subversion

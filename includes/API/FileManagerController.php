@@ -73,8 +73,8 @@ class FileManagerController extends RestController {
 		$path = $request->get_param( 'path' );
 		$result = $this->service->get_file_contents( $path );
 
-		if ($result->is_failure()) {
-			$status_code = match ($result->get_error_code()) {
+		if ( $result->is_failure() ) {
+			$status_code = match ( $result->get_error_code() ) {
 				'file_not_found' => 404,
 				'file_not_readable' => 403,
 				'invalid_path' => 400,
@@ -82,7 +82,7 @@ class FileManagerController extends RestController {
 			};
 			return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => $status_code ] );
 		}
-		
+
 		return rest_ensure_response( $result->get_data() );
 	}
 
