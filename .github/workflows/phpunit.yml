@@ -60,8 +60,5 @@ jobs:
       - name: Run Unit Tests
         run: composer run test:unit
 
-      # Conditionally run integration tests if environment is set up correctly
       - name: Run Integration Tests
-        # TODO: Need to set up the environment for integration tests
-        run: |
-          echo "Integration tests are not set up yet. Skipping..."
+        run: composer run test:integration

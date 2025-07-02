@@ -126,6 +126,15 @@ class FileLogsService implements ServiceInterface {
 			);
 		}
 
+		// Check if file is readable
+		if ( ! is_readable( $file_path ) ) {
+			return ServiceResponse::failure(
+				__( 'Access to this file is not allowed.', 'debug-suite' ),
+				'file_access_denied',
+				[ 'path' => $file_path ]
+			);
+		}
+
 		// Get file information
 		$file_size = filesize( $file_path );
 		$max_size = 50 * 1024 * 1024; // 50MB limit
