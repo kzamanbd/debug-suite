@@ -290,7 +290,7 @@ class FileLogsController extends RestController {
 
 		// Transform service result to HTTP response
 		if ( $result->is_failure() ) {
-			$status_code = match( $result->get_error_code() ) {
+			$status_code = match ( $result->get_error_code() ) {
 				'file_access_denied' => 403,
 				'file_not_found'     => 404,
 				'no_file_path'       => 400,
@@ -305,5 +305,5 @@ class FileLogsController extends RestController {
 		}
 
 		return rest_ensure_response( $result->get_data() );
-}
+	}
 }

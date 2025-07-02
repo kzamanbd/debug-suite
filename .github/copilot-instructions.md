@@ -504,7 +504,7 @@ class ExampleController extends RestController {
 
     ```php
     // Example from SettingsService
-    public function update_debug_settings( array $settings ): ServiceResponse {
+    public function update_settings( array $settings ): ServiceResponse {
         $valid_keys = [ 'WP_DEBUG', 'WP_DEBUG_LOG', 'WP_DEBUG_DISPLAY' ];
 
         foreach ( $settings as $key => $value ) {

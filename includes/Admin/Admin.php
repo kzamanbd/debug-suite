@@ -36,6 +36,43 @@ class Admin implements Hookable {
 	public function register_hooks(): void {
 		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
+		add_action( 'admin_init', [ $this, 'handle_activation_redirect' ] );
+	}
+
+	/**
+	 * Handle activation redirect.
+	 *
+	 * Redirects to the onboarding page after plugin activation
+	 * if onboarding hasn't been completed.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return void
+	 */
+	public function handle_activation_redirect(): void {
+		// Check if we should redirect
+		if ( ! get_transient( 'debug_suite_activation_redirect' ) ) {
+			return;
+		}
+
+		// Delete the redirect transient
+		delete_transient( 'debug_suite_activation_redirect' );
+
+		// Only redirect to onboarding if it hasn't been completed
+		if ( ! get_option( 'debug_suite_onboarding_completed', false ) ) {
+			// Get the onboarding URL
+			$onboarding_url = add_query_arg(
+				[
+					'page' => 'debug-suite',
+					'path' => 'onboarding',
+				],
+				admin_url( 'admin.php' )
+			);
+
+			// Redirect and exit
+			wp_safe_redirect( $onboarding_url );
+			exit;
+		}
 	}
 
 	/**

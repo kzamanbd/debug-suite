@@ -157,16 +157,18 @@ class FileLogsService implements ServiceInterface {
 			);
 		}
 
-		return ServiceResponse::success([
-			'content'           => $content,
-			'filename'          => basename( $file_path ),
-			'size'              => size_format( $file_size ),
-			'size_bytes'        => $file_size,
-			'last_modified'     => gmdate( 'Y-m-d H:i:s', filemtime( $file_path ) ),
-			'truncated'         => $truncated,
-			'max_size_reached'  => $file_size > $max_size,
-			'max_size_limit'    => $max_size,
-		]);
+		return ServiceResponse::success(
+			[
+				'content'           => $content,
+				'filename'          => basename( $file_path ),
+				'size'              => size_format( $file_size ),
+				'size_bytes'        => $file_size,
+				'last_modified'     => gmdate( 'Y-m-d H:i:s', filemtime( $file_path ) ),
+				'truncated'         => $truncated,
+				'max_size_reached'  => $file_size > $max_size,
+				'max_size_limit'    => $max_size,
+			]
+		);
 	}
 
 	/**

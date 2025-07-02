@@ -500,7 +500,7 @@ const Overview = () => {
                         <FileText className="h-5 w-5" />
                         <span>{__('View Debug Logs', 'debug-suite')}</span>
                     </Button>
-                    <Button as={Link} to="/debug-settings">
+                    <Button as={Link} to="/settings">
                         <Settings className="h-5 w-5" />
                         <span>{__('Debug Settings', 'debug-suite')}</span>
                     </Button>

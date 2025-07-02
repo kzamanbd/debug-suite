@@ -12,10 +12,12 @@ use DebugSuite\Core\Container\Container;
 use DebugSuite\Services\DebugLog\FileLogsService;
 use DebugSuite\Services\FileManagerService;
 use DebugSuite\Services\SettingsService;
+use DebugSuite\Services\OnboardingService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\API\FileLogsController;
 use DebugSuite\API\FileManagerController;
 use DebugSuite\API\SettingsController;
+use DebugSuite\API\OnboardingController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,9 +30,11 @@ class AppServiceProvider extends AbstractServiceProvider {
 		FileLogsService::class,
 		FileManagerService::class,
 		SettingsService::class,
+		OnboardingService::class,
 		FileLogsController::class,
 		FileManagerController::class,
 		SettingsController::class,
+		OnboardingController::class,
 	];
 
 	public function register( Container $container ): void {
@@ -41,12 +45,14 @@ class AppServiceProvider extends AbstractServiceProvider {
 				WPLogReaderService::class => $container->object( WPLogReaderService::class ),
 				FileLogsService::class    => $container->object( FileLogsService::class ),
 				FileManagerService::class => $container->object( FileManagerService::class ),
-				SettingsService::class   => $container->object( SettingsService::class ),
+				SettingsService::class    => $container->object( SettingsService::class ),
+				OnboardingService::class  => $container->object( OnboardingService::class ),
 
 				// REST API Controllers with automatic dependency injection
 				FileLogsController::class    => $container->autowire( FileLogsController::class ),
 				FileManagerController::class => $container->autowire( FileManagerController::class ),
-				SettingsController::class   => $container->autowire( SettingsController::class ),
+				SettingsController::class    => $container->autowire( SettingsController::class ),
+				OnboardingController::class  => $container->autowire( OnboardingController::class ),
 			]
 		);
 	}

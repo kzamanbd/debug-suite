@@ -45,7 +45,7 @@ const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element =
         <div className={classNames(className, 'mt-5 min-h-screen rounded-lg bg-white p-5')}>
             <LayoutHeader route={route} />
             {/* Main content area */}
-            <div>{children}</div>
+            {children}
         </div>
     );
 };

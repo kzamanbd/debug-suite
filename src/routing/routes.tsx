@@ -2,6 +2,7 @@ import DebugLog from '@/pages/debug-log';
 import FileManager from '@/pages/file-manager';
 import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
+import Onboarding from '@/pages/onboarding';
 import Overview from '@/pages/overview';
 import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
@@ -16,6 +17,11 @@ export interface DebugSuiteRoute {
     icon?: string;
 }
 const routes: DebugSuiteRoute[] = [
+    {
+        id: 'onboarding',
+        path: '/onboarding',
+        element: <Onboarding />
+    },
     {
         id: 'overview',
         title: __('Overview', 'debug-suite'),

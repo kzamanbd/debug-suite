@@ -61,16 +61,11 @@ class SettingsController extends RestController {
 	}
 
 	public function get_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$result = $this->service->get_current_debug_settings();
+		$result = $this->service->get_settings();
 
 		return $result->is_failure()
 			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
-			: rest_ensure_response(
-				[
-					'success' => true,
-					'settings' => $result->get_data(),
-				]
-			);
+			: rest_ensure_response( $result->get_data() );
 	}
 
 	public function update_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
@@ -90,7 +85,7 @@ class SettingsController extends RestController {
 			$settings['WP_DEBUG_DISPLAY'] = $params['debug_display'];
 		}
 
-		$result = $this->service->update_debug_settings( $settings );
+		$result = $this->service->update_settings( $settings );
 
 		return $result->is_failure()
 			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )

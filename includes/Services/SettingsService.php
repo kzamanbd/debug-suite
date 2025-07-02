@@ -52,7 +52,7 @@ class SettingsService implements ServiceInterface {
 	 * @param array $settings The settings to update.
 	 * @return ServiceResponse
 	 */
-	public function update_debug_settings( array $settings ): ServiceResponse {
+	public function update_settings( array $settings ): ServiceResponse {
 		// Validate input
 		if ( empty( $settings ) ) {
 			return ServiceResponse::failure( __( 'No settings provided.', 'debug-suite' ), 'empty_settings' );
@@ -106,7 +106,7 @@ class SettingsService implements ServiceInterface {
 	 *
 	 * @return ServiceResponse
 	 */
-	public function get_current_debug_settings(): ServiceResponse {
+	public function get_settings(): ServiceResponse {
 		if ( ! file_exists( $this->config_file_path ) ) {
 			return ServiceResponse::failure( __( 'wp-config.php file not found.', 'debug-suite' ), 'config_file_not_found' );
 		}
@@ -130,7 +130,7 @@ class SettingsService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	public function reset_debug_settings(): ServiceResponse {
-		return $this->update_debug_settings( $this->supported_constants );
+		return $this->update_settings( $this->supported_constants );
 	}
 
 	/**
