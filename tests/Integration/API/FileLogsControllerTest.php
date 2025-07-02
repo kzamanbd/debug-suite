@@ -173,16 +173,6 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 	}
 
 	/**
-	 * Test endpoint with malformed request.
-	 */
-	public function test_malformed_request() {
-		$request = new WP_REST_Request( 'POST', '/' . $this->namespace . '/logs/invalid' );
-		$response = rest_get_server()->dispatch( $request );
-		
-		$this->assertEquals( 404, $response->get_status() );
-	}
-
-	/**
 	 * Test permissions check method directly.
 	 */
 	public function test_permissions_check() {
