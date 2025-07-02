@@ -35,10 +35,19 @@ jobs:
           tools: composer:v2
           extensions: mysqli, mbstring
 
+      # Cache PHP extensions
+      - name: Cache PHP extensions
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/php/extensions
+          key: ${{ runner.os }}-php-ext-${{ matrix.php-versions }}-${{ hashFiles('.github/workflows/phpunit.yml') }}
+
+      # Get Composer cache directory
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
+      # Cache Composer dependencies
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -47,15 +56,42 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-${{ matrix.php-versions }}-composer-
 
+      # Cache Node modules
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Cache WordPress test suite
+      - name: Cache WordPress test suite
+        uses: actions/cache@v4
+        with:
+          path: /tmp/wordpress-tests-lib
+          key: wp-tests-${{ matrix.wp-versions }}-${{ hashFiles('tests/install-wp-tests.sh') }}
+
+      # Cache PHPUnit test results
+      - name: Cache PHPUnit test results
+        uses: actions/cache@v4
+        with:
+          path: .phpunit.result.cache
+          key: phpunit-cache-${{ github.sha }}
+          restore-keys: |
+            phpunit-cache-
+
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        run: |
+          composer install --prefer-dist --no-progress
+          npm ci
 
       - name: Install required system packages
         run: sudo apt-get update && sudo apt-get install -y subversion
 
       - name: Install WordPress Test Suite
         run: |
-          bash tests/install-wp-tests.sh wordpress_test root root 127.0.0.1 ${{ matrix.wp-versions }}
+          if [ ! -d "/tmp/wordpress-tests-lib" ]; then
+            bash tests/install-wp-tests.sh wordpress_test root root 127.0.0.1 ${{ matrix.wp-versions }}
+          fi
 
       - name: Run Unit Tests
         run: composer run test:unit

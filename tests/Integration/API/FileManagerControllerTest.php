@@ -76,7 +76,8 @@ class FileManagerControllerTest extends DebugSuiteTestCase {
 		// Set the base path using reflection
 		$reflection = new ReflectionClass($this->service);
 		$property = $reflection->getProperty('base_path');
-		$property->setValue($this->service, $this->test_dir . '/');
+		$property->setAccessible(true); // Make sure we can modify private property
+		$property->setValue($this->service, $this->test_dir);
 		
 		$this->controller = new FileManagerController( $this->service );
 		
