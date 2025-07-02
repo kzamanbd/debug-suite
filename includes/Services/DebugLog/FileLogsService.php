@@ -170,7 +170,7 @@ class FileLogsService implements ServiceInterface {
 	 * Detect a log type based on a file path.
 	 */
 	private function detect_log_type( $path ): string {
-		if ( str_contains( $path, 'debug.log' ) ) {
+		if ( str_contains( $path, 'debug' ) ) {
 			return 'WordPress Debug';
 		}
 		if ( str_contains( $path, 'wc' ) ) {

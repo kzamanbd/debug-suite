@@ -67,7 +67,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->log_file_path = WP_CONTENT_DIR . '/debug.log';
+		$this->log_file_path = ini_get( 'error_log' );
 		$this->buffer_size   = 1000;
 		$this->debug_mode    = false;
 	}
