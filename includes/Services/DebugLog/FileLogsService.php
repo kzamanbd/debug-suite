@@ -7,7 +7,6 @@
 
 namespace DebugSuite\Services\DebugLog;
 
-use Automattic\WooCommerce\Utilities\LoggingUtil;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 
@@ -30,26 +29,18 @@ class FileLogsService implements ServiceInterface {
 	private WPLogReaderService $log_reader;
 
 	/**
-	 * Maximum number of log entries to process.
+	 * Log file discovery service.
 	 *
-	 * @var int
+	 * @var LogFileDiscoveryService
 	 */
-	private int $max_entries;
-
-	/**
-	 * Default log file path.
-	 *
-	 * @var string
-	 */
-	private string $log_file_path;
+	private LogFileDiscoveryService $file_discovery;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->log_reader     = new WPLogReaderService();
-		$this->log_file_path  = WP_CONTENT_DIR . '/debug.log';
-		$this->max_entries    = 1000;
+		$this->log_reader = new WPLogReaderService();
+		$this->file_discovery = new LogFileDiscoveryService();
 	}
 
 	/**
@@ -102,194 +93,7 @@ class FileLogsService implements ServiceInterface {
 	 *
 	 * @return array
 	 */
-
 	public function supported_log_files(): array {
-		$paths = [
-			WP_CONTENT_DIR,         // WordPress content (for debug.log)
-			'/var/log/apache2',     // Apache (Debian/Ubuntu)
-			'/var/log/httpd',       // Apache (CentOS/RedHat)
-			'/var/log/nginx',       // Nginx
-			'/var/log/php',         // PHP logs
-			'/var/log/redis',       // Redis logs
-		];
-
-		// Add custom paths for WooCommerce logs if available.
-		if ( class_exists( '\Automattic\WooCommerce\Utilities\LoggingUtil' ) ) {
-			$paths[] = LoggingUtil::get_log_directory();
-		}
-		$files = [];
-		foreach ( $paths as $path ) {
-			if ( is_dir( $path ) ) {
-				$pattern = rtrim( $path, '/' ) . '/*.log';
-				$found = glob( $pattern );
-				if ( $found ) {
-					$files = array_merge( $files, $found );
-				}
-			}
-		}
-		// Merge with other log file paths.
-		$files = array_merge(
-			$files,
-			[
-				$this->find_apache_log_file(),
-				$this->find_nginx_log_file(),
-				$this->find_redis_log_file(),
-				$this->find_php_fpm_error_log(),
-			]
-		);
-
-		// Filter only valid log file paths that exist.
-		$files = array_filter(
-			$files,
-			( function ( $path ) {
-				return ! empty( $path ) && is_file( $path );
-			} )
-		);
-
-		// Build detailed info only for existing files.
-		$log_files = array_filter(
-			array_map(
-				function ( $path ) {
-					return [
-						'name'        => basename( $path ),
-						'path'        => $path,
-						'size'        => size_format( filesize( $path ) ),
-						'size_bytes'  => filesize( $path ),
-						'modified'    => gmdate( 'Y-m-d H:i:s', filemtime( $path ) ),
-						'type'        => $this->detect_log_type( $path ),
-					];
-				},
-				$files
-			)
-		);
-
-		return array_values( $log_files );
-	}
-
-	/**
-	 * Detect a log type based on a file path.
-	 */
-	private function detect_log_type( $path ): string {
-		if ( str_contains( $path, 'debug' ) ) {
-			return 'WordPress Debug';
-		}
-		if ( str_contains( $path, 'wc' ) ) {
-			return 'WooCommerce';
-		}
-		if ( str_contains( $path, 'apache' ) ) {
-			return 'Apache';
-		}
-		if ( str_contains( $path, 'nginx' ) ) {
-			return 'Nginx';
-		}
-		if ( str_contains( $path, 'redis' ) ) {
-			return 'Redis';
-		}
-		if ( str_contains( $path, 'php' ) ) {
-			return 'PHP-FPM';
-		}
-		return 'Unknown';
-	}
-
-	/**
-	 * Find the PHP-FPM error log file.
-	 *
-	 * @return string|null
-	 */
-	public function find_php_fpm_error_log(): ?string {
-		$candidates = [
-			'/var/log/php-fpm.log',
-			'/var/log/php/php-fpm.log',
-			'/opt/bitnami/php/var/log/php-fpm.log',
-		];
-
-		// Check common PHP-FPM log locations
-		$candidates = array_merge( $candidates, glob( '/var/log/php-fpm*.log' ) );
-		$candidates = array_merge( $candidates, glob( '/var/log/php*.log' ) );
-
-		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
-				return $path;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Find the Apache error log file.
-	 *
-	 * @return string|null
-	 */
-	public function find_apache_log_file(): ?string {
-		$candidates = [
-			'/var/log/apache2/error.log',
-			'/var/log/httpd/error_log',
-			'/usr/local/apache/logs/error_log',
-			'/opt/bitnami/apache2/logs/error_log',
-		];
-		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
-				return $path;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Find the Nginx error log file.
-	 *
-	 * @return string|null
-	 */
-	public function find_nginx_log_file(): ?string {
-		$candidates = [
-			'/var/log/nginx/error.log',
-			'/usr/local/nginx/logs/error.log',
-			'/opt/bitnami/nginx/logs/error.log',
-		];
-		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
-				return $path;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Find the Redis log file.
-	 *
-	 * @return string|null
-	 */
-	public function find_redis_log_file(): ?string {
-		$candidates = [
-			'/var/log/redis/redis-server.log',
-			'/var/log/redis.log',
-		];
-		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
-				return $path;
-			}
-		}
-
-		// Try parsing redis.conf if found
-		$config_paths = [
-			'/etc/redis/redis.conf',
-			'/usr/local/etc/redis/redis.conf',
-		];
-		foreach ( $config_paths as $conf ) {
-			if ( is_readable( $conf ) ) {
-				$lines = file( $conf );
-				foreach ( $lines as $line ) {
-					if ( preg_match( '/^logfile\s+(.+)$/', trim( $line ), $match ) ) {
-						$logfile = trim( $match[1] );
-						if ( is_readable( $logfile ) ) {
-							return $logfile;
-						}
-					}
-				}
-			}
-		}
-
-		return null;
+		return $this->file_discovery->get_supported_log_files();
 	}
 }
