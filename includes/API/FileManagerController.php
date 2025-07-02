@@ -73,9 +73,17 @@ class FileManagerController extends RestController {
 		$path = $request->get_param( 'path' );
 		$result = $this->service->get_file_contents( $path );
 
-		return $result->is_failure()
-			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
-			: rest_ensure_response( $result->get_data() );
+		if ( $result->is_failure() ) {
+			$status = match ( $result->get_error_code() ) {
+				'file_not_found' => 404,
+				'invalid_path' => 400,
+				'file_access_denied' => 403,
+				default => 500
+			};
+			return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => $status ] );
+		}
+
+		return rest_ensure_response( $result->get_data() );
 	}
 
 	public function save_file_contents( WP_REST_Request $request ): WP_REST_Response|WP_Error {

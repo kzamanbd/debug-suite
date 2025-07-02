@@ -10,7 +10,6 @@
 
 namespace DebugSuite\Tests\Integration\API;
 
-use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\API\FileLogsController;
 use DebugSuite\Services\DebugLog\FileLogsService;

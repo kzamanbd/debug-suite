@@ -187,7 +187,7 @@ class FileManagerControllerTest extends DebugSuiteTestCase {
 		
 		$response = rest_get_server()->dispatch( $request );
 		
-		$this->assertEquals( 500, $response->get_status() );
+		$this->assertEquals( 404, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 'file_not_found', $data['code'] );
 	}
