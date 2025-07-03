@@ -1,5 +1,6 @@
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
+import { DialogProvider } from './components/dialog-provider';
 import Layout from './components/layout';
 import { withRouter } from './routing';
 import type { DebugSuiteRoute } from './routing/routes';
@@ -42,7 +43,7 @@ const App = () => {
     const router = createHashRouter(mappedRoutes);
 
     return (
-        <>
+        <DialogProvider>
             <RouterProvider router={router} />
             <ToastContainer
                 rtl={false}
@@ -56,7 +57,7 @@ const App = () => {
                 theme="light"
                 transition={Slide}
             />
-        </>
+        </DialogProvider>
     );
 };
 

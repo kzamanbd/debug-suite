@@ -1,3 +1,44 @@
+import type { ReactNode } from 'react';
+
+export type DialogType = 'success' | 'error' | 'warning' | 'confirm';
+
+export interface DialogOptions {
+    type?: DialogType;
+    title?: string;
+    okText?: string;
+    autoHideDelay?: number;
+    showCancel?: boolean;
+    showOk?: boolean;
+    cancelText?: string;
+    allowOutsideClick?: boolean;
+}
+
+export interface DialogState {
+    open: boolean;
+    title?: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    options: DialogOptions;
+    resolve?: (value: boolean) => void;
+    reject?: () => void;
+}
+
+export interface ModalProps {
+    open: boolean;
+    title?: string;
+    message?: string;
+    options: DialogOptions;
+    onClose: (confirmed: boolean) => void;
+}
+
+export interface TypeProps {
+    icon: ReactNode;
+    defaultTitle: string;
+    iconClass?: string;
+    buttonClass?: string;
+}
+
 export interface ItemTree {
     name: string;
     type: string;

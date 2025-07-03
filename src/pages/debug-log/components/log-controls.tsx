@@ -6,6 +6,7 @@
 import Button from '@/components/ui/button';
 import SearchableSelect from '@/components/ui/select';
 import InputField from '@/components/ui/text-input';
+import { useConfirm } from '@/hooks/useConfirm';
 import { classNames } from '@/utils';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -68,6 +69,13 @@ const LogControls = ({
     rawContent,
     loading = false
 }: LogControlsProps) => {
+    const confirm = useConfirm({
+        type: 'confirm',
+        showCancel: true,
+        showOk: true,
+        okText: __('Ok, Clear', 'debug-suite'),
+        cancelText: __('Cancel', 'debug-suite')
+    });
     const [copying, setCopying] = useState(false);
 
     const filteredLogFiles = logFiles.map((file) => ({
@@ -93,9 +101,11 @@ const LogControls = ({
         onFiltersChange({ search: '' });
     };
 
-    const handleClear = () => {
+    const handleClear = async () => {
         if (
-            confirm(__('Are you sure you want to clear all log entries? This action cannot be undone.', 'debug-suite'))
+            await confirm(
+                __('Are you sure you want to clear all log entries? This action cannot be undone.', 'debug-suite')
+            )
         ) {
             onClear();
         }
