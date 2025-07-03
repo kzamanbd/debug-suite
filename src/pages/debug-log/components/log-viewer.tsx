@@ -73,7 +73,7 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                 const entryNumber = index + 1;
 
                                 return (
-                                    <Disclosure key={log.id || index}>
+                                    <Disclosure key={index}>
                                         {({ open }) => (
                                             <>
                                                 <tr
@@ -103,25 +103,23 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                             <div className="flex items-center justify-between">
                                                                 <span className="flex-1 pr-4">{log.message}</span>
                                                                 <div className="flex items-center space-x-2">
-                                                                    <button
-                                                                        type="button"
+                                                                    <div
+                                                                        role="button"
+                                                                        tabIndex={0}
                                                                         onClick={(e) => {
                                                                             e.preventDefault();
                                                                             e.stopPropagation();
-                                                                            void handleCopy(
-                                                                                log.message,
-                                                                                log.id || index
-                                                                            );
+                                                                            void handleCopy(log.message, index);
                                                                         }}
                                                                         className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none"
                                                                         title={__('Copy message', 'debug-suite')}
                                                                     >
-                                                                        {copiedId === (log.id || index) ? (
+                                                                        {copiedId === index ? (
                                                                             <CheckIcon className="h-4 w-4" />
                                                                         ) : (
                                                                             <ClipboardIcon className="h-4 w-4" />
                                                                         )}
-                                                                    </button>
+                                                                    </div>
                                                                     {log.has_stack_trace && (
                                                                         <span className="text-primary-600 text-xs">
                                                                             {open

@@ -5,7 +5,6 @@
  */
 
 export interface LogEntry {
-    id: number;
     timestamp: string;
     level: 'critical' | 'error' | 'warning' | 'notice' | 'info' | 'debug';
     message: string;
