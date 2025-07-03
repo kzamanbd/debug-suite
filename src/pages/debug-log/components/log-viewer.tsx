@@ -7,9 +7,9 @@ import DateTimeHtml from '@/components/date-time';
 import Button from '@/components/ui/button';
 import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ChevronDownIcon, RefreshCwIcon } from 'lucide-react';
+import { CheckIcon, ChevronDownIcon, ClipboardIcon, RefreshCwIcon } from 'lucide-react';
 import { levelColors, levelIcons } from '../constants';
 import type { InfiniteScrollState, LogEntry } from '../types';
 
@@ -22,6 +22,17 @@ interface LogViewerProps {
 
 const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps) => {
     const tableRef = useRef<HTMLTableElement>(null);
+    const [copiedId, setCopiedId] = useState<string | number | null>(null);
+
+    const handleCopy = async (text: string, id: string | number) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopiedId(id);
+            setTimeout(() => setCopiedId(null), 2000); // Reset after 2 seconds
+        } catch (err) {
+            console.error('Failed to copy text:', err);
+        }
+    };
 
     return (
         <div className="flex flex-1 flex-col overflow-hidden rounded-lg border bg-white">
@@ -91,13 +102,34 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                         <DisclosureButton className="w-full text-left focus:outline-none">
                                                             <div className="flex items-center justify-between">
                                                                 <span className="flex-1 pr-4">{log.message}</span>
-                                                                {log.has_stack_trace && (
-                                                                    <span className="text-primary-600 text-xs">
-                                                                        {open
-                                                                            ? __('Hide Trace', 'debug-suite')
-                                                                            : __('Show Trace', 'debug-suite')}
-                                                                    </span>
-                                                                )}
+                                                                <div className="flex items-center space-x-2">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                            void handleCopy(
+                                                                                log.message,
+                                                                                log.id || index
+                                                                            );
+                                                                        }}
+                                                                        className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none"
+                                                                        title={__('Copy message', 'debug-suite')}
+                                                                    >
+                                                                        {copiedId === (log.id || index) ? (
+                                                                            <CheckIcon className="h-4 w-4" />
+                                                                        ) : (
+                                                                            <ClipboardIcon className="h-4 w-4" />
+                                                                        )}
+                                                                    </button>
+                                                                    {log.has_stack_trace && (
+                                                                        <span className="text-primary-600 text-xs">
+                                                                            {open
+                                                                                ? __('Hide Trace', 'debug-suite')
+                                                                                : __('Show Trace', 'debug-suite')}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                             {log.file && (
                                                                 <div className="mt-1 text-xs text-gray-500">
