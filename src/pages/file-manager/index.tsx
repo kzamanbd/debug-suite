@@ -26,13 +26,11 @@ import FileTreeSkeleton from './components/tree-skeleton';
 const FileManager = () => {
     const [files, setFiles] = useState<ItemTree[]>([]);
     const [openEditor, setOpenEditor] = useState(false);
-    const [fileContents, setFileContents] = useState('');
-    const [fileName, setFileName] = useState('');
     const [selectedFiles, setSelectedFiles] = useState<ItemTree[]>([]);
     const [initialLoading, setInitialLoading] = useState(false);
     const [detailLoading, setDetailLoading] = useState(false);
-    const [loadingFileContent, setLoadingFileContent] = useState(false);
     const [breadcrumb, setBreadcrumb] = useState<string[]>([]);
+    const [selectedFile, setSelectedFile] = useState<ItemTree>();
 
     const fetchFiles = async (path = '') => {
         // Fetch files from the server
@@ -47,22 +45,10 @@ const FileManager = () => {
         });
     };
 
-    const fetchFileContents = async (path = '') => {
-        const apiPath = addQueryArgs('/debug-suite/v1/files/content', {
-            path
-        });
-
-        return apiFetch<{
-            contents: string;
-            extension: string;
-        }>({
-            path: apiPath
-        });
-    };
-
     const fetchNestedFiles = async (file: ItemTree) => {
         if (file.type === 'file') {
-            void fileEditHandler(file);
+            setSelectedFile(file);
+            setOpenEditor(true);
             return;
         }
         const data = file.path.split('/').map((item) => {
@@ -112,20 +98,16 @@ const FileManager = () => {
         }
     }, []);
 
-    const fileEditHandler = async (file: ItemTree) => {
-        toggleEditor();
-        setFileName(file.name);
-        setLoadingFileContent(true);
-        const response = await fetchFileContents(file.path);
-        setFileContents(response.contents);
-        setLoadingFileContent(false);
-    };
-
     const toggleEditor = () => {
         setOpenEditor(!openEditor);
         if (!openEditor) {
-            setFileContents('');
+            setSelectedFile(undefined);
         }
+    };
+
+    const handleEditorSaveSuccess = () => {
+        // Optionally refresh the file list or update UI after successful save
+        void fetchInitialFile(breadcrumb.join('\\'));
     };
 
     const allSelected = selectedFiles.every((file) => file.checked);
@@ -349,10 +331,10 @@ const FileManager = () => {
             </div>
             <FileEditor
                 open={openEditor}
-                loading={loadingFileContent}
                 toggle={toggleEditor}
-                value={fileContents}
-                fileName={fileName}
+                fileName={selectedFile?.name || ''}
+                filePath={selectedFile?.path || ''}
+                onSaveSuccess={handleEditorSaveSuccess}
             />
         </Card>
     );
