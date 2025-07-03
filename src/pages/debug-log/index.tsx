@@ -63,6 +63,17 @@ const FileLogs = () => {
         void exportLogs(format);
     };
 
+    // Handle clearing logs with automatic refresh
+    const handleClearLogs = async () => {
+        try {
+            await clearLogs();
+            // Refresh logs after clearing
+            handleRefresh();
+        } catch (error) {
+            console.error('Error clearing logs:', error);
+        }
+    };
+
     return (
         <div className="flex h-full flex-col">
             <LogControls
@@ -75,7 +86,7 @@ const FileLogs = () => {
                 onFiltersChange={handleFilterChange}
                 totalEntries={totalEntries}
                 onRefresh={handleRefresh}
-                onClear={clearLogs}
+                onClear={handleClearLogs}
                 onExport={handleExport}
                 clearing={clearing}
                 filesLoading={filesLoading}

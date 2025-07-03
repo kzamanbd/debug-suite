@@ -99,10 +99,19 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900">
-                                                        <DisclosureButton className="w-full text-left focus:outline-none">
+                                                        <div className="w-full text-left focus:outline-none">
                                                             <div className="flex items-center justify-between">
                                                                 <span className="flex-1 pr-4">{log.message}</span>
-                                                                <div className="flex items-center space-x-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    {log.has_stack_trace && (
+                                                                        <DisclosureButton className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
+                                                                            <span className="text-primary-600 text-xs">
+                                                                                {open
+                                                                                    ? __('Hide Trace', 'debug-suite')
+                                                                                    : __('Show Trace', 'debug-suite')}
+                                                                            </span>
+                                                                        </DisclosureButton>
+                                                                    )}
                                                                     <div
                                                                         role="button"
                                                                         tabIndex={0}
@@ -111,7 +120,7 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                                             e.stopPropagation();
                                                                             void handleCopy(log.message, index);
                                                                         }}
-                                                                        className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none"
+                                                                        className="hover:text-primary-600 text-gray-400 focus:outline-none"
                                                                         title={__('Copy message', 'debug-suite')}
                                                                     >
                                                                         {copiedId === index ? (
@@ -120,13 +129,6 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                                             <ClipboardIcon className="h-4 w-4" />
                                                                         )}
                                                                     </div>
-                                                                    {log.has_stack_trace && (
-                                                                        <span className="text-primary-600 text-xs">
-                                                                            {open
-                                                                                ? __('Hide Trace', 'debug-suite')
-                                                                                : __('Show Trace', 'debug-suite')}
-                                                                        </span>
-                                                                    )}
                                                                 </div>
                                                             </div>
                                                             {log.file && (
@@ -137,7 +139,7 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                                     {log.line && <span>:{log.line}</span>}
                                                                 </div>
                                                             )}
-                                                        </DisclosureButton>
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-gray-500">
                                                         {entryNumber}

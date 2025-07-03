@@ -204,18 +204,12 @@ export const useLogEntries = () => {
         void fetchAllLogs();
     }, [fetchAllLogs]);
 
-    // Handle visibility change to refetch logs when tab becomes visible
+    // Handle focus change to refetch logs when tab becomes visible
     useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                refetch();
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', refetch);
 
         return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', refetch);
         };
     }, [refetch]);
 

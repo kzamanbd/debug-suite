@@ -299,7 +299,7 @@ const LogControls = ({
                             />
                             <Button onClick={handleClear} variant="danger" disabled={clearing} className="shrink-0">
                                 <TrashIcon className="h-4 w-4" />
-                                <span className="ml-2 hidden md:inline">{__('Clear Log', 'debug-suite')}</span>
+                                <span className="ml-2 hidden md:inline">{__('Clear', 'debug-suite')}</span>
                             </Button>
                         </div>
                     </div>
