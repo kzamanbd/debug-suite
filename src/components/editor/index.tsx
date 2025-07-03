@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { type editor } from 'monaco-editor';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { getLanguage, registerLanguages } from './languages';
-import { validateCode } from './validators';
+import { validateCode, type ValidationError } from './validators';
 
 type EditorOptions = editor.IStandaloneEditorConstructionOptions;
 
@@ -21,9 +21,8 @@ interface EditorProps {
     loading?: boolean;
     /** Custom CSS class name */
     className?: string;
-    /** Callback when content changes */
-    onChange?: (value: string | undefined) => void;
-    /** Callback when editor is ready */
+    /** Callback when content changes with optional error state */
+    onChange?: (value: string | undefined, error: ValidationError | null) => void;
     /** Additional Monaco editor options */
     options?: EditorOptions;
     /** Show loading spinner */
@@ -90,9 +89,9 @@ const Editor: React.FC<EditorProps> = ({
     const handleOnChange = (code: string | undefined) => {
         if (!code || !editorRef.current || !monacoRef.current) return;
 
-        // Simple validation call
-        validateCode(code, language, editorRef.current, monacoRef.current);
-        onChange?.(code);
+        // Validate and get error state
+        const error = validateCode(code, language, editorRef.current, monacoRef.current);
+        onChange?.(code, error);
     };
 
     useEffect(() => {
@@ -120,8 +119,8 @@ const Editor: React.FC<EditorProps> = ({
                 </div>
             )}
             <MonacoEditor
-                height={height}
                 value={value}
+                height={height}
                 language={language}
                 onChange={handleOnChange}
                 onMount={handleEditorDidMount}

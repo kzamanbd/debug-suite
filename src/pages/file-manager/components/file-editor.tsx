@@ -6,6 +6,7 @@
  * @since 1.0.0
  */
 import Editor from '@/components/editor';
+import type { ValidationError } from '@/components/editor/validators';
 import Modal from '@/components/ui/modal';
 import { classNames } from '@/utils';
 import { useState } from '@wordpress/element';
@@ -43,10 +44,13 @@ const FileEditor = ({
     const [editorContent, setEditorContent] = useState(value);
     const [hasChanges, setHasChanges] = useState(false);
 
-    const handleContentChange = (value: string | undefined) => {
+    const handleContentChange = (value: string | undefined, error: ValidationError | null) => {
         const newContent = value || '';
         setEditorContent(newContent);
-        setHasChanges(newContent !== value);
+        setHasChanges(true);
+        if (error) {
+            setHasChanges(false);
+        }
     };
 
     const handleSave = () => {
