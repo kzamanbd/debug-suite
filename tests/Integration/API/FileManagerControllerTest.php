@@ -107,7 +107,7 @@ class FileManagerControllerTest extends DebugSuiteTestCase {
 	 */
 	public function test_get_files_insufficient_permissions() {
 		// Create user without manage_options capability
-		$user_id = $this->factory->user->create();
+		$user_id = $this->factory()->user->create();
 		wp_set_current_user( $user_id );
 		
 		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/files' );

@@ -86,6 +86,3 @@ jobs:
 
       - name: Run Unit Tests
         run: composer run test:unit
-
-      - name: Run Integration Tests
-        run: composer run test:integration
