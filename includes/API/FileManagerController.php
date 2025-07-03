@@ -8,10 +8,13 @@
 namespace DebugSuite\API;
 
 use DebugSuite\Services\FileManagerService;
+use DebugSuite\Core\ServiceResponse;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use Exception;
+use PhpParser\ParserFactory;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -91,6 +94,18 @@ class FileManagerController extends RestController {
 		$contents = $request->get_param( 'contents' );
 		$create_backup = $request->get_param( 'create_backup' ) ?? false;
 
+		// Validate PHP syntax if it's a PHP file
+		if ( pathinfo( $path, PATHINFO_EXTENSION ) === 'php' ) {
+			$validation_result = $this->validate_php_syntax( $contents );
+			if ( $validation_result->is_failure() ) {
+				return new WP_Error(
+					'php_syntax_error',
+					$validation_result->get_error_message(),
+					[ 'status' => 400 ]
+				);
+			}
+		}
+
 		$options = [ 'create_backup' => $create_backup ];
 		$result = $this->service->save_file_contents( $path, $contents, $options );
 
@@ -102,5 +117,27 @@ class FileManagerController extends RestController {
 					'message' => __( 'File saved successfully.', 'debug-suite' ),
 				]
 			);
+	}
+
+	/**
+	 * Validates PHP syntax using PHP-Parser.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @param string $contents PHP code to validate.
+	 * @return ServiceResponse Success if syntax is valid, failure with error message if not.
+	 */
+	private function validate_php_syntax( string $contents ): ServiceResponse {
+
+		try {
+			$parser = ( new ParserFactory() )->create( 1 ); // 1 is PHP7
+			$parser->parse( $contents );
+			return ServiceResponse::success();
+		} catch ( Exception $e ) {
+			return ServiceResponse::failure(
+				$e->getMessage(),
+				'php_syntax_error'
+			);
+		}
 	}
 }
