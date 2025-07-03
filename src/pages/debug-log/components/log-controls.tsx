@@ -10,8 +10,6 @@ import { classNames } from '@/utils';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
-    ChevronDownIcon,
-    ChevronUpIcon,
     CopyIcon,
     DownloadIcon,
     EyeIcon,
@@ -93,11 +91,6 @@ const LogControls = ({
 
     const clearSearch = () => {
         onFiltersChange({ search: '' });
-    };
-
-    const toggleSortOrder = () => {
-        const newOrder = filters.sortOrder === 'asc' ? 'desc' : 'asc';
-        onFiltersChange({ sortOrder: newOrder });
     };
 
     const handleClear = () => {
@@ -201,7 +194,7 @@ const LogControls = ({
                                     placeholder={__('Search in log...', 'debug-suite')}
                                     value={filters.search}
                                     onChange={(e) => onFiltersChange({ search: e.target.value })}
-                                    className="w-full pl-10 md:w-48 lg:w-64"
+                                    className="w-full pl-10 md:w-48"
                                 />
                                 {filters.search && (
                                     <button
@@ -263,9 +256,6 @@ const LogControls = ({
                                     }
                                     className="w-[150px]"
                                 />
-                                <Button className="p-2" onClick={toggleSortOrder}>
-                                    {filters.sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                                </Button>
                             </div>
 
                             {/* Total entries display */}

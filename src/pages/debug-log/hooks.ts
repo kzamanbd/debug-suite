@@ -204,15 +204,6 @@ export const useLogEntries = () => {
         void fetchAllLogs();
     }, [fetchAllLogs]);
 
-    // Handle focus change to refetch logs when tab becomes visible
-    useEffect(() => {
-        window.addEventListener('focus', refetch);
-
-        return () => {
-            window.removeEventListener('focus', refetch);
-        };
-    }, [refetch]);
-
     return {
         logs: paginatedLogs,
         allLogs: filteredLogs,
@@ -310,13 +301,13 @@ export const useRawFileContent = (filePath?: string) => {
     const [content, setContent] = useState<RawFileContent | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const fetchRawContent = async (path?: string) => {
-        if (!path) return;
+    const fetchRawContent = useCallback(async () => {
+        if (!filePath) return;
 
         try {
             setLoading(true);
             const apiPath = addQueryArgs('/debug-suite/v1/logs/raw', {
-                file: path
+                file: filePath
             });
 
             const response = await apiFetch<RawFileContent>({
@@ -330,7 +321,12 @@ export const useRawFileContent = (filePath?: string) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filePath]);
 
-    return { content, loading, refetch: () => fetchRawContent(filePath) };
+    // Refetch raw file content
+    const refetch = useCallback(() => {
+        void fetchRawContent();
+    }, [fetchRawContent]);
+
+    return { content, loading, refetch };
 };

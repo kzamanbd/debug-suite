@@ -9,20 +9,28 @@ import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { CheckIcon, ChevronDownIcon, ClipboardIcon, RefreshCwIcon } from 'lucide-react';
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, ClipboardIcon, RefreshCwIcon } from 'lucide-react';
 import { levelColors, levelIcons } from '../constants';
-import type { InfiniteScrollState, LogEntry } from '../types';
+import type { InfiniteScrollState, LogEntry, LogFilters } from '../types';
 
 interface LogViewerProps {
     logs: LogEntry[];
+    filters: LogFilters;
     loading: boolean;
     infiniteState: InfiniteScrollState;
     onLoadMore: () => void;
+
+    onFiltersChange: (newFilters: Partial<LogFilters>) => void;
 }
 
-const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps) => {
+const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onLoadMore }: LogViewerProps) => {
     const tableRef = useRef<HTMLTableElement>(null);
     const [copiedId, setCopiedId] = useState<string | number | null>(null);
+
+    const toggleSortOrder = () => {
+        const newOrder = filters.sortOrder === 'asc' ? 'desc' : 'asc';
+        onFiltersChange({ sortOrder: newOrder });
+    };
 
     const handleCopy = async (text: string, id: string | number) => {
         try {
@@ -50,7 +58,16 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                 {__('Message', 'debug-suite')}
                             </th>
                             <th className="w-12 px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                {__('#', 'debug-suite')}
+                                <div className="flex items-center gap-2">
+                                    <span className="inline-flex cursor-pointer" onClick={toggleSortOrder}>
+                                        {filters.sortOrder === 'asc' ? (
+                                            <ChevronUpIcon className="h-4 w-4" />
+                                        ) : (
+                                            <ChevronDownIcon className="h-4 w-4" />
+                                        )}
+                                    </span>
+                                    <span>{__('#', 'debug-suite')}</span>
+                                </div>
                             </th>
                         </tr>
                     </thead>
@@ -124,7 +141,7 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                                         title={__('Copy message', 'debug-suite')}
                                                                     >
                                                                         {copiedId === index ? (
-                                                                            <CheckIcon className="h-4 w-4" />
+                                                                            <CheckIcon className="h-4 w-4 text-green-500" />
                                                                         ) : (
                                                                             <ClipboardIcon className="h-4 w-4" />
                                                                         )}
