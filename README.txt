@@ -1,81 +1,154 @@
 === Debug Suite ===
 Contributors: kzamanbd
 Donate link: https://kzaman.me/plugins/debug-suite/
-Tags: debug, development, tools, debugging, wordpress
+Tags: debug, development, tools, debugging, wordpress, error-log, php-debug, wp-debug, developer-tools
 Requires at least: 5.7
-Tested up to: 6.7
-Requires PHP: 7.4
+Tested up to: 6.8
+Requires PHP: 8.2
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive.
+A powerful, enterprise-grade debugging toolkit for WordPress developers with advanced log management, error tracking, and development tools.
 
 == Description ==
 
-Debug Suite is a comprehensive WordPress development toolkit that provides essential debugging and inspection tools for WordPress developers. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.
+Debug Suite is a comprehensive WordPress development toolkit that transforms how developers debug and maintain WordPress sites. Built with enterprise-grade architecture and modern development practices, it provides powerful debugging capabilities while maintaining high performance and code quality.
 
-**Key Features:**
+= 🚀 Key Features =
 
-* **Debug Bar Integration** - Enhanced debugging information
-* **Query Monitor Support** - Database query analysis  
-* **Log Level Management** - Configurable logging levels
-* **Developer-Friendly Interface** - Clean, intuitive admin interface
-* **Performance Monitoring** - Track site performance metrics
-* **Error Tracking** - Comprehensive error logging and reporting
+* **Advanced Log Management**
+  * Real-time log file monitoring
+  * Configurable log levels and filtering
+  * Searchable log entries with context
+  * Log file rotation and cleanup
 
-**Perfect for:**
+* **Error Tracking & Debugging**
+  * Detailed error tracking and reporting
+  * Stack trace analysis
+  * Query debugging and optimization
+  * Performance profiling
 
-* WordPress developers
-* Site maintenance professionals  
-* Performance optimization specialists
-* Debugging complex WordPress issues
+* **Developer Tools**
+  * Built-in code editor with syntax highlighting
+  * File system management interface
+  * Database query analyzer
+  * REST API debugging tools
 
-The plugin follows WordPress coding standards and best practices, ensuring compatibility and security.
+* **Modern Architecture**
+  * Dependency injection container
+  * Service layer pattern
+  * React/TypeScript frontend
+  * Enterprise-grade codebase
+
+= 🎯 Perfect for =
+
+* WordPress developers building complex applications
+* Agency developers managing multiple sites
+* DevOps teams monitoring WordPress installations
+* Site administrators debugging production issues
+
+= 🛡️ Security First =
+
+* Secure by default - strict file permissions
+* Role-based access control
+* Sanitized and escaped data handling
+* WordPress security best practices
+
+= 🔧 Technical Requirements =
+
+* WordPress 5.7 or higher
+* PHP 8.2 or higher
+* Modern browser with JavaScript enabled
+* Write permissions for log directories
+
+= 🌟 Pro Features (Coming Soon) =
+
+* Remote debugging capabilities
+* Advanced performance profiling
+* Team collaboration tools
+* Custom logging integrations
 
 == Installation ==
 
 1. Upload the `debug-suite` folder to the `/wp-content/plugins/` directory
-2. Run `composer install` in the plugin directory to install dependencies  
+2. Run `composer install` in the plugin directory
 3. Activate the plugin through the 'Plugins' menu in WordPress
-4. Navigate to 'Debug Suite' in the WordPress admin menu to configure settings
+4. Navigate to Debug Suite in the admin menu
+5. Configure your logging preferences and access controls
+
+For manual installation:
+
+1. Download the plugin ZIP file
+2. Go to Plugins > Add New in WordPress
+3. Click the Upload Plugin button
+4. Upload the ZIP and activate
 
 == Frequently Asked Questions ==
 
 = Is this plugin safe for production use? =
 
-This plugin is designed for development and debugging purposes. While it includes safety measures, it's recommended to use it primarily in development and staging environments.
+Yes, when configured properly. Debug Suite includes safety measures and role-based access control. However, we recommend initially testing in a staging environment.
 
-= What are the minimum requirements? =
+= Will this plugin slow down my site? =
 
-* WordPress 5.7 or higher
-* PHP 7.4 or higher  
-* Composer (for dependency management)
+No. Debug Suite is built with performance in mind:
+* Lazy loading of components
+* Efficient log processing
+* Minimal impact when not actively debugging
+* Configurable performance settings
 
-= How do I configure the debug settings? =
+= How do I configure logging levels? =
 
-After activation, go to the 'Debug Suite' menu in your WordPress admin. From there you can enable/disable various debugging features and set log levels.
+1. Go to Debug Suite > Settings
+2. Select your preferred log levels
+3. Configure file locations and rotation settings
+4. Save your preferences
 
-= Does this plugin affect site performance? =
+= Can I use this with other debugging plugins? =
 
-The plugin is designed to have minimal impact on site performance when not actively debugging. Most features are only active when explicitly enabled.
+Yes! Debug Suite is designed to work alongside other development tools like Query Monitor and Debug Bar.
+
+= What makes this different from other debugging plugins? =
+
+* Enterprise-grade architecture
+* Modern tech stack (React/TypeScript)
+* Advanced service layer pattern
+* Comprehensive debugging toolkit
+* Performance-focused design
 
 == Screenshots ==
 
-1. Main debug suite admin interface
-2. Settings configuration panel
-3. Debug information display
+1. Main Dashboard - Overview of debugging tools and recent logs
+2. Log Viewer - Real-time log monitoring with filtering
+3. File Manager - Built-in code editor with syntax highlighting
+4. Settings Panel - Comprehensive configuration options
+5. Error Tracking - Detailed error reports and analysis
 
 == Changelog ==
 
 = 1.0.0 =
-* Initial release
-* Debug bar integration
-* Query monitor support  
-* Configurable logging levels
-* Admin interface for settings management
+* Initial release with core features
+* Advanced log management system
+* Real-time log monitoring
+* File system management
+* Modern React/TypeScript interface
+* Enterprise-grade architecture
 
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of Debug Suite - A comprehensive WordPress debugging toolkit.
+Initial release of Debug Suite - Requires PHP 8.2 or higher.
+
+== Development ==
+
+* [GitHub Repository](https://github.com/kzamanbd/debug-suite)
+* [Documentation](https://kzaman.me/plugins/debug-suite/docs)
+* [Issue Tracker](https://github.com/kzamanbd/debug-suite/issues)
+
+== Credits ==
+
+* Built with modern WordPress development practices
+* Uses React and TypeScript for the frontend
+* Implements PSR standards and enterprise patterns
+* Special thanks to the WordPress development community
