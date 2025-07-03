@@ -24,7 +24,7 @@ export interface DialogState {
     reject?: () => void;
 }
 
-export interface ModalProps {
+export interface DialogModalProps {
     open: boolean;
     title?: string;
     message?: string;
@@ -32,7 +32,7 @@ export interface ModalProps {
     onClose: (confirmed: boolean) => void;
 }
 
-export interface TypeProps {
+export interface DialogTypeProps {
     icon: ReactNode;
     defaultTitle: string;
     iconClass?: string;

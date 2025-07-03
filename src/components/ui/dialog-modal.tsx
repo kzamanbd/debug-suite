@@ -1,12 +1,10 @@
-'use client';
-
-import type { DialogType, ModalProps, TypeProps } from '@/types';
+import type { DialogModalProps, DialogType, DialogTypeProps } from '@/types';
 import { classNames } from '@/utils';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from 'react';
 import Modal from './modal';
 
-const typeMap: Record<DialogType, TypeProps> = {
+const typeMap: Record<DialogType, DialogTypeProps> = {
     success: {
         icon: (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -81,17 +79,17 @@ const typeMap: Record<DialogType, TypeProps> = {
             </svg>
         ),
         defaultTitle: 'Are you sure?',
-        iconClass: 'bg-sky-100 text-sky-600',
-        buttonClass: 'bg-sky-600 hover:bg-sky-500'
+        iconClass: 'bg-red-100 text-red-600',
+        buttonClass: 'bg-red-600 hover:bg-red-500'
     }
 };
 
-const DialogModal: React.FC<ModalProps> = ({ title, message, open, options, onClose }) => {
+const DialogModal: React.FC<DialogModalProps> = ({ title, message, open, options, onClose }) => {
     const [hovered, setHovered] = useState(false);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const {
-        type = 'success',
+        type = 'confirm',
         okText = __('Ok', 'debug-suite'),
         autoHideDelay = 2000,
         showOk = true,
