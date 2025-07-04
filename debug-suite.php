@@ -196,6 +196,9 @@ final class DebugSuite {
 		if ( ! defined( 'DEBUG_SUITE_VERSION' ) ) {
 			define( 'DEBUG_SUITE_VERSION', $this->version );
 		}
+		if ( ! defined( 'DEBUG_SUITE_FILE' ) ) {
+			define( 'DEBUG_SUITE_FILE', __FILE__ );
+		}
 		if ( ! defined( 'DEBUG_SUITE_PLUGIN_DIR' ) ) {
 			define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 		}
