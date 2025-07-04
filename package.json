@@ -14,7 +14,10 @@
         "lint": "eslint src",
         "lint:fix": "eslint src --fix",
         "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
-        "makepot": "wp i18n make-pot --domain='debug-suite' --include='assets/js,includes,templates,debug-suite.php' . --headers='{\"Report-Msgid-Bugs-To\":\"https://kzaman.me/contact/\"}' --file-comment=\"Copyright (c) $(date +'%Y') Kamruzzaman. All Rights Reserved.\" languages/debug-suite.pot"
+        "makepot": "wp i18n make-pot --domain='debug-suite' --include='assets/js,includes,templates,debug-suite.php' . --headers='{\"Report-Msgid-Bugs-To\":\"https://kzaman.me/contact/\"}' --file-comment=\"Copyright (c) $(date +'%Y') Kamruzzaman. All Rights Reserved.\" languages/debug-suite.pot",
+        "version": "bin/version.sh",
+        "release": "npm run build && npm run makepot && bin/build.sh",
+        "release:prod": "npm run version && npm run release"
     },
     "author": "kamruzzaman",
     "license": "MIT",

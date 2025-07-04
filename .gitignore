@@ -162,3 +162,4 @@ assets/css/
 vendor
 .idea
 .phpunit.result.cache
+build

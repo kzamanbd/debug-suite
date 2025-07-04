@@ -8,21 +8,21 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-13T22:47:11+00:00\n"
+"POT-Creation-Date: 2025-07-04T07:56:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: debug-suite\n"
 
 #. Plugin Name of the plugin
 #: debug-suite.php
-#: includes/Admin/Admin.php:29
-#: includes/Admin/Admin.php:30
+#: includes/Admin/Admin.php:97
+#: includes/Admin/Admin.php:98
 msgid "Debug Suite"
 msgstr ""
 
 #. Plugin URI of the plugin
 #: debug-suite.php
-msgid "https://kzaman.me/plugins/debug-suite"
+msgid "https://kzaman.me/plugins/debug-suite?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash"
 msgstr ""
 
 #. Description of the plugin
@@ -40,22 +40,905 @@ msgstr ""
 msgid "https://kzaman.me/plugins/debug-suite/"
 msgstr ""
 
-#: debug-suite.php:38
+#: debug-suite.php:40
 msgid "Missing Dependencies Detected [Debug Suite Plugin]"
 msgstr ""
 
-#: includes/Admin/Admin.php:38
-msgid "Dashboard"
+#: includes/Admin/Admin.php:106
+#: assets/js/debug-suite-admin.js:4
+msgid "Overview"
 msgstr ""
 
-#: includes/Admin/Admin.php:39
-msgid "File Logs"
+#: includes/Admin/Admin.php:108
+#: assets/js/debug-suite-admin.js:4
+msgid "Debug Log"
 msgstr ""
 
-#: includes/Admin/Admin.php:40
-msgid "Manage Logs"
+#: includes/Admin/Admin.php:113
+#: assets/js/debug-suite-admin.js:4
+msgid "File Manager"
 msgstr ""
 
-#: includes/Admin/Admin.php:51
+#: includes/Admin/Admin.php:132
 msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: includes/API/FileLogsController.php:158
+msgid "Log file path. If not provided, uses the current debug log file."
+msgstr ""
+
+#: includes/API/FileLogsController.php:211
+#: includes/Services/DebugLog/WPLogReaderService.php:851
+msgid "Log file cleared successfully."
+msgstr ""
+
+#: includes/API/FileManagerController.php:117
+msgid "File saved successfully."
+msgstr ""
+
+#: includes/API/OnboardingController.php:69
+msgid "Whether to enable debug mode"
+msgstr ""
+
+#: includes/API/OnboardingController.php:74
+msgid "Whether to enable debug logging"
+msgstr ""
+
+#: includes/API/OnboardingController.php:79
+msgid "Whether to enable debug display"
+msgstr ""
+
+#: includes/API/RestController.php:42
+msgid "You do not have permission to access this endpoint."
+msgstr ""
+
+#: includes/API/SettingsController.php:74
+msgid "Invalid parameters provided."
+msgstr ""
+
+#: includes/API/SettingsController.php:95
+msgid "Settings updated successfully."
+msgstr ""
+
+#: includes/API/SettingsController.php:108
+msgid "Settings reset to defaults successfully."
+msgstr ""
+
+#: includes/Services/DebugLog/FileLogsService.php:115
+msgid "No log file path provided or configured."
+msgstr ""
+
+#: includes/Services/DebugLog/FileLogsService.php:123
+msgid "The requested log file was not found."
+msgstr ""
+
+#: includes/Services/DebugLog/FileLogsService.php:132
+msgid "Access to this file is not allowed."
+msgstr ""
+
+#: includes/Services/DebugLog/FileLogsService.php:154
+msgid "Failed to read the log file."
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:111
+#: includes/Services/DebugLog/WPLogReaderService.php:777
+msgid "Log file not found."
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:119
+msgid "Log file is not readable."
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:129
+msgid "Failed to read log file."
+msgstr ""
+
+#. translators: %s is the error message.
+#: includes/Services/DebugLog/WPLogReaderService.php:162
+msgid "Error reading log file: %s"
+msgstr ""
+
+#. translators: %s is the unsupported format.
+#: includes/Services/DebugLog/WPLogReaderService.php:649
+msgid "Unsupported export format: %s"
+msgstr ""
+
+#. translators: %s is the error message.
+#: includes/Services/DebugLog/WPLogReaderService.php:666
+msgid "Export failed: %s"
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:835
+msgid "Log file does not exist."
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:844
+msgid "Failed to clear log file."
+msgstr ""
+
+#: includes/Services/FileManagerService.php:135
+#: includes/Services/FileManagerService.php:181
+#: includes/Services/FileManagerService.php:222
+msgid "Invalid path provided."
+msgstr ""
+
+#: includes/Services/FileManagerService.php:139
+msgid "Directory not found."
+msgstr ""
+
+#: includes/Services/FileManagerService.php:185
+msgid "File not found."
+msgstr ""
+
+#: includes/Services/FileManagerService.php:189
+msgid "Path is not a file."
+msgstr ""
+
+#: includes/Services/FileManagerService.php:193
+msgid "File is not readable."
+msgstr ""
+
+#: includes/Services/FileManagerService.php:226
+msgid "File is not writable."
+msgstr ""
+
+#: includes/Services/FileManagerService.php:241
+msgid "Failed to save file."
+msgstr ""
+
+#: includes/Services/FileManagerService.php:320
+msgid "File does not exist for backup."
+msgstr ""
+
+#: includes/Services/FileManagerService.php:327
+msgid "Failed to create backup."
+msgstr ""
+
+#: includes/Services/OnboardingService.php:107
+msgid "Required settings are missing."
+msgstr ""
+
+#: includes/Services/OnboardingService.php:129
+msgid "Onboarding settings saved successfully."
+msgstr ""
+
+#: includes/Services/SettingsService.php:58
+msgid "No settings provided."
+msgstr ""
+
+#: includes/Services/SettingsService.php:62
+#: includes/Services/SettingsService.php:111
+msgid "wp-config.php file not found."
+msgstr ""
+
+#: includes/Services/SettingsService.php:66
+msgid "wp-config.php file is not writable."
+msgstr ""
+
+#. translators: %s is the unsupported setting key.
+#: includes/Services/SettingsService.php:74
+msgid "Unsupported setting: %s"
+msgstr ""
+
+#. translators: %s is the setting key that has an invalid value.
+#: includes/Services/SettingsService.php:82
+msgid "Invalid value for %s. Must be \"true\" or \"false\"."
+msgstr ""
+
+#: includes/Services/SettingsService.php:91
+#: includes/Services/SettingsService.php:116
+msgid "Failed to read wp-config.php file."
+msgstr ""
+
+#: includes/Services/SettingsService.php:98
+msgid "Failed to write wp-config.php file."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Ok"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+#: assets/js/debug-suite-admin.js:4
+msgid "Cancel"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "All Levels"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Critical"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Error"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Warning"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Notice"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Info"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Debug"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "100 items"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "250 items"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "500 items"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "1000 items"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Sort by Date"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Sort by Level"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Export as JSON"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Export as CSV"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Export as TXT"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Ok, Clear"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+#: assets/js/debug-suite-admin.js:4
+msgid "Loading..."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Select a log file"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Parsed"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Raw File"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Search in log..."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Clear search"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Copied!"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Copy"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+#: assets/js/debug-suite-admin.js:4
+msgid "Download"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+#: assets/js/debug-suite-admin.js:4
+msgid "Refresh"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Showing:"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "filtered"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Total entries:"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Export as..."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Are you sure you want to clear all log entries? This action cannot be undone."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:1
+msgid "Clear"
+msgstr ""
+
+#. translators: %1$s: date, %2$s: time
+#: assets/js/debug-suite-admin.js:4
+msgid "%1$s at %2$s"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Date/Time"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Severity"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Message"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "#"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Loading logs..."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "No log entries found matching your criteria."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Hide Trace"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Show Trace"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Copy message"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Loading more entries..."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Load More Entries"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "All entries loaded"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Loading editor…"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Modified:"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "No file content available."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Retry"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Name"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Size"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Last Modified"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Actions"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Loading file details..."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "An error occurred while loading the file."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Loading file editor…"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "An error occurred while saving the file."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Saving..."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Save"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Loading file tree..."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Search Files & Folders"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Create new folder"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "New Folder"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Upload files"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Upload Files"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "root"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "items"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "You have selected"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "users."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Delete"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "them?"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Processing..."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Clear Selected"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Download Selected"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Archive Selected"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Back to Overview"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "View Logs"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Selected:"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "of"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "files"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Log File"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Path"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Entries"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "View"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Log Management Settings"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Archive logs older than"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "7 days"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "30 days"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "90 days"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Max Log File Size"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "MB"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Automatically rotate logs when they exceed this size."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Log Retention"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "60 days"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "180 days"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "1 year"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "How long to keep log files before permanent deletion."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Save Settings"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "404 – Page Not Found"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Sorry, the page you are looking for does not exist or has been moved."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Go to Dashboard"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Welcome"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Debug Mode"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Failed to check onboarding status."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Welcome to Debug Suite!"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Debug Suite helps you monitor and troubleshoot your WordPress site effectively. Let's set up your debugging environment with a few simple steps."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Configure Debug Mode"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "WordPress Debug Mode provides detailed error reporting to help you identify and fix issues."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Enable Debug Mode"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Show detailed error messages and warnings"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Important Note"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Debug mode will display detailed error messages. While helpful during development, it's recommended to disable this in production."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Display Errors"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Show errors directly on the screen"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Displaying errors on screen can expose sensitive information. Consider using debug logging instead for production environments."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Debug Log Setup"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Configure debug logging to save error messages and warnings to a log file for later review."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Enable Debug Log"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Save debug messages to a log file"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Previous"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Settings saved successfully!"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Failed to save settings."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Finish"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Next"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Dashboard data refreshed"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Failed to load dashboard data"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Total Log Entries"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Recent Errors (24h)"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Log File Size"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Debug Status"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Active"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Inactive"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "System Configuration"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "WP Debug"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Enabled"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Disabled"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "WP Debug Log"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "WP Debug Display"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "PHP Version"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "WordPress Version"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Top Recent Errors"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "View All"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Count:"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "No recent errors found"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Top 5 Slowest Queries"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "calls"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Source:"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "total time"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "No slow queries detected"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Quick Actions"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "View Debug Logs"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Debug Settings"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Documentation"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Getting Started Guide"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Learn the basics of Debug Suite"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Best Practices"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "WordPress debugging tips and tricks"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Performance Optimization"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Speed up your WordPress site"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Support & Community"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Community Forum"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Get help from the community"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Report Bug"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Found an issue? Let us know"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Feature Request"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Suggest new features"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Unable to load dashboard"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "There was an error loading the dashboard data. Please refresh the page."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Monitor your WordPress debug activity and system performance."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "View and manage your debug logs."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Manage files and directories on your server."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Manage File Logs"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Manage your application's log files - clear, download, or archive them."
 msgstr ""
