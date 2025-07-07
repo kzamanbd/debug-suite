@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Aggregates data from multiple sources to provide comprehensive dashboard statistics.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class OverviewService implements ServiceInterface {
 

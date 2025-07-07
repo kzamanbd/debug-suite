@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Enhanced file logs service using advanced log reader for WordPress debug log operations.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class FileLogsService implements ServiceInterface {
 

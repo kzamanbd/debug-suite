@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Service for discovering and managing log file paths.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class LogFileDiscoveryService implements ServiceInterface {
 

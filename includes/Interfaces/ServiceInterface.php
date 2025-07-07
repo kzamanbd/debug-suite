@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Provides a contract for service classes that handle business logic
  * separated from API controllers and data access layers.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 interface ServiceInterface {
 	// Marker interface for service identification

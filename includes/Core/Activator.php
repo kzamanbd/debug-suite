@@ -12,7 +12,7 @@ namespace DebugSuite\Core;
  *
  * Handles plugin activation logic and setup procedures.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class Activator {
 

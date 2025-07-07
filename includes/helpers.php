@@ -21,7 +21,7 @@ if ( ! function_exists( 'debug_suite' ) ) {
 	/**
 	 * Get the main Debug Suite instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return DebugSuite The main plugin instance.
 	 */
@@ -34,7 +34,7 @@ if ( ! function_exists( 'debug_suite_container' ) ) {
 	/**
 	 * Get the Debug Suite container instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return Container The DI Container instance.
 	 */
@@ -47,7 +47,7 @@ if ( ! function_exists( 'debug_suite_resolve' ) ) {
 	/**
 	 * Resolve a service from the Debug Suite container.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $service Service name or class name.
 	 *
@@ -62,7 +62,7 @@ if ( ! function_exists( 'debug_suite_service_manager' ) ) {
 	/**
 	 * Get the Debug Suite service manager instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return ServiceManager The service manager instance.
 	 */
@@ -75,7 +75,7 @@ if ( ! function_exists( 'debug_suite_date' ) ) {
 	/**
 	 * Format a timestamp into a localized date string.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $timestamp The timestamp to format.
 	 *

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Service for handling onboarding functionality.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class OnboardingService implements ServiceInterface, Hookable {
 

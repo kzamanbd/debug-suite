@@ -15,7 +15,7 @@ use DebugSuite\Interfaces\Hookable;
  *
  * Handles loading of translation files and text domain registration.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class I18n implements Hookable {
 
@@ -26,12 +26,12 @@ class I18n implements Hookable {
 	 * Registers the plugins_loaded hook to load the plugin text domain
 	 * for translation support.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'plugins_loaded', [ $this, 'load_plugin_textdomain' ] );
+		add_action( 'plugins_loaded', [ $this, 'localization_setup' ] );
 	}
 
 	/**
@@ -40,11 +40,11 @@ class I18n implements Hookable {
 	 * Loads the plugin's text domain from the languages directory
 	 * to enable translation of user-facing strings.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
-	public function load_plugin_textdomain(): void {
+	public function localization_setup(): void {
 		load_plugin_textdomain(
 			'debug-suite',
 			false,

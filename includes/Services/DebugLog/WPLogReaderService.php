@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Advanced log reader service with stack trace support.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class WPLogReaderService implements ServiceInterface {
 

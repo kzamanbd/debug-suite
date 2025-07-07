@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Handles REST API endpoints for dashboard and overview data.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class OverviewController extends RestController {
 

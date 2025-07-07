@@ -12,6 +12,6 @@ namespace DebugSuite\Frontend;
  *
  * Manages public-facing functionality of the Debug Suite plugin.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class Frontend {}

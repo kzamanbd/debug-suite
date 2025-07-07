@@ -13,14 +13,14 @@ namespace DebugSuite\Core\Container\Definitions;
  * Represents a factory callable that will be invoked to create an instance.
  * Follow factory pattern for flexible object creation.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class FactoryDefinition implements DefinitionInterface {
 
 	/**
 	 * The definition name.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
@@ -29,7 +29,7 @@ class FactoryDefinition implements DefinitionInterface {
 	/**
 	 * The factory callable.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var callable
 	 */
@@ -38,7 +38,7 @@ class FactoryDefinition implements DefinitionInterface {
 	/**
 	 * Whether this is a singleton.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -47,7 +47,7 @@ class FactoryDefinition implements DefinitionInterface {
 	/**
 	 * Constructor.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param callable $factory   Factory callable.
 	 * @param bool     $singleton Whether this is a singleton.
@@ -61,7 +61,7 @@ class FactoryDefinition implements DefinitionInterface {
 	/**
 	 * Get the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
@@ -72,7 +72,7 @@ class FactoryDefinition implements DefinitionInterface {
 	/**
 	 * Set the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name The definition name.
 	 *
@@ -86,7 +86,7 @@ class FactoryDefinition implements DefinitionInterface {
 	/**
 	 * Resolve this definition to an instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param callable $resolver Function to resolve dependencies.
 	 *
@@ -99,7 +99,7 @@ class FactoryDefinition implements DefinitionInterface {
 	/**
 	 * Check if this definition is cacheable (singleton).
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */

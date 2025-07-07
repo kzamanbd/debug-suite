@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Simple file manager service for handling file operations.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class FileManagerService implements ServiceInterface {
 

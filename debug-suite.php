@@ -55,7 +55,7 @@ use DebugSuite\Providers\AppServiceProvider;
  * Primary entry point that manages DI Container, service providers,
  * and coordinates the entire plugin initialization process.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 final class DebugSuite {
 
@@ -69,7 +69,7 @@ final class DebugSuite {
 	/**
 	 * Singleton instance of the Debug Suite plugin.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var DebugSuite|null
 	 */
@@ -81,7 +81,7 @@ final class DebugSuite {
 	 * Manages the lifecycle of service providers including registration,
 	 * booting, and automatic hook registration for Hookable services.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var ServiceManager
 	 */
@@ -93,7 +93,7 @@ final class DebugSuite {
 	 * Provides service resolution, autowiring, and dependency management
 	 * with service definition support.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var Container
 	 */
@@ -107,7 +107,7 @@ final class DebugSuite {
 	 * core functionality. This method orchestrates the entire
 	 * plugin initialization process.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @throws Exception If a service cannot be resolved during initialization.
 	 */
@@ -130,7 +130,7 @@ final class DebugSuite {
 	 * service manager, and registers the container and manager as singleton
 	 * instances for easy access throughout the application lifecycle.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */

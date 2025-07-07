@@ -17,7 +17,7 @@ use WP_Roles;
  * Handles admin menu registration, script enqueuing, API route registration,
  * and the main admin interface for the Debug Suite plugin.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class Admin implements Hookable {
 
@@ -29,7 +29,7 @@ class Admin implements Hookable {
 	 * and script enqueuing. REST API routes are automatically registered
 	 * by controllers implementing the Hookable interface.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -45,7 +45,7 @@ class Admin implements Hookable {
 	 * Redirects to the onboarding page after plugin activation
 	 * if onboarding hasn't been completed.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -81,7 +81,7 @@ class Admin implements Hookable {
 	 * Creates the main Debug Suite admin menu and submenus for different
 	 * sections like file manager, error logs, and log management.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -122,7 +122,7 @@ class Admin implements Hookable {
 	 * Outputs the main container div for the React application and
 	 * verifies user permissions before rendering.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -143,7 +143,7 @@ class Admin implements Hookable {
 	 * Loads the necessary JavaScript and CSS files for the Debug Suite admin interface.
 	 * Also localizes script data including WordPress debug constants and user roles.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $hook_suffix The current admin page hook suffix.
 	 *

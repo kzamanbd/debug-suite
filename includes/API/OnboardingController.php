@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * REST controller for onboarding endpoints.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class OnboardingController extends RestController {
 

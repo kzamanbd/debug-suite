@@ -15,14 +15,14 @@ use DebugSuite\Core\Container\Definitions\DefinitionInterface;
  * Provides a fluent interface for configuring dependency injection containers
  * with compatible features and configuration options.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class ContainerBuilder {
 
 	/**
 	 * Whether autowiring is enabled.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -31,7 +31,7 @@ class ContainerBuilder {
 	/**
 	 * Definition sources for the container.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, DefinitionInterface>
 	 */
@@ -40,7 +40,7 @@ class ContainerBuilder {
 	/**
 	 * Enable or disable autowiring.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param bool $enabled Whether autowiring should be enabled.
 	 *
@@ -54,7 +54,7 @@ class ContainerBuilder {
 	/**
 	 * Add definitions to the container.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param array<string, DefinitionInterface> $definitions Array of definitions.
 	 *
@@ -68,7 +68,7 @@ class ContainerBuilder {
 	/**
 	 * Build the container with the configured options.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return Container
 	 */

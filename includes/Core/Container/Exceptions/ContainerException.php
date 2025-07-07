@@ -16,7 +16,7 @@ use Psr\Container\ContainerExceptionInterface;
  * Base exception for all container-related errors. Implements the
  * ContainerExceptionInterface for standard compliance.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class ContainerException extends Exception implements ContainerExceptionInterface {
 }

@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Simple settings service for managing WordPress configuration.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class SettingsService implements ServiceInterface {
 

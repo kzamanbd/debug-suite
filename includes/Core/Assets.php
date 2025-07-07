@@ -12,7 +12,7 @@ class Assets implements Hookable {
 	 * Registers the necessary WordPress hooks for asset management,
 	 * including script and style registration and enqueuing.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -26,7 +26,7 @@ class Assets implements Hookable {
 	 * Returns an array of JavaScript files that can be registered and enqueued.
 	 * Includes information about dependencies, versions, and source paths.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string, array{src: string, version: string, deps: array<string>}> Scripts configuration array.
 	 */
@@ -53,7 +53,7 @@ class Assets implements Hookable {
 	 * Returns an array of CSS files that can be registered and enqueued.
 	 * Includes information about dependencies, versions, and source paths.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string, array{src: string, version: string, deps: array<string>}> Styles configuration array.
 	 */
@@ -80,7 +80,7 @@ class Assets implements Hookable {
 	 * Registers all available scripts and styles with WordPress using
 	 * wp_register_script() and wp_register_style() functions.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */

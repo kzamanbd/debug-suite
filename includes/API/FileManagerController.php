@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Simple file manager controller for Debug Suite.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class FileManagerController extends RestController {
 
@@ -122,7 +122,7 @@ class FileManagerController extends RestController {
 	/**
 	 * Validates PHP syntax using PHP-Parser.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $contents PHP code to validate.
 	 * @return ServiceResponse Success if syntax is valid, failure with error message if not.

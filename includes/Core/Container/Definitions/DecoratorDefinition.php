@@ -13,14 +13,14 @@ namespace DebugSuite\Core\Container\Definitions;
  * Allows wrapping existing services with decorators to add functionality
  * without modifying the original service implementation.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class DecoratorDefinition implements DefinitionInterface {
 
 	/**
 	 * The definition name.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
@@ -29,7 +29,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * The decorator class name.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
@@ -38,7 +38,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * The original service identifier to decorate.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
@@ -47,7 +47,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * Whether this is a singleton.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -56,7 +56,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * Constructor.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $decorator_class   The decorator class name.
 	 * @param string $decorated_service The service to decorate.
@@ -72,7 +72,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * Get the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
@@ -83,7 +83,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * Set the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name The definition name.
 	 *
@@ -97,7 +97,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * Resolve this definition to a decorated service instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param callable $resolver Function to resolve dependencies.
 	 *
@@ -114,7 +114,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * Check if this definition is cacheable (singleton).
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
@@ -125,7 +125,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * Get the decorator class name.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
@@ -136,7 +136,7 @@ class DecoratorDefinition implements DefinitionInterface {
 	/**
 	 * Get the decorated service identifier.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */

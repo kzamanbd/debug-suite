@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Simple settings controller for Debug Suite.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class SettingsController extends RestController {
 
