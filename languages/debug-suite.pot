@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-07T15:12:14+00:00\n"
+"POT-Creation-Date: 2025-07-07T16:48:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: debug-suite\n"
@@ -63,11 +63,11 @@ msgstr ""
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: includes/API/FileLogsController.php:158
+#: includes/API/FileLogsController.php:148
 msgid "Log file path. If not provided, uses the current debug log file."
 msgstr ""
 
-#: includes/API/FileLogsController.php:211
+#: includes/API/FileLogsController.php:201
 #: includes/Services/DebugLog/WPLogReaderService.php:851
 msgid "Log file cleared successfully."
 msgstr ""
@@ -204,6 +204,14 @@ msgstr ""
 
 #: includes/Services/OnboardingService.php:129
 msgid "Onboarding settings saved successfully."
+msgstr ""
+
+#: includes/Services/OverviewService.php:56
+msgid "Failed to retrieve log statistics."
+msgstr ""
+
+#: includes/Services/OverviewService.php:104
+msgid "Not defined"
 msgstr ""
 
 #: includes/Services/SettingsService.php:58
@@ -664,11 +672,27 @@ msgid "Welcome"
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
+msgid "Get started with Debug Suite"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
 msgid "Debug Mode"
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
+msgid "Configure error reporting"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Set up logging"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
 msgid "Failed to check onboarding status."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Loading Debug Suite..."
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
@@ -677,6 +701,30 @@ msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
 msgid "Debug Suite helps you monitor and troubleshoot your WordPress site effectively. Let's set up your debugging environment with a few simple steps."
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Error Monitoring"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Track and resolve issues quickly"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Real-time Logs"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Monitor your site in real-time"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Log Management"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Organize and export log data"
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
@@ -696,7 +744,7 @@ msgid "Show detailed error messages and warnings"
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
-msgid "Important Note"
+msgid "Production Warning"
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
@@ -728,11 +776,35 @@ msgid "Enable Debug Log"
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
-msgid "Save debug messages to a log file"
+msgid "Save debug messages to a log file for analysis"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Why Enable Debug Logging?"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Track errors without displaying them publicly"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Maintain detailed error history"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Safe for production environments"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Easy to analyze and export"
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
 msgid "Previous"
+msgstr ""
+
+#: assets/js/debug-suite-admin.js:4
+msgid "Step"
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
@@ -744,7 +816,7 @@ msgid "Failed to save settings."
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
-msgid "Finish"
+msgid "Finish Setup"
 msgstr ""
 
 #: assets/js/debug-suite-admin.js:4
