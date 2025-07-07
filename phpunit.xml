@@ -32,8 +32,6 @@
 
     <php>
         <const name="WP_TESTS_PHPUNIT_POLYFILLS_PATH" value="./vendor/yoast/phpunit-polyfills" />
-        <env name="WP_TESTS_DIR" value="/tmp/wordpress-tests-lib" />
-        <env name="WP_CORE_DIR" value="/tmp/wordpress" />
     </php>
 
     <groups>
