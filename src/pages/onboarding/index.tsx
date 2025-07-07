@@ -49,9 +49,9 @@ const Onboarding = () => {
     const [saving, setSaving] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [settings, setSettings] = useState<OnboardingSettings>({
-        debug_mode: false,
-        debug_log: false,
-        debug_display: false
+        debug_mode: window.debugSuite.debug_mode === '1',
+        debug_log: window.debugSuite.debug_log === '1',
+        debug_display: window.debugSuite.debug_display === '1'
     });
 
     useEffect(() => {
@@ -66,8 +66,6 @@ const Onboarding = () => {
                     void navigate('/');
                     return;
                 }
-
-                setSettings(response.settings);
                 setLoading(false);
             } catch (error) {
                 console.error('Error checking onboarding status:', error);
