@@ -64,7 +64,7 @@ export interface SettingsState {
 // global window type
 declare global {
     interface Window {
-        debugSuite: SettingsState & {
+        debugSuite: {
             wpDebug: boolean;
             wpDebugLog: boolean;
             wpDebugDisplay: boolean;
@@ -72,7 +72,6 @@ declare global {
             phpVersion: string;
             favicon: string;
             roles: Record<string, { name: string }>;
-            [key: string]: string | boolean | Record<string, { name: string }> | undefined;
-        };
+        } & SettingsState;
     }
 }

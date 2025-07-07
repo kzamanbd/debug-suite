@@ -11,9 +11,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 interface OnboardingSettings {
-    debug_mode: boolean;
-    debug_log: boolean;
-    debug_display: boolean;
+    debug_mode: string | boolean;
+    debug_log: string | boolean;
+    debug_display: string | boolean;
 }
 
 interface OnboardingResponse {
@@ -49,9 +49,9 @@ const Onboarding = () => {
     const [saving, setSaving] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [settings, setSettings] = useState<OnboardingSettings>({
-        debug_mode: window.debugSuite.debug_mode === '1',
-        debug_log: window.debugSuite.debug_log === '1',
-        debug_display: window.debugSuite.debug_display === '1'
+        debug_mode: false,
+        debug_log: false,
+        debug_display: false
     });
 
     useEffect(() => {
@@ -67,6 +67,12 @@ const Onboarding = () => {
                     return;
                 }
                 setLoading(false);
+                setSettings((prev) => ({
+                    ...prev,
+                    debug_mode: response.settings.debug_mode === 'true',
+                    debug_log: response.settings.debug_log === 'true',
+                    debug_display: response.settings.debug_display === 'true'
+                }));
             } catch (error) {
                 console.error('Error checking onboarding status:', error);
                 toast.error(__('Failed to check onboarding status.', 'debug-suite'));
