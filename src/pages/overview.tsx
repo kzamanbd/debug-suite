@@ -26,7 +26,7 @@ import {
     Timer,
     Zap
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 interface DashboardStats {
@@ -101,74 +101,69 @@ const Overview = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const settings = window.debugSuite;
+    const navigate = useNavigate();
 
-    const fetchDashboardData = useCallback(
-        async (showRefreshToast = false) => {
-            try {
-                setRefreshing(true);
+    const fetchDashboardData = useCallback(async (showRefreshToast = false) => {
+        try {
+            setRefreshing(true);
 
-                // Fetch log stats
-                const logStats = await apiFetch<DashboardStats['logs']>({
-                    path: '/debug-suite/v1/logs/stats'
-                });
+            // Fetch dashboard stats
+            const dashboardStats = await apiFetch<DashboardStats>({
+                path: '/debug-suite/v1/overview/stats'
+            });
 
-                // Fetch recent log entries to analyze top errors
-                const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
-                    per_page: 10,
-                    level_filter: 'error'
-                });
+            // Fetch recent log entries to analyze top errors
+            const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
+                per_page: 10,
+                level_filter: 'error'
+            });
 
-                const recentLogs = await apiFetch<{
-                    entries: Array<{ message: string; level: string; timestamp: string }>;
-                }>({
-                    path: recentLogsPath
-                });
+            const recentLogs = await apiFetch<{
+                entries: Array<{ message: string; level: string; timestamp: string }>;
+            }>({
+                path: recentLogsPath
+            });
 
-                // Process top errors
-                const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
-                recentLogs.entries.forEach((entry) => {
-                    const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
-                    if (typeof errorCounts[message] === 'undefined') {
-                        errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
-                    }
-                    errorCounts[message].count++;
-                    if (entry.timestamp > errorCounts[message].last_seen) {
-                        errorCounts[message].last_seen = entry.timestamp;
-                    }
-                });
-
-                const topErrorsList = Object.keys(errorCounts)
-                    .map((message) => ({ message, ...errorCounts[message] }))
-                    .sort((a, b) => b.count - a.count)
-                    .slice(0, 5);
-
-                setStats({
-                    logs: logStats,
-                    system: {
-                        wp_debug: settings.wpDebug,
-                        wp_debug_log: settings.wpDebugLog,
-                        wp_debug_display: settings.wpDebugDisplay,
-                        php_version: settings.phpVersion,
-                        wp_version: settings.wpVersion
-                    }
-                });
-
-                setTopErrors(topErrorsList);
-                setSlowQueries(mockSlowQueries);
-
-                if (showRefreshToast) {
-                    toast.success(__('Dashboard data refreshed', 'debug-suite'));
+            // Process top errors
+            const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
+            recentLogs.entries.forEach((entry) => {
+                const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
+                if (typeof errorCounts[message] === 'undefined') {
+                    errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
                 }
-            } catch (error) {
-                console.error('Error fetching dashboard data:', error);
-                toast.error(__('Failed to load dashboard data', 'debug-suite'));
-            } finally {
-                setLoading(false);
-                setRefreshing(false);
+                errorCounts[message].count++;
+                if (entry.timestamp > errorCounts[message].last_seen) {
+                    errorCounts[message].last_seen = entry.timestamp;
+                }
+            });
+
+            const topErrorsList = Object.keys(errorCounts)
+                .map((message) => ({ message, ...errorCounts[message] }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+
+            setStats(dashboardStats);
+
+            setTopErrors(topErrorsList);
+            setSlowQueries(mockSlowQueries);
+
+            if (showRefreshToast) {
+                toast.success(__('Dashboard data refreshed', 'debug-suite'));
             }
-        },
-        [settings]
-    );
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+            toast.error(__('Failed to load dashboard data', 'debug-suite'));
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!settings.wpDebug) {
+            void navigate('/onboarding');
+        }
+    }, [settings, navigate]);
 
     useEffect(() => {
         void fetchDashboardData();

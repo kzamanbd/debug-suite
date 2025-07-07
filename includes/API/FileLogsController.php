@@ -110,16 +110,6 @@ class FileLogsController extends RestController {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/stats',
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_log_stats' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
-			]
-		);
-
-		register_rest_route(
-			$this->namespace,
 			'/' . $this->rest_base . '/export',
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -213,13 +203,7 @@ class FileLogsController extends RestController {
 			);
 	}
 
-	public function get_log_stats( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$result = $this->service->get_log_file_stats();
 
-		return $result->is_failure()
-			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
-			: rest_ensure_response( $result->get_data() );
-	}
 
 	/**
 	 * Export logs in various formats.
