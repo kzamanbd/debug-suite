@@ -372,7 +372,7 @@ const Overview = () => {
                                 {__('Top Recent Errors', 'debug-suite')}
                             </h3>
                         </div>
-                        <Button size="sm" className="flex items-center gap-1">
+                        <Button as={Link} to="/debug-log" size="sm" className="flex items-center gap-1">
                             <ExternalLink className="h-3 w-3" />
                             {__('View All', 'debug-suite')}
                         </Button>
