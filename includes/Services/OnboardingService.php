@@ -143,7 +143,7 @@ class OnboardingService implements ServiceInterface, Hookable {
 
 		return ServiceResponse::success(
 			[
-				'completed' => $completed,
+				'completed' => $completed && WP_DEBUG,
 				'settings' => [
 					'debug_mode' => $current_settings['WP_DEBUG'],
 					'debug_log' => $current_settings['WP_DEBUG_LOG'],
