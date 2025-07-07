@@ -31,10 +31,18 @@ class FileManagerService implements ServiceInterface {
 	private string $base_path;
 
 	/**
+	 * Load directory size.
+	 *
+	 * @var bool
+	 */
+	private bool $load_directory_size = false;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->base_path = ABSPATH;
+		$this->base_path = get_option( 'debug_suite_file_manager_base_path', ABSPATH );
+		$this->load_directory_size = get_option( 'debug_suite_load_directory_size', false );
 	}
 
 	/**
@@ -101,6 +109,9 @@ class FileManagerService implements ServiceInterface {
 	 */
 
 	private function git_directory_size( $path ): int {
+		if ( ! $this->load_directory_size ) {
+			return 0;
+		}
 
 		if ( ! is_dir( $path ) ) {
 			return filesize( $path );
