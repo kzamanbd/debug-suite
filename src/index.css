@@ -110,3 +110,48 @@ div[data-headlessui-state='open'][role='dialog'] {
 .monaco-editor.vs-dark .error-line-highlight {
     background-color: rgba(255, 0, 0, 0.2);
 }
+/* Core body reset for frontend */
+body.debug-suite-frontend {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #f0f0f1 !important;
+    overflow-x: hidden;
+}
+
+html.root-debug-suite-frontend,
+body.debug-suite-frontend .debug-suite-layout,
+body.debug-suite-frontend.admin-bar {
+    @apply mt-0 rounded-none;
+}
+
+body.debug-suite-frontend #adminmenumain,
+body.debug-suite-frontend #wpadminbar,
+body.debug-suite-frontend #adminmenuwrap,
+body.debug-suite-frontend #screen-meta,
+body.debug-suite-frontend #screen-meta-links,
+body.debug-suite-frontend #footer,
+body.debug-suite-frontend .update-nag {
+    display: none !important;
+}
+body.debug-suite-frontend #wpcontent,
+body.debug-suite-frontend #wpbody,
+body.debug-suite-frontend #wpwrap {
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+}
+body.debug-suite-frontend #wpbody-content {
+    padding-bottom: 0 !important;
+}
+
+/* Theme container resets - more targeted */
+body.debug-suite-frontend .wrap,
+html.wp-toolbar:has(.debug-suite-frontend),
+body.debug-suite-frontend > .container:not(#debug-suite-admin-app),
+body.debug-suite-frontend > .wrapper:not(#debug-suite-admin-app),
+body.debug-suite-frontend > .site:not(#debug-suite-admin-app),
+body.debug-suite-frontend > .site-content:not(#debug-suite-admin-app),
+body.debug-suite-frontend > .content-area:not(#debug-suite-admin-app),
+body.debug-suite-frontend > .main:not(#debug-suite-admin-app) {
+    margin: 0 !important;
+    padding: 0 !important;
+}
