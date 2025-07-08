@@ -22,6 +22,7 @@ export interface LogFile {
     size_bytes: number;
     modified: string;
     type: string;
+    is_current: boolean;
 }
 
 export interface LogResponse {

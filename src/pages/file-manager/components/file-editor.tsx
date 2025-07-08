@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
 interface FileEditorProps {
     open: boolean;
     loading: boolean;
-    value: string;
+    fileContent: string;
     fileName: string;
     readOnly?: boolean;
     toggle: (action: boolean) => void;
@@ -36,17 +36,17 @@ const FileEditor = ({
     toggle,
     fileName,
     loading,
-    value,
+    fileContent,
     readOnly = false,
     onSave
 }: FileEditorProps): JSX.Element => {
-    const [editorContent, setEditorContent] = useState(value);
+    const [editorContent, setEditorContent] = useState(fileContent);
     const [hasChanges, setHasChanges] = useState(false);
 
     const handleContentChange = (value: string | undefined) => {
         const newContent = value || '';
         setEditorContent(newContent);
-        setHasChanges(newContent !== value);
+        setHasChanges(newContent !== fileContent);
     };
 
     const handleSave = () => {
@@ -57,7 +57,7 @@ const FileEditor = ({
     };
 
     const handleClose = () => {
-        setEditorContent(value);
+        setEditorContent(fileContent);
         setHasChanges(false);
         toggle(false);
     };
@@ -72,7 +72,7 @@ const FileEditor = ({
             <Modal.Title>{fileName}</Modal.Title>
             <div className="mt-2">
                 <Editor
-                    value={value}
+                    content={fileContent}
                     filename={fileName}
                     readOnly={readOnly}
                     height="calc(100svh - 160px)"

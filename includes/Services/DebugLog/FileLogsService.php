@@ -7,7 +7,6 @@
 
 namespace DebugSuite\Services\DebugLog;
 
-use Automattic\WooCommerce\Utilities\LoggingUtil;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 
@@ -90,91 +89,12 @@ class FileLogsService implements ServiceInterface {
 	 */
 
 	public function supported_log_files(): array {
-		$paths = [
-			WP_CONTENT_DIR,         // WordPress content (for debug.log)
-			'/var/log/apache2',     // Apache (Debian/Ubuntu)
-			'/var/log/httpd',       // Apache (CentOS/RedHat)
-			'/var/log/nginx',       // Nginx
-			'/var/log/php',         // PHP logs
-			'/var/log/redis',       // Redis logs
+		return [
+			$this->find_apache_log_file(),
+			$this->find_nginx_log_file(),
+			$this->find_redis_log_file(),
+			$this->find_php_fpm_error_log(),
 		];
-
-		// Add custom paths for WooCommerce logs if available.
-		if ( class_exists( '\Automattic\WooCommerce\Utilities\LoggingUtil' ) ) {
-			$paths[] = LoggingUtil::get_log_directory();
-		}
-		$files = [];
-		foreach ( $paths as $path ) {
-			if ( is_dir( $path ) ) {
-				$pattern = rtrim( $path, '/' ) . '/*.log';
-				$found = glob( $pattern );
-				if ( $found ) {
-					$files = array_merge( $files, $found );
-				}
-			}
-		}
-		// Merge with other log file paths.
-		$files = array_merge(
-			$files,
-			[
-				$this->find_apache_log_file(),
-				$this->find_nginx_log_file(),
-				$this->find_redis_log_file(),
-				$this->find_php_fpm_error_log(),
-			]
-		);
-
-		// Filter only valid log file paths that exist.
-		$files = array_filter(
-			$files,
-			( function ( $path ) {
-				return ! empty( $path ) && is_file( $path );
-			} )
-		);
-
-		// Build detailed info only for existing files.
-		$log_files = array_filter(
-			array_map(
-				function ( $path ) {
-					return [
-						'name'        => basename( $path ),
-						'path'        => $path,
-						'size'        => size_format( filesize( $path ) ),
-						'size_bytes'  => filesize( $path ),
-						'modified'    => gmdate( 'Y-m-d H:i:s', filemtime( $path ) ),
-						'type'        => $this->detect_log_type( $path ),
-					];
-				},
-				$files
-			)
-		);
-
-		return array_values( $log_files );
-	}
-
-	/**
-	 * Detect a log type based on a file path.
-	 */
-	private function detect_log_type( $path ): string {
-		if ( str_contains( $path, 'debug.log' ) ) {
-			return 'WordPress Debug';
-		}
-		if ( str_contains( $path, 'wc' ) ) {
-			return 'WooCommerce';
-		}
-		if ( str_contains( $path, 'apache' ) ) {
-			return 'Apache';
-		}
-		if ( str_contains( $path, 'nginx' ) ) {
-			return 'Nginx';
-		}
-		if ( str_contains( $path, 'redis' ) ) {
-			return 'Redis';
-		}
-		if ( str_contains( $path, 'php' ) ) {
-			return 'PHP-FPM';
-		}
-		return 'Unknown';
 	}
 
 	/**

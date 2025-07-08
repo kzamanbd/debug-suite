@@ -59,14 +59,18 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
         try {
             if (!isFullscreen) {
                 // Enter fullscreen
-                if ((containerRef.current as any).webkitRequestFullscreen) {
+                if (containerRef.current.requestFullscreen) {
+                    await containerRef.current.requestFullscreen();
+                } else if ((containerRef.current as any).webkitRequestFullscreen) {
                     await (containerRef.current as any).webkitRequestFullscreen();
                 } else if ((containerRef.current as any).msRequestFullscreen) {
                     await (containerRef.current as any).msRequestFullscreen();
                 }
             } else {
                 // Exit fullscreen
-                if ((document as any).webkitExitFullscreen) {
+                if (document.exitFullscreen) {
+                    await document.exitFullscreen();
+                } else if ((document as any).webkitExitFullscreen) {
                     await (document as any).webkitExitFullscreen();
                 } else if ((document as any).msExitFullscreen) {
                     await (document as any).msExitFullscreen();
@@ -90,7 +94,7 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape' && isFullscreen) {
-                void toggleFullscreen();
+                toggleFullscreen();
             }
         };
 
@@ -177,7 +181,7 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
             {/* Editor */}
             <div className="flex-1">
                 <Editor
-                    value={content.content}
+                    content={content.content}
                     filename={content.filename}
                     loading={loading}
                     readOnly={true}

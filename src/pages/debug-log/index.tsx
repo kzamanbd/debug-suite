@@ -43,7 +43,7 @@ const FileLogs = () => {
         if (viewMode === 'parsed') {
             refetchLogs();
         } else {
-            void refetchRawContent();
+            refetchRawContent();
         }
     };
 
@@ -53,14 +53,14 @@ const FileLogs = () => {
         if (mode !== 'parsed') {
             // If switching to raw view, fetch the raw content for the selected file
             if (!rawContent) {
-                void refetchRawContent();
+                refetchRawContent();
             }
         }
     };
 
     // Handle export with format selection
     const handleExport = (format: 'json' | 'csv' | 'txt') => {
-        void exportLogs(format);
+        exportLogs(format);
     };
 
     return (

@@ -1,7 +1,6 @@
-import type { DebugSuiteRoute } from '@/routing/routes';
+import { DebugSuiteRoute } from '@/routing/routes';
 import { classNames } from '@/utils';
-import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 interface LayoutProps {
     children: ReactNode;
@@ -39,7 +38,7 @@ const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element =
         if (route.title && typeof route.title === 'string') {
             document.title = `${route.title} - Debug Suite`;
         }
-    }, [route.path, route.title]);
+    }, [route.path]);
 
     return (
         <div className={classNames(className, 'mt-5 min-h-screen rounded-lg bg-white p-5')}>

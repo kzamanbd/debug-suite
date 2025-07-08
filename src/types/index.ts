@@ -6,7 +6,7 @@ export interface ItemTree {
     checked: boolean;
     modified_at: string;
     expanded: boolean;
-    children?: ItemTree[];
+    children: ItemTree[];
 }
 
 export interface SettingsState {

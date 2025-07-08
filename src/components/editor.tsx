@@ -34,8 +34,7 @@ const extensionToLanguageMap: Record<string, string> = {
     '.go': 'go',
     '.cs': 'csharp',
     '.swift': 'swift',
-    '.lock': 'json',
-    '.log': 'log'
+    '.lock': 'json'
 };
 
 /**
@@ -63,7 +62,7 @@ function getLanguageFromExtension(filename: string, explicitLanguage?: string): 
  */
 interface EditorProps {
     /** The content to display in the editor */
-    value: string;
+    content: string;
     /** Optional language for syntax highlighting */
     language?: string;
     /** Optional filename to infer language from extension */
@@ -94,7 +93,7 @@ interface EditorProps {
  * @since 1.0.0
  */
 const Editor = ({
-    value,
+    content,
     language,
     filename,
     readOnly = false,
@@ -108,7 +107,6 @@ const Editor = ({
     loadingText
 }: EditorProps): JSX.Element => {
     const editorRef = useRef<any>(undefined);
-    const monacoRef = useRef<any>(undefined);
     const [isInternalLoading, setIsInternalLoading] = useState(true);
 
     // Determine the language to use
@@ -129,9 +127,8 @@ const Editor = ({
         ...options
     };
 
-    const handleEditorDidMount = (editor: any, monaco: any) => {
+    const handleEditorDidMount = (editor: any) => {
         editorRef.current = editor;
-        monacoRef.current = monaco;
         setIsInternalLoading(false);
 
         // Focus the editor if not read-only
@@ -146,13 +143,13 @@ const Editor = ({
     };
 
     useEffect(() => {
-        if (editorRef.current) {
+        if (editorRef.current && content !== undefined) {
             const currentValue = editorRef.current.getValue();
-            if (currentValue !== value) {
-                editorRef.current.setValue(value);
+            if (currentValue !== content) {
+                editorRef.current.setValue(content);
             }
         }
-    }, [value]);
+    }, [content]);
 
     const isLoading = loading || isInternalLoading;
     const displayLoadingText = loadingText || __('Loading editor…', 'debug-suite');
@@ -168,9 +165,8 @@ const Editor = ({
                 </div>
             )}
             <MonacoEditor
-                value={value}
                 height={height}
-                defaultValue={value}
+                defaultValue={content}
                 language={editorLanguage}
                 onMount={handleEditorDidMount}
                 onChange={onChange}

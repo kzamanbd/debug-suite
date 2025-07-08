@@ -3,7 +3,6 @@
  *
  * @since 1.0.0
  */
-import DateTimeHtml from '@/components/date-time';
 import Button from '@/components/ui/button';
 import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
@@ -72,7 +71,7 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                     )}
                                                 >
                                                     <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
-                                                        <DateTimeHtml date={log.timestamp} />
+                                                        {log.timestamp}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span

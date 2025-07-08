@@ -39,7 +39,7 @@ const FileDetailSkeleton = ({ className = '' }: { className?: string }): JSX.Ele
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                        {Array.from({ length: 15 }).map((_, idx) => (
+                        {[...Array(15)].map((_, idx) => (
                             <tr key={idx}>
                                 <td className="px-4 py-3">
                                     <div className="bg-primary-200 dark:bg-primary-800 h-4 w-32 rounded" />
