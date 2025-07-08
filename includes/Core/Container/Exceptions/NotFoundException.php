@@ -1,6 +1,6 @@
 <?php
 /**
- * Not found exception for PSR-11 compliance.
+ * Not found exception for DI compliance.
  *
  * @package DebugSuite
  */
@@ -10,19 +10,19 @@ namespace DebugSuite\Core\Container\Exceptions;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Not found exception for PSR-11 compliance.
+ * Not found exception for DI compliance.
  *
  * Thrown when a service identifier is not found in the container.
- * Implements the PSR-11 NotFoundExceptionInterface for standard compliance.
+ * Implements the NotFoundExceptionInterface for standard compliance.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class NotFoundException extends ContainerException implements NotFoundExceptionInterface {
 
 	/**
 	 * Create a not found exception for a service identifier.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $id The service identifier that was not found.
 	 *
@@ -35,7 +35,7 @@ class NotFoundException extends ContainerException implements NotFoundExceptionI
 	/**
 	 * Create a not found exception for a service identifier with custom message.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $id      The service identifier that was not found.
 	 * @param string $message Custom error message with additional context.

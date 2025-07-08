@@ -14,7 +14,7 @@ namespace DebugSuite\Core\Container;
  * within the dependency injection container. Providers should implement both
  * registration and booting phases for proper service lifecycle management.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 interface ServiceProviderInterface {
 
@@ -25,7 +25,7 @@ interface ServiceProviderInterface {
 	 * and their dependencies to the container. No services should be resolved
 	 * during this phase.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param Container $container The container instance.
 	 *
@@ -40,7 +40,7 @@ interface ServiceProviderInterface {
 	 * registration phase. It's safe to resolve services from the container
 	 * during this phase.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param Container $container The container instance.
 	 *
@@ -54,7 +54,7 @@ interface ServiceProviderInterface {
 	 * Returns an array of service identifiers that this provider
 	 * registers with the container.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string> Array of service identifiers.
 	 */

@@ -1,41 +1,51 @@
 import { cloneElement, createElement, isValidElement } from '@wordpress/element';
-import {
-    createSearchParams,
-    redirect,
-    replace,
-    useLocation,
-    useMatches,
-    useNavigate,
-    useNavigation,
-    useParams
-} from 'react-router-dom';
+import type { ComponentType, ReactElement } from 'react';
+import type { Location, NavigateFunction, Navigation, Params, RedirectFunction } from 'react-router-dom';
+import { redirect, replace, useLocation, useMatches, useNavigate, useNavigation, useParams } from 'react-router-dom';
 
-export function withRouter(Component: any) {
-    return (props: any) => {
-        const navigate = useNavigate();
-        const params = useParams();
-        const location = useLocation();
-        const matches = useMatches();
-        const navigation = useNavigation();
+/**
+ * Router props interface containing all router-related properties
+ */
+interface RouterProps {
+    navigate: NavigateFunction;
+    params: Readonly<Params<string>>;
+    location: Location;
+    redirect: RedirectFunction;
+    replace: RedirectFunction;
+    matches: ReturnType<typeof useMatches>;
+    navigation: Navigation;
+}
 
-        const routerProps = {
-            navigate,
-            params,
-            location,
+/**
+ * Higher-order component that injects router props into the wrapped component
+ *
+ * @template P - Props type of the wrapped component
+ * @param Component - The component to wrap with router props
+ * @returns A new component with router props injected
+ */
+export function withRouter<P extends object>(
+    Component: ComponentType<P & RouterProps> | ReactElement<P & RouterProps>
+) {
+    return (props: P) => {
+        const routerProps: RouterProps = {
             redirect,
             replace,
-            matches,
-            navigation,
-            createSearchParams
+            navigate: useNavigate(),
+            params: useParams(),
+            location: useLocation(),
+            matches: useMatches(),
+            navigation: useNavigation()
         };
 
-        // Check if Component is a valid element
+        // Check if Component is a valid element that needs to be cloned
         if (isValidElement(Component)) {
-            // If it's a valid element, clone it and pass the router props
-            return cloneElement(Component, { ...props, ...routerProps });
+            return cloneElement(Component, {
+                ...props,
+                ...routerProps
+            });
         }
 
-        // If it's a function component, render it with the router props
+        // Otherwise treat it as a function component
         return createElement(Component, {
             ...props,
             ...routerProps

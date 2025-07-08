@@ -10,8 +10,12 @@
 
 
 // Set test environment constants
-define( 'DEBUG_SUITE_TESTING', true );
-define( 'DEBUG_SUITE_TEST_DIR', __DIR__ );
+if( ! defined( 'DEBUG_SUITE_TESTING' ) ) {
+	define( 'DEBUG_SUITE_TESTING', true );
+}
+if( ! defined( 'DEBUG_SUITE_TEST_DIR' ) ) {
+	define( 'DEBUG_SUITE_TEST_DIR', __DIR__ );
+}
 if ( ! defined( 'DEBUG_SUITE_PLUGIN_DIR' ) ) {
 	define( 'DEBUG_SUITE_PLUGIN_DIR', dirname( __DIR__ ) );
 }
@@ -50,7 +54,7 @@ function _manually_load_debug_suite_plugin(): void {
 	// Load plugin helpers
 	require_once DEBUG_SUITE_PLUGIN_DIR . '/includes/helpers.php';
 
-	// Load main plugin file
+	// Load the main plugin file
 	require_once DEBUG_SUITE_PLUGIN_DIR . '/debug-suite.php';
 }
 
@@ -90,23 +94,11 @@ function _setup_debug_suite_test_environment(): void {
 tests_add_filter( 'init', '_setup_debug_suite_test_environment' );
 
 /**
- * Clean up test environment after each test.
+ * Cleanup test environment after each test.
  *
  * @return void
  */
 function _cleanup_debug_suite_test_environment(): void {
-	// Reset container if it exists
-	if ( function_exists( 'debug_suite_container' ) ) {
-		try {
-			$container = debug_suite_container();
-			if ( method_exists( $container, 'reset' ) ) {
-				$container->reset();
-			}
-		} catch ( Exception $e ) {
-			// Ignore container reset errors during tests
-		}
-	}
-
 	// Clean up any test files
 	$temp_dir = DEBUG_SUITE_TEST_DIR . '/temp';
 	if ( is_dir( $temp_dir ) ) {
@@ -121,12 +113,9 @@ tests_add_filter( 'wp_loaded', '_cleanup_debug_suite_test_environment' );
 require $_tests_dir . '/includes/bootstrap.php';
 
 // Load our test helper classes
-require_once DEBUG_SUITE_TEST_DIR . '/Helpers/DebugSuiteTestCase.php';
-require_once DEBUG_SUITE_TEST_DIR . '/Helpers/MockFactory.php';
-
+require_once __DIR__ . '/Helpers/DebugSuiteTestCase.php';
+require_once __DIR__ . '/Helpers/MockFactory.php';
 // Load WordPress function mocks for unit tests
-if ( file_exists( DEBUG_SUITE_TEST_DIR . '/Helpers/wp-functions-mock.php' ) ) {
-	require_once DEBUG_SUITE_TEST_DIR . '/Helpers/wp-functions-mock.php';
-}
+require_once __DIR__ . '/Helpers/wp-functions-mock.php';
 
 echo "Debug Suite Test Bootstrap Complete!" . PHP_EOL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

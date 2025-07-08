@@ -17,7 +17,7 @@ use WP_Roles;
  * Handles admin menu registration, script enqueuing, API route registration,
  * and the main admin interface for the Debug Suite plugin.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class Admin implements Hookable {
 
@@ -29,13 +29,50 @@ class Admin implements Hookable {
 	 * and script enqueuing. REST API routes are automatically registered
 	 * by controllers implementing the Hookable interface.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
 	public function register_hooks(): void {
 		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
+		add_action( 'admin_init', [ $this, 'handle_activation_redirect' ] );
+	}
+
+	/**
+	 * Handle activation redirect.
+	 *
+	 * Redirects to the onboarding page after plugin activation
+	 * if onboarding hasn't been completed.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	public function handle_activation_redirect(): void {
+		// Check if we should redirect
+		if ( ! get_transient( 'debug_suite_activation_redirect' ) ) {
+			return;
+		}
+
+		// Delete the redirect transient
+		delete_transient( 'debug_suite_activation_redirect' );
+
+		// Only redirect to onboarding if it hasn't been completed
+		if ( ! get_option( 'debug_suite_onboarding_completed', false ) ) {
+			// Get the onboarding URL
+			$onboarding_url = add_query_arg(
+				[
+					'page' => 'debug-suite',
+					'path' => 'onboarding',
+				],
+				admin_url( 'admin.php' )
+			);
+
+			// Redirect and exit
+			wp_safe_redirect( $onboarding_url );
+			exit;
+		}
 	}
 
 	/**
@@ -44,7 +81,7 @@ class Admin implements Hookable {
 	 * Creates the main Debug Suite admin menu and submenus for different
 	 * sections like file manager, error logs, and log management.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -85,7 +122,7 @@ class Admin implements Hookable {
 	 * Outputs the main container div for the React application and
 	 * verifies user permissions before rendering.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -106,7 +143,7 @@ class Admin implements Hookable {
 	 * Loads the necessary JavaScript and CSS files for the Debug Suite admin interface.
 	 * Also localizes script data including WordPress debug constants and user roles.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $hook_suffix The current admin page hook suffix.
 	 *

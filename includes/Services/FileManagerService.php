@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Simple file manager service for handling file operations.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class FileManagerService implements ServiceInterface {
 
@@ -31,10 +31,18 @@ class FileManagerService implements ServiceInterface {
 	private string $base_path;
 
 	/**
+	 * Load directory size.
+	 *
+	 * @var bool
+	 */
+	private bool $load_directory_size = false;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->base_path = ABSPATH;
+		$this->base_path = get_option( 'debug_suite_file_manager_base_path', ABSPATH );
+		$this->load_directory_size = get_option( 'debug_suite_load_directory_size', false );
 	}
 
 	/**
@@ -101,13 +109,21 @@ class FileManagerService implements ServiceInterface {
 	 */
 
 	private function git_directory_size( $path ): int {
+		if ( ! $this->load_directory_size ) {
+			return 0;
+		}
 
 		if ( ! is_dir( $path ) ) {
 			return filesize( $path );
 		}
 
-		// if os is Unix-based or macOS, then use the du command
-		if ( PHP_OS_FAMILY === 'Darwin' || PHP_OS_FAMILY === 'Linux' ) {
+		// Use platform-specific du command
+		if ( PHP_OS_FAMILY === 'Darwin' ) {
+			// macOS doesn't support -b, use -k and convert to bytes
+			$size_kb = (int) shell_exec( "du -sk $path | awk '{print $1}'" );
+			return $size_kb * 1024;
+		} elseif ( PHP_OS_FAMILY === 'Linux' ) {
+			// Linux supports -b for bytes
 			return (int) shell_exec( "du -sb $path | awk '{print $1}'" );
 		}
 

@@ -11,16 +11,16 @@ namespace DebugSuite\Core\Container\Definitions;
  * Base definition interface for dependency injection definitions.
  *
  * Defines the contract for all dependency injection definition types.
- * This follows PHP-DI's definition pattern for flexible service configuration.
+ * This follows a definition pattern for flexible service configuration.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 interface DefinitionInterface {
 
 	/**
 	 * Get the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
@@ -29,7 +29,7 @@ interface DefinitionInterface {
 	/**
 	 * Set the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name The definition name.
 	 *
@@ -40,7 +40,7 @@ interface DefinitionInterface {
 	/**
 	 * Resolve this definition to an instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param callable $resolver Function to resolve dependencies.
 	 *
@@ -51,7 +51,7 @@ interface DefinitionInterface {
 	/**
 	 * Check if this definition is cacheable (singleton).
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */

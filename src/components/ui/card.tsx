@@ -1,5 +1,6 @@
 import { classNames } from '@/utils';
-import React, { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
+import React from 'react';
 
 type CardProps = HTMLAttributes<HTMLDivElement> & {
     className?: string;

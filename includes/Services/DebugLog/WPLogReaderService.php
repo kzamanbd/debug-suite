@@ -22,14 +22,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Advanced log reader service with stack trace support.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class WPLogReaderService implements ServiceInterface {
 
 	/**
 	 * Log levels mapping.
 	 *
-	 * @var array
+	 * @var array<string, int>
 	 */
 	private array $log_levels = [
 		'emergency' => 0,
@@ -50,12 +50,26 @@ class WPLogReaderService implements ServiceInterface {
 	private string $log_file_path;
 
 	/**
-	 * Constructor.
+	 * Buffer size for reading log files.
 	 *
-	 * Automatically sets the WordPress debug log file path.
+	 * @var int
+	 */
+	private int $buffer_size;
+
+	/**
+	 * Debug mode flag.
+	 *
+	 * @var bool
+	 */
+	private bool $debug_mode;
+
+	/**
+	 * Constructor.
 	 */
 	public function __construct() {
-		$this->log_file_path = WP_CONTENT_DIR . '/debug.log';
+		$this->log_file_path = ini_get( 'error_log' );
+		$this->buffer_size = 1024;
+		$this->debug_mode = false;
 	}
 
 	/**
@@ -86,7 +100,7 @@ class WPLogReaderService implements ServiceInterface {
 	 *     @type int    $limit      Number of entries to return.
 	 *     @type int    $offset     Offset for pagination.
 	 *     @type string $log_file   Custom log file path.
-	 *
+	 * }
 	 * @return ServiceResponse
 	 */
 	public function read_log_entries( array $options = [] ): ServiceResponse {
@@ -100,18 +114,36 @@ class WPLogReaderService implements ServiceInterface {
 			);
 		}
 
+		if ( ! is_readable( $log_file ) ) {
+			return ServiceResponse::failure(
+				__( 'Log file is not readable.', 'debug-suite' ),
+				'file_not_readable',
+				[ 'path' => $log_file ]
+			);
+		}
+
 		try {
 			$lines = file( $log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
 			if ( false === $lines ) {
 				return ServiceResponse::failure(
 					__( 'Failed to read log file.', 'debug-suite' ),
-					'read_error'
+					'read_error',
+					[ 'path' => $log_file ]
 				);
 			}
 
 			$entries = $this->parse_log_entries( $lines );
 			$filtered_entries = $this->filter_entries( $entries, $options );
 			$paginated_entries = $this->paginate_entries( $filtered_entries, $options );
+
+			$stats = [
+				'total_entries'     => count( $entries ),
+				'filtered_entries'  => count( $filtered_entries ),
+				'returned_entries'  => count( $paginated_entries ),
+				'file_size'        => filesize( $log_file ),
+				'file_size_human'  => size_format( filesize( $log_file ) ),
+				'last_modified'    => filemtime( $log_file ),
+			];
 
 			return ServiceResponse::success(
 				[
@@ -120,6 +152,7 @@ class WPLogReaderService implements ServiceInterface {
 					'file'    => $log_file,
 					'size'    => filesize( $log_file ),
 					'labels'  => $this->get_log_levels(),
+					'stats'   => $stats,
 				]
 			);
 
@@ -127,7 +160,8 @@ class WPLogReaderService implements ServiceInterface {
 			return ServiceResponse::failure(
 				// translators: %s is the error message.
 				sprintf( __( 'Error reading log file: %s', 'debug-suite' ), $e->getMessage() ),
-				'parse_error'
+				'parse_error',
+				[ 'error' => $e->getMessage() ]
 			);
 		}
 	}
@@ -454,29 +488,41 @@ class WPLogReaderService implements ServiceInterface {
 				$filtered = array_filter(
 					$filtered,
 					function ( $entry ) use ( $target_level ) {
-						$entry_level = $this->log_levels[ $entry['level'] ] ?? 7;
+						$entry_level = $this->log_levels[ $entry['level'] ] ?? 7; // Default to debug level
 						return $entry_level <= $target_level;
 					}
 				);
 			}
 		}
 
-		// Filter by search term
+		// Filter by search term (improved to search in more fields)
 		if ( ! empty( $options['search'] ) ) {
 			$search_term = strtolower( $options['search'] );
 			$filtered = array_filter(
 				$filtered,
 				function ( $entry ) use ( $search_term ) {
-					return str_contains( strtolower( $entry['message'] ), $search_term ) ||
-					   str_contains( strtolower( $entry['raw_line'] ), $search_term );
+					// Search in multiple fields
+					$searchable_content = implode(
+						' ',
+						array_filter(
+							[
+								$entry['message'] ?? '',
+								$entry['type'] ?? '',
+								$entry['file'] ?? '',
+								$entry['raw_line'] ?? '',
+								$entry['stack_trace']['summary'] ?? '',
+							]
+						)
+					);
+					return str_contains( strtolower( $searchable_content ), $search_term );
 				}
 			);
 		}
 
-		// Filter by date range
+		// Filter by date range with improved validation
 		if ( ! empty( $options['date_from'] ) || ! empty( $options['date_to'] ) ) {
-			$date_from = $options['date_from'] ?? '1970-01-01';
-			$date_to = $options['date_to'] ?? '2099-12-31';
+			$date_from = $this->validate_date( $options['date_from'] ?? '1970-01-01' );
+			$date_to = $this->validate_date( $options['date_to'] ?? '2099-12-31' );
 
 			$filtered = array_filter(
 				$filtered,
@@ -497,7 +543,57 @@ class WPLogReaderService implements ServiceInterface {
 			);
 		}
 
+		// Apply sorting if specified
+		if ( ! empty( $options['sort_by'] ) ) {
+			$sort_field = $options['sort_by'];
+			$sort_order = $options['sort_order'] ?? 'desc';
+
+			usort(
+				$filtered,
+				function ( $a, $b ) use ( $sort_field, $sort_order ) {
+					$a_value = $this->get_sort_value( $a, $sort_field );
+					$b_value = $this->get_sort_value( $b, $sort_field );
+
+					$result = $a_value <=> $b_value;
+					return $sort_order === 'desc' ? -$result : $result;
+				}
+			);
+		}
+
 		return array_values( $filtered );
+	}
+
+	/**
+	 * Get sortable value from an entry.
+	 *
+	 * @param array  $entry Entry data.
+	 * @param string $field Field to sort by.
+	 * @return mixed
+	 */
+	private function get_sort_value( array $entry, string $field ) {
+		switch ( $field ) {
+			case 'timestamp':
+				return strtotime( $entry['timestamp'] );
+			case 'level':
+				return $this->log_levels[ $entry['level'] ] ?? 7;
+			case 'type':
+				return strtolower( $entry['type'] ?? '' );
+			case 'message':
+				return strtolower( $entry['message'] ?? '' );
+			default:
+				return $entry[ $field ] ?? '';
+		}
+	}
+
+	/**
+	 * Validate and normalize date string.
+	 *
+	 * @param string $date Date string.
+	 * @return string
+	 */
+	private function validate_date( string $date ): string {
+		$timestamp = strtotime( $date );
+		return $timestamp ? gmdate( 'Y-m-d', $timestamp ) : '1970-01-01';
 	}
 
 	/**
@@ -508,8 +604,8 @@ class WPLogReaderService implements ServiceInterface {
 	 * @return array
 	 */
 	private function paginate_entries( array $entries, array $options ): array {
-		$limit = $options['limit'] ?? 100;
-		$offset = $options['offset'] ?? 0;
+		$limit = max( 1, min( (int) ( $options['limit'] ?? 100 ), 1000 ) );
+		$offset = max( 0, (int) ( $options['offset'] ?? 0 ) );
 
 		return array_slice( $entries, $offset, $limit );
 	}
@@ -532,48 +628,44 @@ class WPLogReaderService implements ServiceInterface {
 		$entries = $data['entries'];
 
 		try {
-			switch ( $format ) {
-				case 'json':
-					$content = wp_json_encode( $entries, JSON_PRETTY_PRINT );
-					$mime_type = 'application/json';
-					$extension = 'json';
-					break;
+			$result = match ( $format ) {
+				'json' => [
+					'content'   => wp_json_encode( $entries, JSON_PRETTY_PRINT ),
+					'mime_type' => 'application/json',
+					'extension' => 'json',
+				],
+				'csv' => [
+					'content'   => $this->export_to_csv( $entries ),
+					'mime_type' => 'text/csv',
+					'extension' => 'csv',
+				],
+				'txt' => [
+					'content'   => $this->export_to_text( $entries ),
+					'mime_type' => 'text/plain',
+					'extension' => 'txt',
+				],
+				default => throw new Exception(
+					// translators: %s is the unsupported format.
+					sprintf( __( 'Unsupported export format: %s', 'debug-suite' ), $format )
+				),
+			};
 
-				case 'csv':
-					$content = $this->export_to_csv( $entries );
-					$mime_type = 'text/csv';
-					$extension = 'csv';
-					break;
-
-				case 'txt':
-					$content = $this->export_to_text( $entries );
-					$mime_type = 'text/plain';
-					$extension = 'txt';
-					break;
-
-				default:
-					return ServiceResponse::failure(
-						// translators: %s is the unsupported format.
-						sprintf( __( 'Unsupported export format: %s', 'debug-suite' ), $format ),
-						'invalid_format'
-					);
-			}
-
-			return ServiceResponse::success(
-				[
-					'content'   => $content,
-					'mime_type' => $mime_type,
-					'filename'  => 'debug-log-export-' . gmdate( 'Y-m-d-H-i-s' ) . '.' . $extension,
-					'size'      => strlen( $content ),
-					'entries'   => count( $entries ),
-				]
+			$result['filename'] = sprintf(
+				'debug-log-export-%s.%s',
+				gmdate( 'Y-m-d-H-i-s' ),
+				$result['extension']
 			);
+			$result['size'] = strlen( $result['content'] );
+			$result['entries'] = count( $entries );
+
+			return ServiceResponse::success( $result );
 
 		} catch ( Exception $e ) {
 			return ServiceResponse::failure(
 				// translators: %s is the error message.
 				sprintf( __( 'Export failed: %s', 'debug-suite' ), $e->getMessage() ),
-				'export_error'
+				'export_error',
+				[ 'error' => $e->getMessage() ]
 			);
 		}
 	}
@@ -593,11 +685,13 @@ class WPLogReaderService implements ServiceInterface {
 			[
 				'Timestamp',
 				'Level',
+				'Type',
 				'Message',
-				'Has Stack Trace',
-				'Stack Trace Frames',
 				'File',
-				'Line Number',
+				'Line',
+				'Has Stack Trace',
+				'Stack Trace Summary',
+				'Raw Line',
 			]
 		);
 
@@ -606,12 +700,14 @@ class WPLogReaderService implements ServiceInterface {
 				$output,
 				[
 					$entry['timestamp'],
-					$entry['level'],
+					strtoupper( $entry['level'] ),
+					$entry['type'],
 					$entry['message'],
+					$entry['file'] ?? '',
+					$entry['line'] ?? '',
 					$entry['has_stack_trace'] ? 'Yes' : 'No',
-					$entry['has_stack_trace'] ? $entry['stack_trace']['frame_count'] : 0,
+					$entry['has_stack_trace'] ? ( $entry['stack_trace']['summary'] ?? '' ) : '',
 					$entry['raw_line'],
-					$entry['line_number'],
 				]
 			);
 		}
@@ -632,27 +728,30 @@ class WPLogReaderService implements ServiceInterface {
 	private function export_to_text( array $entries ): string {
 		$lines = [];
 		$lines[] = '# Debug Log Export';
-		$lines[] = '# Generated: ' . gmdate( 'Y-m-d H:i:s' ) . ' UTC';
-		$lines[] = '# Total Entries: ' . count( $entries );
+		$lines[] = sprintf( '# Generated: %s UTC', gmdate( 'Y-m-d H:i:s' ) );
+		$lines[] = sprintf( '# Total Entries: %d', count( $entries ) );
 		$lines[] = '';
 
 		foreach ( $entries as $i => $entry ) {
 			$lines[] = sprintf( '## Entry #%d', $i + 1 );
 			$lines[] = sprintf( 'Timestamp: %s', $entry['timestamp'] );
 			$lines[] = sprintf( 'Level: %s', strtoupper( $entry['level'] ) );
-			$lines[] = sprintf( 'Line: %d', $entry['line_number'] );
+			$lines[] = sprintf( 'Type: %s', $entry['type'] );
+
+			if ( ! empty( $entry['file'] ) ) {
+				$lines[] = sprintf( 'File: %s', $entry['file'] );
+				if ( ! empty( $entry['line'] ) ) {
+					$lines[] = sprintf( 'Line: %d', $entry['line'] );
+				}
+			}
+
 			$lines[] = sprintf( 'Message: %s', $entry['message'] );
 
 			if ( $entry['has_stack_trace'] ) {
-				$lines[] = sprintf( 'Stack Trace: %d frames', $entry['stack_trace']['frame_count'] );
 				$lines[] = '';
-				$lines[] = '### Stack Trace Details:';
+				$lines[] = '### Stack Trace:';
 				foreach ( $entry['stack_trace']['frames'] as $frame ) {
 					$lines[] = sprintf( '#%d %s', $frame['number'], $frame['raw'] );
-				}
-				if ( ! empty( $entry['stack_trace']['summary'] ) ) {
-					$lines[] = '';
-					$lines[] = 'Summary: ' . $entry['stack_trace']['summary'];
 				}
 			}
 

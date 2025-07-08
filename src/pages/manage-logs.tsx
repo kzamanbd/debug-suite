@@ -58,7 +58,7 @@ const ManageLogs = () => {
         }
     };
 
-    const handleClearLogs = async () => {
+    const handleClearLogs = () => {
         if (selectedFiles.length === 0) {
             alert('Please select at least one log file to clear.');
             return;
@@ -81,7 +81,7 @@ const ManageLogs = () => {
         }, 1500);
     };
 
-    const handleDownloadLogs = async () => {
+    const handleDownloadLogs = () => {
         if (selectedFiles.length === 0) {
             alert('Please select at least one log file to download.');
             return;
@@ -95,7 +95,7 @@ const ManageLogs = () => {
         }, 1000);
     };
 
-    const handleArchiveLogs = async () => {
+    const handleArchiveLogs = () => {
         if (selectedFiles.length === 0) {
             alert('Please select at least one log file to archive.');
             return;

@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @covers \DebugSuite\Core\Container\Container
  * @group container
  * @group enhanced-features
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class ContainerTest extends TestCase {
 

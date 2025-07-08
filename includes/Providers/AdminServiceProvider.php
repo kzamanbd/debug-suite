@@ -18,10 +18,9 @@ class AdminServiceProvider extends AbstractServiceProvider {
 	];
 
 	public function register( Container $container ): void {
-		// Modern PHP-DI style definition array approach
+		// Simple admin service registration
 		$container->add_definitions(
 			[
-				// Admin service with object creation
 				Admin::class => $container->object( Admin::class ),
 			]
 		);

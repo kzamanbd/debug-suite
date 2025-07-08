@@ -3,6 +3,9 @@
  * Value definition for dependency injection.
  *
  * @package DebugSuite
+ *
+ * @internal This class is for internal container use only.
+ *           Use $container->object() and $container->autowire() instead.
  */
 
 namespace DebugSuite\Core\Container\Definitions;
@@ -11,16 +14,19 @@ namespace DebugSuite\Core\Container\Definitions;
  * Value definition for dependency injection.
  *
  * Represents a static value that will be returned directly.
- * Follow PHP-DI's value pattern for simple value injection.
+ * Follow value pattern for simple value injection.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
+ *
+ * @internal This class is for internal container use only.
+ *           Use $container->object() and $container->autowire() in service providers instead.
  */
 class ValueDefinition implements DefinitionInterface {
 
 	/**
 	 * The definition name.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
@@ -29,7 +35,7 @@ class ValueDefinition implements DefinitionInterface {
 	/**
 	 * The value to return.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var mixed
 	 */
@@ -38,7 +44,7 @@ class ValueDefinition implements DefinitionInterface {
 	/**
 	 * Constructor.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param mixed $value The value to return.
 	 */
@@ -50,7 +56,7 @@ class ValueDefinition implements DefinitionInterface {
 	/**
 	 * Get the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
@@ -61,7 +67,7 @@ class ValueDefinition implements DefinitionInterface {
 	/**
 	 * Set the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name The definition name.
 	 *
@@ -75,7 +81,7 @@ class ValueDefinition implements DefinitionInterface {
 	/**
 	 * Resolve this definition to an instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param callable $resolver Function to resolve dependencies.
 	 *
@@ -88,7 +94,7 @@ class ValueDefinition implements DefinitionInterface {
 	/**
 	 * Check if this definition is cacheable (singleton).
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */

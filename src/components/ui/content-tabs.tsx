@@ -1,9 +1,9 @@
 import { classNames } from '@/utils';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface ContentTabsProps {
-    tabs: { key: string; label: string; content: ReactNode }[];
+    tabs: Array<{ key: string; label: string; content: ReactNode }>;
     className?: string;
 }
 

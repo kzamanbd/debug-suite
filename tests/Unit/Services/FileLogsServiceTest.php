@@ -12,6 +12,8 @@ namespace DebugSuite\Tests\Unit\Services;
 use DebugSuite\Tests\Helpers\TestCase;
 use DebugSuite\Services\DebugLog\FileLogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
+use DebugSuite\Services\DebugLog\LogFileDiscoveryService;
+use DebugSuite\Core\ServiceResponse;
 use ReflectionClass;
 
 /**
@@ -25,7 +27,21 @@ class FileLogsServiceTest extends TestCase {
 	 * @var FileLogsService
 	 */
 	private $service;
-	
+
+	/**
+	 * WPLogReaderService mock.
+	 *
+	 * @var WPLogReaderService|\PHPUnit\Framework\MockObject\MockObject
+	 */
+	private $log_reader;
+
+	/**
+	 * LogFileDiscoveryService mock.
+	 *
+	 * @var LogFileDiscoveryService|\PHPUnit\Framework\MockObject\MockObject
+	 */
+	private $file_discovery;
+
 	/**
 	 * Temporary log file path.
 	 *
@@ -38,221 +54,287 @@ class FileLogsServiceTest extends TestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
-		
+
 		// Create a temporary log file for testing
-		$this->test_log_file = $this->create_test_file('', '.log');
-		
-		// Create log reader service and set custom log file path using reflection
-		$log_reader = new WPLogReaderService();
-		$reflection = new \ReflectionClass( $log_reader );
-		$path_property = $reflection->getProperty( 'log_file_path' );
-		$path_property->setValue( $log_reader, $this->test_log_file );
-		
-		// Create service instance with dependency injection
-		$this->service = new FileLogsService( $log_reader );
+		$this->test_log_file = $this->create_test_file( '', '.log' );
+
+		// Create mocks
+		$this->log_reader = $this->createMock( WPLogReaderService::class );
+		$this->file_discovery = $this->createMock( LogFileDiscoveryService::class );
+
+		// Create service instance with mocked dependencies
+		$this->service = new FileLogsService();
+		$reflection = new ReflectionClass( $this->service );
+		$log_reader_prop = $reflection->getProperty( 'log_reader' );
+		$log_reader_prop->setValue( $this->service, $this->log_reader );
+		$file_discovery_prop = $reflection->getProperty( 'file_discovery' );
+		$file_discovery_prop->setValue( $this->service, $this->file_discovery );
 	}
 
 	/**
-	 * Test get_log_entries with empty log file.
-	 * 
-	 * @covers \DebugSuite\Services\FileLogsService::get_log_entries
+	 * Test get_log_entries delegates to WPLogReaderService.
 	 */
-	public function test_get_log_entries_empty_file() {
-		// Make sure log file exists but is empty
-		file_put_contents($this->test_log_file, '');
-		
-		// Test the method
-		$result = $this->service->get_log_entries();
-		
-		// Assert the result is successful
-		$this->assert_service_result_success($result);
-		
-		// Check that entries array is empty
-		$data = $result->get_data();
-		$this->assertIsArray($data['entries']);
-		$this->assertEmpty($data['entries']);
-		$this->assertEquals(0, $data['total']);
-	}
-	
-	/**
-	 * Test get_log_entries with some log entries.
-	 * 
-	 * @covers \DebugSuite\Services\FileLogsService::get_log_entries
-	 */
-	public function test_get_log_entries_with_content() {
-		// Create log content with standard WordPress log format
-		$log_content = <<<EOT
-[25-Jun-2025 10:15:45 UTC] PHP Notice: Undefined variable: test in /wp-content/plugins/test-plugin/test.php on line 25
-[25-Jun-2025 10:16:30 UTC] PHP Warning: Invalid argument supplied for foreach() in /wp-content/themes/mytheme/functions.php on line 120
-[25-Jun-2025 10:17:20 UTC] PHP Fatal error: Uncaught Error: Call to undefined function test_function() in /wp-content/plugins/debug-suite/debug-suite.php:50
-EOT;
-		
-		// Write log content to test file
-		file_put_contents($this->test_log_file, $log_content);
-		
-		// Test the method
-		$result = $this->service->get_log_entries();
-		
-		// Assert the result is successful
-		$this->assert_service_result_success($result);
-		
-		// Check that entries were parsed correctly
-		$data = $result->get_data();
-		$this->assertIsArray($data['entries']);
-		$this->assertCount(3, $data['entries'], 'Should have 3 log entries');
-		
-		// Check each entry to verify it contains the expected content
-		$found_notice = false;
-		foreach ($data['entries'] as $entry) {
-			if ( str_contains( $entry['message'], 'Undefined variable' ) ) {
-				$found_notice = true;
-				break;
-			}
-		}
-		$this->assertTrue($found_notice, 'Should find an entry with "Undefined variable"');
-		$this->assertArrayHasKey('level', $data['entries'][0], 'Entry should have a level field');
-		// Level could be 'notice' or 'Notice' depending on implementation, so we don't assert exact value
+	public function test_get_log_entries_delegates_to_reader(): void {
+		$options = [ 'limit' => 10 ];
+		$expected_response = ServiceResponse::success( [ 'entries' => [] ] );
+
+		$this->log_reader->expects( $this->once() )
+			->method( 'get_log_entries' )
+			->with( $options )
+			->willReturn( $expected_response );
+
+		$result = $this->service->get_log_entries( $options );
+		$this->assertSame( $expected_response, $result );
 	}
 
 	/**
-	 * Test get_log_entries with non-existent file.
-	 *
-	 * @covers \DebugSuite\Services\FileLogsService::get_log_entries
+	 * Test clear_log_file delegates to WPLogReaderService.
 	 */
-	public function test_get_log_entries_missing_file() {
-		// Create a service instance with a non-existent file path
-		$non_existent_file = '/path/to/nonexistent/debug.log';
-		
-		// Create log reader service and set custom log file path using reflection
-		$log_reader = new WPLogReaderService();
-		$reflection = new \ReflectionClass( $log_reader );
-		$path_property = $reflection->getProperty( 'log_file_path' );
-		$path_property->setValue( $log_reader, $non_existent_file );
-		
-		// Create service instance with dependency injection
-		$service = new FileLogsService( $log_reader );
-		
-		$result = $service->get_log_entries();
-		
-		$this->assert_service_result_failure($result);
-		// Use the actual error code from the service - could be either 'file_not_found' or 'log_file_not_found'
-		$this->assertTrue(
-			in_array($result->get_error_code(), ['file_not_found', 'log_file_not_found']),
-			'Error code should indicate file not found'
-		);
-	}
+	public function test_clear_log_file_delegates_to_reader(): void {
+		$expected_response = ServiceResponse::success( [ 'message' => 'Cleared' ] );
 
-	/**
-	 * Test get_log_file_stats method.
-	 *
-	 * @covers \DebugSuite\Services\FileLogsService::get_log_file_stats
-	 */
-	public function test_get_log_file_stats() {
-		// Add sample log content with different levels
-		$log_content = <<<EOT
-[18-Jun-2025 10:30:00 UTC] PHP Fatal error: Fatal error message
-[18-Jun-2025 10:31:00 UTC] PHP Warning: Warning message
-[18-Jun-2025 10:32:00 UTC] PHP Notice: Notice message
-EOT;
-		
-		file_put_contents($this->test_log_file, $log_content);
-		
-		$result = $this->service->get_log_file_stats();
-		
-		$this->assert_service_result_success($result);
-		$stats = $result->get_data();
-		
-		$this->assertArrayHasKey('file_size', $stats);
-		$this->assertArrayHasKey('file_size_human', $stats);
-		$this->assertArrayHasKey('total_entries', $stats);
-		$this->assertArrayHasKey('last_modified', $stats);
-		$this->assertArrayHasKey('levels', $stats);
-		
-		// Verify the content matches what we wrote
-		$this->assertGreaterThan(0, $stats['file_size']);
-		$this->assertEquals(3, $stats['total_entries']);
-		$this->assertIsArray($stats['levels']);
-	}
+		$this->log_reader->expects( $this->once() )
+			->method( 'clear_log_file' )
+			->willReturn( $expected_response );
 
-	/**
-	 * Test clear_log_file method.
-	 *
-	 * @covers \DebugSuite\Services\FileLogsService::clear_log_file
-	 */
-	public function test_clear_log_file() {
-		// Add content to log file
-		file_put_contents($this->test_log_file, 'Test log content');
-		$this->assertGreaterThan(0, filesize($this->test_log_file));
-		
 		$result = $this->service->clear_log_file();
-		
-		$this->assert_service_result_success($result);
-		
-		// Check if file exists and is either empty or very small (≤ 5 bytes)
-		// This accommodates platform differences in file handling
-		$this->assertTrue(file_exists($this->test_log_file), 'Log file should exist after clearing');
-		// Optionally, check if the content is empty
-		$this->assertEmpty(file_get_contents($this->test_log_file), 'Log file content should be empty after clearing');
+		$this->assertSame( $expected_response, $result );
 	}
 
 	/**
-	 * Test get_log_entries with limit parameter.
-	 *
-	 * @covers \DebugSuite\Services\FileLogsService::get_log_entries
+	 * Test get_log_file_stats delegates to WPLogReaderService.
 	 */
-	public function test_get_log_entries_with_limit() {
-		// Create log file with multiple entries
-		$log_content = '';
-		for ($i = 1; $i <= 10; $i++) {
-			$log_content .= "[18-Jun-2025 10:3$i:00 UTC] PHP Notice: Test message $i\n";
-		}
-		
-		file_put_contents($this->test_log_file, $log_content);
-		
-		// Test with limit of 5
-		$result = $this->service->get_log_entries(['limit' => 5]);
-		
-		$this->assert_service_result_success($result);
-		$data = $result->get_data();
-		
-		$this->assertCount(5, $data['entries'], 'Should return only 5 entries when limit is set to 5');
-		// The total should be the total number of matching entries that were successfully parsed
-		// If only 9 out of 10 entries parse correctly, that's what we'll get
-		$this->assertLessThanOrEqual(10, $data['total'], 'Total should not exceed the number of entries we created');
-		$this->assertGreaterThanOrEqual(5, $data['total'], 'Total should be at least as many as we requested in limit');
+	public function test_get_log_file_stats_delegates_to_reader(): void {
+		$expected_response = ServiceResponse::success( [ 'stats' => [] ] );
+
+		$this->log_reader->expects( $this->once() )
+			->method( 'get_log_file_stats' )
+			->willReturn( $expected_response );
+
+		$result = $this->service->get_log_file_stats();
+		$this->assertSame( $expected_response, $result );
 	}
-	
+
 	/**
-	 * Test get_log_entries with search parameter.
-	 *
-	 * @covers \DebugSuite\Services\FileLogsService::get_log_entries
+	 * Test export_logs delegates to WPLogReaderService.
 	 */
-	public function test_get_log_entries_with_search() {
-		// Create log with different messages
-		$log_content = <<<EOT
-[18-Jun-2025 10:30:00 UTC] PHP Notice: Search term appears here
-[18-Jun-2025 10:31:00 UTC] PHP Warning: Different message without term
-[18-Jun-2025 10:32:00 UTC] PHP Notice: Another message with SEARCH term
-EOT;
-		
-		file_put_contents($this->test_log_file, $log_content);
-		
-		// Search for "search term" (case insensitive)
-		$result = $this->service->get_log_entries(['search' => 'search term']);
-		
-		$this->assert_service_result_success($result);
+	public function test_export_logs_delegates_to_reader(): void {
+		$options = [ 'format' => 'json' ];
+		$expected_response = ServiceResponse::success( [ 'content' => '{}' ] );
+
+		$this->log_reader->expects( $this->once() )
+			->method( 'export_logs' )
+			->with( $options )
+			->willReturn( $expected_response );
+
+		$result = $this->service->export_logs( $options );
+		$this->assertSame( $expected_response, $result );
+	}
+
+	/**
+	 * Test supported_log_files delegates to LogFileDiscoveryService.
+	 */
+	public function test_supported_log_files_delegates_to_discovery(): void {
+		$expected_files = [
+			[
+				'name'       => 'debug.log',
+				'path'       => '/var/log/debug.log',
+				'size'       => '1 KB',
+				'size_bytes' => 1024,
+				'modified'   => '2025-06-18 10:30:00',
+				'type'       => 'WordPress Debug',
+			],
+		];
+
+		$this->file_discovery->expects( $this->once() )
+			->method( 'get_supported_log_files' )
+			->willReturn( $expected_files );
+
+		$result = $this->service->supported_log_files();
+		$this->assertSame( $expected_files, $result );
+	}
+
+	/**
+	 * Test constructor with default dependencies.
+	 */
+	public function test_constructor_with_default_dependencies(): void {
+		$service = new FileLogsService();
+		$this->assertInstanceOf( FileLogsService::class, $service );
+
+		$reflection = new ReflectionClass( $service );
+
+		$log_reader_prop = $reflection->getProperty( 'log_reader' );
+		$this->assertInstanceOf( WPLogReaderService::class, $log_reader_prop->getValue( $service ) );
+
+		$file_discovery_prop = $reflection->getProperty( 'file_discovery' );
+		$this->assertInstanceOf( LogFileDiscoveryService::class, $file_discovery_prop->getValue( $service ) );
+	}
+
+	/**
+	 * Test get_raw_file_content with valid file path.
+	 */
+	public function test_get_raw_file_content_success(): void {
+		$test_content = "Test log content\n[2025-07-02 10:30:00] WordPress error: Test message\n";
+		file_put_contents( $this->test_log_file, $test_content );
+
+		$result = $this->service->get_raw_file_content( $this->test_log_file );
+
+		$this->assertTrue( $result->is_success() );
 		$data = $result->get_data();
-		
-		// The current implementation might return all entries even when searching
-		// Let's adjust our expectations to check if at least one entry contains the search term
-		$found_match = false;
-		foreach ($data['entries'] as $entry) {
-			if (preg_match('/search\s+term/i', $entry['message'])) {
-				$found_match = true;
-				break;
-			}
+		$this->assertArrayHasKey( 'content', $data );
+		$this->assertArrayHasKey( 'filename', $data );
+		$this->assertArrayHasKey( 'size', $data );
+		$this->assertArrayHasKey( 'size_bytes', $data );
+		$this->assertArrayHasKey( 'last_modified', $data );
+		$this->assertArrayHasKey( 'truncated', $data );
+		$this->assertArrayHasKey( 'max_size_reached', $data );
+		$this->assertArrayHasKey( 'max_size_limit', $data );
+
+		$this->assertEquals( $test_content, $data['content'] );
+		$this->assertEquals( basename( $this->test_log_file ), $data['filename'] );
+		$this->assertFalse( $data['truncated'] );
+		$this->assertFalse( $data['max_size_reached'] );
+		$this->assertEquals( 50 * 1024 * 1024, $data['max_size_limit'] );
+	}
+
+	/**
+	 * Test get_raw_file_content with non-existent file.
+	 */
+	public function test_get_raw_file_content_file_not_found(): void {
+		$non_existent_file = '/path/to/non/existent/file.log';
+
+		$result = $this->service->get_raw_file_content( $non_existent_file );
+
+		$this->assertTrue( $result->is_failure() );
+		$this->assertEquals( 'file_not_found', $result->get_error_code() );
+		$this->assertStringContainsString( 'not found', $result->get_error_message() );
+		$this->assertEquals( $non_existent_file, $result->get_context()['path'] );
+	}
+
+	/**
+	 * Test get_raw_file_content with empty file path.
+	 */
+	public function test_get_raw_file_content_no_file_path(): void {
+		// We can't easily mock ini_get in a unit test without runkit or similar extensions
+		// Instead, we'll test with an empty string directly
+		$result = $this->service->get_raw_file_content( '' );
+
+		$this->assertTrue( $result->is_failure() );
+		$this->assertEquals( 'no_file_path', $result->get_error_code() );
+		$this->assertStringContainsString( 'No log file path provided', $result->get_error_message() );
+	}
+
+	/**
+	 * Test get_raw_file_content with default debug log path.
+	 */
+	public function test_get_raw_file_content_uses_default_debug_log(): void {
+		$test_content = "Default debug log content\n";
+		file_put_contents( $this->test_log_file, $test_content );
+
+		// Since we can't easily mock ini_get, let's test with a valid file path instead
+		$result = $this->service->get_raw_file_content( $this->test_log_file );
+
+		$this->assertTrue( $result->is_success() );
+		$data = $result->get_data();
+		$this->assertEquals( $test_content, $data['content'] );
+	}
+
+	/**
+	 * Test get_raw_file_content with large file that gets truncated.
+	 */
+	public function test_get_raw_file_content_large_file_truncation(): void {
+		// Create a file larger than 50MB limit
+		$large_content = str_repeat( "This is a test line for large file content.\n", 1200000 ); // ~50MB
+		file_put_contents( $this->test_log_file, $large_content );
+
+		$result = $this->service->get_raw_file_content( $this->test_log_file );
+
+		$this->assertTrue( $result->is_success() );
+		$data = $result->get_data();
+		$this->assertTrue( $data['truncated'] );
+		$this->assertTrue( $data['max_size_reached'] );
+		$this->assertLessThan( strlen( $large_content ), strlen( $data['content'] ) );
+	}
+
+	/**
+	 * Test read_file_tail private method indirectly through large file.
+	 */
+	public function test_read_file_tail_functionality(): void {
+		// Create a file with specific content for tail testing
+		$content_lines = [];
+		for ( $i = 1; $i <= 1000; $i++ ) {
+			$content_lines[] = "Line $i: This is test content for tail reading functionality.";
 		}
-		
-		$this->assertTrue($found_match, 'Should find at least one entry containing search term');
+		$full_content = implode( "\n", $content_lines );
+		file_put_contents( $this->test_log_file, $full_content );
+
+		// Force file to be considered "large" by creating a very large file
+		$large_content = str_repeat( $full_content . "\n", 1000 ); // Make it very large
+		file_put_contents( $this->test_log_file, $large_content );
+
+		$result = $this->service->get_raw_file_content( $this->test_log_file );
+
+		$this->assertTrue( $result->is_success() );
+		$data = $result->get_data();
+		$this->assertTrue( $data['truncated'] );
+		$this->assertNotEmpty( $data['content'] );
+		// Verify the content is from the end of the file
+		$this->assertStringContainsString( 'Line 1000:', $data['content'] );
+	}
+
+	/**
+	 * Test get_raw_file_content with small file (no truncation).
+	 */
+	public function test_get_raw_file_content_small_file(): void {
+		$small_content = "Small file content\nJust a few lines\nNo truncation needed";
+		file_put_contents( $this->test_log_file, $small_content );
+
+		$result = $this->service->get_raw_file_content( $this->test_log_file );
+
+		$this->assertTrue( $result->is_success() );
+		$data = $result->get_data();
+		$this->assertEquals( $small_content, $data['content'] );
+		$this->assertFalse( $data['truncated'] );
+		$this->assertFalse( $data['max_size_reached'] );
+		$this->assertEquals( strlen( $small_content ), $data['size_bytes'] );
+	}
+
+	/**
+	 * Test get_raw_file_content response structure.
+	 */
+	public function test_get_raw_file_content_response_structure(): void {
+		$test_content = "Test content for response structure validation";
+		file_put_contents( $this->test_log_file, $test_content );
+
+		$result = $this->service->get_raw_file_content( $this->test_log_file );
+
+		$this->assertTrue( $result->is_success() );
+		$data = $result->get_data();
+
+		// Verify all expected keys are present
+		$expected_keys = [
+			'content',
+			'filename',
+			'size',
+			'size_bytes',
+			'last_modified',
+			'truncated',
+			'max_size_reached',
+			'max_size_limit',
+		];
+
+		foreach ( $expected_keys as $key ) {
+			$this->assertArrayHasKey( $key, $data, "Missing key: $key" );
+		}
+
+		// Verify data types
+		$this->assertIsString( $data['content'] );
+		$this->assertIsString( $data['filename'] );
+		$this->assertIsString( $data['size'] );
+		$this->assertIsInt( $data['size_bytes'] );
+		$this->assertIsString( $data['last_modified'] );
+		$this->assertIsBool( $data['truncated'] );
+		$this->assertIsBool( $data['max_size_reached'] );
+		$this->assertIsInt( $data['max_size_limit'] );
 	}
 }

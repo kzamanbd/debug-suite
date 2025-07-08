@@ -1,6 +1,7 @@
 import { classNames } from '@/utils';
 import { Dialog, DialogBackdrop, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
-import React, { Fragment, HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
+import React, { Fragment } from 'react';
 
 export type ModalProps = {
     children: React.ReactNode;

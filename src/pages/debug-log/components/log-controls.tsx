@@ -4,14 +4,14 @@
  * @since 1.0.0
  */
 import Button from '@/components/ui/button';
-import Combobox from '@/components/ui/combobox';
-import InputField from '@/components/ui/input-field';
-import Listbox from '@/components/ui/listbox';
+import SearchableSelect from '@/components/ui/select';
+import InputField from '@/components/ui/text-input';
+import { useConfirm } from '@/hooks/useConfirm';
 import { classNames } from '@/utils';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
-    ChevronDownIcon,
-    ChevronUpIcon,
+    CopyIcon,
     DownloadIcon,
     EyeIcon,
     FileTextIcon,
@@ -21,7 +21,7 @@ import {
     XIcon
 } from 'lucide-react';
 import { exportOptions, levelOptions, perPageOptions, sortOptions } from '../constants';
-import type { LogFile, LogFilters, ViewMode } from '../types';
+import type { LogFile, LogFilters, RawFileContent, ViewMode } from '../types';
 
 interface LogControlsProps {
     // File selection
@@ -46,6 +46,10 @@ interface LogControlsProps {
     onExport: (format: 'json' | 'csv' | 'txt') => void;
     clearing: boolean;
     filesLoading?: boolean;
+    loading?: boolean;
+
+    // Raw file content (only used in raw mode)
+    rawContent?: RawFileContent | null;
 }
 
 const LogControls = ({
@@ -61,12 +65,23 @@ const LogControls = ({
     onClear,
     onExport,
     clearing,
-    filesLoading = false
+    filesLoading = false,
+    rawContent,
+    loading = false
 }: LogControlsProps) => {
+    const confirm = useConfirm({
+        type: 'confirm',
+        showCancel: true,
+        showOk: true,
+        okText: __('Ok, Clear', 'debug-suite'),
+        cancelText: __('Cancel', 'debug-suite')
+    });
+    const [copying, setCopying] = useState(false);
+
     const filteredLogFiles = logFiles.map((file) => ({
         value: file.path,
         label: file.name,
-        meta: `${file.type} • ${file.size} • Modified: ${file.modified}`
+        ...file
     }));
 
     const selectedLogFile = () => {
@@ -78,8 +93,7 @@ const LogControls = ({
         }
         return {
             value: selectedFile,
-            label: logFiles.find((f) => f.path === selectedFile)?.name || 'debug.log',
-            meta: `${logFiles.find((f) => f.path === selectedFile)?.type || 'WordPress Debug'} • ${logFiles.find((f) => f.path === selectedFile)?.size || '0 B'}`
+            label: logFiles.find((f) => f.path === selectedFile)?.name || 'debug.log'
         };
     };
 
@@ -87,14 +101,11 @@ const LogControls = ({
         onFiltersChange({ search: '' });
     };
 
-    const toggleSortOrder = () => {
-        const newOrder = filters.sortOrder === 'asc' ? 'desc' : 'asc';
-        onFiltersChange({ sortOrder: newOrder });
-    };
-
-    const handleClear = () => {
+    const handleClear = async () => {
         if (
-            confirm(__('Are you sure you want to clear all log entries? This action cannot be undone.', 'debug-suite'))
+            await confirm(
+                __('Are you sure you want to clear all log entries? This action cannot be undone.', 'debug-suite')
+            )
         ) {
             onClear();
         }
@@ -107,23 +118,54 @@ const LogControls = ({
         onExport(format as 'json' | 'csv' | 'txt');
     };
 
+    const handleCopy = async () => {
+        if (!rawContent?.content) return;
+
+        try {
+            setCopying(true);
+            await navigator.clipboard.writeText(rawContent.content);
+
+            // Show temporary success feedback
+            setTimeout(() => {
+                setCopying(false);
+            }, 2000);
+        } catch (error) {
+            console.error('Failed to copy content:', error);
+            setCopying(false);
+        }
+    };
+
+    const handleDownload = () => {
+        if (!rawContent) return;
+
+        const blob = new Blob([rawContent.content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = rawContent.filename || 'debug.log';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="divide divide-y">
             {/* Header with file selector */}
             <div className="bg-white py-4">
                 <div className="flex flex-col flex-wrap gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                        <Combobox
+                        <SearchableSelect
                             options={filteredLogFiles}
                             value={selectedLogFile()}
                             onChange={(option) => onFileChange(option?.value || '')}
                             isDisabled={filesLoading}
-                            className="w-full sm:min-w-[200px] md:min-w-[220px] lg:min-w-[250px]"
+                            className="w-56"
                             placeholder={__('Select a log file', 'debug-suite')}
                         />
 
                         {/* View Mode Toggle */}
-                        <nav className="flex w-full gap-x-0.5 rounded-lg bg-gray-100 p-0.5 md:gap-x-1 dark:bg-neutral-800">
+                        <nav className="flex gap-x-0.5 rounded-lg bg-gray-100 p-0.5 md:gap-x-1 dark:bg-neutral-800">
                             <button
                                 type="button"
                                 onClick={() => onViewModeChange('parsed')}
@@ -162,7 +204,7 @@ const LogControls = ({
                                     placeholder={__('Search in log...', 'debug-suite')}
                                     value={filters.search}
                                     onChange={(e) => onFiltersChange({ search: e.target.value })}
-                                    className="w-full pl-10 md:w-48 lg:w-64"
+                                    className="w-full pl-10 md:w-48"
                                 />
                                 {filters.search && (
                                     <button
@@ -175,8 +217,20 @@ const LogControls = ({
                                 )}
                             </div>
                         )}
-                        <Button onClick={onRefresh} className="shrink-0">
-                            <RefreshCwIcon className="h-4 w-4" />
+                        {viewMode === 'raw' && rawContent && (
+                            <>
+                                <Button onClick={handleCopy} disabled={copying}>
+                                    <CopyIcon className="mr-2 h-4 w-4" />
+                                    {copying ? __('Copied!', 'debug-suite') : __('Copy', 'debug-suite')}
+                                </Button>
+                                <Button onClick={handleDownload}>
+                                    <DownloadIcon className="mr-2 h-4 w-4" />
+                                    {__('Download', 'debug-suite')}
+                                </Button>
+                            </>
+                        )}
+                        <Button onClick={onRefresh} className="shrink-0" disabled={loading}>
+                            <RefreshCwIcon className={classNames('h-4 w-4', loading && 'animate-spin')} />
                             <span className="ml-2 hidden md:inline">{__('Refresh', 'debug-suite')}</span>
                         </Button>
                     </div>
@@ -189,33 +243,29 @@ const LogControls = ({
                     <div className="flex flex-col flex-wrap gap-4 md:gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:gap-4">
-                                <Combobox
+                                <SearchableSelect
                                     options={levelOptions}
                                     value={levelOptions.find((opt) => opt.value === filters.level) || levelOptions[0]}
                                     onChange={(option) => onFiltersChange({ level: option?.value || '' })}
-                                    className="w-[150px]"
                                 />
-                                <Combobox
+                                <SearchableSelect
                                     options={sortOptions}
                                     value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
-                                    onChange={(option) => onFiltersChange({ sortBy: option?.value || 'timestamp' })}
+                                    onChange={(option) => onFiltersChange({ sortBy: option?.value || '' })}
                                     className="w-[150px]"
                                 />
-                                <Button
-                                    onClick={toggleSortOrder}
-                                    className="flex items-center justify-center gap-1 md:gap-1.5"
-                                >
-                                    {filters.sortOrder === 'asc' ? (
-                                        <ChevronUpIcon className="h-4 w-4" />
-                                    ) : (
-                                        <ChevronDownIcon className="h-4 w-4" />
-                                    )}
-                                    <span className="hidden md:inline">
-                                        {filters.sortOrder === 'asc'
-                                            ? __('Ascending', 'debug-suite')
-                                            : __('Descending', 'debug-suite')}
-                                    </span>
-                                </Button>
+
+                                <SearchableSelect
+                                    options={perPageOptions}
+                                    value={
+                                        perPageOptions.find((opt) => opt.value === filters.perPage.toString()) ||
+                                        perPageOptions[0]
+                                    }
+                                    onChange={(option) =>
+                                        onFiltersChange({ perPage: parseInt(option?.value || '100', 10) })
+                                    }
+                                    className="w-[150px]"
+                                />
                             </div>
 
                             {/* Total entries display */}
@@ -239,36 +289,17 @@ const LogControls = ({
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 md:gap-3">
-                            <Combobox
-                                options={perPageOptions}
-                                value={
-                                    perPageOptions.find((opt) => opt.value === filters.perPage.toString()) ||
-                                    perPageOptions[1]
-                                }
-                                onChange={(option) => onFiltersChange({ perPage: parseInt(option?.value || '25') })}
-                                className="w-[150px]"
-                            />
-
-                            {/* Export Listbox */}
-                            <Listbox
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <SearchableSelect
                                 options={exportOptions}
-                                onChange={(option) => handleExport(option?.value || 'json')}
-                                formatButtonLabel={() => (
-                                    <div className="flex items-center">
-                                        <DownloadIcon className="mr-2 h-4 w-4" />
-                                        <span className="hidden md:inline">{__('Export', 'debug-suite')}</span>
-                                    </div>
-                                )}
-                                placeholder={__('Export', 'debug-suite')}
+                                value={null}
+                                onChange={(option) => handleExport(option?.value || '')}
+                                placeholder={__('Export as...', 'debug-suite')}
                                 className="w-[150px]"
                             />
-
-                            <Button onClick={handleClear} disabled={clearing} className="w-full sm:w-auto">
-                                <TrashIcon className="mr-2 h-4 w-4" />
-                                <span className="hidden md:inline">
-                                    {clearing ? __('Clearing...', 'debug-suite') : __('Clear', 'debug-suite')}
-                                </span>
+                            <Button onClick={handleClear} variant="danger" disabled={clearing} className="shrink-0">
+                                <TrashIcon className="h-4 w-4" />
+                                <span className="ml-2 hidden md:inline">{__('Clear', 'debug-suite')}</span>
                             </Button>
                         </div>
                     </div>

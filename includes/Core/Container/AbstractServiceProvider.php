@@ -13,14 +13,14 @@ namespace DebugSuite\Core\Container;
  * Provides common functionality for service providers including
  * registration tracking and service listing capabilities.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 abstract class AbstractServiceProvider implements ServiceProviderInterface {
 
 	/**
 	 * Services provided by this provider.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string>
 	 */
@@ -29,7 +29,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	/**
 	 * Register services with the container.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param Container $container The container instance.
 	 *
@@ -41,7 +41,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	 * Boot services after all providers have been registered.
 	 * Override this method in child classes if needed.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param Container $container The container instance.
 	 *
@@ -54,7 +54,7 @@ abstract class AbstractServiceProvider implements ServiceProviderInterface {
 	/**
 	 * Get the services provided by this provider.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string>
 	 */

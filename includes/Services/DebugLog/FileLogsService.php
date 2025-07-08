@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Enhanced file logs service using advanced log reader for WordPress debug log operations.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class FileLogsService implements ServiceInterface {
 
@@ -29,12 +29,18 @@ class FileLogsService implements ServiceInterface {
 	private WPLogReaderService $log_reader;
 
 	/**
-	 * Constructor for FileLogsService.
+	 * Log file discovery service.
 	 *
-	 * @param WPLogReaderService $log_reader The log reader service.
+	 * @var LogFileDiscoveryService
 	 */
-	public function __construct( WPLogReaderService $log_reader ) {
-		$this->log_reader = $log_reader;
+	private LogFileDiscoveryService $file_discovery;
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->log_reader = new WPLogReaderService();
+		$this->file_discovery = new LogFileDiscoveryService();
 	}
 
 	/**
@@ -87,115 +93,102 @@ class FileLogsService implements ServiceInterface {
 	 *
 	 * @return array
 	 */
-
 	public function supported_log_files(): array {
-		return [
-			$this->find_apache_log_file(),
-			$this->find_nginx_log_file(),
-			$this->find_redis_log_file(),
-			$this->find_php_fpm_error_log(),
-		];
+		return $this->file_discovery->get_supported_log_files();
 	}
 
 	/**
-	 * Find the PHP-FPM error log file.
+	 * Get raw file content for viewing.
 	 *
-	 * @return string|null
+	 * @param string|null $file_path Optional file path. If null, uses current debug log.
+	 * @return ServiceResponse
 	 */
-	public function find_php_fpm_error_log(): ?string {
-		$candidates = [
-			'/var/log/php-fpm.log',
-			'/var/log/php/php-fpm.log',
-			'/opt/bitnami/php/var/log/php-fpm.log',
-		];
-
-		// Check common PHP-FPM log locations
-		$candidates = array_merge( $candidates, glob( '/var/log/php-fpm*.log' ) );
-		$candidates = array_merge( $candidates, glob( '/var/log/php*.log' ) );
-
-		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
-				return $path;
-			}
+	public function get_raw_file_content( ?string $file_path = null ): ServiceResponse {
+		// Default to main debug log if no file specified
+		if ( empty( $file_path ) ) {
+			$file_path = ini_get( 'error_log' );
 		}
 
-		return null;
+		// Validate file path
+		if ( empty( $file_path ) ) {
+			return ServiceResponse::failure(
+				__( 'No log file path provided or configured.', 'debug-suite' ),
+				'no_file_path'
+			);
+		}
+
+		// Check if file exists first
+		if ( ! file_exists( $file_path ) ) {
+			return ServiceResponse::failure(
+				__( 'The requested log file was not found.', 'debug-suite' ),
+				'file_not_found',
+				[ 'path' => $file_path ]
+			);
+		}
+
+		// Check if file is readable
+		if ( ! is_readable( $file_path ) ) {
+			return ServiceResponse::failure(
+				__( 'Access to this file is not allowed.', 'debug-suite' ),
+				'file_access_denied',
+				[ 'path' => $file_path ]
+			);
+		}
+
+		// Get file information
+		$file_size = filesize( $file_path );
+		$max_size = 50 * 1024 * 1024; // 50MB limit
+
+		// For large files, limit the content to avoid memory issues
+		if ( $file_size > $max_size ) {
+			// Read only the last portion of the file
+			$content = $this->read_file_tail( $file_path, $max_size );
+			$truncated = true;
+		} else {
+			$content = file_get_contents( $file_path );
+			$truncated = false;
+		}
+
+		if ( $content === false ) {
+			return ServiceResponse::failure(
+				__( 'Failed to read the log file.', 'debug-suite' ),
+				'file_read_error',
+				[ 'path' => $file_path ]
+			);
+		}
+
+		return ServiceResponse::success(
+			[
+				'content'           => $content,
+				'filename'          => basename( $file_path ),
+				'size'              => size_format( $file_size ),
+				'size_bytes'        => $file_size,
+				'last_modified'     => gmdate( 'Y-m-d H:i:s', filemtime( $file_path ) ),
+				'truncated'         => $truncated,
+				'max_size_reached'  => $file_size > $max_size,
+				'max_size_limit'    => $max_size,
+			]
+		);
 	}
 
 	/**
-	 * Find the Apache error log file.
+	 * Read the tail of a large file efficiently.
 	 *
-	 * @return string|null
+	 * @param string $file_path The file path.
+	 * @param int    $bytes     Number of bytes to read from the end.
+	 * @return string|false
 	 */
-	public function find_apache_log_file(): ?string {
-		$candidates = [
-			'/var/log/apache2/error.log',
-			'/var/log/httpd/error_log',
-			'/usr/local/apache/logs/error_log',
-			'/opt/bitnami/apache2/logs/error_log',
-		];
-		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
-				return $path;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Find the Nginx error log file.
-	 *
-	 * @return string|null
-	 */
-	public function find_nginx_log_file(): ?string {
-		$candidates = [
-			'/var/log/nginx/error.log',
-			'/usr/local/nginx/logs/error.log',
-			'/opt/bitnami/nginx/logs/error.log',
-		];
-		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
-				return $path;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Find the Redis log file.
-	 *
-	 * @return string|null
-	 */
-	public function find_redis_log_file(): ?string {
-		$candidates = [
-			'/var/log/redis/redis-server.log',
-			'/var/log/redis.log',
-		];
-		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
-				return $path;
-			}
+	private function read_file_tail( string $file_path, int $bytes ): false|string {
+		$handle = fopen( $file_path, 'rb' );
+		if ( ! $handle ) {
+			return false;
 		}
 
-		// Try parsing redis.conf if found
-		$config_paths = [
-			'/etc/redis/redis.conf',
-			'/usr/local/etc/redis/redis.conf',
-		];
-		foreach ( $config_paths as $conf ) {
-			if ( is_readable( $conf ) ) {
-				$lines = file( $conf );
-				foreach ( $lines as $line ) {
-					if ( preg_match( '/^logfile\s+(.+)$/', trim( $line ), $match ) ) {
-						$logfile = trim( $match[1] );
-						if ( is_readable( $logfile ) ) {
-							return $logfile;
-						}
-					}
-				}
-			}
-		}
+		// Seek to the position we want to start reading from
+		fseek( $handle, -$bytes, SEEK_END );
+		$content = fread( $handle, $bytes );
+		fclose( $handle );
 
-		return null;
+		return $content;
 	}
 }

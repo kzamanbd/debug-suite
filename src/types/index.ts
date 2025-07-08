@@ -1,3 +1,44 @@
+import type { ReactNode } from 'react';
+
+export type DialogType = 'success' | 'error' | 'warning' | 'confirm';
+
+export interface DialogOptions {
+    type?: DialogType;
+    title?: string;
+    okText?: string;
+    autoHideDelay?: number;
+    showCancel?: boolean;
+    showOk?: boolean;
+    cancelText?: string;
+    allowOutsideClick?: boolean;
+}
+
+export interface DialogState {
+    open: boolean;
+    title?: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    options: DialogOptions;
+    resolve?: (value: boolean) => void;
+    reject?: () => void;
+}
+
+export interface DialogModalProps {
+    open: boolean;
+    title?: string;
+    message?: string;
+    options: DialogOptions;
+    onClose: (confirmed: boolean) => void;
+}
+
+export interface DialogTypeProps {
+    icon: ReactNode;
+    defaultTitle: string;
+    iconClass?: string;
+    buttonClass?: string;
+}
+
 export interface ItemTree {
     name: string;
     type: string;
@@ -6,7 +47,7 @@ export interface ItemTree {
     checked: boolean;
     modified_at: string;
     expanded: boolean;
-    children: ItemTree[];
+    children?: ItemTree[];
 }
 
 export interface SettingsState {
@@ -23,7 +64,7 @@ export interface SettingsState {
 // global window type
 declare global {
     interface Window {
-        debugSuite: SettingsState & {
+        debugSuite: {
             wpDebug: boolean;
             wpDebugLog: boolean;
             wpDebugDisplay: boolean;
@@ -31,7 +72,6 @@ declare global {
             phpVersion: string;
             favicon: string;
             roles: Record<string, { name: string }>;
-            [key: string]: string | boolean | Record<string, { name: string }> | undefined;
-        };
+        } & SettingsState;
     }
 }

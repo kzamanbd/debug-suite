@@ -21,11 +21,16 @@ pids
 lib-cov
 
 # Coverage directory used by tools like istanbul
-coverage
 *.lcov
 
 # nyc test coverage
 .nyc_output
+
+# PHPUnit test directories - all test outputs go to tests/ folder
+tests/coverage/
+tests/reports/
+tests/temp/
+.phpunit.result.cache
 
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
@@ -157,3 +162,4 @@ assets/css/
 vendor
 .idea
 .phpunit.result.cache
+build

@@ -13,14 +13,14 @@ namespace DebugSuite\Core\Container\Definitions;
  * Allows services to be configured differently based on environment,
  * WordPress constants, or other runtime conditions.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class ConfigDefinition implements DefinitionInterface {
 
 	/**
 	 * The definition name.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
@@ -29,7 +29,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Configuration mapping for different environments.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, mixed>
 	 */
@@ -38,7 +38,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Default configuration fallback.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var mixed
 	 */
@@ -47,7 +47,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Whether this is a singleton.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -60,7 +60,7 @@ class ConfigDefinition implements DefinitionInterface {
 	 * @param mixed|null $default_config Default configuration.
 	 * @param bool  $singleton      Whether this is a singleton.
 	 *
-	 *@since DEBUG_SUITE_SINCE
+	 *@since 1.0.0
 	 */
 	public function __construct( array $configurations = [], mixed $default_config = null, bool $singleton = false ) {
 		$this->configurations = $configurations;
@@ -72,7 +72,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Get the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
@@ -83,7 +83,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Set the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name The definition name.
 	 *
@@ -97,7 +97,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Resolve this definition to a configuration value.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param callable $resolver Function to resolve dependencies.
 	 *
@@ -128,7 +128,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Check if this definition is cacheable (singleton).
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
@@ -139,7 +139,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Set configuration for a specific environment.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $environment Environment name.
 	 * @param mixed  $config      Configuration value.
@@ -154,7 +154,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Set configuration for debug mode.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param mixed $config Configuration value.
 	 *
@@ -168,7 +168,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Set configuration for production mode.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param mixed $config Configuration value.
 	 *
@@ -182,7 +182,7 @@ class ConfigDefinition implements DefinitionInterface {
 	/**
 	 * Detect current environment.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */

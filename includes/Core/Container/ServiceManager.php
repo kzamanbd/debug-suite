@@ -15,14 +15,14 @@ use DebugSuite\Interfaces\Hookable;
  * Provides centralized management of service provider registration, booting,
  * and hook registration. Ensures proper lifecycle management for all services.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class ServiceManager {
 
 	/**
 	 * Container instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var Container
 	 */
@@ -31,7 +31,7 @@ class ServiceManager {
 	/**
 	 * Registered service providers.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var ServiceProviderInterface[]
 	 */
@@ -40,7 +40,7 @@ class ServiceManager {
 	/**
 	 * Whether all providers have been booted.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -49,7 +49,7 @@ class ServiceManager {
 	/**
 	 * Constructor.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param Container $container Container instance.
 	 */
@@ -60,7 +60,7 @@ class ServiceManager {
 	/**
 	 * Register a service provider.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param ServiceProviderInterface|string $provider Provider instance or class name.
 	 *
@@ -102,7 +102,7 @@ class ServiceManager {
 	/**
 	 * Register multiple service providers.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param array $providers Array of provider instances or class names.
 	 *
@@ -117,7 +117,7 @@ class ServiceManager {
 	/**
 	 * Boot all registered service providers.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -140,7 +140,7 @@ class ServiceManager {
 	/**
 	 * Boot a specific service provider.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param ServiceProviderInterface $provider Provider to boot.
 	 *
@@ -154,7 +154,7 @@ class ServiceManager {
 	/**
 	 * Register hooks for all services that implement Hookable interface.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -176,7 +176,7 @@ class ServiceManager {
 	/**
 	 * Get the container instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return Container
 	 */
@@ -187,7 +187,7 @@ class ServiceManager {
 	/**
 	 * Get all registered providers.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return ServiceProviderInterface[]
 	 */
@@ -198,7 +198,7 @@ class ServiceManager {
 	/**
 	 * Check if a provider is registered.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $provider_class Provider class name.
 	 *
@@ -211,7 +211,7 @@ class ServiceManager {
 	/**
 	 * Get a specific provider.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $provider_class Provider class name.
 	 *
@@ -224,7 +224,7 @@ class ServiceManager {
 	/**
 	 * Check if all providers have been booted.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
@@ -235,7 +235,7 @@ class ServiceManager {
 	/**
 	 * Resolve a service from the container.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name Service name.
 	 *
@@ -248,7 +248,7 @@ class ServiceManager {
 	/**
 	 * Magic method to resolve services.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name Service name.
 	 *
@@ -261,7 +261,7 @@ class ServiceManager {
 	/**
 	 * Magic method to check if service exists.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name Service name.
 	 *

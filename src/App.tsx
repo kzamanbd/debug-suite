@@ -1,8 +1,10 @@
-import { RouterProvider, createHashRouter } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
+import { DialogProvider } from './components/dialog-provider';
 import Layout from './components/layout';
 import { withRouter } from './routing';
-import routes, { DebugSuiteRoute } from './routing/routes';
+import type { DebugSuiteRoute } from './routing/routes';
+import routes from './routing/routes';
 import { mutationObserver } from './utils';
 
 const App = () => {
@@ -41,22 +43,21 @@ const App = () => {
     const router = createHashRouter(mappedRoutes);
 
     return (
-        <>
+        <DialogProvider>
             <RouterProvider router={router} />
             <ToastContainer
+                rtl={false}
                 position="bottom-center"
                 autoClose={5000}
                 hideProgressBar
                 newestOnTop={false}
                 closeOnClick={false}
-                rtl={false}
                 pauseOnFocusLoss
-                draggable
                 pauseOnHover
                 theme="light"
                 transition={Slide}
             />
-        </>
+        </DialogProvider>
     );
 };
 

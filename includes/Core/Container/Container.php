@@ -1,6 +1,6 @@
 <?php
 /**
- * PSR-11 compliant dependency injection container with PHP-DI features.
+ * Dependency injection container with advanced features.
  *
  * @package DebugSuite
  */
@@ -19,22 +19,23 @@ use DebugSuite\Core\Container\Definitions\DecoratorDefinition;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
+use Throwable;
 
 /**
- * PSR-11 compliant dependency injection container with PHP-DI features.
+ * Dependency injection container with advanced features.
  *
  * Provides a singleton container implementation for dependency injection
  * with support for service binding, singleton management, automatic
- * dependency resolution using reflection, and PHP-DI style definitions.
+ * dependency resolution using reflection, and service definitions.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class Container implements ContainerInterface {
 
 	/**
 	 * Container singleton instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var Container|null
 	 */
@@ -43,7 +44,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Registered services array.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, mixed>
 	 */
@@ -53,7 +54,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Singleton instances cache.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, mixed>
 	 */
@@ -62,7 +63,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Service definitions configuration.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, DefinitionInterface>
 	 */
@@ -71,7 +72,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Legacy service bindings configuration (for backward compatibility).
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, array{resolver: mixed, singleton: bool}>
 	 */
@@ -80,7 +81,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Autowiring enabled flag.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -89,7 +90,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Tagged services registry.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, array<string>>
 	 */
@@ -98,7 +99,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Reflection cache for performance optimization.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, ReflectionClass>
 	 */
@@ -107,7 +108,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Constructor parameter cache for performance optimization.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, array<ReflectionParameter>>
 	 */
@@ -116,7 +117,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Service resolution stack for circular dependency detection.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string>
 	 */
@@ -125,7 +126,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Service resolution performance statistics.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, array{success: array<float>, failure: array<float>}>
 	 */
@@ -134,7 +135,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Service aliases for interface binding and aliasing.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, string>
 	 */
@@ -143,7 +144,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Interface to implementation bindings.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, string>
 	 */
@@ -152,7 +153,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Debug mode flag for enhanced logging.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -161,7 +162,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Container compilation state for performance optimization.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -172,7 +173,7 @@ class Container implements ContainerInterface {
 	 *
 	 * Implements singleton pattern by preventing external instantiation.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 */
 	private function __construct() {
 		// Private constructor
@@ -184,7 +185,7 @@ class Container implements ContainerInterface {
 	 * Returns the singleton instance of the container, creating it if
 	 * it doesn't exist yet.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return Container The container instance.
 	 */
@@ -197,25 +198,25 @@ class Container implements ContainerInterface {
 	}
 
 	/**
-	 * PSR-11: Finds an entry of the container by its identifier and returns it.
+	 * Finds an entry of the container by its identifier and returns it.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $id Identifier of the entry to look for.
 	 *
 	 * @return mixed Entry.
 	 *
 	 * @throws NotFoundException  No entry was found for this identifier.
-	 * @throws ContainerException Error while retrieving the entry.
+	 * @throws ContainerException|Throwable Error while retrieving the entry.
 	 */
-	public function get( string $id ) {
+	public function get( string $id ): mixed {
 		return $this->resolve( $id );
 	}
 
 	/**
-	 * PSR-11: Returns true if the container can return an entry for the given identifier.
+	 * Returns true if the container can return an entry for the given identifier.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $id Identifier of the entry to look for.
 	 *
@@ -241,7 +242,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Set a definition for a service.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string              $id         Service identifier.
 	 * @param DefinitionInterface $definition Service definition.
@@ -269,7 +270,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Create a factory definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param callable $factory The factory callable.
 	 *
@@ -282,7 +283,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Create an autowired definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $class_name The class name to autowire.
 	 *
@@ -295,20 +296,20 @@ class Container implements ContainerInterface {
 	/**
 	 * Create a value definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param mixed $value The value to return.
 	 *
 	 * @return ValueDefinition
 	 */
-	public function value( $value ): ValueDefinition {
+	public function value( mixed $value ): ValueDefinition {
 		return new ValueDefinition( $value );
 	}
 
 	/**
 	 * Create an object definition (autowired singleton).
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $class_name The class name to autowire.
 	 *
@@ -321,7 +322,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Create a configuration definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param array $configurations Environment-specific configurations.
 	 * @param mixed $default_config Default configuration.
@@ -336,7 +337,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Create a decorator definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $decorator_class   The decorator class name.
 	 * @param string $decorated_service The service to decorate.
@@ -354,7 +355,7 @@ class Container implements ContainerInterface {
 	 * Registers a service resolver in the container with optional singleton behavior.
 	 * The resolver can be a class name, closure, or any callable.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name Service name/identifier.
 	 * @param mixed  $resolver Resolver function or class name.
@@ -389,12 +390,13 @@ class Container implements ContainerInterface {
 	 * Convenience method for binding a service as a singleton.
 	 * Equivalent to calling bind() with singleton parameter set to true.
 	 *
-	 * @since DEBUG_SUITE_SINCE
-	 *
 	 * @param string $name Service name/identifier.
-	 * @param mixed  $resolver Resolver function or class name.
+	 * @param mixed $resolver Resolver function or class name.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @return void
+	 * @throws ContainerException If container is compiled.
 	 */
 	public function singleton( string $name, $resolver ): void {
 		$this->bind( $name, $resolver, true );
@@ -406,7 +408,7 @@ class Container implements ContainerInterface {
 	 * Stores an already instantiated object in the container as a singleton.
 	 * Useful for registering objects that were created externally.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name Service name/identifier.
 	 * @param mixed  $instance Service instance.
@@ -420,7 +422,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Get cached reflection class for performance optimization.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $class_name The class name to get reflection for.
 	 *
@@ -443,7 +445,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Get cached constructor parameters for performance optimization.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string          $class_name The class name to get constructor parameters for.
 	 * @param ReflectionClass $reflection Optional reflection class to use.
@@ -470,7 +472,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Check for circular dependency in service resolution.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $class_name The class name being resolved.
 	 *
@@ -488,7 +490,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Record resolution time for performance monitoring.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $service    The service identifier.
 	 * @param float  $start_time The start time of resolution.
@@ -518,7 +520,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Build enhanced error message with context.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $service The service identifier.
 	 * @param string $message Base error message.
@@ -551,14 +553,14 @@ class Container implements ContainerInterface {
 	/**
 	 * Profile service resolution for performance monitoring.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string   $service  The service identifier.
 	 * @param callable $resolver The resolver callable.
 	 *
 	 * @return mixed The resolved service.
 	 *
-	 * @throws \Throwable If service resolution fails.
+	 * @throws Throwable If service resolution fails.
 	 */
 	private function profile_resolution( string $service, callable $resolver ) {
 		$start = microtime( true );
@@ -581,7 +583,7 @@ class Container implements ContainerInterface {
 			}
 
 			return $result;
-		} catch ( \Throwable $e ) {
+		} catch ( Throwable $e ) {
 			$time = microtime( true ) - $start;
 
 			if ( ! isset( $this->resolution_stats[ $service ] ) ) {
@@ -604,7 +606,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Find similar service names for better error messages.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $service The service name to find suggestions for.
 	 *
@@ -634,14 +636,14 @@ class Container implements ContainerInterface {
 	/**
 	 * Generate enhanced error message with context and suggestions.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string          $service  The service that failed to resolve.
-	 * @param \Throwable|null $previous Previous exception if any.
+	 * @param Throwable|null $previous Previous exception if any.
 	 *
 	 * @return string Enhanced error message.
 	 */
-	private function generate_enhanced_error_message( string $service, ?\Throwable $previous = null ): string {
+	private function generate_enhanced_error_message( string $service, ?Throwable $previous = null ): string {
 		$message = "Failed to resolve service: $service";
 
 		if ( ! empty( $this->resolving_stack ) ) {
@@ -677,7 +679,7 @@ class Container implements ContainerInterface {
 	 * Retrieves a service instance from the container, creating it if necessary.
 	 * Handles singleton caching and automatic dependency injection through reflection.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name Service name/identifier.
 	 *
@@ -693,14 +695,14 @@ class Container implements ContainerInterface {
 	 * Handles singleton caching, automatic dependency injection through reflection,
 	 * circular dependency detection, and performance profiling.
 	 *
-	 * @since DEBUG_SUITE_SINCE
-	 *
 	 * @param string $name Service name/identifier.
 	 *
 	 * @return mixed The resolved service instance.
 	 *
+	 * @since 1.0.0
+	 *
 	 * @throws NotFoundException  If service not found.
-	 * @throws ContainerException If service cannot be resolved.
+	 * @throws ContainerException|Throwable If service cannot be resolved.
 	 */
 	public function resolve( string $name ) {
 		return $this->profile_resolution(
@@ -790,7 +792,7 @@ class Container implements ContainerInterface {
 	 * Uses reflection to automatically resolve class dependencies by analyzing
 	 * constructor parameters and recursively resolving dependencies from the container.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $class_name Class name to resolve.
 	 *
@@ -801,7 +803,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Auto-resolve a class with dependency injection.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $class_name The class name to auto-resolve.
 	 *
@@ -829,7 +831,6 @@ class Container implements ContainerInterface {
 				array_pop( $this->resolving_stack );
 				return $instance;
 			}
-
 			// Get constructor parameters from cache or reflection
 			$parameters = $this->get_cached_constructor_parameters( $class_name, $reflection );
 
@@ -842,31 +843,7 @@ class Container implements ContainerInterface {
 			}
 
 			// Resolve constructor dependencies
-			$dependencies = [];
-			foreach ( $parameters as $parameter ) {
-				$type = $parameter->getType();
-				// @phpstan-ignore-next-line
-				if ( $type && ! $type->isBuiltin() ) {
-					// @phpstan-ignore-next-line
-					$dependency_class = $type->getName();
-					$dependencies[]   = $this->resolve( $dependency_class );
-				} elseif ( $parameter->isDefaultValueAvailable() ) {
-					$dependencies[] = $parameter->getDefaultValue();
-				} else {
-					$error_message = $this->build_enhanced_error_message(
-						$class_name,
-						"Cannot resolve parameter [{$parameter->getName()}]",
-						[
-							'parameter_name' => $parameter->getName(),
-							'parameter_type' => $type ? $type->getName() : 'mixed',
-							'has_default'    => $parameter->isDefaultValueAvailable(),
-							'is_optional'    => $parameter->isOptional(),
-							'resolution_stack' => $this->resolving_stack,
-						]
-					);
-					throw new ContainerException( $error_message );
-				}
-			}
+			$dependencies = $this->resolve_constructor_dependencies( $class_name, $parameters );
 
 			$instance = $reflection->newInstanceArgs( $dependencies );
 			$this->record_resolution_time( $class_name, $start_time, true );
@@ -899,7 +876,7 @@ class Container implements ContainerInterface {
 	 * Auto-resolve a class with dependency injection without managing resolution stack.
 	 * This is used internally when the stack is already managed by the caller.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $class_name The class name to auto-resolve.
 	 *
@@ -932,31 +909,7 @@ class Container implements ContainerInterface {
 			}
 
 			// Resolve constructor dependencies
-			$dependencies = [];
-			foreach ( $parameters as $parameter ) {
-				$type = $parameter->getType();
-				// @phpstan-ignore-next-line
-				if ( $type && ! $type->isBuiltin() ) {
-					// @phpstan-ignore-next-line
-					$dependency_class = $type->getName();
-					$dependencies[]   = $this->resolve( $dependency_class );
-				} elseif ( $parameter->isDefaultValueAvailable() ) {
-					$dependencies[] = $parameter->getDefaultValue();
-				} else {
-					$error_message = $this->build_enhanced_error_message(
-						$class_name,
-						"Cannot resolve parameter [{$parameter->getName()}]",
-						[
-							'parameter_name' => $parameter->getName(),
-							'parameter_type' => $type ? $type->getName() : 'mixed',
-							'has_default'    => $parameter->isDefaultValueAvailable(),
-							'is_optional'    => $parameter->isOptional(),
-							'resolution_stack' => $this->resolving_stack,
-						]
-					);
-					throw new ContainerException( $error_message );
-				}
-			}
+			$dependencies = $this->resolve_constructor_dependencies( $class_name, $parameters );
 
 			$instance = $reflection->newInstanceArgs( $dependencies );
 			$this->record_resolution_time( $class_name, $start_time, true );
@@ -985,7 +938,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Enable or disable autowiring.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param bool $enabled Whether autowiring is enabled.
 	 *
@@ -998,7 +951,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Check if autowiring is enabled.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
@@ -1009,7 +962,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Tag a service with a specific tag.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $service_id The service identifier.
 	 * @param string $tag        The tag to apply.
@@ -1029,7 +982,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Get all services tagged with a specific tag.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $tag The tag to search for.
 	 *
@@ -1053,7 +1006,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Get all tags for a service.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $service_id The service identifier.
 	 *
@@ -1071,11 +1024,11 @@ class Container implements ContainerInterface {
 	}
 
 	/**
-	 * Add multiple definitions from an array (PHP-DI style).
+	 * Add multiple definitions from an array.
 	 *
-	 * Supports PHP-DI compatible definition arrays for bulk service configuration.
+	 * Supports compatible definition arrays for bulk service configuration.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param array $definitions Associative array of service_id => definition pairs.
 	 *
@@ -1112,7 +1065,7 @@ class Container implements ContainerInterface {
 	 * Returns an array of all service names that are either defined,
 	 * bound in the container, or exist as cached instances.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string> Array of service names.
 	 */
@@ -1130,7 +1083,7 @@ class Container implements ContainerInterface {
 	 * Allows accessing services using property syntax: $container->service_name
 	 * instead of $container->resolve('service_name').
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name Service name.
 	 *
@@ -1149,7 +1102,7 @@ class Container implements ContainerInterface {
 	 * Allows checking service existence using isset($container->service_name)
 	 * syntax instead of $container->has('service_name').
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name Service name.
 	 *
@@ -1165,7 +1118,7 @@ class Container implements ContainerInterface {
 	 * When compiled, the container becomes immutable and optimizes
 	 * performance by pre-caching reflection data and definitions.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 *
@@ -1199,7 +1152,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Check if the container is compiled.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool True if compiled, false otherwise.
 	 */
@@ -1210,7 +1163,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Enable or disable debug mode.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param bool $enabled Whether debug mode is enabled.
 	 *
@@ -1223,7 +1176,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Check if debug mode is enabled.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool True if debug mode is enabled, false otherwise.
 	 */
@@ -1234,7 +1187,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Bind an interface to an implementation.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $b_interface      The interface name.
 	 * @param string $implementation The implementation class name.
@@ -1261,7 +1214,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Create an alias for a service.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $alias   The alias name.
 	 * @param string $service The original service name.
@@ -1282,7 +1235,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Resolve an alias to the actual service name.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $id The service identifier or alias.
 	 *
@@ -1307,7 +1260,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Resolve interface binding to implementation.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $id The interface name.
 	 *
@@ -1320,7 +1273,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Ensure container is not compiled before modification.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 *
@@ -1335,7 +1288,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Get container performance statistics.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string, mixed> Performance statistics including resolution times and cache hits.
 	 */
@@ -1365,7 +1318,7 @@ class Container implements ContainerInterface {
 	/**
 	 * Clear performance statistics and caches.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -1377,5 +1330,47 @@ class Container implements ContainerInterface {
 		if ( $this->debug_mode ) {
 			error_log( 'Debug Suite Container: Performance data cleared.' );
 		}
+	}
+
+	/**
+	 * Resolve constructor dependencies for a class.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string                      $class_name The class name being resolved.
+	 * @param array<ReflectionParameter> $parameters The constructor parameters.
+	 *
+	 * @return array<mixed> The resolved dependencies.
+	 *
+	 * @throws ContainerException If a parameter cannot be resolved.
+	 */
+	private function resolve_constructor_dependencies( string $class_name, array $parameters ): array {
+		$dependencies = [];
+		foreach ( $parameters as $parameter ) {
+			$type = $parameter->getType();
+			// @phpstan-ignore-next-line
+			if ( $type && ! $type->isBuiltin() ) {
+				// @phpstan-ignore-next-line
+				$dependency_class = $type->getName();
+				$dependencies[]   = $this->resolve( $dependency_class );
+			} elseif ( $parameter->isDefaultValueAvailable() ) {
+				$dependencies[] = $parameter->getDefaultValue();
+			} else {
+				$error_message = $this->build_enhanced_error_message(
+					$class_name,
+					"Cannot resolve parameter [{$parameter->getName()}]",
+					[
+						'parameter_name' => $parameter->getName(),
+						'parameter_type' => $type ? $type->getName() : 'mixed',
+						'has_default'    => $parameter->isDefaultValueAvailable(),
+						'is_optional'    => $parameter->isOptional(),
+						'resolution_stack' => $this->resolving_stack,
+					]
+				);
+				throw new ContainerException( esc_html( $error_message ) );
+			}
+		}
+
+		return $dependencies;
 	}
 }

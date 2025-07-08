@@ -137,7 +137,7 @@ class MockFactory {
 				]);
 			}
 			
-			public function update_debug_settings( array $settings ) {
+			public function update_settings( array $settings ) {
 				return ServiceResponse::success();
 			}
 			

@@ -19,16 +19,34 @@ jobs:
           coverage: none
           tools: cs2pr, composer:v2
 
+      # Cache PHP extensions
+      - name: Cache PHP extensions
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/php/extensions
+          key: ${{ runner.os }}-php-ext-${{ hashFiles('.github/workflows/phpcs.yml') }}
+
+      # Get Composer cache directory
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
+      # Cache Composer dependencies
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: "${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}"
           restore-keys: ${{ runner.os }}-composer-
+
+      # Cache PHPCS results
+      - name: Cache PHPCS results
+        uses: actions/cache@v4
+        with:
+          path: .phpcs.cache
+          key: phpcs-cache-${{ github.sha }}
+          restore-keys: |
+            phpcs-cache-
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
@@ -40,4 +58,4 @@ jobs:
           echo "files=$FILES" >> $GITHUB_OUTPUT
 
       - name: Detect coding standard violations
-        run: vendor/bin/phpcs ${{ steps.changes.outputs.files }} -q --report=checkstyle | cs2pr --graceful-warnings
+        run: vendor/bin/phpcs ${{ steps.changes.outputs.files }} -q --report=checkstyle --cache=.phpcs.cache | cs2pr --graceful-warnings

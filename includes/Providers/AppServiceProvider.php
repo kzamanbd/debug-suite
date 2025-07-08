@@ -1,6 +1,6 @@
 <?php
 /**
- * Services service provider for Debug Suite.
+ * Application service provider for Debug Suite.
  *
  * @package DebugSuite
  */
@@ -12,10 +12,14 @@ use DebugSuite\Core\Container\Container;
 use DebugSuite\Services\DebugLog\FileLogsService;
 use DebugSuite\Services\FileManagerService;
 use DebugSuite\Services\SettingsService;
+use DebugSuite\Services\OnboardingService;
+use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\API\FileLogsController;
 use DebugSuite\API\FileManagerController;
 use DebugSuite\API\SettingsController;
+use DebugSuite\API\OnboardingController;
+use DebugSuite\API\OverviewController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,27 +32,33 @@ class AppServiceProvider extends AbstractServiceProvider {
 		FileLogsService::class,
 		FileManagerService::class,
 		SettingsService::class,
+		OnboardingService::class,
+		OverviewService::class,
 		FileLogsController::class,
 		FileManagerController::class,
 		SettingsController::class,
+		OnboardingController::class,
+		OverviewController::class,
 	];
 
 	public function register( Container $container ): void {
-		// Modern PHP-DI style definition array approach
+		// Simple service registration - merged from ServicesServiceProvider
 		$container->add_definitions(
 			[
-				// Advanced log reader service (foundation service)
+				// Core services as singletons
 				WPLogReaderService::class => $container->object( WPLogReaderService::class ),
-
-				// Enhanced services with dependency injection
-				FileLogsService::class    => $container->autowire( FileLogsService::class )->set_name( FileLogsService::class ),
+				FileLogsService::class    => $container->object( FileLogsService::class ),
 				FileManagerService::class => $container->object( FileManagerService::class ),
-				SettingsService::class   => $container->object( SettingsService::class ),
+				SettingsService::class    => $container->object( SettingsService::class ),
+				OnboardingService::class  => $container->object( OnboardingService::class ),
+				OverviewService::class    => $container->autowire( OverviewService::class ),
 
-				// Controllers with dependency injection
-				FileLogsController::class    => $container->autowire( FileLogsController::class )->set_name( FileLogsController::class ),
-				FileManagerController::class => $container->autowire( FileManagerController::class )->set_name( FileManagerController::class ),
-				SettingsController::class   => $container->autowire( SettingsController::class )->set_name( SettingsController::class ),
+				// REST API Controllers with automatic dependency injection
+				FileLogsController::class    => $container->autowire( FileLogsController::class ),
+				FileManagerController::class => $container->autowire( FileManagerController::class ),
+				SettingsController::class    => $container->autowire( SettingsController::class ),
+				OnboardingController::class  => $container->autowire( OnboardingController::class ),
+				OverviewController::class    => $container->autowire( OverviewController::class ),
 			]
 		);
 	}

@@ -4,25 +4,17 @@
  *
  * WordPress reads this file to generate the plugin information in the plugin
  * admin area. This file includes all dependencies, registers activation and
- * deactivation functions, and initializes the PSR-11 compliant dependency
- * injection container with PHP-DI style features.
- *
- * The plugin uses a modern architecture with:
- * - PSR-11 compliant dependency injection container
- * - PHP-DI style definitions for service configuration
- * - Service provider pattern for modular service registration
- * - Automatic hook registration for services implementing Hookable interface
- * - Type-safe service resolution with proper exception handling
+ * deactivation functions, and initializes the dependency
+ * injection container.
  *
  * @link              https://kzaman.me/plugins/debug-suite
  * @since             1.0.0
- * @package           Debug_Suite
+ * @package           DebugSuite
  *
- * @wordpress-plugin
- * Plugin Name: Debug Suite
- * Plugin Slug: debug-suite
- * Plugin URI: https://kzaman.me/plugins/debug-suite
- * Description: WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.
+ * Plugin Name:       Debug Suite
+ * Plugin Slug:       debug-suite
+ * Plugin URI:        https://kzaman.me/plugins/debug-suite?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
+ * Description:       WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.
  * Version:           1.0.0
  * Author:            Kamruzzaman
  * Author URI:        https://kzaman.me/plugins/debug-suite/
@@ -30,6 +22,9 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       debug-suite
  * Domain Path:       /languages
+ *
+ * Requires PHP: 8.2
+ * Tested up to: 6.8
  */
 
 // If this file is called directly, abort.
@@ -42,15 +37,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 } else {
-	wp_die( esc_html__( 'Missing Dependencies Detected [Debug Suite Plugin]', 'debug-suite' ) );
+	die( esc_html__( 'Missing Dependencies Detected [Debug Suite Plugin]', 'debug-suite' ) );
 }
 
-use DebugSuite\Admin\Admin;
 use DebugSuite\Core\Activator;
 use DebugSuite\Core\Deactivator;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
-use DebugSuite\Frontend\Frontend;
 use DebugSuite\Providers\CoreServiceProvider;
 use DebugSuite\Providers\AdminServiceProvider;
 use DebugSuite\Providers\FrontendServiceProvider;
@@ -59,42 +52,48 @@ use DebugSuite\Providers\AppServiceProvider;
 /**
  * Main plugin bootstrap and orchestration class for Debug Suite.
  *
- * Primary entry point that manages PSR-11 DI Container, service providers,
+ * Primary entry point that manages DI Container, service providers,
  * and coordinates the entire plugin initialization process.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 final class DebugSuite {
 
 	/**
+	* Plugin version
+	*
+	* @var string
+	*/
+	public string $version = '1.0.0';
+
+	/**
 	 * Singleton instance of the Debug Suite plugin.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var DebugSuite|null
 	 */
 	private static ?DebugSuite $instance = null;
 
 	/**
-	 * PSR-11 compliant service manager instance.
+	 * Service manager instance.
 	 *
 	 * Manages the lifecycle of service providers including registration,
 	 * booting, and automatic hook registration for Hookable services.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var ServiceManager
 	 */
 	private ServiceManager $service_manager;
 
 	/**
-	 * PSR-11 compliant dependency injection container.
+	 * Dependency injection container.
 	 *
 	 * Provides service resolution, autowiring, and dependency management
-	 * with full PSR-11 DI Interface compliance and PHP-DI style
-	 * definition support.
+	 * with service definition support.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var Container
 	 */
@@ -103,12 +102,12 @@ final class DebugSuite {
 	/**
 	 * Initialize the Debug Suite plugin.
 	 *
-	 * Sets up the PSR-11 compliant dependency injection container,
+	 * Sets up the dependency injection container,
 	 * registers service providers, and initializes the plugin's
 	 * core functionality. This method orchestrates the entire
 	 * plugin initialization process.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @throws Exception If a service cannot be resolved during initialization.
 	 */
@@ -125,13 +124,13 @@ final class DebugSuite {
 	}
 
 	/**
-	 * Initialize the PSR-11 compliant dependency injection container.
+	 * Initialize the dependency injection container.
 	 *
-	 * Creates and configures the DI Container with the service manager,
-	 * then registers the container and manager as singleton instances
-	 * for easy access throughout the application lifecycle.
+	 * Creates and configures the DI Container with enhanced features,
+	 * service manager, and registers the container and manager as singleton
+	 * instances for easy access throughout the application lifecycle.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -139,11 +138,20 @@ final class DebugSuite {
 		$this->container       = Container::get_instance();
 		$this->service_manager = new ServiceManager( $this->container );
 
+		// Enable enhanced container features
+		$container_debug_mode = get_option( 'debug_suite_container_debug_mode', false );
+		$this->container->set_debug_mode( $container_debug_mode );
+		$this->container->set_autowiring( true );
+
 		// Register the container and service manager as singletons
 		$this->container->instance( 'container', $this->container );
 		$this->container->instance( 'service_manager', $this->service_manager );
 		$this->container->instance( ServiceManager::class, $this->service_manager );
 		$this->container->instance( Container::class, $this->container );
+
+		// Register the main plugin instance
+		$this->container->instance( DebugSuite::class, $this );
+		$this->container->instance( 'debug_suite', $this );
 	}
 
 	/**
@@ -155,8 +163,8 @@ final class DebugSuite {
 	 */
 	private function register_providers(): void {
 		$providers = [
-			AppServiceProvider::class,
 			CoreServiceProvider::class,
+			AppServiceProvider::class,
 			AdminServiceProvider::class,
 			FrontendServiceProvider::class,
 		];
@@ -167,6 +175,9 @@ final class DebugSuite {
 	/**
 	 * Boot all registered services.
 	 *
+	 * Initializes all service providers and automatically registers hooks
+	 * for services implementing the Hookable interface.
+	 *
 	 * @throws Exception If a service cannot be resolved.
 	 * @since    1.0.0
 	 * @access   private
@@ -174,14 +185,6 @@ final class DebugSuite {
 	 */
 	private function boot_services(): void {
 		$this->service_manager->boot();
-
-		// Initialize admin functionality if in admin area
-		if ( is_admin() ) {
-			$this->container->resolve( Admin::class );
-		}
-
-		// Initialize frontend functionality
-		$this->container->resolve( Frontend::class );
 	}
 
 	/**
@@ -190,9 +193,18 @@ final class DebugSuite {
 	 * @return void
 	 */
 	public function define_constants(): void {
-		define( 'DEBUG_SUITE_VERSION', '1.0.0' );
-		define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-		define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		if ( ! defined( 'DEBUG_SUITE_VERSION' ) ) {
+			define( 'DEBUG_SUITE_VERSION', $this->version );
+		}
+		if ( ! defined( 'DEBUG_SUITE_FILE' ) ) {
+			define( 'DEBUG_SUITE_FILE', __FILE__ );
+		}
+		if ( ! defined( 'DEBUG_SUITE_PLUGIN_DIR' ) ) {
+			define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+		}
+		if ( ! defined( 'DEBUG_SUITE_PLUGIN_URL' ) ) {
+			define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		}
 	}
 
 	/**
@@ -238,7 +250,7 @@ final class DebugSuite {
 	 * @throws   Exception If the service cannot be resolved.
 	 * @since    1.0.0
 	 */
-	public function resolve( string $service ) {
+	public function resolve( string $service ): mixed {
 		return $this->container->resolve( $service );
 	}
 }

@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Provides a consistent way to return success/failure states with data
  * and error messages from service layer operations.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  *
  * @template T
  */
@@ -25,7 +25,7 @@ final class ServiceResponse {
 	/**
 	 * Whether the operation was successful.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -34,7 +34,7 @@ final class ServiceResponse {
 	/**
 	 * The data returned by the operation.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var mixed
 	 */
@@ -43,7 +43,7 @@ final class ServiceResponse {
 	/**
 	 * Error message if the operation failed.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string|null
 	 */
@@ -52,7 +52,7 @@ final class ServiceResponse {
 	/**
 	 * Error code if the operation failed.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string|null
 	 */
@@ -61,7 +61,7 @@ final class ServiceResponse {
 	/**
 	 * Additional context data for the result.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, mixed>
 	 */
@@ -70,7 +70,7 @@ final class ServiceResponse {
 	/**
 	 * Constructor for ServiceResponse.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param bool                 $success       Whether the operation was successful.
 	 * @param mixed                $data          The data returned by the operation.
@@ -95,7 +95,7 @@ final class ServiceResponse {
 	/**
 	 * Create a successful result.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param mixed                $data    The data to return.
 	 * @param array<string, mixed> $context Additional context data.
@@ -109,7 +109,7 @@ final class ServiceResponse {
 	/**
 	 * Create a failed result.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string               $error_message The error message.
 	 * @param string|null          $error_code    The error code.
@@ -124,7 +124,7 @@ final class ServiceResponse {
 	/**
 	 * Check if the operation was successful.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
@@ -135,7 +135,7 @@ final class ServiceResponse {
 	/**
 	 * Check if the operation failed.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
@@ -146,7 +146,7 @@ final class ServiceResponse {
 	/**
 	 * Get the data from the result.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return mixed
 	 */
@@ -157,7 +157,7 @@ final class ServiceResponse {
 	/**
 	 * Get the error message.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string|null
 	 */
@@ -168,7 +168,7 @@ final class ServiceResponse {
 	/**
 	 * Get the error code.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string|null
 	 */
@@ -179,7 +179,7 @@ final class ServiceResponse {
 	/**
 	 * Get the context data.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string, mixed>
 	 */
@@ -190,7 +190,7 @@ final class ServiceResponse {
 	/**
 	 * Get a specific context value.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $key     The context key.
 	 * @param mixed  $default Default value if key doesn't exist.
@@ -204,7 +204,7 @@ final class ServiceResponse {
 	/**
 	 * Get the context data for an error.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string, mixed>
 	 */
@@ -215,7 +215,7 @@ final class ServiceResponse {
 	/**
 	 * Get the data or a default value if this is a failure.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param mixed $default The default value to return if this is a failure.
 	 *
@@ -228,7 +228,7 @@ final class ServiceResponse {
 	/**
 	 * Convert the response to an array suitable for API responses.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string, mixed>
 	 */

@@ -1,0 +1,111 @@
+# Development Files
+.git
+.github
+.gitignore
+.editorconfig
+.eslintrc
+.prettierrc
+.stylelintrc
+.wordpress-org
+.distignore
+.env*
+.DS_Store
+.idea
+.vscode
+*.code-workspace
+
+# Package Managers
+node_modules
+vendor
+composer.lock
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Build Tools
+webpack.config.js
+tsconfig.json
+postcss.config.js
+tailwind.config.js
+vite.config.js
+babel.config.js
+jest.config.js
+phpcs.xml
+phpstan.neon
+phpunit.xml
+
+# Development Assets
+src
+tests
+documentation
+.wordpress-org
+assets/src
+*.map
+
+# Development Scripts
+bin
+scripts
+install-wp-tests.sh
+
+# Misc Development Files
+*.log
+*.sql
+*.tar.gz
+*.zip
+.phpunit.result.cache
+coverage
+phpunit.xml
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE.md
+composer.json
+package.json
+pnpm-workspace.yaml
+
+# IDE/Editor Files
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
+.komodotools
+*.code-workspace
+
+# Testing
+tests
+phpunit.xml.dist
+.phpunit.result.cache
+.phpcs.cache
+.php_cs.cache
+.php_cs.dist
+
+# Documentation
+docs
+*.md
+!README.txt
+
+# Build Process
+build
+dist
+release
+temp
+tmp
+
+# Version Control
+.svn
+.git
+.gitignore
+.gitattributes
+
+# Logs and Databases
+*.log
+*.sql
+*.sqlite
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db 

@@ -3,24 +3,44 @@
  *
  * @since 1.0.0
  */
+import DateTimeHtml from '@/components/date-time';
 import Button from '@/components/ui/button';
 import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ChevronDownIcon, RefreshCwIcon } from 'lucide-react';
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, ClipboardIcon, RefreshCwIcon } from 'lucide-react';
 import { levelColors, levelIcons } from '../constants';
-import type { InfiniteScrollState, LogEntry } from '../types';
+import type { InfiniteScrollState, LogEntry, LogFilters } from '../types';
 
 interface LogViewerProps {
     logs: LogEntry[];
+    filters: LogFilters;
     loading: boolean;
     infiniteState: InfiniteScrollState;
     onLoadMore: () => void;
+
+    onFiltersChange: (newFilters: Partial<LogFilters>) => void;
 }
 
-const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps) => {
+const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onLoadMore }: LogViewerProps) => {
     const tableRef = useRef<HTMLTableElement>(null);
+    const [copiedId, setCopiedId] = useState<string | number | null>(null);
+
+    const toggleSortOrder = () => {
+        const newOrder = filters.sortOrder === 'asc' ? 'desc' : 'asc';
+        onFiltersChange({ sortOrder: newOrder });
+    };
+
+    const handleCopy = async (text: string, id: string | number) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopiedId(id);
+            setTimeout(() => setCopiedId(null), 2000); // Reset after 2 seconds
+        } catch (err) {
+            console.error('Failed to copy text:', err);
+        }
+    };
 
     return (
         <div className="flex flex-1 flex-col overflow-hidden rounded-lg border bg-white">
@@ -38,7 +58,16 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                 {__('Message', 'debug-suite')}
                             </th>
                             <th className="w-12 px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                {__('#', 'debug-suite')}
+                                <div className="flex items-center gap-2">
+                                    <span className="inline-flex cursor-pointer" onClick={toggleSortOrder}>
+                                        {filters.sortOrder === 'asc' ? (
+                                            <ChevronUpIcon className="h-4 w-4" />
+                                        ) : (
+                                            <ChevronDownIcon className="h-4 w-4" />
+                                        )}
+                                    </span>
+                                    <span>{__('#', 'debug-suite')}</span>
+                                </div>
                             </th>
                         </tr>
                     </thead>
@@ -61,7 +90,7 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                 const entryNumber = index + 1;
 
                                 return (
-                                    <Disclosure key={log.id || index}>
+                                    <Disclosure key={index}>
                                         {({ open }) => (
                                             <>
                                                 <tr
@@ -71,7 +100,7 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                     )}
                                                 >
                                                     <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
-                                                        {log.timestamp}
+                                                        <DateTimeHtml date={log.timestamp} />
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span
@@ -87,16 +116,37 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900">
-                                                        <DisclosureButton className="w-full text-left focus:outline-none">
+                                                        <div className="w-full text-left focus:outline-none">
                                                             <div className="flex items-center justify-between">
                                                                 <span className="flex-1 pr-4">{log.message}</span>
-                                                                {log.has_stack_trace && (
-                                                                    <span className="text-primary-600 text-xs">
-                                                                        {open
-                                                                            ? __('Hide Trace', 'debug-suite')
-                                                                            : __('Show Trace', 'debug-suite')}
-                                                                    </span>
-                                                                )}
+                                                                <div className="flex items-center gap-2">
+                                                                    {log.has_stack_trace && (
+                                                                        <DisclosureButton className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
+                                                                            <span className="text-primary-600 text-xs">
+                                                                                {open
+                                                                                    ? __('Hide Trace', 'debug-suite')
+                                                                                    : __('Show Trace', 'debug-suite')}
+                                                                            </span>
+                                                                        </DisclosureButton>
+                                                                    )}
+                                                                    <div
+                                                                        role="button"
+                                                                        tabIndex={0}
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                            void handleCopy(log.message, index);
+                                                                        }}
+                                                                        className="hover:text-primary-600 text-gray-400 focus:outline-none"
+                                                                        title={__('Copy message', 'debug-suite')}
+                                                                    >
+                                                                        {copiedId === index ? (
+                                                                            <CheckIcon className="h-4 w-4 text-green-500" />
+                                                                        ) : (
+                                                                            <ClipboardIcon className="h-4 w-4" />
+                                                                        )}
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                             {log.file && (
                                                                 <div className="mt-1 text-xs text-gray-500">
@@ -106,7 +156,7 @@ const LogViewer = ({ logs, loading, infiniteState, onLoadMore }: LogViewerProps)
                                                                     {log.line && <span>:{log.line}</span>}
                                                                 </div>
                                                             )}
-                                                        </DisclosureButton>
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-gray-500">
                                                         {entryNumber}

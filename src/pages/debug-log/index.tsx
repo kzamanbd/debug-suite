@@ -3,7 +3,7 @@
  *
  * @since 1.0.0
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { LogControls, LogViewer, RawFileViewer } from './components';
 import FileLogsSkeleton from './components/logs-skeleton';
 import { useLogActions, useLogEntries, useLogFiles, useRawFileContent } from './hooks';
@@ -27,6 +27,22 @@ const FileLogs = () => {
 
     // Local state for view mode only
     const [viewMode, setViewMode] = useState<ViewMode>('parsed');
+
+    // Handle focus change to refetch logs when tab becomes visible
+    useEffect(() => {
+        const handleFocus = () => {
+            if (viewMode === 'parsed') {
+                refetchLogs();
+            } else {
+                refetchRawContent();
+            }
+        };
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [refetchLogs, refetchRawContent, viewMode]);
 
     // Show skeleton while initial data loads
     if (filesLoading) {
@@ -60,29 +76,49 @@ const FileLogs = () => {
 
     // Handle export with format selection
     const handleExport = (format: 'json' | 'csv' | 'txt') => {
-        exportLogs(format);
+        void exportLogs(format);
+    };
+
+    // Handle clearing logs with automatic refresh
+    const handleClearLogs = async () => {
+        try {
+            await clearLogs();
+            // Refresh logs after clearing
+            handleRefresh();
+        } catch (error) {
+            console.error('Error clearing logs:', error);
+        }
     };
 
     return (
         <div className="flex h-full flex-col">
             <LogControls
-                logFiles={logFiles}
-                selectedFile={selectedFile}
-                onFileChange={setSelectedFile}
-                viewMode={viewMode}
-                onViewModeChange={handleViewModeChange}
                 filters={filters}
+                logFiles={logFiles}
+                viewMode={viewMode}
+                selectedFile={selectedFile}
+                clearing={clearing}
+                filesLoading={filesLoading}
+                rawContent={rawContent}
+                loading={logsLoading || rawLoading}
+                onFileChange={setSelectedFile}
+                onViewModeChange={handleViewModeChange}
                 onFiltersChange={handleFilterChange}
                 totalEntries={totalEntries}
                 onRefresh={handleRefresh}
-                onClear={clearLogs}
+                onClear={handleClearLogs}
                 onExport={handleExport}
-                clearing={clearing}
-                filesLoading={filesLoading}
             />
 
             {viewMode === 'parsed' ? (
-                <LogViewer logs={logs} loading={logsLoading} infiniteState={infiniteState} onLoadMore={loadMore} />
+                <LogViewer
+                    logs={logs}
+                    filters={filters}
+                    onLoadMore={loadMore}
+                    loading={logsLoading}
+                    infiniteState={infiniteState}
+                    onFiltersChange={handleFilterChange}
+                />
             ) : (
                 <RawFileViewer content={rawContent} loading={rawLoading} onRefresh={refetchRawContent} />
             )}

@@ -12,7 +12,7 @@ interface FileLogsSkeletonProps {
     className?: string;
 }
 
-const skeleton = (extra: string = '') => classNames('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
+const skeleton = (extra = '') => classNames('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
 
 const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Element => {
     return (
@@ -45,7 +45,7 @@ const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Elemen
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-900">
-                        {[...Array(15)].map((_, i) => (
+                        {Array.from({ length: 15 }).map((_, i) => (
                             <tr key={i}>
                                 {[1, 2, 3, 4].map((j) => (
                                     <td key={j} className="px-4 py-2">

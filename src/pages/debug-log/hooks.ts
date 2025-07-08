@@ -25,11 +25,11 @@ export const useLogFiles = () => {
     const fetchLogFiles = async () => {
         try {
             setLoading(true);
-            const response = await apiFetch<{ files: LogFile[]; current_file: string }>({
+            const response = await apiFetch<{ files: LogFile[] }>({
                 path: '/debug-suite/v1/logs/supported-files'
             });
             setLogFiles(response.files);
-            setSelectedFile(response.current_file);
+            setSelectedFile(response.files[0].path);
         } catch (error) {
             console.error('Error fetching log files:', error);
         } finally {
@@ -39,7 +39,7 @@ export const useLogFiles = () => {
 
     // Fetch log files on component mount
     useEffect(() => {
-        fetchLogFiles();
+        void fetchLogFiles();
     }, []);
 
     return { logFiles, selectedFile, setSelectedFile, loading, refetch: fetchLogFiles };
@@ -57,24 +57,24 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
     }
 
     // Filter by search term
-    if (filters.search && filters.search.trim()) {
+    if (filters.search.trim()) {
         const searchTerm = filters.search.toLowerCase().trim();
         filtered = filtered.filter(
             (log) =>
                 log.message.toLowerCase().includes(searchTerm) ||
-                (log.file && log.file.toLowerCase().includes(searchTerm)) ||
+                log.file?.toLowerCase().includes(searchTerm) ||
                 log.level.toLowerCase().includes(searchTerm)
         );
     }
 
     // Sort the entries
     filtered.sort((a, b) => {
-        let aValue: any, bValue: any;
-
+        let aValue: string | number, bValue: string | number;
+        const levelOrder = { critical: 6, error: 5, warning: 4, notice: 3, info: 2, debug: 1 };
         switch (filters.sortBy) {
             case 'level':
                 // Define level hierarchy for sorting
-                const levelOrder = { critical: 6, error: 5, warning: 4, notice: 3, info: 2, debug: 1 };
+
                 aValue = levelOrder[a.level] || 0;
                 bValue = levelOrder[b.level] || 0;
                 break;
@@ -148,7 +148,7 @@ export const useLogEntries = () => {
             search: debouncedSearch
         };
         return filterLogEntries(allLogs, filtersWithDebouncedSearch);
-    }, [allLogs, filters.level, filters.sortBy, filters.sortOrder, debouncedSearch]);
+    }, [allLogs, filters, debouncedSearch]);
 
     // Paginated logs for display
     const paginatedLogs = useMemo(() => {
@@ -196,28 +196,13 @@ export const useLogEntries = () => {
 
     // Refetch all logs
     const refetch = useCallback(() => {
-        fetchAllLogs();
+        void fetchAllLogs();
     }, [fetchAllLogs]);
 
     // Fetch all logs on component mount
     useEffect(() => {
-        fetchAllLogs();
+        void fetchAllLogs();
     }, [fetchAllLogs]);
-
-    // Handle visibility change to refetch logs when tab becomes visible
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                refetch();
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, [refetch]);
 
     return {
         logs: paginatedLogs,
@@ -252,7 +237,7 @@ export const useLogStats = () => {
 
     // Fetch stats on component mount
     useEffect(() => {
-        fetchStats();
+        void fetchStats();
     }, []);
 
     return { stats, loading, refetch: fetchStats };
@@ -316,13 +301,13 @@ export const useRawFileContent = (filePath?: string) => {
     const [content, setContent] = useState<RawFileContent | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const fetchRawContent = async (path?: string) => {
-        if (!path) return;
+    const fetchRawContent = useCallback(async () => {
+        if (!filePath) return;
 
         try {
             setLoading(true);
             const apiPath = addQueryArgs('/debug-suite/v1/logs/raw', {
-                file: path
+                file: filePath
             });
 
             const response = await apiFetch<RawFileContent>({
@@ -336,7 +321,12 @@ export const useRawFileContent = (filePath?: string) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filePath]);
 
-    return { content, loading, refetch: () => fetchRawContent(filePath) };
+    // Refetch raw file content
+    const refetch = useCallback(() => {
+        void fetchRawContent();
+    }, [fetchRawContent]);
+
+    return { content, loading, refetch };
 };

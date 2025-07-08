@@ -12,16 +12,25 @@ namespace DebugSuite\Core;
  *
  * Handles plugin activation logic and setup procedures.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class Activator {
 
 	/**
-	 * Plugin activation logic.
+	 * Activate the plugin.
 	 *
 	 * @return void
 	 */
 	public static function activate(): void {
-		// Add activation logic here
+		// Set default options
+		if ( ! get_option( 'debug_suite_version' ) ) {
+			update_option( 'debug_suite_version', DEBUG_SUITE_VERSION );
+		}
+
+		// Set onboarding flag
+		update_option( 'debug_suite_needs_onboarding', true );
+
+		// Add activation redirect transient
+		set_transient( 'debug_suite_activation_redirect', true, 30 );
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Interface for classes that register WordPress hooks with PSR-11 DI integration.
+ * Interface for classes that register WordPress hooks with DI integration.
  *
  * @package DebugSuite
  */
@@ -12,7 +12,7 @@ namespace DebugSuite\Interfaces;
  *
  * Ensures automatic hook registration when services are resolved from the container.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 interface Hookable {
 
@@ -22,7 +22,7 @@ interface Hookable {
 	 * This method will be called automatically when the service is resolved
 	 * from the container to register the necessary WordPress hooks.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */

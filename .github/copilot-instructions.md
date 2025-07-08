@@ -4,25 +4,22 @@ This document provides comprehensive guidelines for GitHub Copilot to assist wit
 
 ## Project Overview
 
-Debug Suite is a WordPress plugin that provides advanced debugging tools for WordPress developers. It features a modern, enterprise-grade architecture with a **PSR-11 compliant dependency injection container** system, **PHP-DI compatibility features**, PSR-4 autoloading, and a React/TypeScript frontend with Tailwind CSS v4 styling.
+Debug Suite is a WordPress plugin that provides advanced debugging tools for WordPress developers. It features a modern architecture with a **dependency injection container** system, PSR-4 autoloading, and a React/TypeScript frontend with Tailwind CSS v4 styling.
 
 ### Core Architecture
 
-- **PSR-11 Compliant DI Container**: Full compliance with PSR-11 DI Interface specification in `DebugSuite\Core\Container` namespace
-- **PHP-DI Style Definitions**: Support for `AutowiredDefinition`, `FactoryDefinition`, and `ValueDefinition` patterns
-- **Enhanced Service Provider System**: Advanced lifecycle management with registration and booting phases
-- **Container Builder Pattern**: Fluent interface for container configuration and dependency setup
+- **Dependency Injection Container**: Service container for managing dependencies in `DebugSuite\Core\Container` namespace
+- **Service Provider System**: Lifecycle management with registration and booting phases
 - **Service Manager**: Centralized provider lifecycle management with automatic hook registration
 - **Hookable Interface**: Automatic WordPress hook registration for services implementing `Hookable`
 - **WordPress Integration**: Seamless integration with WordPress hooks, lifecycle, and admin interfaces
-- **Helper Functions**: Global functions for easy container access and dependency injection operations
+- **Helper Functions**: Global functions for easy container access and service resolution
 
 ## Code Standards and Requirements
 
 ### PHP Backend
 
 1. **PHP Version**: Use PHP 8.2 features including:
-
     - Union types
     - Named arguments
     - Constructor property promotion
@@ -32,14 +29,12 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     - DNF (Disjunctive Normal Form) types
 
 2. **Type Hinting**:
-
     - Use return type declarations for all methods and functions
     - Use parameter type hints for all method and function parameters
     - Use union types where appropriate (`string|null`, etc.)
     - Use nullable types when applicable
 
 3. **Coding Standards**:
-
     - Follow PSR-12 coding standard
     - Follow WordPress coding standards (where not in conflict with PSR-12)
     - **Use snake_case for all method and function names** (WordPress standard)
@@ -55,24 +50,20 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 ### JavaScript/TypeScript Frontend
 
 1. **TypeScript**:
-
     - Use TypeScript for all frontend components
     - Properly type all variables, functions, and components
     - Use interfaces for object shapes
 
 2. **React**:
-
     - Use `@wordpress/element` for React components
     - Follow functional component patterns with hooks
     - Use typed props for all components
 
 3. **ESLint**:
-
     - Follow ESLint rules for JavaScript and TypeScript
     - Maintain code quality with ESLint static analysis
 
 4. **Tailwind CSS v4**:
-
     - Use Tailwind CSS v4 with the Oxide engine for styling
     - **Always use the `primary` color as the brand color for all UI elements.**
     - Follow utility-first CSS approach with Tailwind classes
@@ -83,13 +74,11 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     - Apply responsive design using Tailwind's breakpoint utilities
 
 5. **React Component String internationalization**:
-
     - Use `@wordpress/i18n` for string internationalization
     - Use `__()` and `_x()` functions for translating strings
     - Ensure all user-facing strings are translatable
 
 6. **Icons**:
-
     - **Always use Lucide React icons for all UI icons**
     - Import icons from `lucide-react` package
     - Never use inline SVG code or other icon libraries
@@ -97,7 +86,6 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     - Example: `import { FolderOpen, Settings, X } from 'lucide-react';`
 
 7. **UI Components**:
-
     - **Use Headless UI for interactive components**: Prefer `@headlessui/react` components for dropdowns, modals, dialogs, and other interactive elements
     - **Combobox for Dropdowns**: Use the custom `Combobox` component (built on Headless UI) for all dropdown selections instead of native selects
     - **Accessibility First**: Always use Headless UI components which provide built-in accessibility features
@@ -161,31 +149,48 @@ npm run lint
 
 ## Architecture Guidelines
 
-1. **PSR-11 Dependency Injection Container System**:
+### **IMPORTANT: Simplified DI Container Usage**
 
-    - **Container Location**: Use `DebugSuite\Core\Container\Container` which implements `Psr\Container\ContainerInterface`
-    - **PSR-11 Methods**: Support for `get()` and `has()` methods with proper exception handling
-    - **Exception Handling**: Throw `DebugSuite\Core\Container\Exceptions\NotFoundException` for missing services and `DebugSuite\Core\Container\Exceptions\ContainerException` for container errors
+**🚨 Use ONLY these simple registration patterns:**
+
+```php
+// ✅ CORRECT - Simple service registration
+$container->add_definitions([
+    // Use object() for simple services without dependencies
+    MyService::class => $container->object(MyService::class),
+
+    // Use autowire() for services with constructor dependencies
+    MyController::class => $container->autowire(MyController::class),
+]);
+```
+
+**❌ AVOID Complex DI Patterns:**
+
+- Do NOT use `ValueDefinition`, `AutowiredDefinition`, `FactoryDefinition` directly
+- Do NOT use advanced container builder patterns
+- Do NOT use environment-specific autowiring helpers
+- Do NOT implement complex definition interfaces
+
+**✅ Simple Service Patterns:**
+
+- Services should have no constructor parameters OR simple constructor injection
+- Use `$container->object()` for stateless services
+- Use `$container->autowire()` for services that need other services injected
+- Keep service registration in `AppServiceProvider` only
+
+1. **Dependency Injection Container System**:
+    - **Container Location**: Use `DebugSuite\Core\Container\Container` for service management
+    - **Simple Registration**: Use only `$container->object()` and `$container->autowire()` methods
     - **Singleton Pattern**: Container uses singleton pattern accessible via `Container::get_instance()`
-    - **Magic Methods**: Support for property-style access (`$container->service_name`) and `isset()` checks
+    - **No Complex Definitions**: Avoid using ValueDefinition, AutowiredDefinition, etc. directly
 
-2. **PHP-DI Style Definition System**:
+2. **Simple Service Registration**:
+    - **Object Registration**: Use `$container->object(Class::class)` for simple service registration
+    - **Autowired Registration**: Use `$container->autowire(Class::class)` for services with dependencies
+    - **Clean Structure**: Use minimal boilerplate with focused, readable code
+    - **Single Provider**: Register all business services in `AppServiceProvider` only
 
-    - **AutowiredDefinition**: Use for automatic dependency resolution with reflection-based injection
-        - Advanced parameter injection with static overrides, dynamic callbacks, and environment-aware configuration
-        - Multiple parameter resolution strategies with priority-based fallback system
-        - Enhanced error messages with actionable suggestions for parameter resolution failures
-        - Convenience methods for bulk parameter setting and introspection
-    - **FactoryDefinition**: Use for factory-based service creation with callable factories
-    - **ValueDefinition**: Use for static values and configuration data
-    - **ConfigDefinition**: Use for environment-aware configuration management
-    - **DecoratorDefinition**: Use for service decoration patterns
-    - **Definition Interface**: All definitions implement `DefinitionInterface` with `resolve()` method
-    - **Singleton Support**: Definitions support both singleton and transient service lifetimes
-    - **Parameter Injection**: Comprehensive constructor parameter injection with multiple strategies
-
-3. **Enhanced Service Provider System**:
-
+3. **Service Provider System**:
     - **Base Class**: Extend `DebugSuite\Core\Container\AbstractServiceProvider` for new service providers
     - **Simple Registration**: Register services with concise arrow function singletons
     - **Provider Services**: List provided services in the `$provides` array property for tracking
@@ -208,156 +213,47 @@ npm run lint
         ];
 
         public function register( Container $container ): void {
-            $container->singleton( ExampleService::class, fn() => new ExampleService() );
-            $container->singleton( ExampleController::class, fn( $c ) => new ExampleController( $c->get( ExampleService::class ) ) );
+            $container->add_definitions([
+                ExampleService::class => $container->object( ExampleService::class ),
+                ExampleController::class => $container->autowire( ExampleController::class ),
+            ]);
         }
     }
     ```
 
-4. **Container Builder Pattern**:
-
-    - **Builder Class**: Use `DebugSuite\Core\Container\ContainerBuilder` for fluent container configuration
-    - **Autowiring Control**: Enable/disable autowiring with `enable_autowiring()` method
-    - **Definition Management**: Add definitions using `add_definitions()` with fluent interface
-    - **Container Creation**: Configure settings then call `build()` to create configured container
-    - **Fluent Interface**: All builder methods return `$this` for method chaining
-
-5. **Service Manager Lifecycle**:
-
+4. **Service Manager Lifecycle**:
     - **Manager Class**: Use `DebugSuite\Core\Container\ServiceManager` for provider lifecycle management
     - **Provider Registration**: Register providers with `register()` or `register_providers()` methods
     - **Boot Process**: Call `boot()` to initialize all providers and register hooks
     - **Hook Registration**: Automatically register hooks for services implementing `Hookable` interface
-    - **Service Resolution**: Resolve services through the container with proper dependency injection
+    - **Service Resolution**: Resolve services through the container with dependency injection
     - **Boot State**: Track boot state with `is_booted()` method
 
-6. **Hookable Interface Pattern**:
-
+5. **Hookable Interface Pattern**:
     - **Interface Implementation**: Implement `DebugSuite\Interfaces\Hookable` for classes needing WordPress hooks
     - **Hook Method**: Use `register_hooks()` method to register all WordPress hooks and filters
     - **Automatic Registration**: Hook registration handled automatically by ServiceManager after provider booting
     - **Manual Registration**: Avoid manual hook registration in constructors or boot methods
     - **Testing Benefits**: Allows testing services without triggering WordPress hooks
 
-7. **Debug Provider System**:
-
-    - **Base Provider**: Extend `AbstractDebugProvider` for new debug providers
-    - **Provider Interface**: Implement `DebugProviderInterface` methods for consistent debug provider behavior
-    - **Provider Manager**: Use `DebugProviderManager` for debug provider registration and lifecycle
-    - **Provider Integration**: Integrate debug providers with the main DI container system
-
-8. **Service Layer Pattern Architecture**:
-
+6. **Service Layer Pattern Architecture**:
     - **Service Layer Location**: All business logic services are located in `DebugSuite\Services` namespace
     - **Service Interface**: All services implement `DebugSuite\Interfaces\ServiceInterface` marker interface
     - **ServiceResponse Pattern**: All service methods return `DebugSuite\Core\ServiceResponse` objects for consistent error handling
     - **Separation of Concerns**: REST controllers only handle HTTP requests/responses, services handle business logic
-    - **Dependency Injection**: Services are registered as singletons in the PSR-11 container via `ServicesServiceProvider`
-    - **Configuration Support**: Services accept configurable dependencies through container bindings (e.g., custom file paths)
+    - **Dependency Injection**: Services are registered as singletons in the container via `AppServiceProvider`
     - **Error Handling**: Use `ServiceResponse::success($data)` and `ServiceResponse::failure($message, $code)` for consistent responses
-    - **Service Registration**: Add new services to `ServicesServiceProvider::$provides` array and register in `register()` method
+    - **Service Registration**: Add new services to `AppServiceProvider::$provides` array and register in `register()` method
     - **Implemented Services**: `FileLogsService` (debug log operations), `SettingsService` (wp-config.php management), `FileManagerService` (file system operations)
     - **Service Dependencies**: Services accept optional constructor parameters for configuration (log file paths, base directories, config files)
     - **Container Integration**: Services are resolved via `debug_suite_resolve()` helper or direct container access
     - **Testing Architecture**: Services are easily unit testable without WordPress dependencies or global state
 
-9. **Helper Functions and Global Access**:
-
+7. **Helper Functions and Global Access**:
     - **Container Access**: Use `debug_suite_container()` to get container instance
     - **Service Resolution**: Use `debug_suite_resolve(string $service)` to resolve services
     - **Service Manager**: Use `debug_suite_service_manager()` to get service manager instance
     - **Main Instance**: Use `debug_suite()` to get main plugin instance
-    - **DI Definitions**: Use helper functions like `debug_suite_autowire()`, `debug_suite_factory()` for creating definitions
-    - **Advanced Autowiring**: Use `debug_suite_autowire_with_params()` for quick parameter injection
-    - **Environment Autowiring**: Use `debug_suite_autowire_env()` for environment-specific service configuration
-    - **Configuration Management**: Use `debug_suite_config()` for environment-aware configuration
-    - **Service Decoration**: Use `debug_suite_decorate()` for decorator pattern implementation
-    - **Tagged Services**: Use `debug_suite_tagged()` to retrieve services by tag
-    - **Legacy Compatibility**: All legacy helper functions remain functional for backward compatibility
-
-## Advanced Dependency Injection Patterns
-
-### AutowiredDefinition Parameter Injection
-
-The `AutowiredDefinition` class supports multiple parameter injection strategies with priority-based resolution:
-
-1. **Environment-Specific Parameters** (highest priority)
-
-    ```php
-    $definition = $container->autowire(DatabaseService::class)
-        ->environment_parameters('development', [
-            'host' => 'localhost',
-            'debug' => true
-        ])
-        ->environment_parameters('production', [
-            'host' => 'prod-db.example.com',
-            'debug' => false
-        ]);
-    ```
-
-2. **Dynamic Parameter Callbacks**
-
-    ```php
-    $definition = $container->autowire(EmailService::class)
-        ->constructor_parameter_callback('api_key', function($resolver) {
-            $config = $resolver(ConfigService::class);
-            return $config->get('email.api_key');
-        });
-    ```
-
-3. **Static Parameter Overrides**
-
-    ```php
-    // Single parameter
-    $definition = $container->autowire(LoggerService::class)
-        ->constructor_parameter('log_level', 'debug');
-
-    // Multiple parameters
-    $definition = $container->autowire(LoggerService::class)
-        ->constructor_parameters([
-            'log_level' => 'debug',
-            'log_file' => '/var/log/app.log'
-        ]);
-    ```
-
-4. **Type-Based Dependency Injection** (automatic)
-5. **Default Parameter Values** (from constructor)
-6. **Enhanced Error Messages** (with actionable suggestions)
-
-### Environment-Aware Services
-
-Services automatically adapt to WordPress environment using:
-
-- `WP_ENVIRONMENT_TYPE` constant (WordPress 5.5+)
-- `WP_DEBUG` constant (fallback)
-- Default to 'production' if neither is set
-
-Supported environments: `development`, `staging`, `production`, `testing`
-
-### Convenience Helper Functions
-
-```php
-// Quick autowiring with parameters
-$definition = debug_suite_autowire_with_params(LoggerService::class, [
-    'log_level' => 'debug',
-    'log_file' => '/var/log/app.log'
-], true); // singleton
-
-// Environment-aware autowiring
-$definition = debug_suite_autowire_env(DatabaseService::class, [
-    'development' => ['host' => 'localhost', 'debug' => true],
-    'production' => ['host' => 'prod-db.com', 'debug' => false]
-], true); // singleton
-
-// Configuration management
-$config = debug_suite_config([
-    'development' => ['api_url' => 'https://dev-api.com'],
-    'production' => ['api_url' => 'https://api.com']
-]);
-
-// Service decoration
-$decorated = debug_suite_decorate(CachedEmailService::class, EmailService::class, true);
-```
 
 ## Feature Implementation Guidelines
 
@@ -452,10 +348,10 @@ class ExampleService implements ServiceInterface {
 
 ```php
 // In AppServiceProvider::register()
-$container->singleton( ExampleService::class, fn() => new ExampleService() );
-
-// Register controller with dependency injection
-$container->singleton( ExampleController::class, fn( $c ) => new ExampleController( $c->get( ExampleService::class ) ) );
+$container->add_definitions([
+    ExampleService::class => $container->object( ExampleService::class ),
+    ExampleController::class => $container->autowire( ExampleController::class ),
+]);
 
 // Add to $provides array (follow existing pattern)
 protected array $provides = [
@@ -582,7 +478,6 @@ class ExampleController extends RestController {
 ### 2. **Service Layer Best Practices**
 
 - **Single Responsibility**: Each service handles one domain of business logic
-
     - `FileLogsService`: Debug log operations only
     - `SettingsService`: wp-config.php management only
     - `FileManagerService`: File system operations only
@@ -609,7 +504,7 @@ class ExampleController extends RestController {
 
     ```php
     // Example from SettingsService
-    public function update_debug_settings( array $settings ): ServiceResponse {
+    public function update_settings( array $settings ): ServiceResponse {
         $valid_keys = [ 'WP_DEBUG', 'WP_DEBUG_LOG', 'WP_DEBUG_DISPLAY' ];
 
         foreach ( $settings as $key => $value ) {
@@ -680,7 +575,7 @@ class ExampleControllerTest extends DebugSuiteTestCase {
         $this->assertInstanceOf(WP_Error::class, $response);
 
         // Test with admin privileges
-        $user_id = $this->factory->user->create(['role' => 'administrator']);
+        $user_id = $this->factory()->user->create(['role' => 'administrator']);
         wp_set_current_user($user_id);
         $response = $this->controller->permissions_check($request);
         $this->assertTrue($response);
@@ -713,7 +608,7 @@ The Debug Suite Container System provides enterprise-grade dependency injection 
 
 ### 1. **Service Registration Patterns**
 
-#### Modern PHP-DI Style Registration (Current Implementation)
+#### Modern Service Registration (Current Implementation)
 
 ```php
 class AppServiceProvider extends AbstractServiceProvider {
@@ -1056,6 +951,7 @@ Debug Suite implements **client-side filtering** for optimal performance and rea
 #### SOP 1: Client-Side Filtering Hook Pattern
 
 **Implementation Standard:**
+
 ```typescript
 export const useDataEntries = () => {
     const [allData, setAllData] = useState<DataEntry[]>([]);
@@ -1079,11 +975,11 @@ export const useDataEntries = () => {
                 per_page: 10000, // High limit to get all data
                 page: 1
             });
-            
+
             const response = await apiFetch<DataResponse>({
                 path: apiPath
             });
-            
+
             setAllData(response.entries);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -1104,11 +1000,11 @@ export const useDataEntries = () => {
 
     // Update filters with automatic pagination reset
     const updateFilters = useCallback((newFilters: Partial<DataFilters>) => {
-        setFilters(prev => ({
+        setFilters((prev) => ({
             ...prev,
             ...newFilters,
             // Reset pagination when filters change (except perPage)
-            ...(Object.keys(newFilters).some(key => key !== 'perPage') ? { perPage: 100 } : {})
+            ...(Object.keys(newFilters).some((key) => key !== 'perPage') ? { perPage: 100 } : {})
         }));
     }, []);
 
@@ -1127,22 +1023,24 @@ export const useDataEntries = () => {
 #### SOP 2: Client-Side Filter Function Pattern
 
 **Filtering Implementation Standard:**
+
 ```typescript
 const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[] => {
     let filtered = [...data];
 
     // Category/Level filtering
     if (filters.category && filters.category !== 'all') {
-        filtered = filtered.filter(item => item.category === filters.category);
+        filtered = filtered.filter((item) => item.category === filters.category);
     }
 
     // Search filtering (message, file, category)
     if (filters.search && filters.search.trim()) {
         const searchTerm = filters.search.toLowerCase().trim();
-        filtered = filtered.filter(item => 
-            item.message.toLowerCase().includes(searchTerm) ||
-            (item.file && item.file.toLowerCase().includes(searchTerm)) ||
-            item.category.toLowerCase().includes(searchTerm)
+        filtered = filtered.filter(
+            (item) =>
+                item.message.toLowerCase().includes(searchTerm) ||
+                (item.file && item.file.toLowerCase().includes(searchTerm)) ||
+                item.category.toLowerCase().includes(searchTerm)
         );
     }
 
@@ -1153,7 +1051,7 @@ const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[]
         switch (filters.sortBy) {
             case 'category':
                 // Define hierarchy for categorical sorting
-                const categoryOrder = { 'critical': 6, 'error': 5, 'warning': 4, 'notice': 3, 'info': 2, 'debug': 1 };
+                const categoryOrder = { critical: 6, error: 5, warning: 4, notice: 3, info: 2, debug: 1 };
                 aValue = categoryOrder[a.category] || 0;
                 bValue = categoryOrder[b.category] || 0;
                 break;
@@ -1186,6 +1084,7 @@ const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[]
 #### SOP 3: Real-Time Filtering UI Feedback
 
 **UI Implementation Standard:**
+
 ```tsx
 // Show filtered vs total count when filters are active
 <div className="text-sm text-gray-600">
@@ -1210,7 +1109,7 @@ const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[]
 // Debounced search input with clear button
 <div className="relative">
     <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-    <InputField
+    <TextInput
         type="text"
         placeholder={__('Search...', 'debug-suite')}
         value={filters.search}

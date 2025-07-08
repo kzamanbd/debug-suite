@@ -6,7 +6,7 @@
  * @since 1.0.0
  */
 import { classNames } from '@/utils';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export type BadgeVariant = 'primary' | 'success' | 'danger' | 'warning' | 'default' | 'info';
 

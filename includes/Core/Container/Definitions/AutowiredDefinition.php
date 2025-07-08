@@ -15,34 +15,19 @@ use DebugSuite\Core\Container\Exceptions\ContainerException;
 /**
  * Autowired definition for advanced dependency injection.
  *
- * Provides comprehensive autowiring capabilities with multiple parameter injection strategies:
+ * Provides comprehensive autowiring capabilities with multiple parameter injection strategies.
  *
- * **Core Features:**
- * - Automatic constructor dependency resolution via reflection
- * - Manual parameter overrides for specific constructor arguments
- * - Dynamic parameter callbacks with container resolver access
- * - Environment-aware parameter configuration (development/production/testing)
- * - Fluent method chaining for configuration
- * - Singleton and transient service lifetime support
+ * @since 1.0.0
  *
- * **Parameter Resolution Priority:**
- * 1. Environment-specific parameters (highest priority)
- * 2. Dynamic parameter callbacks
- * 3. Static parameter overrides
- * 4. Type-based dependency injection
- * 5. Default parameter values
- * 6. Container exception (if none above match)
- *
- * Follows PHP-DI's autowiring pattern with WordPress-specific enhancements.
- *
- * @since DEBUG_SUITE_SINCE
+ * @internal This class is for internal container use only.
+ *           Use $container->object() and $container->autowire() in service providers instead.
  */
 class AutowiredDefinition implements DefinitionInterface {
 
 	/**
 	 * The definition name/identifier.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
@@ -51,7 +36,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * The class name to autowire.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
@@ -60,7 +45,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Whether this definition should be cached as singleton.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var bool
 	 */
@@ -69,7 +54,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Static parameter value overrides by parameter name.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, mixed>
 	 */
@@ -78,7 +63,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Dynamic parameter resolution callbacks by parameter name.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, callable>
 	 */
@@ -87,7 +72,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Environment-specific parameter configurations.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @var array<string, array<string, mixed>>
 	 */
@@ -96,7 +81,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Constructor.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $class_name The class name to autowire.
 	 * @param bool   $singleton  Whether this definition should be cached as singleton.
@@ -109,7 +94,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Get the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
@@ -120,7 +105,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Set the name of this definition.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $name The definition name/identifier.
 	 *
@@ -134,7 +119,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Check if this definition is cacheable (singleton).
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
@@ -145,7 +130,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Get the target class name for autowiring.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
@@ -156,7 +141,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Resolve this definition to an instance using reflection and dependency injection.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param callable $resolver Function to resolve dependencies.
 	 *
@@ -199,7 +184,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	 * This method allows you to manually specify values for constructor parameters,
 	 * overriding the default autowiring behavior for specific arguments.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $parameter_name The exact name of the constructor parameter.
 	 * @param mixed  $value          The static value to inject for this parameter.
@@ -225,7 +210,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	 * The callback receives the container resolver as its first argument, allowing
 	 * access to other container services for complex parameter construction.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string   $parameter_name The exact name of the constructor parameter.
 	 * @param callable $callback       Callable that returns the parameter value.
@@ -255,7 +240,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	 * (development, production, staging, testing). Environment detection is automatic
 	 * using WP_ENVIRONMENT_TYPE constant or WP_DEBUG fallback.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $environment The target environment name (development, production, staging, testing).
 	 * @param array  $parameters  Associative array of parameter_name => value pairs for this environment.
@@ -288,7 +273,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	 * Convenience method for setting multiple static parameter values without
 	 * chaining multiple constructor_parameter() calls.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param array $parameters Associative array of parameter_name => value pairs.
 	 *
@@ -315,7 +300,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	 * Returns an array of all currently configured static parameter overrides.
 	 * Useful for debugging or introspection purposes.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return array<string, mixed> Array of parameter_name => value pairs.
 	 */
@@ -326,7 +311,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Resolve constructor dependencies using various injection strategies.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param array    $parameters Array of ReflectionParameter objects.
 	 * @param callable $resolver   Function to resolve dependencies.
@@ -348,7 +333,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Resolve a single constructor parameter using multiple injection strategies.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param ReflectionParameter $parameter The parameter to resolve.
 	 * @param callable            $resolver  Function to resolve dependencies.
@@ -399,7 +384,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Resolve environment-specific parameter value.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param string $param_name The parameter name.
 	 *
@@ -419,7 +404,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	/**
 	 * Detect the current WordPress environment.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string The detected environment (development, staging, production).
 	 */
@@ -444,7 +429,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	 * Creates a helpful error message with suggestions for resolving
 	 * parameter injection issues.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @param ReflectionParameter $parameter The failed parameter.
 	 *

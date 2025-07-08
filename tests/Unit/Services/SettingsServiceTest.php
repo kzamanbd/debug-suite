@@ -70,12 +70,12 @@ EOT;
 	}
 
 	/**
-	 * Test get_current_debug_settings method.
+	 * Test get_settings method.
 	 * 
-	 * @covers \DebugSuite\Services\SettingsService::get_current_debug_settings
+	 * @covers \DebugSuite\Services\SettingsService::get_settings
 	 */
-	public function test_get_current_debug_settings() {
-		$result = $this->service->get_current_debug_settings();
+	public function test_get_settings() {
+		$result = $this->service->get_settings();
 		
 		// Assert the result is successful
 		$this->assert_service_result_success($result);
@@ -95,17 +95,17 @@ EOT;
 	}
 
 	/**
-	 * Test update_debug_settings method.
+	 * Test update_settings method.
 	 * 
-	 * @covers \DebugSuite\Services\SettingsService::update_debug_settings
+	 * @covers \DebugSuite\Services\SettingsService::update_settings
 	 */
-	public function test_update_debug_settings() {
+	public function test_update_settings() {
 		$new_settings = [
 			'WP_DEBUG' => 'true',
 			'WP_DEBUG_LOG' => 'true',
 		];
 		
-		$result = $this->service->update_debug_settings($new_settings);
+		$result = $this->service->update_settings($new_settings);
 		
 		// Assert the result is successful
 		$this->assert_service_result_success($result);
@@ -120,9 +120,9 @@ EOT;
 	}
 
 	/**
-	 * Test update_debug_settings method with all constants.
+	 * Test update_settings method with all constants.
 	 * 
-	 * @covers \DebugSuite\Services\SettingsService::update_debug_settings
+	 * @covers \DebugSuite\Services\SettingsService::update_settings
 	 */
 	public function test_update_all_debug_settings() {
 		$new_settings = [
@@ -131,7 +131,7 @@ EOT;
 			'WP_DEBUG_DISPLAY' => 'true',
 		];
 		
-		$result = $this->service->update_debug_settings($new_settings);
+		$result = $this->service->update_settings($new_settings);
 		
 		// Assert the result is successful
 		$this->assert_service_result_success($result);
@@ -146,17 +146,17 @@ EOT;
 	}
 
 	/**
-	 * Test update_debug_settings method with invalid settings.
+	 * Test update_settings method with invalid settings.
 	 * 
-	 * @covers \DebugSuite\Services\SettingsService::update_debug_settings
+	 * @covers \DebugSuite\Services\SettingsService::update_settings
 	 */
-	public function test_update_debug_settings_invalid_key() {
+	public function test_update_settings_invalid_key() {
 		$invalid_settings = [
 			'WP_DEBUG' => 'true',
 			'INVALID_CONSTANT' => 'true',
 		];
 		
-		$result = $this->service->update_debug_settings($invalid_settings);
+		$result = $this->service->update_settings($invalid_settings);
 		
 		// Assert the result is a failure
 		$this->assert_service_result_failure($result);
@@ -164,16 +164,16 @@ EOT;
 	}
 
 	/**
-	 * Test update_debug_settings method with invalid values.
+	 * Test update_settings method with invalid values.
 	 * 
-	 * @covers \DebugSuite\Services\SettingsService::update_debug_settings
+	 * @covers \DebugSuite\Services\SettingsService::update_settings
 	 */
-	public function test_update_debug_settings_invalid_value() {
+	public function test_update_settings_invalid_value() {
 		$invalid_settings = [
 			'WP_DEBUG' => 'invalid_value',
 		];
 		
-		$result = $this->service->update_debug_settings($invalid_settings);
+		$result = $this->service->update_settings($invalid_settings);
 		
 		// Assert the result is a failure
 		$this->assert_service_result_failure($result);
@@ -181,12 +181,12 @@ EOT;
 	}
 
 	/**
-	 * Test update_debug_settings method with empty settings.
+	 * Test update_settings method with empty settings.
 	 * 
-	 * @covers \DebugSuite\Services\SettingsService::update_debug_settings
+	 * @covers \DebugSuite\Services\SettingsService::update_settings
 	 */
-	public function test_update_debug_settings_empty() {
-		$result = $this->service->update_debug_settings([]);
+	public function test_update_settings_empty() {
+		$result = $this->service->update_settings([]);
 		
 		// Assert the result is a failure
 		$this->assert_service_result_failure($result);
@@ -200,7 +200,7 @@ EOT;
 	 */
 	public function test_reset_debug_settings() {
 		// First update some settings
-		$this->service->update_debug_settings([
+		$this->service->update_settings([
 			'WP_DEBUG' => 'true',
 			'WP_DEBUG_LOG' => 'true',
 			'WP_DEBUG_DISPLAY' => 'true',
@@ -213,7 +213,7 @@ EOT;
 		$this->assert_service_result_success($result);
 		
 		// Get the current settings after reset
-		$current_settings = $this->service->get_current_debug_settings()->get_data();
+		$current_settings = $this->service->get_settings()->get_data();
 		
 		// All settings should be set to 'false'
 		$this->assertEquals('false', $current_settings['WP_DEBUG']);
@@ -224,7 +224,7 @@ EOT;
 	/**
 	 * Test handling non-existent config file.
 	 * 
-	 * @covers \DebugSuite\Services\SettingsService::get_current_debug_settings
+	 * @covers \DebugSuite\Services\SettingsService::get_settings
 	 */
 	public function test_nonexistent_config_file() {
 		// Set the config file path to a non-existent file
@@ -232,7 +232,7 @@ EOT;
 		$property = $reflection->getProperty('config_file_path');
 		$property->setValue($this->service, '/path/to/nonexistent/wp-config.php');
 		
-		$result = $this->service->get_current_debug_settings();
+		$result = $this->service->get_settings();
 		
 		// Assert the result is a failure
 		$this->assert_service_result_failure($result);

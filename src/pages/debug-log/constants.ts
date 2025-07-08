@@ -34,16 +34,15 @@ export const levelOptions = [
 ];
 
 export const perPageOptions = [
-    { value: '100', label: __('100 items per page', 'debug-suite') },
-    { value: '250', label: __('250 items per page', 'debug-suite') },
-    { value: '500', label: __('500 items per page', 'debug-suite') },
-    { value: '1000', label: __('1000 items per page', 'debug-suite') }
+    { value: '100', label: __('100 items', 'debug-suite') },
+    { value: '250', label: __('250 items', 'debug-suite') },
+    { value: '500', label: __('500 items', 'debug-suite') },
+    { value: '1000', label: __('1000 items', 'debug-suite') }
 ];
 
 export const sortOptions = [
     { value: 'timestamp', label: __('Sort by Date', 'debug-suite') },
-    { value: 'level', label: __('Sort by Level', 'debug-suite') },
-    { value: 'message', label: __('Sort by Message', 'debug-suite') }
+    { value: 'level', label: __('Sort by Level', 'debug-suite') }
 ];
 
 export const exportOptions = [
