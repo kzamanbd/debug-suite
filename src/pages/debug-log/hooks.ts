@@ -25,11 +25,11 @@ export const useLogFiles = () => {
     const fetchLogFiles = async () => {
         try {
             setLoading(true);
-            const response = await apiFetch<{ files: LogFile[]; current_file: string }>({
+            const response = await apiFetch<{ files: LogFile[] }>({
                 path: '/debug-suite/v1/logs/supported-files'
             });
             setLogFiles(response.files);
-            setSelectedFile(response.current_file);
+            setSelectedFile(response.files[0].path);
         } catch (error) {
             console.error('Error fetching log files:', error);
         } finally {
@@ -39,7 +39,7 @@ export const useLogFiles = () => {
 
     // Fetch log files on component mount
     useEffect(() => {
-        fetchLogFiles();
+        void fetchLogFiles();
     }, []);
 
     return { logFiles, selectedFile, setSelectedFile, loading, refetch: fetchLogFiles };
@@ -57,12 +57,12 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
     }
 
     // Filter by search term
-    if (filters.search && filters.search.trim()) {
+    if (filters.search.trim()) {
         const searchTerm = filters.search.toLowerCase().trim();
         filtered = filtered.filter(
             (log) =>
                 log.message.toLowerCase().includes(searchTerm) ||
-                (log.file && log.file.toLowerCase().includes(searchTerm)) ||
+                log.file?.toLowerCase().includes(searchTerm) ||
                 log.level.toLowerCase().includes(searchTerm)
         );
     }
@@ -70,11 +70,11 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
     // Sort the entries
     filtered.sort((a, b) => {
         let aValue: any, bValue: any;
-
+        const levelOrder = { critical: 6, error: 5, warning: 4, notice: 3, info: 2, debug: 1 };
         switch (filters.sortBy) {
             case 'level':
                 // Define level hierarchy for sorting
-                const levelOrder = { critical: 6, error: 5, warning: 4, notice: 3, info: 2, debug: 1 };
+
                 aValue = levelOrder[a.level] || 0;
                 bValue = levelOrder[b.level] || 0;
                 break;
@@ -196,12 +196,12 @@ export const useLogEntries = () => {
 
     // Refetch all logs
     const refetch = useCallback(() => {
-        fetchAllLogs();
+        void fetchAllLogs();
     }, [fetchAllLogs]);
 
     // Fetch all logs on component mount
     useEffect(() => {
-        fetchAllLogs();
+        void fetchAllLogs();
     }, [fetchAllLogs]);
 
     // Handle visibility change to refetch logs when tab becomes visible
@@ -252,7 +252,7 @@ export const useLogStats = () => {
 
     // Fetch stats on component mount
     useEffect(() => {
-        fetchStats();
+        void fetchStats();
     }, []);
 
     return { stats, loading, refetch: fetchStats };

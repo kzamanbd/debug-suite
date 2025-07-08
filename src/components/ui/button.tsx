@@ -7,7 +7,7 @@
  */
 import { classNames } from '@/utils';
 import { Loader2 } from 'lucide-react';
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export type ButtonVariant = 'primary' | 'success' | 'danger' | 'warning' | 'default' | 'info';
 

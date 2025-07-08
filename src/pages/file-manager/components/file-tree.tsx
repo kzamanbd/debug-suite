@@ -5,7 +5,7 @@
  *
  * @since 1.0.0
  */
-import { ItemTree } from '@/types';
+import type { ItemTree } from '@/types';
 import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import FileIcon from './file-icon';
@@ -82,7 +82,7 @@ const FileTree = ({ file, action, className = '' }: TreeProps) => {
                                     ? 'bg-primary-100 dark:bg-primary-900/30 hover:bg-primary-150 dark:hover:bg-primary-900/40'
                                     : 'hover:bg-primary-50 dark:hover:bg-primary-900/20 active:bg-primary-100 dark:active:bg-primary-900/40'
                             )}
-                            onClick={(e) => action(file)}
+                            onClick={() => action(file)}
                         >
                             <FileIcon
                                 type="directory"
@@ -111,7 +111,7 @@ const FileTree = ({ file, action, className = '' }: TreeProps) => {
                         as="ul"
                         className="mt-2 ml-2 origin-top border-l border-gray-100 pl-4 transition-all duration-200 ease-out data-[closed]:-translate-y-4 data-[closed]:opacity-0 dark:border-gray-800"
                     >
-                        {file.children.map((child) => (
+                        {file.children?.map((child) => (
                             <FileTree key={child.path} file={child} action={action} />
                         ))}
                     </DisclosurePanel>

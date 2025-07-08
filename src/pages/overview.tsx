@@ -4,7 +4,7 @@ import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 
 import apiFetch from '@wordpress/api-fetch';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import {
@@ -101,74 +101,78 @@ const Overview = () => {
     const [refreshing, setRefreshing] = useState(false);
     const settings = window.debugSuite;
 
-    const fetchDashboardData = async (showRefreshToast = false) => {
-        try {
-            setRefreshing(true);
+    const fetchDashboardData = useCallback(
+        async (showRefreshToast = false) => {
+            try {
+                setRefreshing(true);
 
-            // Fetch log stats
-            const logStats = await apiFetch<DashboardStats['logs']>({
-                path: '/debug-suite/v1/logs/stats'
-            });
+                // Fetch log stats
+                const logStats = await apiFetch<DashboardStats['logs']>({
+                    path: '/debug-suite/v1/logs/stats'
+                });
 
-            // Fetch recent log entries to analyze top errors
-            const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
-                per_page: 10,
-                level_filter: 'error'
-            });
+                // Fetch recent log entries to analyze top errors
+                const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
+                    per_page: 10,
+                    level_filter: 'error'
+                });
 
-            const recentLogs = await apiFetch<{
-                entries: Array<{ message: string; level: string; timestamp: string }>;
-            }>({
-                path: recentLogsPath
-            });
+                const recentLogs = await apiFetch<{
+                    entries: Array<{ message: string; level: string; timestamp: string }>;
+                }>({
+                    path: recentLogsPath
+                });
 
-            // Process top errors
-            const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
-            recentLogs.entries.forEach((entry) => {
-                const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
-                if (!errorCounts[message]) {
-                    errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
+                // Process top errors
+                const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
+                recentLogs.entries.forEach((entry) => {
+                    const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
+                    // eslint-disable-next-line
+                    if (errorCounts[message]) {
+                        errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
+                    }
+                    errorCounts[message].count++;
+                    if (entry.timestamp > errorCounts[message].last_seen) {
+                        errorCounts[message].last_seen = entry.timestamp;
+                    }
+                });
+
+                const topErrorsList = Object.keys(errorCounts)
+                    .map((message) => ({ message, ...errorCounts[message] }))
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, 5);
+
+                setStats({
+                    logs: logStats,
+                    system: {
+                        wp_debug: settings.wpDebug,
+                        wp_debug_log: settings.wpDebugLog,
+                        wp_debug_display: settings.wpDebugDisplay,
+                        php_version: settings.phpVersion,
+                        wp_version: settings.wpVersion
+                    }
+                });
+
+                setTopErrors(topErrorsList);
+                setSlowQueries(mockSlowQueries);
+
+                if (showRefreshToast) {
+                    toast.success(__('Dashboard data refreshed', 'debug-suite'));
                 }
-                errorCounts[message].count++;
-                if (entry.timestamp > errorCounts[message].last_seen) {
-                    errorCounts[message].last_seen = entry.timestamp;
-                }
-            });
-
-            const topErrorsList = Object.keys(errorCounts)
-                .map((message) => ({ message, ...errorCounts[message] }))
-                .sort((a, b) => b.count - a.count)
-                .slice(0, 5);
-
-            setStats({
-                logs: logStats,
-                system: {
-                    wp_debug: settings.wpDebug,
-                    wp_debug_log: settings.wpDebugLog,
-                    wp_debug_display: settings.wpDebugDisplay,
-                    php_version: settings.phpVersion,
-                    wp_version: settings.wpVersion
-                }
-            });
-
-            setTopErrors(topErrorsList);
-            setSlowQueries(mockSlowQueries);
-
-            if (showRefreshToast) {
-                toast.success(__('Dashboard data refreshed', 'debug-suite'));
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+                toast.error(__('Failed to load dashboard data', 'debug-suite'));
+            } finally {
+                setLoading(false);
+                setRefreshing(false);
             }
-        } catch (error) {
-            console.error('Error fetching dashboard data:', error);
-            toast.error(__('Failed to load dashboard data', 'debug-suite'));
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    };
+        },
+        [settings]
+    );
 
     useEffect(() => {
-        fetchDashboardData();
-    }, []);
+        void fetchDashboardData();
+    }, [fetchDashboardData]);
 
     const getStatusIcon = (enabled: boolean) => {
         return enabled ? (
@@ -202,12 +206,12 @@ const Overview = () => {
                     </div>
                 </div>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    {[...Array(4)].map((_, i) => (
+                    {Array.from({ length: 4 }).map((_, i) => (
                         <div key={i} className="h-32 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"></div>
                     ))}
                 </div>
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                    {[...Array(2)].map((_, i) => (
+                    {Array.from({ length: 2 }).map((_, i) => (
                         <div key={i} className="h-96 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"></div>
                     ))}
                 </div>
