@@ -42,7 +42,7 @@ const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element =
     }, [route.path, route.title]);
 
     return (
-        <div className={classNames(className, 'mt-5 min-h-screen rounded-lg bg-white p-5')}>
+        <div className={classNames(className, 'debug-suite-layout')}>
             <LayoutHeader route={route} />
             {/* Main content area */}
             {children}

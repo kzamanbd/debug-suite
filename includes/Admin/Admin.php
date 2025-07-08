@@ -184,10 +184,10 @@ class Admin implements Hookable {
 		$settings  = get_option( 'debug_suite_settings', [] );
 		$settings  = array_merge( $constants, $settings );
 
-		wp_enqueue_script( 'debug-suite-admin' );
-		wp_enqueue_style( 'debug-suite-admin' );
+		wp_enqueue_script( 'debug-suite-script' );
+		wp_enqueue_style( 'debug-suite-style' );
 		wp_localize_script(
-			'debug-suite-admin',
+			'debug-suite-script',
 			'debugSuite',
 			$settings
 		);

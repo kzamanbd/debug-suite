@@ -3,7 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 const entries = {
-    'debug-suite-admin': './src/index.tsx'
+    'debug-suite': './src/index.tsx'
 };
 
 module.exports = {

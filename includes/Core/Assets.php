@@ -33,12 +33,12 @@ class Assets implements Hookable {
 	public function scripts(): array {
 		$scripts = [];
 
-		$admin_assets = DEBUG_SUITE_PLUGIN_DIR . 'assets/js/debug-suite-admin.asset.php';
+		$admin_assets = DEBUG_SUITE_PLUGIN_DIR . 'assets/js/debug-suite.asset.php';
 		if ( file_exists( $admin_assets ) ) {
 			$admin_assets = require $admin_assets;
 
-			$scripts['debug-suite-admin'] = [
-				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/js/debug-suite-admin.js',
+			$scripts['debug-suite-script'] = [
+				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/js/debug-suite.js',
 				'version' => $admin_assets['version'],
 				'deps'    => $admin_assets['dependencies'],
 			];
@@ -60,12 +60,12 @@ class Assets implements Hookable {
 	public function styles(): array {
 		$styles = [];
 
-		$admin_assets = DEBUG_SUITE_PLUGIN_DIR . 'assets/js/debug-suite-admin.asset.php';
+		$admin_assets = DEBUG_SUITE_PLUGIN_DIR . 'assets/js/debug-suite.asset.php';
 		if ( file_exists( $admin_assets ) ) {
 			$admin_assets = require $admin_assets;
 
-			$styles['debug-suite-admin'] = [
-				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/css/debug-suite-admin.css',
+			$styles['debug-suite-style'] = [
+				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/css/debug-suite.css',
 				'version' => $admin_assets['version'],
 				'deps'    => [], // CSS files typically don't need JavaScript dependencies
 			];

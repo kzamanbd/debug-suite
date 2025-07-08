@@ -60,6 +60,9 @@
         p {
             @apply m-0 p-0;
         }
+        input {
+            @apply h-auto;
+        }
     }
 }
 
@@ -82,6 +85,9 @@ div[data-headlessui-state='open'][role='dialog'] {
 .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+}
+.debug-suite-layout {
+    @apply mt-5 min-h-screen rounded-lg bg-white p-5;
 }
 
 /* Monaco Editor Error Highlighting */
