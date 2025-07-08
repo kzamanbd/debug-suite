@@ -4,9 +4,9 @@ import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
 import { __ } from '@wordpress/i18n';
-import type { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
-export interface DebugSuiteRoute {
+export type DebugSuiteRoute = {
     id: string;
     title?: string | ReactNode;
     description?: string | ReactNode;
@@ -14,7 +14,7 @@ export interface DebugSuiteRoute {
     element: ReactNode;
     className?: string;
     icon?: string;
-}
+};
 const routes: DebugSuiteRoute[] = [
     {
         id: 'overview',

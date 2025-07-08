@@ -12,7 +12,7 @@ interface FileLogsSkeletonProps {
     className?: string;
 }
 
-const skeleton = (extra = '') => classNames('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
+const skeleton = (extra: string = '') => classNames('bg-gray-200 dark:bg-gray-700 animate-pulse rounded', extra);
 
 const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Element => {
     return (

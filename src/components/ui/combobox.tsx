@@ -54,7 +54,7 @@ const Combobox = ({
                   return (
                       option.label.toLowerCase().includes(query.toLowerCase()) ||
                       option.value.toLowerCase().includes(query.toLowerCase()) ||
-                      (option.meta?.toLowerCase().includes(query.toLowerCase()))
+                      (option.meta && option.meta.toLowerCase().includes(query.toLowerCase()))
                   );
               });
 

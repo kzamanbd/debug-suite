@@ -6,7 +6,7 @@
  * @since 1.0.0
  */
 import { classNames } from '@/utils';
-import type { InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes } from 'react';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;

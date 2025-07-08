@@ -6,7 +6,7 @@
  * @since 1.0.0
  */
 import { classNames } from '@/utils';
-import type { InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes } from 'react';
 
 interface RadioButtonProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
     label: string;
