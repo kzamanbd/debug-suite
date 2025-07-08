@@ -25,3 +25,8 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+// Delete options
+delete_option( 'debug_suite_version' );
+delete_option( 'debug_suite_needs_onboarding' );
+delete_transient( 'debug_suite_activation_redirect' );
