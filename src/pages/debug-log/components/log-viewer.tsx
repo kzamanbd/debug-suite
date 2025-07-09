@@ -118,17 +118,8 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                     <td className="px-6 py-4 text-sm text-gray-900">
                                                         <div className="w-full text-left focus:outline-none">
                                                             <div className="flex items-center justify-between">
-                                                                {!log.line && !log.file_path ? (
-                                                                    <div className="flex-1 pr-4 whitespace-pre-wrap">
-                                                                        <pre className="whitespace-pre-wrap">
-                                                                            {log.raw_line}
-                                                                        </pre>
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="flex-1 pr-4 whitespace-pre-wrap">
-                                                                        {log.message}
-                                                                    </div>
-                                                                )}
+                                                                <div className="flex-1 pr-4">{log.message}</div>
+
                                                                 <div className="flex items-center gap-2">
                                                                     {log.has_stack_trace && (
                                                                         <DisclosureButton className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
