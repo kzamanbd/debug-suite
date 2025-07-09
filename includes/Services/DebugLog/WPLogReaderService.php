@@ -149,7 +149,7 @@ class WPLogReaderService implements ServiceInterface {
 				[
 					'entries' => $paginated_entries,
 					'total'   => count( $filtered_entries ),
-					'file'    => $log_file,
+					'file_path'    => $log_file,
 					'size'    => filesize( $log_file ),
 					'labels'  => $this->get_log_levels(),
 					'stats'   => $stats,
@@ -228,7 +228,7 @@ class WPLogReaderService implements ServiceInterface {
 					'type'             => $type,
 					'level'            => $level,
 					'message'          => $message,
-					'file'             => $file,
+					'file_path'        => $file,
 					'line'             => $line_info,
 					'stack_trace'      => '',
 					'has_stack_trace'  => false,
@@ -426,12 +426,12 @@ class WPLogReaderService implements ServiceInterface {
 
 				// Parse file, line, and function
 				if ( preg_match( '/^(.*?)\((\d+)\):\s*(.*)$/', $matches[2], $frame_matches ) ) {
-					$frame['file']     = $frame_matches[1];
+					$frame['file_path']= $frame_matches[1];
 					$frame['line']     = (int) $frame_matches[2];
 					$frame['function'] = $frame_matches[3];
 				} else {
 					$frame['function'] = $matches[2];
-					$frame['file']     = null;
+					$frame['file_path']= null;
 					$frame['line']     = null;
 				}
 
@@ -442,7 +442,7 @@ class WPLogReaderService implements ServiceInterface {
 					'number'   => $index,
 					'raw'      => $line,
 					'function' => $line,
-					'file'     => null,
+					'file_path'=> null,
 					'line'     => null,
 				];
 			}
@@ -508,7 +508,7 @@ class WPLogReaderService implements ServiceInterface {
 							[
 								$entry['message'] ?? '',
 								$entry['type'] ?? '',
-								$entry['file'] ?? '',
+								$entry['file_path'] ?? '',
 								$entry['raw_line'] ?? '',
 								$entry['stack_trace']['summary'] ?? '',
 							]
@@ -703,7 +703,7 @@ class WPLogReaderService implements ServiceInterface {
 					strtoupper( $entry['level'] ),
 					$entry['type'],
 					$entry['message'],
-					$entry['file'] ?? '',
+					$entry['file_path'] ?? '',
 					$entry['line'] ?? '',
 					$entry['has_stack_trace'] ? 'Yes' : 'No',
 					$entry['has_stack_trace'] ? ( $entry['stack_trace']['summary'] ?? '' ) : '',
@@ -738,8 +738,8 @@ class WPLogReaderService implements ServiceInterface {
 			$lines[] = sprintf( 'Level: %s', strtoupper( $entry['level'] ) );
 			$lines[] = sprintf( 'Type: %s', $entry['type'] );
 
-			if ( ! empty( $entry['file'] ) ) {
-				$lines[] = sprintf( 'File: %s', $entry['file'] );
+			if ( ! empty( $entry['file_path'] ) ) {
+				$lines[] = sprintf( 'File: %s', $entry['file_path'] );
 				if ( ! empty( $entry['line'] ) ) {
 					$lines[] = sprintf( 'Line: %d', $entry['line'] );
 				}

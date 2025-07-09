@@ -124,9 +124,9 @@ class FileLogsController extends RestController {
 					],
 					'limit' => [
 						'type'              => 'integer',
-						'default'           => 1000,
+						'default'           => 100,
 						'minimum'           => 1,
-						'maximum'           => 10000,
+						'maximum'           => 1000,
 						'sanitize_callback' => 'absint',
 					],
 				],

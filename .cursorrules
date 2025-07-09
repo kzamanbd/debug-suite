@@ -73,12 +73,12 @@ use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 
 class ExampleService implements ServiceInterface {
-    
+
     public function __construct(
         private SomeDependency $dependency,
         private ?string $config_value = null
     ) {}
-    
+
     public function process_data(array $input): ServiceResponse {
         // Validate input
         if (empty($input['required_field'])) {
@@ -87,10 +87,10 @@ class ExampleService implements ServiceInterface {
                 'validation_error'
             );
         }
-        
+
         // Process business logic
         $result = $this->do_business_logic($input);
-        
+
         return ServiceResponse::success([
             'data' => $result,
             'timestamp' => current_time('mysql')
@@ -111,20 +111,20 @@ use WP_REST_Response;
 use WP_Error;
 
 class ExampleController extends RestController {
-    
+
     public function __construct(
         private ExampleService $service
     ) {}
-    
+
     public function handle_request(WP_REST_Request $request): WP_REST_Response|WP_Error {
         // Extract input
         $input = [
             'field' => $request->get_param('field')
         ];
-        
+
         // Delegate to service
         $result = $this->service->process_data($input);
-        
+
         // Transform to HTTP response
         if ($result->is_failure()) {
             return new WP_Error(
@@ -133,7 +133,7 @@ class ExampleController extends RestController {
                 ['status' => 400]
             );
         }
-        
+
         return rest_ensure_response($result->to_array());
     }
 }
@@ -143,17 +143,17 @@ class ExampleController extends RestController {
 
 ```php
 class AppServiceProvider extends AbstractServiceProvider {
-    
+
     protected array $provides = [
         ExampleService::class,
         ExampleController::class,
     ];
-    
+
     public function register(Container $container): void {
         $container->add_definitions([
             // Services with autowiring
             ExampleService::class => $container->autowire(ExampleService::class),
-            
+
             // Controllers with dependency injection
             ExampleController::class => $container->autowire(ExampleController::class),
         ]);
@@ -167,12 +167,12 @@ class AppServiceProvider extends AbstractServiceProvider {
 use DebugSuite\Interfaces\Hookable;
 
 class AdminService implements Hookable {
-    
+
     public function register_hooks(): void {
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_init', [$this, 'init_settings']);
     }
-    
+
     public function add_admin_menu(): void {
         // Implementation
     }
@@ -204,21 +204,21 @@ const MyComponent: React.FC<ComponentProps> = ({ data, onSelect, isLoading = fal
 
 ```typescript
 // ✅ Frontend naming conventions
-const ComponentName = () => {};           // PascalCase for components
-const myVariableName = 'value';          // camelCase for variables/functions
-const handleButtonClick = () => {};      // camelCase for functions
-interface MyInterface {}                 // PascalCase for interfaces
-const useMyHook = () => {};             // camelCase starting with 'use' for hooks
+const ComponentName = () => {}; // PascalCase for components
+const myVariableName = 'value'; // camelCase for variables/functions
+const handleButtonClick = () => {}; // camelCase for functions
+interface MyInterface {} // PascalCase for interfaces
+const useMyHook = () => {}; // camelCase starting with 'use' for hooks
 ```
 
 ### File Naming Conventions
 
 ```md
 // ✅ Use kebab-case for files
-src/components/log-viewer.tsx           // Components
-src/hooks/use-log-entries.ts           // Hooks  
-src/utils/date-helpers.ts              // Utilities
-src/types/log-types.ts                 // Types
+src/components/log-viewer.tsx // Components
+src/hooks/use-log-entries.ts // Hooks  
+src/utils/date-helpers.ts // Utilities
+src/types/log-types.ts // Types
 ```
 
 ### Component Architecture - Consolidation Over Micro-Components
@@ -232,7 +232,7 @@ const LogViewer = ({ logs, loading, pagination }: LogViewerProps) => {
     // Table rendering, log details, expandable rows, formatting
 };
 
-// log-controls.tsx - Handles ALL control concerns  
+// log-controls.tsx - Handles ALL control concerns
 const LogControls = ({ filters, onFiltersChange, actions }: LogControlsProps) => {
     // File selection, filtering, search, pagination, export, clear
 };
@@ -307,28 +307,28 @@ const contextual = _x('Settings', 'menu item', 'debug-suite');
 
 ```md
 includes/
-├── Services/                    # Business logic services
-│   ├── ServiceInterface.php    # Service marker interface
-│   ├── ExampleService.php      # Individual services
-│   └── DebugLog/               # Feature-specific services
-├── API/                        # REST controllers only
-│   ├── RestController.php      # Base controller
-│   └── ExampleController.php   # Individual controllers
-├── Providers/                  # Service providers
-│   └── AppServiceProvider.php  # Service registration
+├── Services/ # Business logic services
+│ ├── ServiceInterface.php # Service marker interface
+│ ├── ExampleService.php # Individual services
+│ └── DebugLog/ # Feature-specific services
+├── API/ # REST controllers only
+│ ├── RestController.php # Base controller
+│ └── ExampleController.php # Individual controllers
+├── Providers/ # Service providers
+│ └── AppServiceProvider.php # Service registration
 └── Core/
-    ├── ServiceResponse.php     # Response wrapper
-    └── Container/              # Container system
+├── ServiceResponse.php # Response wrapper
+└── Container/ # Container system
 
 src/
-├── pages/[feature-name]/       # Feature pages
-│   ├── index.tsx              # Main component
-│   ├── types.ts               # TypeScript types
-│   ├── hooks.ts               # Custom hooks
-│   └── components/            # Feature components
-│       ├── feature-viewer.tsx # Display component
-│       └── feature-controls.tsx # Controls component
-└── components/ui/             # Reusable UI components
+├── pages/[feature-name]/ # Feature pages
+│ ├── index.tsx # Main component
+│ ├── types.ts # TypeScript types
+│ ├── hooks.ts # Custom hooks
+│ └── components/ # Feature components
+│ ├── feature-viewer.tsx # Display component
+│ └── feature-controls.tsx # Controls component
+└── components/ui/ # Reusable UI components
 ```
 
 ## Helper Functions Usage
@@ -389,11 +389,11 @@ try {
  * @group unit
  */
 class ExampleServiceTest extends DebugSuiteTestCase {
-    
+
     public function test_process_data_success(): void {
         $service = new ExampleService();
         $result = $service->process_data(['required_field' => 'value']);
-        
+
         $this->assertTrue($result->is_success());
         $this->assertArrayHasKey('data', $result->to_array());
     }
@@ -441,7 +441,7 @@ private array $reflection_cache = [];
  *     @type int    $optional_field Optional field description.
  * }
  * @return ServiceResponse Success with processed data or failure with error.
- * 
+ *
  * @since DEBUG_SUITE_SINCE
  */
 public function process_data(array $input): ServiceResponse {
@@ -452,7 +452,7 @@ public function process_data(array $input): ServiceResponse {
 ## Key Reminders
 
 1. **Service Layer First**: All business logic goes in services, controllers are thin HTTP layers
-2. **Return ServiceResponse**: Services always return ServiceResponse, never throw exceptions to controllers  
+2. **Return ServiceResponse**: Services always return ServiceResponse, never throw exceptions to controllers
 3. **Use Container**: Register services in providers, resolve via container
 4. **snake_case PHP**: Functions, methods, variables use snake_case (WordPress standard)
 5. **camelCase Frontend**: JavaScript/TypeScript uses camelCase
@@ -496,14 +496,14 @@ export const useDataEntries = () => {
         try {
             setLoading(true);
             const apiPath = addQueryArgs('/debug-suite/v1/endpoint', {
-                per_page: 10000, // High limit to get all data
+                per_page: 100, // High limit to get all data
                 page: 1
             });
-            
+
             const response = await apiFetch<DataResponse>({
                 path: apiPath
             });
-            
+
             setAllData(response.entries);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -524,11 +524,11 @@ export const useDataEntries = () => {
 
     // Update filters with automatic pagination reset
     const updateFilters = useCallback((newFilters: Partial<DataFilters>) => {
-        setFilters(prev => ({
+        setFilters((prev) => ({
             ...prev,
             ...newFilters,
             // Reset pagination when filters change (except perPage)
-            ...(Object.keys(newFilters).some(key => key !== 'perPage') ? { perPage: 100 } : {})
+            ...(Object.keys(newFilters).some((key) => key !== 'perPage') ? { perPage: 100 } : {})
         }));
     }, []);
 
@@ -602,7 +602,7 @@ const debouncedSearch = useDebounce(filters.search, 300);
 
 // Search input with clear button
 <div className="relative">
-    <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+    <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
     <TextInput
         type="text"
         placeholder={__('Search...', 'debug-suite')}
@@ -613,13 +613,13 @@ const debouncedSearch = useDebounce(filters.search, 300);
     {filters.search && (
         <button
             onClick={() => updateFilters({ search: '' })}
-            className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
+            className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
             title={__('Clear search', 'debug-suite')}
         >
             <XIcon className="h-4 w-4" />
         </button>
     )}
-</div>
+</div>;
 ```
 
 #### SOP 5: Client-Side Filter Function Pattern
@@ -632,16 +632,17 @@ const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[]
 
     // Category/Level filtering
     if (filters.category && filters.category !== 'all') {
-        filtered = filtered.filter(item => item.category === filters.category);
+        filtered = filtered.filter((item) => item.category === filters.category);
     }
 
     // Search filtering (message, file, category)
     if (filters.search && filters.search.trim()) {
         const searchTerm = filters.search.toLowerCase().trim();
-        filtered = filtered.filter(item => 
-            item.message.toLowerCase().includes(searchTerm) ||
-            (item.file && item.file.toLowerCase().includes(searchTerm)) ||
-            item.category.toLowerCase().includes(searchTerm)
+        filtered = filtered.filter(
+            (item) =>
+                item.message.toLowerCase().includes(searchTerm) ||
+                (item.file && item.file.toLowerCase().includes(searchTerm)) ||
+                item.category.toLowerCase().includes(searchTerm)
         );
     }
 
@@ -652,7 +653,7 @@ const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[]
         switch (filters.sortBy) {
             case 'category':
                 // Define hierarchy for categorical sorting
-                const categoryOrder = { 'critical': 6, 'error': 5, 'warning': 4, 'notice': 3, 'info': 2, 'debug': 1 };
+                const categoryOrder = { critical: 6, error: 5, warning: 4, notice: 3, info: 2, debug: 1 };
                 aValue = categoryOrder[a.category] || 0;
                 bValue = categoryOrder[b.category] || 0;
                 break;
@@ -689,7 +690,7 @@ const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[]
 **Use `@wordpress/url` `addQueryArgs` for all API endpoint construction:**
 
 - **Automatic URL Encoding**: Handles special characters and Unicode automatically
-- **Type Safety**: Works with strings, numbers, booleans, and undefined values  
+- **Type Safety**: Works with strings, numbers, booleans, and undefined values
 - **WordPress Compliance**: Follows WordPress coding standards
 - **Security**: Prevents URL injection vulnerabilities
 

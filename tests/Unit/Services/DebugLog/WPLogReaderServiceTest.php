@@ -155,7 +155,7 @@ class WPLogReaderServiceTest extends TestCase {
 		$this->assertEquals( 'PHP Warning', $entry['type'] );
 		$this->assertEquals( 'warning', $entry['level'] );
 		$this->assertEquals( 'Undefined variable $test', $entry['message'] );
-		$this->assertEquals( '/var/www/test.php', $entry['file'] );
+		$this->assertEquals( '/var/www/test.php', $entry['file_path'] );
 		$this->assertEquals( 123, $entry['line'] );
 		$this->assertFalse( $entry['has_stack_trace'] );
 	}
@@ -598,7 +598,7 @@ class WPLogReaderServiceTest extends TestCase {
 		$this->assertEquals( 'PHP Deprecated', $first_entry['type'] );
 		$this->assertEquals( 'debug', $first_entry['level'] );
 		$this->assertStringContainsString( 'Creation of dynamic property', $first_entry['message'] );
-		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-content/plugins/woocommerce-bookings/includes/class-wc-bookings-google-calendar-connection.php', $first_entry['file'] );
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-content/plugins/woocommerce-bookings/includes/class-wc-bookings-google-calendar-connection.php', $first_entry['file_path'] );
 		$this->assertEquals( 128, $first_entry['line'] );
 
 		// Test second entry (complex HTML content) - this is the critical test
@@ -613,7 +613,7 @@ class WPLogReaderServiceTest extends TestCase {
 		$this->assertStringContainsString( 'This message was added in version 6.7.0.', $html_entry['message'] );
 		
 		// Verify file and line information is extracted correctly despite HTML content
-		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-includes/functions.php', $html_entry['file'] );
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-includes/functions.php', $html_entry['file_path'] );
 		$this->assertEquals( 6121, $html_entry['line'] );
 
 		// Test third entry
@@ -677,7 +677,7 @@ true
 		$this->assertEquals( 'E_WARNING', $warning_entry['type'] );
 		$this->assertEquals( 'warning', $warning_entry['level'] );
 		$this->assertStringContainsString( 'Trying to access array offset on null', $warning_entry['message'] );
-		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-content/plugins/dokan-lite/includes/Order/VendorBalanceUpdateHandler.php', $warning_entry['file'] );
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-content/plugins/dokan-lite/includes/Order/VendorBalanceUpdateHandler.php', $warning_entry['file_path'] );
 		$this->assertEquals( 169, $warning_entry['line'] );
 
 		// Test Array dump entry (no colon format)
@@ -687,7 +687,7 @@ true
 		$this->assertStringContainsString( 'Array', $array_entry['message'] );
 		$this->assertStringContainsString( '[paypal_marketplace] => 1', $array_entry['message'] );
 		$this->assertStringContainsString( '[net_refund_amount] => 45', $array_entry['message'] );
-		$this->assertNull( $array_entry['file'] );
+		$this->assertNull( $array_entry['file_path'] );
 		$this->assertNull( $array_entry['line'] );
 
 		// Test E_USER_DEPRECATED entry
@@ -695,7 +695,7 @@ true
 		$this->assertEquals( 'E_USER_DEPRECATED', $deprecated_entry['type'] );
 		$this->assertEquals( 'debug', $deprecated_entry['level'] );
 		$this->assertStringContainsString( 'Hook woocommerce_rest_api_option_permissions is deprecated', $deprecated_entry['message'] );
-		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-includes/functions.php', $deprecated_entry['file'] );
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-includes/functions.php', $deprecated_entry['file_path'] );
 		$this->assertEquals( 6121, $deprecated_entry['line'] );
 
 		// Test simple status message (no colon format)
@@ -703,7 +703,7 @@ true
 		$this->assertEquals( 'System Update', $update_entry['type'] );
 		$this->assertEquals( 'info', $update_entry['level'] );
 		$this->assertEquals( 'Automatic updates starting...', $update_entry['message'] );
-		$this->assertNull( $update_entry['file'] );
+		$this->assertNull( $update_entry['file_path'] );
 		$this->assertNull( $update_entry['line'] );
 
 		// Test scraping result with complex multiline format
@@ -730,7 +730,7 @@ true
 		$this->assertStringContainsString( 'log_path', $exception_entry['message'] );
 		$this->assertStringContainsString( '&gt;', $exception_entry['message'] ); // HTML entities preserved
 		$this->assertStringContainsString( '&#039;', $exception_entry['message'] ); // HTML entities preserved
-		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-content/plugins/debug-suite/includes/Core/Container/Definitions/AutowiredDefinition.php', $exception_entry['file'] );
+		$this->assertEquals( '/Users/kzaman/Herd/dokan/wp-content/plugins/debug-suite/includes/Core/Container/Definitions/AutowiredDefinition.php', $exception_entry['file_path'] );
 		$this->assertEquals( 393, $exception_entry['line'] );
 
 		// Verify all entries have proper timestamps

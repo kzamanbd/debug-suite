@@ -972,7 +972,7 @@ export const useDataEntries = () => {
         try {
             setLoading(true);
             const apiPath = addQueryArgs('/debug-suite/v1/endpoint', {
-                per_page: 10000, // High limit to get all data
+                per_page: 100, // High limit to get all data
                 page: 1
             });
 

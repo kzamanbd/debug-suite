@@ -8,10 +8,12 @@ export interface LogEntry {
     timestamp: string;
     level: 'critical' | 'error' | 'warning' | 'notice' | 'info' | 'debug';
     message: string;
-    file?: string;
+    file_path?: string;
     line?: number;
+    line_number?: number;
     stack_trace?: string;
     has_stack_trace?: boolean;
+    raw_line?: string;
 }
 
 export interface LogFile {
