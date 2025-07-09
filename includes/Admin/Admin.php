@@ -40,6 +40,34 @@ class Admin implements Hookable {
 	}
 
 	/**
+	 * Get the menu items for the Debug Suite admin menu.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return array The menu items.
+	 */
+	public function get_menu_items(): array {
+		return [
+			[
+				'title' => __( 'Overview', 'debug-suite' ),
+				'path' => '/',
+			],
+			[
+				'title' => __( 'Debug Log', 'debug-suite' ),
+				'path' => 'debug-log',
+			],
+			[
+				'title' => __( 'File Manager', 'debug-suite' ),
+				'path' => 'file-manager',
+			],
+			[
+				'title' => __( 'Configuration', 'debug-suite' ),
+				'path' => 'config',
+			],
+		];
+	}
+
+	/**
 	 * Handle activation redirect.
 	 *
 	 * Redirects to the onboarding page after plugin activation
@@ -103,17 +131,13 @@ class Admin implements Hookable {
 			$position
 		);
 
-		$submenu[ $slug ][] = [ __( 'Overview', 'debug-suite' ), $capability, 'admin.php?page=' . $slug . '#' ];
-		$submenu[ $slug ][] = [
-			__( 'Debug Log', 'debug-suite' ),
-			$capability,
-			'admin.php?page=' . $slug . '#debug-log',
-		];
-		$submenu[ $slug ][] = [
-			__( 'File Manager', 'debug-suite' ),
-			$capability,
-			'admin.php?page=' . $slug . '#file-manager',
-		];
+		foreach ( $this->get_menu_items() as $sub_menu ) {
+			$submenu[ $slug ][] = [
+				$sub_menu['title'],
+				$capability,
+				'admin.php?page=' . $slug . '#' . $sub_menu['path'],
+			];
+		}
 	}
 
 	/**

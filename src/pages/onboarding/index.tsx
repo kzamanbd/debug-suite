@@ -1,6 +1,6 @@
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
-import CustomSwitch from '@/components/ui/custom-switch';
+import CustomSwitch from '@/components/ui/switch';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
