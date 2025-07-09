@@ -426,12 +426,12 @@ class WPLogReaderService implements ServiceInterface {
 
 				// Parse file, line, and function
 				if ( preg_match( '/^(.*?)\((\d+)\):\s*(.*)$/', $matches[2], $frame_matches ) ) {
-					$frame['file_path']= $frame_matches[1];
+					$frame['file_path'] = $frame_matches[1];
 					$frame['line']     = (int) $frame_matches[2];
 					$frame['function'] = $frame_matches[3];
 				} else {
 					$frame['function'] = $matches[2];
-					$frame['file_path']= null;
+					$frame['file_path'] = null;
 					$frame['line']     = null;
 				}
 
@@ -442,7 +442,7 @@ class WPLogReaderService implements ServiceInterface {
 					'number'   => $index,
 					'raw'      => $line,
 					'function' => $line,
-					'file_path'=> null,
+					'file_path' => null,
 					'line'     => null,
 				];
 			}
