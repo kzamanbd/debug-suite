@@ -58,6 +58,16 @@ class SettingsController extends RestController {
 				'permission_callback' => [ $this, 'permissions_check' ],
 			]
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/full-view',
+			[
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => [ $this, 'full_view' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+			]
+		);
 	}
 
 	public function get_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
@@ -108,5 +118,18 @@ class SettingsController extends RestController {
 					'message' => __( 'Settings reset to defaults successfully.', 'debug-suite' ),
 				]
 			);
+	}
+
+	public function full_view( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$user_meta = get_user_meta( get_current_user_id(), 'debug_suite_full_view', true );
+		$updated = update_user_meta( get_current_user_id(), 'debug_suite_full_view', ! $user_meta );
+
+		return rest_ensure_response(
+			[
+				'success' => $updated,
+				'data' => ! $user_meta,
+				'message' => __( 'Full view request processed successfully.', 'debug-suite' ),
+			]
+		);
 	}
 }

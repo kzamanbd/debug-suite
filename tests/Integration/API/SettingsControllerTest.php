@@ -60,7 +60,7 @@ class SettingsControllerTest extends DebugSuiteTestCase {
 		
 		// Skip WordPress-specific setup if not available
 		if ( ! $this->is_wordpress_available() ) {
-			$this->markTestSkipped( 'WordPress test environment not available. Run: bash tests/install-wp-tests.sh wordpress_test root "" localhost latest' );
+			$this->markTestSkipped( 'WordPress test environment not available. Run: bash bin/install-wp-tests.sh wordpress_test root "" localhost latest' );
 		}
 		
 		// Set up REST API

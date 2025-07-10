@@ -4,7 +4,7 @@ import App from './App';
 import activeMenuLink from './utils/menu';
 
 domReady(() => {
-    const container = document.getElementById('debug-suite-admin-app');
+    const container = document.getElementById('debug-suite-root-app');
     if (container) {
         const root = createRoot(container);
         root.render(<App />);

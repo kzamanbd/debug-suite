@@ -152,7 +152,7 @@ const LogControls = ({
     return (
         <div className="divide divide-y">
             {/* Header with file selector */}
-            <div className="bg-white py-4">
+            <div className="bg-white pb-4">
                 <div className="flex flex-col flex-wrap gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                         <SearchableSelect

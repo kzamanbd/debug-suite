@@ -8,6 +8,7 @@
 import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
+import CustomCheckbox from '@/components/ui/checkbox';
 import TextInput from '@/components/ui/text-input';
 import type { ItemTree } from '@/types';
 import { classNames } from '@/utils';
@@ -238,12 +239,7 @@ const FileManager = () => {
                                 <thead>
                                     <tr className="bg-gray-50 text-xs font-semibold text-gray-500 uppercase dark:bg-gray-800 dark:text-gray-300">
                                         <td className="sticky top-0 z-50 w-10 rounded-tl-lg border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700">
-                                            <input
-                                                type="checkbox"
-                                                className="form-input-checkbox accent-primary-500"
-                                                checked={allSelected}
-                                                onChange={checkedAllItems}
-                                            />
+                                            <CustomCheckbox checked={allSelected} onChange={checkedAllItems} />
                                         </td>
                                         <th className="sticky top-0 z-50 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700">
                                             {__('Name', 'debug-suite')}
@@ -292,9 +288,7 @@ const FileManager = () => {
                                             )}
                                         >
                                             <td className="w-10 border-b border-gray-200 px-4 py-3 align-middle dark:border-gray-700">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-input-checkbox accent-primary-500"
+                                                <CustomCheckbox
                                                     onChange={checkedItem.bind(null, file)}
                                                     checked={file.checked}
                                                 />

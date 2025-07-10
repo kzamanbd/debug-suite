@@ -118,7 +118,8 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                     <td className="px-6 py-4 text-sm text-gray-900">
                                                         <div className="w-full text-left focus:outline-none">
                                                             <div className="flex items-center justify-between">
-                                                                <span className="flex-1 pr-4">{log.message}</span>
+                                                                <div className="flex-1 pr-4">{log.message}</div>
+
                                                                 <div className="flex items-center gap-2">
                                                                     {log.has_stack_trace && (
                                                                         <DisclosureButton className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
@@ -148,10 +149,10 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            {log.file && (
+                                                            {log.file_path && (
                                                                 <div className="mt-1 text-xs text-gray-500">
                                                                     <code className="rounded bg-gray-100 px-1">
-                                                                        {log.file}
+                                                                        {log.file_path}
                                                                     </code>
                                                                     {log.line && <span>:{log.line}</span>}
                                                                 </div>

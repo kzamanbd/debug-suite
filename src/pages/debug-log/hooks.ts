@@ -62,7 +62,7 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
         filtered = filtered.filter(
             (log) =>
                 log.message.toLowerCase().includes(searchTerm) ||
-                log.file?.toLowerCase().includes(searchTerm) ||
+                log.file_path?.toLowerCase().includes(searchTerm) ||
                 log.level.toLowerCase().includes(searchTerm)
         );
     }
@@ -83,8 +83,8 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
                 bValue = b.message.toLowerCase();
                 break;
             case 'file':
-                aValue = (a.file || '').toLowerCase();
-                bValue = (b.file || '').toLowerCase();
+                aValue = (a.file_path || '').toLowerCase();
+                bValue = (b.file_path || '').toLowerCase();
                 break;
             case 'timestamp':
             default:
@@ -124,7 +124,7 @@ export const useLogEntries = () => {
 
             // Fetch all logs with a high limit to get everything
             const apiPath = addQueryArgs('/debug-suite/v1/logs', {
-                per_page: 10000,
+                per_page: 100,
                 page: 1
             });
 

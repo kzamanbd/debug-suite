@@ -1,6 +1,7 @@
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
-import CustomSwitch from '@/components/ui/custom-switch';
+import CustomSwitch from '@/components/ui/switch';
+import { useToast } from '@/components/ui/toast';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
@@ -8,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 import { AlertTriangle, Archive, ArrowRight, CheckCircle2, Eye, FileText, Settings, Shield, Zap } from 'lucide-react';
 import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 interface OnboardingSettings {
     debug_mode: string | boolean;
@@ -45,6 +45,7 @@ const steps = [
 
 const Onboarding = () => {
     const navigate = useNavigate();
+    const toast = useToast();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
@@ -81,7 +82,7 @@ const Onboarding = () => {
         };
 
         void checkOnboardingStatus();
-    }, [navigate]);
+    }, [navigate, toast]);
 
     const nextStep = async () => {
         if (currentStep === steps.length) {

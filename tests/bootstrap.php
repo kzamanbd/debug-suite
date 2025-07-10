@@ -28,8 +28,8 @@ if ( ! $_tests_dir ) {
 
 // Check if WordPress test library exists
 if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
-	echo "Could not find $_tests_dir/includes/functions.php, have you run tests/install-wp-tests.sh ?" . PHP_EOL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	echo "Please run: tests/install-wp-tests.sh <db-name> <db-user> <db-pass> [db-host] [wp-version]" . PHP_EOL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo "Could not find $_tests_dir/includes/functions.php, have you run bin/install-wp-tests.sh ?" . PHP_EOL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo "Please run: bin/install-wp-tests.sh <db-name> <db-user> <db-pass> [db-host] [wp-version]" . PHP_EOL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	exit( 1 );
 }
 
