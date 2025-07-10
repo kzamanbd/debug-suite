@@ -1,16 +1,12 @@
 import Button from '@/components/ui/button';
-import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Fullscreen } from 'lucide-react';
-interface ViewModeSwitcherProps {
-    className?: string;
-}
+import { Maximize, Minimize } from 'lucide-react';
 
-const ViewModeSwitcher = ({ className = '' }: ViewModeSwitcherProps): JSX.Element => {
+const ViewModeSwitcher = () => {
     // Simple check - are we on frontend?
-    const isFullScreen = document.body.classList.contains('debug-suite-full-view');
+    const isMaximize = document.body.classList.contains('debug-suite-full-view');
     const [isLoading, setIsLoading] = useState(false);
 
     const toggleFullScreen = async () => {
@@ -33,21 +29,17 @@ const ViewModeSwitcher = ({ className = '' }: ViewModeSwitcherProps): JSX.Elemen
     };
 
     return (
-        <div className={classNames(className, 'flex items-center space-x-3')}>
-            <Button loading={isLoading} onClick={toggleFullScreen} className="flex items-center">
-                {isFullScreen ? (
-                    <>
-                        <Fullscreen className="mr-2 h-4 w-4" />
-                        {__('Exit Fullscreen', 'debug-suite')}
-                    </>
-                ) : (
-                    <>
-                        <Fullscreen className="mr-2 h-4 w-4" />
-                        {__('View Fullscreen', 'debug-suite')}
-                    </>
-                )}
-            </Button>
-        </div>
+        <Button loading={isLoading} onClick={toggleFullScreen} className="flex items-center p-2">
+            {isMaximize ? (
+                <div title={__('Minimize', 'debug-suite')}>
+                    <Minimize className="size-4" />
+                </div>
+            ) : (
+                <div title={__('Maximize', 'debug-suite')}>
+                    <Maximize className="size-4" />
+                </div>
+            )}
+        </Button>
     );
 };
 

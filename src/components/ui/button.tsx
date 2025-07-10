@@ -63,7 +63,8 @@ const Button = <T extends ElementType = 'button'>({
                 'flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-sm font-medium dark:border-gray-700',
                 variantClasses[variant],
                 sizeClasses[size],
-                className
+                className,
+                loading && 'cursor-wait opacity-75'
             )}
             disabled={isButton ? loading || disabled : undefined}
             aria-disabled={loading || disabled}
