@@ -88,13 +88,21 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 7. **UI Components**:
     - **Use Headless UI for interactive components**: Prefer `@headlessui/react` components for dropdowns, modals, dialogs, and other interactive elements
     - **Combobox for Dropdowns**: Use the custom `Combobox` component (built on Headless UI) for all dropdown selections instead of native selects
+    - **Toast Notifications**: Use the custom `Toast` component with variation methods for user feedback
     - **Accessibility First**: Always use Headless UI components which provide built-in accessibility features
     - **Custom Components**: Build custom UI components in `src/components/ui/` following the established patterns
     - **Component Examples**:
+
         ```typescript
         // ✅ Good - Use Headless UI Combobox
         import Combobox from '@/components/ui/combobox';
         <Combobox options={options} value={selected} onChange={setSelected} />
+
+        // ✅ Good - Use Toast variations
+        import { useToast } from '@/components/ui/toast';
+        const { toast } = useToast();
+        toast.success('Operation completed successfully!');
+        toast.error('Something went wrong');
         ```
 
 ## TypeScript and Build Configuration
@@ -120,7 +128,6 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     "react-router-dom": "Routing",
     "clsx": "Class name utility",
     "tailwind-merge": "Tailwind class merging",
-    "react-toastify": "Toast notifications",
     "simplebar-react": "Custom scrollbars",
     "@monaco-editor/react": "Code editor"
   },
@@ -837,46 +844,13 @@ src/pages/[feature-name]/
 
 **Good: Two Substantial Components**
 
-```typescript
-// log-viewer.tsx - Handles all display concerns
-const LogViewer = ({ logs, loading, currentPage, perPage }: LogViewerProps) => {
-    // Table rendering, log entry details, expandable rows, etc.
-};
-
-// log-controls.tsx - Handles all control concerns
-const LogControls = ({
-    filters,
-    onFiltersChange,
-    logFiles,
-    selectedFile,
-    onFileChange,
-    pagination,
-    actions
-}: LogControlsProps) => {
-    // File selection, filtering, search, pagination, export, clear actions
-};
-```
+- **Viewer Components**: Handle display, tables, content rendering, and detail views
+- **Controls Components**: Handle filtering, search, pagination, actions, and form controls
 
 **Avoid: Excessive Micro-Components**
 
-```typescript
-// ❌ Too granular - creates maintenance overhead
--log -
-    entry.tsx -
-    log -
-    table.tsx -
-    log -
-    file -
-    selector.tsx -
-    log -
-    filters -
-    bar.tsx -
-    log -
-    pagination.tsx -
-    log -
-    stats -
-    footer.tsx;
-```
+- ❌ Too granular - creates maintenance overhead
+- ❌ Separate components for entry, table, file selector, filters bar, pagination, stats footer
 
 #### Implementation Guidelines
 
@@ -891,39 +865,7 @@ const LogControls = ({
 
 #### Dropdown/Select Components
 
-**Always use the custom Combobox component** built on Headless UI for all dropdown selections:
-
-```typescript
-import Combobox from '@/components/ui/combobox';
-
-// Basic usage
-<Combobox
-    options={[
-        { value: 'option1', label: 'Option 1' },
-        { value: 'option2', label: 'Option 2' }
-    ]}
-    value={selectedOption}
-    onChange={setSelectedOption}
-/>
-
-// With additional features
-<Combobox
-    options={options}
-    value={selected}
-    onChange={setSelected}
-    placeholder="Select an option..."
-    label="Choose option"
-    error={validationError}
-    isDisabled={loading}
-    className="min-w-[200px]"
-    formatOptionLabel={(option) => (
-        <div>
-            <div className="font-medium">{option.label}</div>
-            <div className="text-xs text-gray-500">{option.meta}</div>
-        </div>
-    )}
-/>
-```
+**Always use the custom Combobox component** built on Headless UI for all dropdown selections.
 
 **Features:**
 
@@ -942,6 +884,29 @@ import Combobox from '@/components/ui/combobox';
 - ❌ External libraries like `react-select` (removed from project)
 - ❌ Custom dropdown implementations without accessibility
 
+### Toast Notification Standards
+
+**Always use the custom Toast component** with built-in variation methods for user feedback.
+
+**Features:**
+
+- ✅ Success and error variation methods (`toast.success()`, `toast.error()`)
+- ✅ Custom icons with automatic color coding (green for success, red for error)
+- ✅ Configurable duration with sensible defaults
+- ✅ Dismissible with close button
+- ✅ Multiple toast stacking support
+- ✅ Smooth animations and transitions
+- ✅ Consistent styling with design system
+- ✅ TypeScript support with proper typing
+
+**Usage Guidelines:**
+
+- Use `toast.success()` for positive feedback (saves, updates, successful actions)
+- Use `toast.error()` for error feedback (validation errors, API failures)
+- Use `toast()` for neutral notifications (info, warnings, custom messages)
+- Keep messages concise and actionable
+- Use consistent duration (2000ms default, 3000ms for important messages)
+
 ## Advanced Frontend Architecture SOPs
 
 ### Client-Side Filtering Standard Operating Procedures
@@ -952,181 +917,29 @@ Debug Suite implements **client-side filtering** for optimal performance and rea
 
 **Implementation Standard:**
 
-```typescript
-export const useDataEntries = () => {
-    const [allData, setAllData] = useState<DataEntry[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState<DataFilters>({
-        search: '',
-        category: '',
-        sortBy: 'timestamp',
-        sortOrder: 'desc',
-        perPage: 100
-    });
+Use `useDataEntries` hook with:
 
-    // Debounce search input to improve performance (300ms standard)
-    const debouncedSearch = useDebounce(filters.search, 300);
-
-    // Fetch all data once without server-side filtering
-    const fetchAllData = useCallback(async () => {
-        try {
-            setLoading(true);
-            const apiPath = addQueryArgs('/debug-suite/v1/endpoint', {
-                per_page: 100, // High limit to get all data
-                page: 1
-            });
-
-            const response = await apiFetch<DataResponse>({
-                path: apiPath
-            });
-
-            setAllData(response.entries);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            setAllData([]);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    // Apply client-side filtering with debounced search
-    const filteredData = useMemo(() => {
-        const filtersWithDebouncedSearch = {
-            ...filters,
-            search: debouncedSearch
-        };
-        return filterDataEntries(allData, filtersWithDebouncedSearch);
-    }, [allData, filters.category, filters.sortBy, filters.sortOrder, debouncedSearch]);
-
-    // Update filters with automatic pagination reset
-    const updateFilters = useCallback((newFilters: Partial<DataFilters>) => {
-        setFilters((prev) => ({
-            ...prev,
-            ...newFilters,
-            // Reset pagination when filters change (except perPage)
-            ...(Object.keys(newFilters).some((key) => key !== 'perPage') ? { perPage: 100 } : {})
-        }));
-    }, []);
-
-    return {
-        data: filteredData.slice(0, filters.perPage),
-        allData: filteredData,
-        loading,
-        totalEntries: filteredData.length,
-        filters,
-        updateFilters,
-        refetch: fetchAllData
-    };
-};
-```
+- Debounced search (300ms standard)
+- Client-side filtering for real-time performance
+- Automatic pagination reset on filter changes
+- Memoized filtered results
 
 #### SOP 2: Client-Side Filter Function Pattern
 
 **Filtering Implementation Standard:**
 
-```typescript
-const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[] => {
-    let filtered = [...data];
+Implement filtering with:
 
-    // Category/Level filtering
-    if (filters.category && filters.category !== 'all') {
-        filtered = filtered.filter((item) => item.category === filters.category);
-    }
-
-    // Search filtering (message, file, category)
-    if (filters.search && filters.search.trim()) {
-        const searchTerm = filters.search.toLowerCase().trim();
-        filtered = filtered.filter(
-            (item) =>
-                item.message.toLowerCase().includes(searchTerm) ||
-                (item.file && item.file.toLowerCase().includes(searchTerm)) ||
-                item.category.toLowerCase().includes(searchTerm)
-        );
-    }
-
-    // Sorting with type-specific logic
-    filtered.sort((a, b) => {
-        let aValue: any, bValue: any;
-
-        switch (filters.sortBy) {
-            case 'category':
-                // Define hierarchy for categorical sorting
-                const categoryOrder = { critical: 6, error: 5, warning: 4, notice: 3, info: 2, debug: 1 };
-                aValue = categoryOrder[a.category] || 0;
-                bValue = categoryOrder[b.category] || 0;
-                break;
-            case 'message':
-                aValue = a.message.toLowerCase();
-                bValue = b.message.toLowerCase();
-                break;
-            case 'file':
-                aValue = (a.file || '').toLowerCase();
-                bValue = (b.file || '').toLowerCase();
-                break;
-            case 'timestamp':
-            default:
-                aValue = new Date(a.timestamp).getTime();
-                bValue = new Date(b.timestamp).getTime();
-                break;
-        }
-
-        if (filters.sortOrder === 'asc') {
-            return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-        } else {
-            return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-        }
-    });
-
-    return filtered;
-};
-```
+- Category/level filtering
+- Multi-field search (message, file, category)
+- Type-specific sorting with hierarchical ordering
+- Performance-optimized array operations
 
 #### SOP 3: Real-Time Filtering UI Feedback
 
 **UI Implementation Standard:**
 
-```tsx
-// Show filtered vs total count when filters are active
-<div className="text-sm text-gray-600">
-    {filters.search || filters.category ? (
-        <>
-            {__('Showing:', 'debug-suite')}{' '}
-            <span className="font-medium text-primary">{totalEntries}</span>
-            {filters.search && (
-                <span className="ml-1 text-xs text-gray-500">
-                    ({__('filtered', 'debug-suite')})
-                </span>
-            )}
-        </>
-    ) : (
-        <>
-            {__('Total entries:', 'debug-suite')}{' '}
-            <span className="font-medium">{totalEntries}</span>
-        </>
-    )}
-</div>
-
-// Debounced search input with clear button
-<div className="relative">
-    <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-    <TextInput
-        type="text"
-        placeholder={__('Search...', 'debug-suite')}
-        value={filters.search}
-        onChange={(e) => updateFilters({ search: e.target.value })}
-        className="w-full pl-10"
-    />
-    {filters.search && (
-        <button
-            onClick={() => updateFilters({ search: '' })}
-            className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
-            title={__('Clear search', 'debug-suite')}
-        >
-            <XIcon className="h-4 w-4" />
-        </button>
-    )}
-</div>
-```
+Show filtered vs total count when filters are active, include debounced search input with clear button, and provide real-time feedback on filter states.
 
 ### URL Parameter Handling SOPs
 
@@ -1134,57 +947,23 @@ Debug Suite follows **WordPress URL standards** using `@wordpress/url` for all A
 
 #### SOP 4: WordPress URL Construction Standard
 
-**Always use `addQueryArgs` from `@wordpress/url` instead of manual URL construction:**
+**Always use `addQueryArgs` from `@wordpress/url` instead of manual URL construction.**
 
-```typescript
-import { addQueryArgs } from '@wordpress/url';
+**Benefits:**
 
-// ✅ Correct - WordPress standard
-const apiPath = addQueryArgs('/debug-suite/v1/endpoint', {
-    param1: value1,
-    param2: value2,
-    file: filePath // Automatic encoding
-});
-
-const response = await apiFetch({
-    path: apiPath
-});
-
-// ❌ Incorrect - Manual construction
-const apiPath = `/debug-suite/v1/endpoint?param1=${value1}&param2=${encodeURIComponent(value2)}`;
-const apiPath = `/debug-suite/v1/endpoint?${params.toString()}`;
-```
+- **Automatic URL Encoding**: Handles special characters and Unicode automatically
+- **Type Safety**: Works with strings, numbers, booleans, and undefined values
+- **WordPress Compliance**: Follows WordPress coding standards
+- **Security**: Prevents URL injection vulnerabilities
 
 #### SOP 5: API Endpoint URL Construction Patterns
 
 **Standard patterns for different API scenarios:**
 
-```typescript
-// Single parameter
-const apiPath = addQueryArgs('/debug-suite/v1/logs', {
-    per_page: 1000
-});
-
-// Multiple parameters with optional values
-const apiPath = addQueryArgs('/debug-suite/v1/logs', {
-    per_page: perPage,
-    level_filter: level || undefined, // Handles empty strings automatically
-    search: searchTerm,
-    sort_by: sortBy,
-    sort_order: sortOrder
-});
-
-// File path parameters (automatic encoding)
-const apiPath = addQueryArgs('/debug-suite/v1/files', {
-    path: filePath || '' // Safe handling of empty paths
-});
-
-// Export with format and limits
-const apiPath = addQueryArgs('/debug-suite/v1/logs/export', {
-    format,
-    limit: 1000
-});
-```
+- Single parameter: `addQueryArgs('/debug-suite/v1/logs', { per_page: 1000 })`
+- Multiple parameters with optional values: Handle empty strings automatically
+- File path parameters: Automatic encoding for special characters
+- Export operations: Format and limit parameters
 
 #### SOP 6: Parameter Encoding and Safety
 
@@ -1195,17 +974,6 @@ const apiPath = addQueryArgs('/debug-suite/v1/logs/export', {
 - **Empty Parameter Handling**: Filters out undefined/null values automatically
 - **WordPress Compliance**: Follows WordPress coding standards and best practices
 - **Security**: Prevents URL injection vulnerabilities through proper encoding
-
-```typescript
-// Handles complex parameters safely
-const apiPath = addQueryArgs('/debug-suite/v1/search', {
-    query: 'user input with spaces & special chars',
-    file_path: '/path/to/file with spaces.log',
-    limit: 100,
-    debug: true,
-    optional_param: undefined // Automatically filtered out
-});
-```
 
 ### Performance Optimization SOPs
 

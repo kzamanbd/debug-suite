@@ -8,7 +8,11 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 
 - **Dependency injection container** system
 - **Service Layer Pattern** architecture for business logic separation
-- **React/TypeScript frontend** with Tailwind CSS v4 and WordPress integration
+- **React/TypeScript frontend** with Tailwind CSS v4 and Word8. **Primary Color**: Always use 'primary' as brand color in Tailwind
+
+1. **Toast Notifications**: Use `toast.success()` and `toast.error()` for user feedback
+2. **Type Everything**: Full TypeScript coverage, PHP 8.2 type hints everywhereess integration
+
 - **Modern PHP 8.2** features with strict typing and enterprise patterns
 
 ## Core Architecture Principles
@@ -65,243 +69,102 @@ $myVariableName = 'value';        // Wrong
 
 ### Service Implementation Pattern
 
-```php
-<?php
-namespace DebugSuite\Services;
+**All services must implement the ServiceInterface and return ServiceResponse objects:**
 
-use DebugSuite\Core\ServiceResponse;
-use DebugSuite\Interfaces\ServiceInterface;
-
-class ExampleService implements ServiceInterface {
-
-    public function __construct(
-        private SomeDependency $dependency,
-        private ?string $config_value = null
-    ) {}
-
-    public function process_data(array $input): ServiceResponse {
-        // Validate input
-        if (empty($input['required_field'])) {
-            return ServiceResponse::failure(
-                __('Required field is missing.', 'debug-suite'),
-                'validation_error'
-            );
-        }
-
-        // Process business logic
-        $result = $this->do_business_logic($input);
-
-        return ServiceResponse::success([
-            'data' => $result,
-            'timestamp' => current_time('mysql')
-        ]);
-    }
-}
-```
+- **Validation**: Validate input in service methods
+- **Success Response**: Use `ServiceResponse::success($data)` for successful operations
+- **Error Response**: Use `ServiceResponse::failure($message, $code)` for failures
+- **Context Data**: Include helpful context in error responses
+- **No Exceptions**: Never throw exceptions to controllers
 
 ### REST Controller Pattern
 
-```php
-<?php
-namespace DebugSuite\API;
+**Controllers handle only HTTP requests/responses, delegate business logic to services:**
 
-use DebugSuite\Services\ExampleService;
-use WP_REST_Request;
-use WP_REST_Response;
-use WP_Error;
-
-class ExampleController extends RestController {
-
-    public function __construct(
-        private ExampleService $service
-    ) {}
-
-    public function handle_request(WP_REST_Request $request): WP_REST_Response|WP_Error {
-        // Extract input
-        $input = [
-            'field' => $request->get_param('field')
-        ];
-
-        // Delegate to service
-        $result = $this->service->process_data($input);
-
-        // Transform to HTTP response
-        if ($result->is_failure()) {
-            return new WP_Error(
-                $result->get_error_code(),
-                $result->get_error_message(),
-                ['status' => 400]
-            );
-        }
-
-        return rest_ensure_response($result->to_array());
-    }
-}
-```
+- **Constructor Injection**: Accept services through constructor
+- **HTTP-Only Logic**: Handle only request/response transformation
+- **Service Delegation**: Delegate all business logic to services
+- **Error Mapping**: Map ServiceResponse errors to appropriate HTTP status codes
 
 ### Service Provider Registration
 
-```php
-class AppServiceProvider extends AbstractServiceProvider {
+**Register services and controllers in AppServiceProvider:**
 
-    protected array $provides = [
-        ExampleService::class,
-        ExampleController::class,
-    ];
-
-    public function register(Container $container): void {
-        $container->add_definitions([
-            // Services with autowiring
-            ExampleService::class => $container->autowire(ExampleService::class),
-
-            // Controllers with dependency injection
-            ExampleController::class => $container->autowire(ExampleController::class),
-        ]);
-    }
-}
-```
+- **Provides Array**: List all services provided by the provider
+- **Simple Registration**: Use `$container->object()` for services without dependencies
+- **Autowired Registration**: Use `$container->autowire()` for services with dependencies
+- **Clean Structure**: Maintain minimal boilerplate with focused registration
 
 ### WordPress Hooks with Hookable Interface
 
-```php
-use DebugSuite\Interfaces\Hookable;
+**Services implementing Hookable interface get automatic hook registration:**
 
-class AdminService implements Hookable {
-
-    public function register_hooks(): void {
-        add_action('admin_menu', [$this, 'add_admin_menu']);
-        add_action('admin_init', [$this, 'init_settings']);
-    }
-
-    public function add_admin_menu(): void {
-        // Implementation
-    }
-}
-```
+- **Hookable Interface**: Implement `Hookable` for services needing WordPress hooks
+- **Hook Method**: Use `register_hooks()` method to register all WordPress hooks
+- **Automatic Registration**: Hook registration handled automatically by ServiceManager
+- **No Manual Registration**: Avoid manual hook registration in constructors
 
 ## Frontend Standards (React/TypeScript)
 
 ### TypeScript & React Requirements
 
-```typescript
-// ✅ Use TypeScript for all frontend components
-// ✅ Use @wordpress/element for React components
-// ✅ Functional components with hooks
-// ✅ Proper interface definitions
-
-interface ComponentProps {
-    data: LogEntry[];
-    onSelect: (id: string) => void;
-    isLoading?: boolean;
-}
-
-const MyComponent: React.FC<ComponentProps> = ({ data, onSelect, isLoading = false }) => {
-    // Implementation
-};
-```
+- **TypeScript**: Use TypeScript for all frontend components
+- **WordPress Element**: Use `@wordpress/element` for React components
+- **Functional Components**: Use functional components with hooks
+- **Interface Definitions**: Proper interface definitions for all props
 
 ### Naming Conventions (JavaScript/TypeScript)
 
-```typescript
-// ✅ Frontend naming conventions
-const ComponentName = () => {}; // PascalCase for components
-const myVariableName = 'value'; // camelCase for variables/functions
-const handleButtonClick = () => {}; // camelCase for functions
-interface MyInterface {} // PascalCase for interfaces
-const useMyHook = () => {}; // camelCase starting with 'use' for hooks
-```
+- **Components**: PascalCase for React components
+- **Variables/Functions**: camelCase for variables and functions
+- **Interfaces**: PascalCase for TypeScript interfaces
+- **Hooks**: camelCase starting with 'use' for custom hooks
 
 ### File Naming Conventions
 
-```md
-// ✅ Use kebab-case for files
-src/components/log-viewer.tsx // Components
-src/hooks/use-log-entries.ts // Hooks  
-src/utils/date-helpers.ts // Utilities
-src/types/log-types.ts // Types
-```
+- **Components**: kebab-case for component files (e.g., `log-viewer.tsx`)
+- **Hooks**: kebab-case for hook files (e.g., `use-log-entries.ts`)
+- **Utilities**: kebab-case for utility files (e.g., `date-helpers.ts`)
+- **Types**: kebab-case for type files (e.g., `log-types.ts`)
 
 ### Component Architecture - Consolidation Over Micro-Components
 
-```typescript
-// ✅ Prefer 2-3 substantial components (100-300 lines each)
-// ✅ Group related functionality logically:
+**Prefer 2-3 substantial components (100-300 lines each):**
 
-// log-viewer.tsx - Handles ALL display concerns
-const LogViewer = ({ logs, loading, pagination }: LogViewerProps) => {
-    // Table rendering, log details, expandable rows, formatting
-};
-
-// log-controls.tsx - Handles ALL control concerns
-const LogControls = ({ filters, onFiltersChange, actions }: LogControlsProps) => {
-    // File selection, filtering, search, pagination, export, clear
-};
-
-// ❌ Avoid excessive micro-components:
-// log-entry.tsx, log-table.tsx, log-file-selector.tsx, etc.
-```
+- **Viewer Components**: Handle ALL display concerns (tables, details, formatting)
+- **Controls Components**: Handle ALL control concerns (filtering, search, actions)
+- **Avoid Micro-Components**: Don't create excessive micro-level components
 
 ### UI Component Standards
 
 #### Always Use Headless UI Components
 
-```typescript
-// ✅ Use custom Combobox for all dropdowns
-import Combobox from '@/components/ui/combobox';
+**Custom components for consistent UI:**
 
-<Combobox
-    options={[
-        { value: 'option1', label: 'Option 1' },
-        { value: 'option2', label: 'Option 2' }
-    ]}
-    value={selectedOption}
-    onChange={setSelectedOption}
-    placeholder="Select option..."
-/>
-
-// ❌ Never use native <select> or other dropdown libraries
-```
+- **Combobox**: For all dropdowns instead of native selects
+- **Toast**: With variation methods (`toast.success()`, `toast.error()`)
+- **Headless UI**: For accessibility-compliant interactive components
 
 #### Icon Usage - Lucide React Only
 
-```typescript
-// ✅ Always use Lucide React icons
-import { FolderOpen, Settings, X, Check } from 'lucide-react';
+**Always use Lucide React icons for consistency.**
 
-<FolderOpen size={16} className="text-primary" />
+#### Tailwind CSS v4 Standards
 
-// ❌ Never use inline SVG or other icon libraries
-```
+**Use Tailwind CSS v4 with Oxide engine:**
 
-### Tailwind CSS v4 Standards
+- **Primary Color**: Always use 'primary' color as brand color
+- **Utility Classes**: Follow utility-first CSS approach
+- **Conditional Classes**: Use `classNames` utility for conditional styling
+- **Responsive Design**: Apply breakpoint utilities for responsive layouts
 
-```typescript
-// ✅ Use Tailwind CSS v4 with Oxide engine
-// ✅ ALWAYS use 'primary' color as brand color
-className="bg-primary text-primary-foreground hover:bg-primary/90"
+#### Internationalization
 
-// ✅ Use classNames utility for conditional classes
-import { classNames } from '@/utils';
+**Use `@wordpress/i18n` for all user-facing strings:**
 
-className={classNames(
-    'base-classes',
-    isActive && 'active-classes',
-    hasError && 'error-classes'
-)}
-
-// ✅ Responsive design with breakpoints
-className="w-full md:w-1/2 lg:w-1/3"
-```
-
-### Internationalization
-
-```typescript
-// ✅ Use @wordpress/i18n for all user-facing strings
-import { __ } from '@wordpress/i18n';
-
-const message = __('Debug log cleared successfully', 'debug-suite');
-const contextual = _x('Settings', 'menu item', 'debug-suite');
-```
+- Use `__()` for basic translation
+- Use `_x()` for contextual translation
+- Ensure all user-facing strings are translatable
 
 ## Directory Structure Standards
 
@@ -460,7 +323,8 @@ public function process_data(array $input): ServiceResponse {
 7. **Headless UI**: Use Headless UI components for accessibility
 8. **Lucide Icons**: Only use Lucide React icons
 9. **Primary Color**: Always use 'primary' as brand color in Tailwind
-10. **Type Everything**: Full TypeScript coverage, PHP 8.2 type hints everywhere
+10. **Toast Notifications**: Use `toast.success()` and `toast.error()` for user feedback
+11. **Type Everything**: Full TypeScript coverage, PHP 8.2 type hints everywhere
 
 Follow these rules consistently to maintain the enterprise-grade architecture and coding standards of the Debug Suite plugin.
 
@@ -476,212 +340,47 @@ Debug Suite implements **client-side filtering** for optimal performance and rea
 
 **Implementation Standard:**
 
-```typescript
-export const useDataEntries = () => {
-    const [allData, setAllData] = useState<DataEntry[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState<DataFilters>({
-        search: '',
-        category: '',
-        sortBy: 'timestamp',
-        sortOrder: 'desc',
-        perPage: 100
-    });
+Use `useDataEntries` hook with:
 
-    // Debounce search input to improve performance (300ms standard)
-    const debouncedSearch = useDebounce(filters.search, 300);
-
-    // Fetch all data once without server-side filtering
-    const fetchAllData = useCallback(async () => {
-        try {
-            setLoading(true);
-            const apiPath = addQueryArgs('/debug-suite/v1/endpoint', {
-                per_page: 100, // High limit to get all data
-                page: 1
-            });
-
-            const response = await apiFetch<DataResponse>({
-                path: apiPath
-            });
-
-            setAllData(response.entries);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            setAllData([]);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    // Apply client-side filtering with debounced search
-    const filteredData = useMemo(() => {
-        const filtersWithDebouncedSearch = {
-            ...filters,
-            search: debouncedSearch
-        };
-        return filterDataEntries(allData, filtersWithDebouncedSearch);
-    }, [allData, filters.category, filters.sortBy, filters.sortOrder, debouncedSearch]);
-
-    // Update filters with automatic pagination reset
-    const updateFilters = useCallback((newFilters: Partial<DataFilters>) => {
-        setFilters((prev) => ({
-            ...prev,
-            ...newFilters,
-            // Reset pagination when filters change (except perPage)
-            ...(Object.keys(newFilters).some((key) => key !== 'perPage') ? { perPage: 100 } : {})
-        }));
-    }, []);
-
-    return {
-        data: filteredData.slice(0, filters.perPage),
-        allData: filteredData,
-        loading,
-        totalEntries: filteredData.length,
-        filters,
-        updateFilters,
-        refetch: fetchAllData
-    };
-};
-```
+- Debounced search (300ms standard)
+- Client-side filtering for real-time performance
+- Automatic pagination reset on filter changes
+- Memoized filtered results
 
 #### SOP 2: WordPress URL Construction Standard
 
 **Always use `addQueryArgs` from `@wordpress/url`:**
 
-```typescript
-import { addQueryArgs } from '@wordpress/url';
-
-// ✅ Correct - WordPress standard
-const apiPath = addQueryArgs('/debug-suite/v1/endpoint', {
-    param1: value1,
-    param2: value2,
-    file: filePath // Automatic encoding
-});
-
-const response = await apiFetch({
-    path: apiPath
-});
-
-// ❌ Incorrect - Manual construction
-const apiPath = `/debug-suite/v1/endpoint?param1=${value1}&param2=${encodeURIComponent(value2)}`;
-const apiPath = `/debug-suite/v1/endpoint?${params.toString()}`;
-```
+- Automatic URL encoding and type safety
+- WordPress compliance and security
+- Consistent parameter handling
+- Supports strings, numbers, booleans, undefined values
 
 #### SOP 3: Real-Time Filtering UI Feedback
 
 **Show filtered vs total count when filters are active:**
 
-```typescript
-<div className="text-sm text-gray-600">
-    {filters.search || filters.category ? (
-        <>
-            {__('Showing:', 'debug-suite')}{' '}
-            <span className="font-medium text-primary">{totalEntries}</span>
-            {filters.search && (
-                <span className="ml-1 text-xs text-gray-500">
-                    ({__('filtered', 'debug-suite')})
-                </span>
-            )}
-        </>
-    ) : (
-        <>
-            {__('Total entries:', 'debug-suite')}{' '}
-            <span className="font-medium">{totalEntries}</span>
-        </>
-    )}
-</div>
-```
+- Display filtered count vs total count
+- Provide search input with debounced feedback
+- Include clear filters functionality
+- Show loading states during filtering
 
 #### SOP 4: Debounced Search Implementation
 
 **Use 300ms debounce for search inputs:**
 
-```tsx
-// Standard debounce timing
-const debouncedSearch = useDebounce(filters.search, 300);
-
-// Search input with clear button
-<div className="relative">
-    <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-    <TextInput
-        type="text"
-        placeholder={__('Search...', 'debug-suite')}
-        value={filters.search}
-        onChange={(e) => updateFilters({ search: e.target.value })}
-        className="w-full pl-10"
-    />
-    {filters.search && (
-        <button
-            onClick={() => updateFilters({ search: '' })}
-            className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
-            title={__('Clear search', 'debug-suite')}
-        >
-            <XIcon className="h-4 w-4" />
-        </button>
-    )}
-</div>;
-```
+- Standard debounce timing for optimal performance
+- Search input with clear button functionality
+- Automatic search filtering with user feedback
 
 #### SOP 5: Client-Side Filter Function Pattern
 
 **Standard filtering implementation:**
 
-```typescript
-const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[] => {
-    let filtered = [...data];
-
-    // Category/Level filtering
-    if (filters.category && filters.category !== 'all') {
-        filtered = filtered.filter((item) => item.category === filters.category);
-    }
-
-    // Search filtering (message, file, category)
-    if (filters.search && filters.search.trim()) {
-        const searchTerm = filters.search.toLowerCase().trim();
-        filtered = filtered.filter(
-            (item) =>
-                item.message.toLowerCase().includes(searchTerm) ||
-                (item.file && item.file.toLowerCase().includes(searchTerm)) ||
-                item.category.toLowerCase().includes(searchTerm)
-        );
-    }
-
-    // Sorting with type-specific logic
-    filtered.sort((a, b) => {
-        let aValue: any, bValue: any;
-
-        switch (filters.sortBy) {
-            case 'category':
-                // Define hierarchy for categorical sorting
-                const categoryOrder = { critical: 6, error: 5, warning: 4, notice: 3, info: 2, debug: 1 };
-                aValue = categoryOrder[a.category] || 0;
-                bValue = categoryOrder[b.category] || 0;
-                break;
-            case 'message':
-                aValue = a.message.toLowerCase();
-                bValue = b.message.toLowerCase();
-                break;
-            case 'file':
-                aValue = (a.file || '').toLowerCase();
-                bValue = (b.file || '').toLowerCase();
-                break;
-            case 'timestamp':
-            default:
-                aValue = new Date(a.timestamp).getTime();
-                bValue = new Date(b.timestamp).getTime();
-                break;
-        }
-
-        if (filters.sortOrder === 'asc') {
-            return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-        } else {
-            return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-        }
-    });
-
-    return filtered;
-};
-```
+- Category/level filtering with hierarchical ordering
+- Multi-field search (message, file, category)
+- Type-specific sorting with performance optimization
+- Consistent filtering patterns across components
 
 ### URL Parameter Handling SOPs
 
@@ -694,48 +393,13 @@ const filterDataEntries = (data: DataEntry[], filters: DataFilters): DataEntry[]
 - **WordPress Compliance**: Follows WordPress coding standards
 - **Security**: Prevents URL injection vulnerabilities
 
-```typescript
-// API endpoint patterns
-const apiPath = addQueryArgs('/debug-suite/v1/logs', {
-    per_page: perPage,
-    level_filter: level || undefined,
-    search: searchTerm,
-    sort_by: sortBy,
-    sort_order: sortOrder
-});
-
-// File operations with automatic encoding
-const apiPath = addQueryArgs('/debug-suite/v1/files', {
-    path: filePath || ''
-});
-
-// Export operations
-const apiPath = addQueryArgs('/debug-suite/v1/logs/export', {
-    format,
-    limit: 1000
-});
-```
-
 #### SOP 7: Performance Optimization
 
 **Use precise dependency arrays for memoization:**
 
-```typescript
-// Precise memoization - only recalculate when necessary
-const filteredData = useMemo(() => {
-    return filterDataEntries(allData, {
-        ...filters,
-        search: debouncedSearch
-    });
-}, [allData, filters.category, filters.sortBy, filters.sortOrder, debouncedSearch]);
-
-// Progressive loading for infinite scroll
-const loadMore = useCallback(() => {
-    if (filteredData.length > filters.perPage) {
-        updateFilters({ perPage: filters.perPage + 100 });
-    }
-}, [filteredData.length, filters.perPage, updateFilters]);
-```
+- Precise memoization - only recalculate when necessary
+- Progressive loading for infinite scroll
+- Optimized filtering performance
 
 These SOPs ensure consistent, performant, and WordPress-compliant implementation across all Debug Suite components.
 
