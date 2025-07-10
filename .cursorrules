@@ -6,24 +6,53 @@ You are an expert WordPress plugin developer working on the Debug Suite plugin, 
 
 Debug Suite is a WordPress plugin providing advanced debugging tools with:
 
-- **Dependency injection container** system
+- **Dependency injection container** system with singleton pattern and autowired service registration
 - **Service Layer Pattern** architecture for business logic separation
-- **React/TypeScript frontend** with Tailwind CSS v4 and Word8. **Primary Color**: Always use 'primary' as brand color in Tailwind
-
-1. **Toast Notifications**: Use `toast.success()` and `toast.error()` for user feedback
-2. **Type Everything**: Full TypeScript coverage, PHP 8.2 type hints everywhereess integration
-
+- **React/TypeScript frontend** with Tailwind CSS v4, WordPress Element, and React Router DOM v7
 - **Modern PHP 8.2** features with strict typing and enterprise patterns
+- **Comprehensive testing** with PHPUnit, WordPress test framework, and custom test helpers
+- **Monaco Editor** integration for advanced code editing capabilities
+
+### Core Technologies Stack
+
+**Backend (PHP 8.2+):**
+
+- PSR-4 autoloading with Composer
+- Dependency injection container with service providers
+- Service layer pattern with ServiceResponse objects
+- WordPress REST API integration
+- Symfony Finder for file operations
+- PHP Parser for code analysis
+
+**Frontend (React/TypeScript):**
+
+- React 18 with WordPress Element (`@wordpress/element`)
+- TypeScript with strict mode enabled
+- React Router DOM v7 for navigation
+- Tailwind CSS v4 with Oxide engine and **primary** brand color
+- Headless UI v2 for accessible components
+- Monaco Editor for code editing
+- Lucide React for icons (ONLY icon library)
+- React Select v5 for advanced dropdowns
+- SimpleBar React for custom scrollbars
+
+**Testing Infrastructure:**
+
+- PHPUnit 9.5 with WordPress test framework
+- Custom test helpers (`TestCase`, `DebugSuiteTestCase`)
+- Separate unit and integration test suites
+- MockFactory for test fixture creation
+- Coverage reporting and CI/CD support
 
 ## Core Architecture Principles
 
 ### Dependency Injection Container System
 
-- Use `DebugSuite\Core\Container\Container` for service management
-- Support for simple object and autowired service registration
-- Container uses singleton pattern accessible via `Container::get_instance()`
+- Use `DebugSuite\Core\Container\Container` singleton for service management
+- Support for simple object (`$container->object()`) and autowired (`$container->autowire()`) service registration
+- Container accessible via `Container::get_instance()` or `debug_suite_container()` helper
 - Service providers extend `AbstractServiceProvider` with registration and booting phases
-- Automatic hook registration for services implementing `Hookable` interface
+- Automatic hook registration for services implementing `Hookable` interface via `ServiceManager`
 
 ### Service Layer Pattern (Critical)
 
@@ -32,6 +61,7 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 - Services return `ServiceResponse` objects (`ServiceResponse::success($data)` or `ServiceResponse::failure($message, $code)`)
 - REST controllers only handle HTTP requests/responses, delegate to services
 - Services registered as singletons in the container via service providers
+- Constructor dependency injection for service dependencies (e.g., `OverviewService` depends on `FileLogsService`)
 
 ## PHP Backend Standards
 
@@ -41,8 +71,8 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 // ✅ Use PHP 8.2 features
 - Union types: `string|null`, `array|false`
 - Named arguments in function calls
-- Constructor property promotion
-- Match expressions over switch
+- Constructor property promotion with private/readonly properties
+- Match expressions over switch statements
 - Readonly properties where appropriate
 - First-class callable syntax: `$callback = strlen(...)`
 - DNF (Disjunctive Normal Form) types
@@ -51,6 +81,7 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 - Return type declarations for ALL methods and functions
 - Parameter type hints for ALL method and function parameters
 - Use nullable types: `?string` or `string|null`
+- Array type hints with specific structures where possible
 ```
 
 ### Naming Conventions (WordPress Standard)
@@ -71,29 +102,31 @@ $myVariableName = 'value';        // Wrong
 
 **All services must implement the ServiceInterface and return ServiceResponse objects:**
 
-- **Validation**: Validate input in service methods
+- **Validation**: Validate input in service methods before processing
 - **Success Response**: Use `ServiceResponse::success($data)` for successful operations
-- **Error Response**: Use `ServiceResponse::failure($message, $code)` for failures
-- **Context Data**: Include helpful context in error responses
-- **No Exceptions**: Never throw exceptions to controllers
+- **Error Response**: Use `ServiceResponse::failure($message, $code, $context)` for failures
+- **Context Data**: Include helpful context in error responses for debugging
+- **No Exceptions**: Never throw exceptions to controllers, always return ServiceResponse
 
 ### REST Controller Pattern
 
 **Controllers handle only HTTP requests/responses, delegate business logic to services:**
 
-- **Constructor Injection**: Accept services through constructor
+- **Constructor Injection**: Accept services through constructor (e.g., `FileLogsController(FileLogsService $service)`)
 - **HTTP-Only Logic**: Handle only request/response transformation
 - **Service Delegation**: Delegate all business logic to services
 - **Error Mapping**: Map ServiceResponse errors to appropriate HTTP status codes
+- **Automatic Registration**: Controllers implementing `Hookable` get automatic hook registration
 
 ### Service Provider Registration
 
 **Register services and controllers in AppServiceProvider:**
 
-- **Provides Array**: List all services provided by the provider
+- **Provides Array**: List all services provided by the provider in `$provides` property
 - **Simple Registration**: Use `$container->object()` for services without dependencies
 - **Autowired Registration**: Use `$container->autowire()` for services with dependencies
 - **Clean Structure**: Maintain minimal boilerplate with focused registration
+- **Service Dependencies**: Services with constructor dependencies are automatically resolved
 
 ### WordPress Hooks with Hookable Interface
 
@@ -108,24 +141,35 @@ $myVariableName = 'value';        // Wrong
 
 ### TypeScript & React Requirements
 
-- **TypeScript**: Use TypeScript for all frontend components
-- **WordPress Element**: Use `@wordpress/element` for React components
-- **Functional Components**: Use functional components with hooks
-- **Interface Definitions**: Proper interface definitions for all props
+- **TypeScript**: Use TypeScript for all frontend components with strict mode enabled
+- **WordPress Element**: Use `@wordpress/element` for React components and hooks
+- **Functional Components**: Use functional components with hooks pattern
+- **Interface Definitions**: Proper interface definitions for all props and data structures
+- **Path Aliases**: Use `@/` alias for src directory imports (configured in tsconfig.json)
+
+### Frontend Technology Stack
+
+```typescript
+// ✅ Core libraries
+import { useState, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
+import apiFetch from '@wordpress/api-fetch';
+import { createHashRouter, RouterProvider, useNavigate } from 'react-router-dom';
+import { Dialog, DialogPanel } from '@headlessui/react';
+import { Search, Settings, FileText } from 'lucide-react'; // ONLY icon library
+import MonacoEditor from '@monaco-editor/react';
+import Select from 'react-select';
+import SimpleBar from 'simplebar-react';
+```
 
 ### Naming Conventions (JavaScript/TypeScript)
 
-- **Components**: PascalCase for React components
-- **Variables/Functions**: camelCase for variables and functions
-- **Interfaces**: PascalCase for TypeScript interfaces
-- **Hooks**: camelCase starting with 'use' for custom hooks
-
-### File Naming Conventions
-
-- **Components**: kebab-case for component files (e.g., `log-viewer.tsx`)
-- **Hooks**: kebab-case for hook files (e.g., `use-log-entries.ts`)
-- **Utilities**: kebab-case for utility files (e.g., `date-helpers.ts`)
-- **Types**: kebab-case for type files (e.g., `log-types.ts`)
+- **Components**: PascalCase for React components (`LogViewer`, `FileEditor`)
+- **Variables/Functions**: camelCase for variables and functions (`selectedFile`, `handleClick`)
+- **Interfaces**: PascalCase for TypeScript interfaces (`LogEntry`, `FileTreeItem`)
+- **Hooks**: camelCase starting with 'use' for custom hooks (`useLogEntries`, `useDebounce`)
+- **Files**: kebab-case for all file names (`log-viewer.tsx`, `use-log-entries.ts`)
 
 ### Component Architecture - Consolidation Over Micro-Components
 
@@ -133,7 +177,7 @@ $myVariableName = 'value';        // Wrong
 
 - **Viewer Components**: Handle ALL display concerns (tables, details, formatting)
 - **Controls Components**: Handle ALL control concerns (filtering, search, actions)
-- **Avoid Micro-Components**: Don't create excessive micro-level components
+- **Avoid Micro-Components**: Don't create excessive micro-level components unless for reusability
 
 ### UI Component Standards
 
@@ -141,57 +185,146 @@ $myVariableName = 'value';        // Wrong
 
 **Custom components for consistent UI:**
 
-- **Combobox**: For all dropdowns instead of native selects
-- **Toast**: With variation methods (`toast.success()`, `toast.error()`)
-- **Headless UI**: For accessibility-compliant interactive components
+- **Dialog/Modal**: Use Headless UI Dialog for all modals and popups
+- **Dropdown/Select**: Use React Select or Headless UI components instead of native selects
+- **Toast**: Custom toast system with variation methods (`toast.success()`, `toast.error()`)
+- **Accessibility**: All interactive components must be keyboard and screen reader accessible
 
 #### Icon Usage - Lucide React Only
 
-**Always use Lucide React icons for consistency.**
+**Always use Lucide React icons for consistency:**
+
+```typescript
+// ✅ Correct icon usage
+import { Search, FileText, Settings, AlertCircle } from 'lucide-react';
+
+// ❌ Do not use other icon libraries
+import { FaSearch } from 'react-icons/fa'; // Wrong
+```
 
 #### Tailwind CSS v4 Standards
 
 **Use Tailwind CSS v4 with Oxide engine:**
 
-- **Primary Color**: Always use 'primary' color as brand color
+- **Primary Color**: Always use 'primary' color as brand color (mapped to indigo)
 - **Utility Classes**: Follow utility-first CSS approach
-- **Conditional Classes**: Use `classNames` utility for conditional styling
+- **Conditional Classes**: Use `classNames` utility from `@/utils` for conditional styling
 - **Responsive Design**: Apply breakpoint utilities for responsive layouts
+- **Custom Theme**: Use CSS custom properties for primary color variants
 
 #### Internationalization
 
 **Use `@wordpress/i18n` for all user-facing strings:**
 
-- Use `__()` for basic translation
-- Use `_x()` for contextual translation
-- Ensure all user-facing strings are translatable
+```typescript
+// ✅ Correct i18n usage
+import { __, _x } from '@wordpress/i18n';
+
+const message = __('Debug Log', 'debug-suite');
+const contextMessage = _x('Settings', 'navigation menu', 'debug-suite');
+```
 
 ## Directory Structure Standards
 
-```md
+```
 includes/
-├── Services/ # Business logic services
-│ ├── ServiceInterface.php # Service marker interface
-│ ├── ExampleService.php # Individual services
-│ └── DebugLog/ # Feature-specific services
-├── API/ # REST controllers only
-│ ├── RestController.php # Base controller
-│ └── ExampleController.php # Individual controllers
-├── Providers/ # Service providers
-│ └── AppServiceProvider.php # Service registration
-└── Core/
-├── ServiceResponse.php # Response wrapper
-└── Container/ # Container system
+├── Services/                    # Business logic services
+│   ├── ServiceInterface.php    # Service marker interface
+│   ├── OverviewService.php     # Dashboard overview service
+│   ├── FileManagerService.php  # File operations service
+│   ├── SettingsService.php     # WordPress config management
+│   ├── OnboardingService.php   # Plugin setup and onboarding
+│   └── DebugLog/               # Debug log specific services
+│       ├── FileLogsService.php      # Log file operations
+│       ├── WPLogReaderService.php   # Advanced log parsing
+│       └── LogFileDiscoveryService.php # Log file discovery
+├── API/                        # REST controllers only
+│   ├── RestController.php      # Base controller with Hookable
+│   ├── FileLogsController.php  # Debug log endpoints
+│   ├── FileManagerController.php # File manager endpoints
+│   ├── SettingsController.php  # Settings endpoints
+│   ├── OnboardingController.php # Onboarding endpoints
+│   └── OverviewController.php  # Dashboard endpoints
+├── Providers/                  # Service providers
+│   ├── AppServiceProvider.php  # Main service registration
+│   ├── CoreServiceProvider.php # Core WordPress services
+│   ├── AdminServiceProvider.php # Admin-specific services
+│   └── FrontendServiceProvider.php # Frontend services
+├── Admin/                      # WordPress admin integration
+│   └── Admin.php              # Admin menu and page management
+├── Core/                       # Core framework components
+│   ├── ServiceResponse.php     # Response wrapper pattern
+│   ├── Assets.php              # Asset management
+│   ├── I18n.php               # Internationalization
+│   └── Container/              # Dependency injection system
+└── helpers.php                 # Global helper functions
 
 src/
-├── pages/[feature-name]/ # Feature pages
-│ ├── index.tsx # Main component
-│ ├── types.ts # TypeScript types
-│ ├── hooks.ts # Custom hooks
-│ └── components/ # Feature components
-│ ├── feature-viewer.tsx # Display component
-│ └── feature-controls.tsx # Controls component
-└── components/ui/ # Reusable UI components
+├── pages/                      # Feature pages
+│   ├── debug-log/             # Debug log viewer
+│   │   ├── index.tsx          # Main component
+│   │   ├── types.ts           # TypeScript interfaces
+│   │   ├── hooks.ts           # Custom hooks
+│   │   ├── constants.ts       # Log level constants
+│   │   └── components/        # Feature components
+│   │       ├── log-viewer.tsx      # Log display component
+│   │       ├── log-controls.tsx    # Filter controls
+│   │       ├── raw-file-viewer.tsx # Raw file viewer
+│   │       └── logs-skeleton.tsx   # Loading states
+│   ├── file-manager/          # File management interface
+│   │   ├── index.tsx          # Main component
+│   │   └── components/        # File manager components
+│   │       ├── file-tree.tsx       # Directory tree
+│   │       ├── file-editor.tsx     # Monaco-based editor
+│   │       └── file-icon.tsx       # File type icons
+│   ├── overview.tsx           # Dashboard overview
+│   ├── onboarding/            # Setup wizard
+│   │   └── index.tsx          # Onboarding flow
+│   └── not-found.tsx          # 404 page
+├── components/                 # Reusable components
+│   ├── ui/                    # UI component library
+│   │   ├── button.tsx         # Button variants
+│   │   ├── modal.tsx          # Modal dialogs
+│   │   ├── toast.tsx          # Toast notifications
+│   │   ├── select.tsx         # React Select wrapper
+│   │   ├── text-input.tsx     # Form inputs
+│   │   └── content-tabs.tsx   # Tab navigation
+│   ├── editor/                # Monaco editor integration
+│   │   ├── index.tsx          # Main editor component
+│   │   ├── languages.ts       # Language detection
+│   │   └── validators.ts      # Code validation
+│   ├── layout.tsx             # Main layout wrapper
+│   └── dialog-provider.tsx    # Global dialog context
+├── routing/                   # Navigation system
+│   ├── routes.tsx             # Route definitions
+│   └── index.ts               # Router utilities
+├── hooks/                     # Custom React hooks
+│   └── useConfirm.ts          # Confirmation dialogs
+├── utils/                     # Utility functions
+│   ├── index.ts               # General utilities
+│   ├── menu.ts                # WordPress menu integration
+│   └── use-debounce.ts        # Debounce hook
+├── types/                     # TypeScript type definitions
+│   └── index.ts               # Global type exports
+├── App.tsx                    # Root application component
+├── index.tsx                  # Application entry point
+└── index.css                  # Tailwind CSS configuration
+
+tests/
+├── Unit/                      # Unit tests (no WordPress)
+│   ├── Core/                  # Core functionality tests
+│   │   ├── Container/         # DI container tests
+│   │   └── ServiceResponseTest.php # Response object tests
+│   └── Services/              # Service layer tests
+├── Integration/               # Integration tests (with WordPress)
+│   └── API/                   # REST API endpoint tests
+├── Helpers/                   # Test utilities
+│   ├── TestCase.php           # Base unit test class
+│   ├── DebugSuiteTestCase.php # Base integration test class
+│   ├── MockFactory.php        # Test fixture factory
+│   └── wp-functions-mock.php  # WordPress function mocks
+├── bootstrap.php              # PHPUnit bootstrap
+└── README.md                  # Testing documentation
 ```
 
 ## Helper Functions Usage
@@ -199,9 +332,23 @@ src/
 ### PHP Helpers
 
 ```php
-// ✅ Use debug suite helpers
-$service = debug_suite_resolve(ExampleService::class);
+// ✅ Use debug suite helpers for DI container access
+$service = debug_suite_resolve(FileLogsService::class);
 $container = debug_suite_container();
+$service_manager = debug_suite_service_manager();
+$plugin_instance = debug_suite();
+```
+
+### Frontend Utilities
+
+```typescript
+// ✅ Use utility functions
+import { classNames } from '@/utils';
+import { useDebounce } from '@/utils/use-debounce';
+
+// ✅ WordPress utilities
+import { addQueryArgs } from '@wordpress/url';
+import apiFetch from '@wordpress/api-fetch';
 ```
 
 ## Error Handling Patterns
@@ -214,30 +361,41 @@ if (!file_exists($file_path)) {
     return ServiceResponse::failure(
         __('File not found.', 'debug-suite'),
         'file_not_found',
-        ['path' => $file_path] // Context data
+        ['path' => $file_path] // Context data for debugging
     );
 }
 
-// ✅ Success responses with data
+// ✅ Success responses with structured data
 return ServiceResponse::success([
-    'data' => $processed_data,
-    'timestamp' => current_time('mysql')
+    'entries' => $log_entries,
+    'total' => count($log_entries),
+    'file_path' => $log_file,
+    'stats' => $file_stats
 ]);
 ```
 
 ### Frontend Error Handling
 
 ```typescript
-// ✅ Handle API errors gracefully
+// ✅ Handle API errors gracefully with toast notifications
+import { useToast } from '@/components/ui/toast';
+
 try {
-    const response = await apiClient.getData();
+    const response = await apiFetch<ApiResponse>({
+        path: addQueryArgs('/debug-suite/v1/logs', { limit: 100 })
+    });
+
     if (response.success) {
         setData(response.data);
+        toast.success(__('Data loaded successfully', 'debug-suite'));
     } else {
         setError(response.message);
+        toast.error(response.message);
     }
 } catch (error) {
-    setError(__('An unexpected error occurred', 'debug-suite'));
+    const message = __('An unexpected error occurred', 'debug-suite');
+    setError(message);
+    toast.error(message);
 }
 ```
 
@@ -247,18 +405,46 @@ try {
 
 ```php
 /**
- * @covers \DebugSuite\Services\ExampleService
+ * @covers \DebugSuite\Services\FileLogsService
  * @group services
  * @group unit
  */
-class ExampleServiceTest extends DebugSuiteTestCase {
+class FileLogsServiceTest extends TestCase {
 
-    public function test_process_data_success(): void {
-        $service = new ExampleService();
-        $result = $service->process_data(['required_field' => 'value']);
+    public function test_get_log_entries_success(): void {
+        $service = new FileLogsService();
+        $result = $service->get_log_entries(['limit' => 10]);
 
-        $this->assertTrue($result->is_success());
-        $this->assertArrayHasKey('data', $result->to_array());
+        $this->assert_service_result_success($result);
+        $this->assertArrayHasKey('entries', $result->get_data());
+    }
+
+    public function test_service_failure_with_context(): void {
+        $result = ServiceResponse::failure('Test error', 'test_code', ['key' => 'value']);
+
+        $this->assert_service_result_failure($result);
+        $this->assert_service_result_error_code($result, 'test_code');
+    }
+}
+```
+
+### Integration Tests
+
+```php
+/**
+ * @covers \DebugSuite\API\FileLogsController
+ * @group api
+ * @group integration
+ */
+class FileLogsControllerTest extends DebugSuiteTestCase {
+
+    public function test_get_logs_endpoint(): void {
+        $this->create_admin_user();
+
+        $request = new WP_REST_Request('GET', '/debug-suite/v1/logs');
+        $response = rest_get_server()->dispatch($request);
+
+        $this->assertEquals(200, $response->get_status());
     }
 }
 ```
@@ -274,7 +460,7 @@ if (!$this->is_path_safe($full_path)) {
     return ServiceResponse::failure('Invalid path', 'invalid_path');
 }
 
-// ✅ Check permissions
+// ✅ Check permissions in controllers
 if (!current_user_can('manage_options')) {
     return new WP_Error('permission_denied', 'Insufficient permissions');
 }
@@ -283,11 +469,13 @@ if (!current_user_can('manage_options')) {
 ### Performance Optimization
 
 ```php
-// ✅ Use container singleton pattern
-$container->singleton(ExpensiveService::class, fn() => new ExpensiveService());
+// ✅ Use container singleton pattern for expensive operations
+$container->add_definitions([
+    ExpensiveService::class => $container->object(ExpensiveService::class)
+]);
 
-// ✅ Cache reflection for autowiring
-private array $reflection_cache = [];
+// ✅ Implement caching for file operations
+private array $file_cache = [];
 ```
 
 ## Documentation Requirements
@@ -296,18 +484,37 @@ private array $reflection_cache = [];
 
 ```php
 /**
- * Process input data with validation and business logic.
+ * Get log entries with advanced filtering and pagination.
  *
- * @param array $input {
- *     Input data array.
- *     @type string $required_field Required field description.
- *     @type int    $optional_field Optional field description.
+ * @param array $options {
+ *     Parsing options for log entries.
+ *     @type int    $limit        Maximum entries to return. Default 100.
+ *     @type string $level        Filter by log level (error, warning, notice).
+ *     @type string $search       Search term for filtering messages.
+ *     @type string $date_from    Start date filter (Y-m-d format).
+ *     @type string $date_to      End date filter (Y-m-d format).
  * }
- * @return ServiceResponse Success with processed data or failure with error.
+ * @return ServiceResponse Success with log entries or failure with error.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
-public function process_data(array $input): ServiceResponse {
+public function get_log_entries(array $options = []): ServiceResponse {
+    // Implementation
+}
+```
+
+### Frontend Documentation
+
+```typescript
+/**
+ * Custom hook for managing log entries with client-side filtering.
+ *
+ * @param initialFilters - Initial filter state
+ * @returns Object containing logs, filters, and filter management functions
+ *
+ * @since 1.0.0
+ */
+export function useLogEntries(initialFilters: LogFilters = {}) {
     // Implementation
 }
 ```
@@ -316,19 +523,21 @@ public function process_data(array $input): ServiceResponse {
 
 1. **Service Layer First**: All business logic goes in services, controllers are thin HTTP layers
 2. **Return ServiceResponse**: Services always return ServiceResponse, never throw exceptions to controllers
-3. **Use Container**: Register services in providers, resolve via container
+3. **Use Container**: Register services in providers, resolve via container and helper functions
 4. **snake_case PHP**: Functions, methods, variables use snake_case (WordPress standard)
-5. **camelCase Frontend**: JavaScript/TypeScript uses camelCase
+5. **camelCase Frontend**: JavaScript/TypeScript uses camelCase for variables and functions
 6. **Consolidate Components**: Prefer substantial components over micro-components
-7. **Headless UI**: Use Headless UI components for accessibility
-8. **Lucide Icons**: Only use Lucide React icons
-9. **Primary Color**: Always use 'primary' as brand color in Tailwind
+7. **Headless UI**: Use Headless UI components for accessibility and consistency
+8. **Lucide Icons**: Only use Lucide React icons for all UI icons
+9. **Primary Color**: Always use 'primary' as brand color in Tailwind CSS
 10. **Toast Notifications**: Use `toast.success()` and `toast.error()` for user feedback
 11. **Type Everything**: Full TypeScript coverage, PHP 8.2 type hints everywhere
+12. **WordPress Standards**: Follow WordPress coding standards and use WordPress utilities
+13. **Monaco Editor**: Use Monaco Editor for all code editing interfaces
+14. **React Router v7**: Use React Router DOM v7 for all navigation
+15. **Testing**: Write comprehensive unit and integration tests for all functionality
 
 Follow these rules consistently to maintain the enterprise-grade architecture and coding standards of the Debug Suite plugin.
-
-- Provide meaningful error messages for users
 
 ## Standard Operating Procedures (SOPs)
 
@@ -340,47 +549,74 @@ Debug Suite implements **client-side filtering** for optimal performance and rea
 
 **Implementation Standard:**
 
-Use `useDataEntries` hook with:
+Use custom hooks with client-side filtering:
 
 - Debounced search (300ms standard)
 - Client-side filtering for real-time performance
 - Automatic pagination reset on filter changes
-- Memoized filtered results
+- Memoized filtered results for performance
 
 #### SOP 2: WordPress URL Construction Standard
 
 **Always use `addQueryArgs` from `@wordpress/url`:**
 
-- Automatic URL encoding and type safety
-- WordPress compliance and security
-- Consistent parameter handling
-- Supports strings, numbers, booleans, undefined values
+```typescript
+import { addQueryArgs } from '@wordpress/url';
+
+const apiPath = addQueryArgs('/debug-suite/v1/logs', {
+    limit: 100,
+    level: 'error',
+    search: searchTerm
+});
+```
 
 #### SOP 3: Real-Time Filtering UI Feedback
 
 **Show filtered vs total count when filters are active:**
 
-- Display filtered count vs total count
+- Display filtered count vs total count in UI
 - Provide search input with debounced feedback
 - Include clear filters functionality
-- Show loading states during filtering
+- Show loading states during filtering operations
 
 #### SOP 4: Debounced Search Implementation
 
 **Use 300ms debounce for search inputs:**
 
-- Standard debounce timing for optimal performance
-- Search input with clear button functionality
-- Automatic search filtering with user feedback
+```typescript
+import { useDebounce } from '@/utils/use-debounce';
 
-#### SOP 5: Client-Side Filter Function Pattern
+const debouncedSearch = useDebounce(searchValue, 300);
+```
 
-**Standard filtering implementation:**
+#### SOP 5: Custom Hook Pattern for Data Management
 
-- Category/level filtering with hierarchical ordering
-- Multi-field search (message, file, category)
-- Type-specific sorting with performance optimization
-- Consistent filtering patterns across components
+**Standard data management implementation:**
+
+```typescript
+export function useLogEntries(initialFilters: LogFilters = {}) {
+    const [logs, setLogs] = useState<LogEntry[]>([]);
+    const [filters, setFilters] = useState<LogFilters>(initialFilters);
+    const [loading, setLoading] = useState(false);
+
+    // Client-side filtering logic
+    const filteredLogs = useMemo(() => {
+        return logs.filter((log) => {
+            // Implement filtering logic
+        });
+    }, [logs, filters]);
+
+    return {
+        logs: filteredLogs,
+        filters,
+        updateFilters: setFilters,
+        loading,
+        refetch: () => {
+            /* refetch logic */
+        }
+    };
+}
+```
 
 ### URL Parameter Handling SOPs
 
@@ -399,7 +635,33 @@ Use `useDataEntries` hook with:
 
 - Precise memoization - only recalculate when necessary
 - Progressive loading for infinite scroll
-- Optimized filtering performance
+- Optimized filtering performance with useMemo and useCallback
+
+### Testing SOPs
+
+#### SOP 8: Test Organization
+
+**Separate unit and integration tests:**
+
+- **Unit Tests**: `tests/Unit/` - No WordPress dependencies, use `TestCase` base class
+- **Integration Tests**: `tests/Integration/` - With WordPress, use `DebugSuiteTestCase` base class
+- **API Tests**: Test REST endpoints with proper authentication and permissions
+- **Service Tests**: Test business logic with mocked dependencies
+
+#### SOP 9: Test Helper Usage
+
+**Use custom test helpers for consistency:**
+
+```php
+// Use custom assertions
+$this->assert_service_result_success($result);
+$this->assert_service_result_failure($result);
+$this->assert_service_result_error_code($result, 'expected_code');
+
+// Use factory methods
+$mockService = $this->mock_factory->create_file_logs_service();
+$testFile = $this->create_test_file('content', '.log');
+```
 
 These SOPs ensure consistent, performant, and WordPress-compliant implementation across all Debug Suite components.
 
@@ -407,5 +669,6 @@ These SOPs ensure consistent, performant, and WordPress-compliant implementation
 
 - Use comprehensive DocBlocks for all PHP classes and methods
 - Include JSDoc comments for TypeScript functions and components
-- Maintain README files for major components
-- Document API endpoints and their usage
+- Maintain README files for major components and testing
+- Document API endpoints and their usage patterns
+- Follow WordPress documentation standards for hooks and filters

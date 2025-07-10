@@ -6,6 +6,10 @@ This document provides comprehensive guidelines for GitHub Copilot to assist wit
 
 Debug Suite is a WordPress plugin that provides advanced debugging tools for WordPress developers. It features a modern architecture with a **dependency injection container** system, PSR-4 autoloading, and a React/TypeScript frontend with Tailwind CSS v4 styling.
 
+**Current Version**: 1.0.0  
+**PHP Requirements**: PHP 8.2+  
+**Node/NPM**: Uses pnpm for package management
+
 ### Core Architecture
 
 - **Dependency Injection Container**: Service container for managing dependencies in `DebugSuite\Core\Container` namespace
@@ -72,6 +76,8 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     - Maintain consistent spacing and sizing using Tailwind's design system
     - Utilize Tailwind v4's CSS variables system for theme customization
     - Apply responsive design using Tailwind's breakpoint utilities
+    - **Primary color configuration**: Uses indigo color scale (`--color-primary: #6366f1`) defined in `src/index.css`
+    - **No separate tailwind.config file**: Uses inline configuration in CSS with `@theme` directive
 
 5. **React Component String internationalization**:
     - Use `@wordpress/i18n` for string internationalization
@@ -87,16 +93,16 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 
 7. **UI Components**:
     - **Use Headless UI for interactive components**: Prefer `@headlessui/react` components for dropdowns, modals, dialogs, and other interactive elements
-    - **Combobox for Dropdowns**: Use the custom `Combobox` component (built on Headless UI) for all dropdown selections instead of native selects
+    - **Combobox for Dropdowns**: Use the custom `SearchableSelect` component (built on react-select) for all dropdown selections instead of native selects
     - **Toast Notifications**: Use the custom `Toast` component with variation methods for user feedback
     - **Accessibility First**: Always use Headless UI components which provide built-in accessibility features
     - **Custom Components**: Build custom UI components in `src/components/ui/` following the established patterns
     - **Component Examples**:
 
         ```typescript
-        // ✅ Good - Use Headless UI Combobox
-        import Combobox from '@/components/ui/combobox';
-        <Combobox options={options} value={selected} onChange={setSelected} />
+        // ✅ Good - Use react-select based SearchableSelect
+        import SearchableSelect from '@/components/ui/select';
+        <SearchableSelect options={options} value={selected} onChange={setSelected} />
 
         // ✅ Good - Use Toast variations
         import { useToast } from '@/components/ui/toast';
@@ -129,19 +135,22 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     "clsx": "Class name utility",
     "tailwind-merge": "Tailwind class merging",
     "simplebar-react": "Custom scrollbars",
-    "@monaco-editor/react": "Code editor"
+    "@monaco-editor/react": "Code editor",
+    "react-select": "Dropdown component library"
   },
   "devDependencies": {
     "@wordpress/scripts": "Build tooling and configuration",
     "typescript": "TypeScript language support",
     "@types/react": "React type definitions",
-    "@types/wordpress__element": "WordPress element types"
+    "@types/wordpress__element": "WordPress element types",
+    "@tailwindcss/cli": "Tailwind CSS v4 CLI",
+    "concurrently": "Run multiple commands"
   }
 }
 
 ### Build Scripts
 ```bash
-# Development with watch mode
+# Development with watch mode (runs both Tailwind and WordPress scripts)
 npm run dev
 
 # Production build
@@ -152,18 +161,24 @@ npm run type-check
 
 # Linting
 npm run lint
+
+# WordPress build only
+npm run wp:build
+
+# Tailwind build only
+npm run tailwind:build
 ````
 
 ## Architecture Guidelines
 
-### **IMPORTANT: Simplified DI Container Usage**
+### **IMPORTANT: Current DI Container Usage**
 
-**🚨 Use ONLY these simple registration patterns:**
+**� Use the current established patterns:**
 
 ```php
-// ✅ CORRECT - Simple service registration
+// ✅ CORRECT - Current service registration in AppServiceProvider
 $container->add_definitions([
-    // Use object() for simple services without dependencies
+    // Use object() for simple services (singletons)
     MyService::class => $container->object(MyService::class),
 
     // Use autowire() for services with constructor dependencies
@@ -171,19 +186,21 @@ $container->add_definitions([
 ]);
 ```
 
-**❌ AVOID Complex DI Patterns:**
+**✅ Available Definition Types:**
 
-- Do NOT use `ValueDefinition`, `AutowiredDefinition`, `FactoryDefinition` directly
-- Do NOT use advanced container builder patterns
-- Do NOT use environment-specific autowiring helpers
-- Do NOT implement complex definition interfaces
+- `$container->object(Class::class)` - Creates autowired singletons
+- `$container->autowire(Class::class)` - Creates autowired instances with dependency injection
+- `$container->factory(callable)` - Creates factory definitions
+- `$container->value(mixed)` - Creates value definitions
+- `$container->config(array, mixed, bool)` - Creates configuration definitions
+- `$container->decorate(string, string, bool)` - Creates decorator definitions
 
-**✅ Simple Service Patterns:**
+**✅ Current Service Registration Pattern:**
 
-- Services should have no constructor parameters OR simple constructor injection
-- Use `$container->object()` for stateless services
-- Use `$container->autowire()` for services that need other services injected
-- Keep service registration in `AppServiceProvider` only
+- All business services registered in `AppServiceProvider` using `add_definitions()`
+- Services use `object()` for simple singletons
+- Controllers use `autowire()` for dependency injection
+- Service classes implement `ServiceInterface` marker interface
 
 1. **Dependency Injection Container System**:
     - **Container Location**: Use `DebugSuite\Core\Container\Container` for service management
@@ -251,7 +268,14 @@ $container->add_definitions([
     - **Dependency Injection**: Services are registered as singletons in the container via `AppServiceProvider`
     - **Error Handling**: Use `ServiceResponse::success($data)` and `ServiceResponse::failure($message, $code)` for consistent responses
     - **Service Registration**: Add new services to `AppServiceProvider::$provides` array and register in `register()` method
-    - **Implemented Services**: `FileLogsService` (debug log operations), `SettingsService` (wp-config.php management), `FileManagerService` (file system operations)
+    - **Implemented Services**:
+        - `FileLogsService` (debug log operations)
+        - `SettingsService` (wp-config.php management)
+        - `FileManagerService` (file system operations)
+        - `OnboardingService` (onboarding flow)
+        - `OverviewService` (dashboard overview)
+        - `WPLogReaderService` (WordPress log file reading)
+        - `LogFileDiscoveryService` (log file discovery)
     - **Service Dependencies**: Services accept optional constructor parameters for configuration (log file paths, base directories, config files)
     - **Container Integration**: Services are resolved via `debug_suite_resolve()` helper or direct container access
     - **Testing Architecture**: Services are easily unit testable without WordPress dependencies or global state
@@ -261,6 +285,15 @@ $container->add_definitions([
     - **Service Resolution**: Use `debug_suite_resolve(string $service)` to resolve services
     - **Service Manager**: Use `debug_suite_service_manager()` to get service manager instance
     - **Main Instance**: Use `debug_suite()` to get main plugin instance
+    - **Date Utility**: Use `debug_suite_date(string $timestamp)` for consistent date formatting
+
+**Note**: The helper functions available are:
+
+- `debug_suite()` - Main plugin instance
+- `debug_suite_container()` - DI Container instance
+- `debug_suite_resolve($service)` - Resolve service from container
+- `debug_suite_service_manager()` - Service manager instance
+- `debug_suite_date($timestamp)` - Date formatting utility
 
 ## Feature Implementation Guidelines
 
@@ -362,10 +395,18 @@ $container->add_definitions([
 
 // Add to $provides array (follow existing pattern)
 protected array $provides = [
+	WPLogReaderService::class,
 	FileLogsService::class,
 	FileManagerService::class,
 	SettingsService::class,
+	OnboardingService::class,
+	OverviewService::class,
 	ExampleService::class,      // Add new service here
+	FileLogsController::class,
+	FileManagerController::class,
+	SettingsController::class,
+	OnboardingController::class,
+	OverviewController::class,
 	ExampleController::class,   // Add new controller here
 ];
 ```
@@ -620,58 +661,38 @@ The Debug Suite Container System provides enterprise-grade dependency injection 
 ```php
 class AppServiceProvider extends AbstractServiceProvider {
     protected array $provides = [
+        WPLogReaderService::class,
         FileLogsService::class,
         FileManagerService::class,
         SettingsService::class,
+        OnboardingService::class,
+        OverviewService::class,
         FileLogsController::class,
         FileManagerController::class,
         SettingsController::class,
+        OnboardingController::class,
+        OverviewController::class,
     ];
 
     public function register(Container $container): void {
         // Modern definition array approach
         $container->add_definitions([
             // Services with simple autowiring
-            FileLogsService::class    => $container->object(FileLogsService::class),
-            FileManagerService::class => $container->object(FileManagerService::class),
-            SettingsService::class   => $container->object(SettingsService::class),
+            WPLogReaderService::class    => $container->object(WPLogReaderService::class),
+            FileLogsService::class       => $container->object(FileLogsService::class),
+            FileManagerService::class    => $container->object(FileManagerService::class),
+            SettingsService::class       => $container->object(SettingsService::class),
+            OnboardingService::class     => $container->object(OnboardingService::class),
+            OverviewService::class       => $container->autowire(OverviewService::class),
 
             // Controllers with dependency injection
             FileLogsController::class    => $container->autowire(FileLogsController::class),
             FileManagerController::class => $container->autowire(FileManagerController::class),
             SettingsController::class   => $container->autowire(SettingsController::class),
+            OnboardingController::class => $container->autowire(OnboardingController::class),
+            OverviewController::class   => $container->autowire(OverviewController::class),
         ]);
     }
-}
-```
-
-#### Environment-Aware Service Registration
-
-```php
-public function register(Container $container): void {
-    // Environment-specific configuration
-    $container->set(ApiService::class,
-        debug_suite_autowire_env(ApiService::class, [
-            'development' => [
-                'base_url' => 'https://dev-api.example.com',
-                'timeout' => 30,
-                'debug' => true,
-                'rate_limit' => false
-            ],
-            'staging' => [
-                'base_url' => 'https://staging-api.example.com',
-                'timeout' => 20,
-                'debug' => true,
-                'rate_limit' => true
-            ],
-            'production' => [
-                'base_url' => 'https://api.example.com',
-                'timeout' => 10,
-                'debug' => false,
-                'rate_limit' => true
-            ]
-        ], true) // singleton
-    );
 }
 ```
 
@@ -706,11 +727,9 @@ class AdminDashboardService implements Hookable {
     }
 }
 
-// Registration with parameter injection
+// Registration with parameter injection (advanced pattern)
 $container->set(AdminDashboardService::class,
-    debug_suite_autowire_with_params(AdminDashboardService::class, [
-        'menu_slug' => 'my-debug-suite'
-    ])
+    $container->autowire(AdminDashboardService::class)
 );
 ```
 
@@ -760,33 +779,17 @@ $container->set(LogsApiController::class, $container->autowire(LogsApiController
 // Quick service resolution
 $logger = debug_suite_resolve(LoggerInterface::class);
 
-// Container builder for complex setups
-$container = debug_suite_container_builder()
-    ->enable_autowiring(true)
-    ->add_definitions([
-        'database.host' => debug_suite_value('localhost'),
-        'database.port' => debug_suite_value(3306),
-        DatabaseInterface::class => debug_suite_autowire_env(MySQLDatabase::class, [
-            'development' => ['debug' => true],
-            'production' => ['debug' => false]
-        ]),
-        'logger' => debug_suite_factory(fn() => new FileLogger()),
-    ])
-    ->build();
+// Container access
+$container = debug_suite_container();
 
-// Tagged service management
-$notifiers = debug_suite_tagged('notifiers');
-foreach ($notifiers as $notifier) {
-    $notifier->send($message);
-}
+// Service manager access
+$service_manager = debug_suite_service_manager();
 
-// Quick autowiring with parameters
-$service = debug_suite_autowire_with_params(ApiService::class, [
-    'api_key' => $_ENV['API_KEY'],
-    'timeout' => 30,
-    'debug' => WP_DEBUG
-]);
+// Get main plugin instance
+$plugin = debug_suite();
 ```
+
+Note: Advanced helper functions like `debug_suite_container_builder()`, `debug_suite_tagged()`, and `debug_suite_autowire_with_params()` are not currently implemented in the project.
 
 These patterns provide comprehensive coverage for most real-world scenarios when using the Debug Suite Container System. Always prefer dependency injection over service location, use environment-specific configuration for different deployment stages, and leverage the Hookable interface for automatic WordPress integration.
 
@@ -865,7 +868,7 @@ src/pages/[feature-name]/
 
 #### Dropdown/Select Components
 
-**Always use the custom Combobox component** built on Headless UI for all dropdown selections.
+**Always use the custom SearchableSelect component** built on react-select for all dropdown selections.
 
 **Features:**
 
@@ -881,8 +884,26 @@ src/pages/[feature-name]/
 **Do NOT use:**
 
 - ❌ Native HTML `<select>` elements (poor UX)
-- ❌ External libraries like `react-select` (removed from project)
+- ❌ Direct react-select imports (use the custom wrapper)
 - ❌ Custom dropdown implementations without accessibility
+
+**Usage Example:**
+
+```typescript
+import SearchableSelect from '@/components/ui/select';
+
+const options = [
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' },
+];
+
+<SearchableSelect
+    options={options}
+    value={selectedOption}
+    onChange={(option) => setSelectedOption(option)}
+    placeholder="Select an option..."
+/>
+```
 
 ### Toast Notification Standards
 
@@ -907,119 +928,43 @@ src/pages/[feature-name]/
 - Keep messages concise and actionable
 - Use consistent duration (2000ms default, 3000ms for important messages)
 
-## Advanced Frontend Architecture SOPs
+## Current Project Organization
 
-### Client-Side Filtering Standard Operating Procedures
+### Core Service Providers
 
-Debug Suite implements **client-side filtering** for optimal performance and real-time user experience. Follow these SOPs for consistent filtering implementation across all data-heavy components.
+The project follows a clean service provider architecture:
 
-#### SOP 1: Client-Side Filtering Hook Pattern
+- **CoreServiceProvider**: Registers core services (`Assets`, `I18n`, `Plugin`)
+- **AppServiceProvider**: Registers business logic services and REST controllers
+- **AdminServiceProvider**: Registers admin-specific services (`Admin`)
+- **FrontendServiceProvider**: Registers frontend services (`Frontend`)
 
-**Implementation Standard:**
+### Service Layer Implementation
 
-Use `useDataEntries` hook with:
+All business logic is implemented in the `includes/Services/` directory:
 
-- Debounced search (300ms standard)
-- Client-side filtering for real-time performance
-- Automatic pagination reset on filter changes
-- Memoized filtered results
+- **DebugLog/** - Debug log related services
+    - `FileLogsService` - Debug log operations
+    - `WPLogReaderService` - WordPress log file reading
+    - `LogFileDiscoveryService` - Log file discovery
+- **FileManagerService** - File system operations
+- **SettingsService** - wp-config.php management
+- **OnboardingService** - Onboarding flow management
+- **OverviewService** - Dashboard overview functionality
 
-#### SOP 2: Client-Side Filter Function Pattern
+### REST API Controllers
 
-**Filtering Implementation Standard:**
+All API endpoints are handled by controllers in `includes/API/`:
 
-Implement filtering with:
+- `FileLogsController` - Debug log API endpoints
+- `FileManagerController` - File management API endpoints
+- `SettingsController` - Settings management API endpoints
+- `OnboardingController` - Onboarding API endpoints
+- `OverviewController` - Dashboard overview API endpoints
 
-- Category/level filtering
-- Multi-field search (message, file, category)
-- Type-specific sorting with hierarchical ordering
-- Performance-optimized array operations
+### Testing Infrastructure
 
-#### SOP 3: Real-Time Filtering UI Feedback
-
-**UI Implementation Standard:**
-
-Show filtered vs total count when filters are active, include debounced search input with clear button, and provide real-time feedback on filter states.
-
-### URL Parameter Handling SOPs
-
-Debug Suite follows **WordPress URL standards** using `@wordpress/url` for all API endpoint construction and parameter handling.
-
-#### SOP 4: WordPress URL Construction Standard
-
-**Always use `addQueryArgs` from `@wordpress/url` instead of manual URL construction.**
-
-**Benefits:**
-
-- **Automatic URL Encoding**: Handles special characters and Unicode automatically
-- **Type Safety**: Works with strings, numbers, booleans, and undefined values
-- **WordPress Compliance**: Follows WordPress coding standards
-- **Security**: Prevents URL injection vulnerabilities
-
-#### SOP 5: API Endpoint URL Construction Patterns
-
-**Standard patterns for different API scenarios:**
-
-- Single parameter: `addQueryArgs('/debug-suite/v1/logs', { per_page: 1000 })`
-- Multiple parameters with optional values: Handle empty strings automatically
-- File path parameters: Automatic encoding for special characters
-- Export operations: Format and limit parameters
-
-#### SOP 6: Parameter Encoding and Safety
-
-**`addQueryArgs` provides automatic safety features:**
-
-- **Automatic URL Encoding**: Handles special characters, spaces, and Unicode automatically
-- **Type Safety**: Works with strings, numbers, booleans, and undefined values
-- **Empty Parameter Handling**: Filters out undefined/null values automatically
-- **WordPress Compliance**: Follows WordPress coding standards and best practices
-- **Security**: Prevents URL injection vulnerabilities through proper encoding
-
-### Performance Optimization SOPs
-
-#### SOP 7: Debounced Search Implementation
-
-**Standard debounce timing and implementation:**
-
-```typescript
-// Use 300ms debounce for search inputs (optimal balance)
-const debouncedSearch = useDebounce(filters.search, 300);
-
-// Custom debounce hook (if not available in utils)
-const useDebounce = (value: string, delay: number) => {
-    const [debouncedValue, setDebouncedValue] = useState(value);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [value, delay]);
-
-    return debouncedValue;
-};
-```
-
-#### SOP 8: Memoization Patterns for Filtering
-
-**Use precise dependency arrays for optimal re-renders:**
-
-```typescript
-// Precise memoization - only recalculate when necessary
-const filteredData = useMemo(() => {
-    return filterDataEntries(allData, {
-        ...filters,
-        search: debouncedSearch
-    });
-}, [allData, filters.category, filters.sortBy, filters.sortOrder, debouncedSearch]);
-
-// Avoid - over-memoization with entire filter object
-const filteredData = useMemo(() => {
-    return filterDataEntries(allData, filters);
-}, [allData, filters]); // Causes unnecessary re-renders when search changes
-```
-
-These SOPs ensure consistent, performant, and WordPress-compliant implementation of filtering and URL handling across all Debug Suite components.
+- **Unit Tests**: `tests/Unit/` - Isolated component testing
+- **Integration Tests**: `tests/Integration/` - Service integration testing
+- **Test Helpers**: `tests/Helpers/DebugSuiteTestCase.php` - Base test case
+- **Coverage Reports**: `tests/coverage/` - Code coverage analysis
