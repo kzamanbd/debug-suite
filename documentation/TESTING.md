@@ -88,7 +88,7 @@ The `DebugSuiteTestCase` class provides:
 The plugin includes a script to set up the WordPress test environment:
 
 ```bash
-tests/install-wp-tests.sh wordpress_test root password localhost latest
+bin/install-wp-tests.sh wordpress_test root password localhost latest
 ```
 
 This script will:
@@ -317,7 +317,7 @@ For CI/CD integration, the plugin includes GitHub Actions workflows that automat
 
 1. **WordPress Test Environment Not Found**
    - Make sure the `WP_TESTS_DIR` environment variable is set correctly
-   - Run the `tests/install-wp-tests.sh` script again
+   - Run the `bin/install-wp-tests.sh` script again
 
 2. **Database Connection Issues**
    - Verify your database credentials in the WordPress test config
