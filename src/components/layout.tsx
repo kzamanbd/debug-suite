@@ -2,6 +2,7 @@ import type { DebugSuiteRoute } from '@/routing/routes';
 import { classNames } from '@/utils';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
+import ViewModeSwitcher from './view-mode-switcher';
 
 interface LayoutProps {
     children: ReactNode;
@@ -15,12 +16,15 @@ const LayoutHeader = ({ route }: { route: DebugSuiteRoute }) => {
     }
     return (
         <div className="mb-4 flex items-center justify-between">
-            <div>
-                {typeof route.title === 'string' ? (
-                    <div className="text-2xl font-semibold text-gray-900 dark:text-white">{route.title}</div>
-                ) : (
-                    route.title
-                )}
+            <div className="flex-1">
+                <div className="flex items-start justify-between gap-4">
+                    {typeof route.title === 'string' ? (
+                        <div className="text-2xl font-semibold text-gray-900 dark:text-white">{route.title}</div>
+                    ) : (
+                        route.title
+                    )}
+                    <ViewModeSwitcher />
+                </div>
                 <div className="mt-2">
                     {typeof route.description === 'string' ? (
                         <div className="text-sm text-gray-600 dark:text-gray-400">{route.description}</div>
