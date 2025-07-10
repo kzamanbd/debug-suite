@@ -88,6 +88,14 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                         ) : (
                             logs.map((log, index) => {
                                 const entryNumber = index + 1;
+                                const onlyDumped = log.raw_line && !log.file_path && !log.line;
+                                const showDisclosure = log.stack_trace || onlyDumped;
+                                const showText = onlyDumped
+                                    ? __('Show Dump', 'debug-suite')
+                                    : __('Show Trace', 'debug-suite');
+                                const hideText = onlyDumped
+                                    ? __('Hide Dump', 'debug-suite')
+                                    : __('Hide Trace', 'debug-suite');
 
                                 return (
                                     <Disclosure key={index}>
@@ -118,15 +126,15 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                     <td className="px-6 py-4 text-sm text-gray-900">
                                                         <div className="w-full text-left focus:outline-none">
                                                             <div className="flex items-center justify-between">
-                                                                <div className="flex-1 pr-4">{log.message}</div>
+                                                                <div className="line-clamp-3 flex-1 pr-4">
+                                                                    {log.message}
+                                                                </div>
 
                                                                 <div className="flex items-center gap-2">
-                                                                    {log.has_stack_trace && (
+                                                                    {showDisclosure && (
                                                                         <DisclosureButton className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
                                                                             <span className="text-primary-600 text-xs">
-                                                                                {open
-                                                                                    ? __('Hide Trace', 'debug-suite')
-                                                                                    : __('Show Trace', 'debug-suite')}
+                                                                                {open ? hideText : showText}
                                                                             </span>
                                                                         </DisclosureButton>
                                                                     )}
@@ -163,7 +171,7 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                         {entryNumber}
                                                     </td>
                                                 </tr>
-                                                {log.stack_trace && (
+                                                {showDisclosure && (
                                                     <DisclosurePanel as="tr">
                                                         <td
                                                             colSpan={4}
@@ -171,7 +179,9 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                         >
                                                             <div className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100">
                                                                 <pre className="font-mono text-xs whitespace-pre-wrap">
-                                                                    {JSON.stringify(log.stack_trace, null, 2)}
+                                                                    {onlyDumped
+                                                                        ? log.raw_line
+                                                                        : JSON.stringify(log.stack_trace, null, 2)}
                                                                 </pre>
                                                             </div>
                                                         </td>

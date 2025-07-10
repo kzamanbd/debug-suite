@@ -13,8 +13,9 @@ type CustomSwitchProps = React.InputHTMLAttributes<HTMLInputElement> & {
 };
 
 const CustomSwitch = ({ className = '', ...props }: CustomSwitchProps): JSX.Element => (
-    <div className={classNames('relative h-5 w-10', className)}>
+    <label className={classNames('relative h-5 w-10 cursor-pointer', className)}>
         <input
+            id={props.id || 'custom-switch'}
             type="checkbox"
             value="toggle"
             className="peer absolute z-10 h-full w-full cursor-pointer opacity-0"
@@ -26,7 +27,7 @@ const CustomSwitch = ({ className = '', ...props }: CustomSwitchProps): JSX.Elem
                 props.disabled ? 'cursor-not-allowed opacity-50' : ''
             )}
         />
-    </div>
+    </label>
 );
 
 export default CustomSwitch;
