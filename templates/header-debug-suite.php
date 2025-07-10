@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html <?php language_attributes(); ?> class="root-debug-suite-frontend">
+<html <?php language_attributes(); ?> class="root-debug-suite-full-view">
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,4 +8,4 @@
 	
 	<?php wp_head(); ?>
 </head>
-<body class="debug-suite-frontend">
+<body class="debug-suite-full-view">

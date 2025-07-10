@@ -1,5 +1,5 @@
 import { classNames } from '@/utils';
-import { Loader2 } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 
 export type ButtonVariant = 'primary' | 'success' | 'danger' | 'warning' | 'default' | 'info';
@@ -35,7 +35,7 @@ const sizeClasses = {
 };
 
 const Spinner = ({ className = '' }: { className?: string }) => (
-    <Loader2 className={classNames('h-5 w-5 animate-spin text-white', className)} />
+    <LoaderCircle className={classNames('h-5 w-5 animate-spin', className)} />
 );
 
 type PolymorphicComponentProps<T extends ElementType> = ButtonOwnProps<T> &

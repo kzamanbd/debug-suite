@@ -37,6 +37,7 @@ class Admin implements Hookable {
 		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 		add_action( 'admin_init', [ $this, 'handle_activation_redirect' ] );
+		add_filter( 'admin_body_class', [ $this, 'add_admin_body_class' ] );
 	}
 
 	/**
@@ -159,6 +160,27 @@ class Admin implements Hookable {
 		ob_start();
 		echo '<div class="wrap"><div id="debug-suite-root-app" class="debug-suite-root-app"></div></div>';
 		echo ob_get_clean(); // phpcs:ignore
+	}
+
+	/**
+	 * Add a custom body class for the admin interface.
+	 *
+	 * Adds a specific class to the body tag of the admin interface
+	 * to allow for custom styling or JavaScript targeting.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $classes Existing body classes.
+	 *
+	 * @return string Modified body classes.
+	 */
+	public function add_admin_body_class( string $classes ): string {
+		// Add a custom class for the Debug Suite admin interface
+		$user_meta = get_user_meta( get_current_user_id(), 'debug_suite_full_view', true );
+		if ( ! $user_meta ) {
+			return $classes;
+		}
+		return "$classes debug-suite-full-view";
 	}
 
 	/**
