@@ -32,5 +32,22 @@ class Activator {
 
 		// Add activation redirect transient
 		set_transient( 'debug_suite_activation_redirect', true, 30 );
+
+		// Flush rewrite rules for frontend routing
+		self::flush_rewrite_rules_on_activation();
+	}
+
+	/**
+	 * Flush rewrite rules on plugin activation.
+	 *
+	 * @return void
+	 */
+	public static function flush_rewrite_rules_on_activation(): void {
+		// Add rewrite rules for frontend routing
+		add_rewrite_rule( '^debug-suite/?$', 'index.php?debug_suite_page=main', 'top' );
+		add_rewrite_rule( '^debug-suite/([^/]+)/?$', 'index.php?debug_suite_page=$matches[1]', 'top' );
+
+		// Flush rewrite rules
+		flush_rewrite_rules();
 	}
 }

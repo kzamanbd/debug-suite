@@ -22,6 +22,16 @@ class Deactivator {
 	 * @return void
 	 */
 	public static function deactivate(): void {
-		// Add deactivation logic here
+		// Clean up rewrite rules
+		self::flush_rewrite_rules_on_deactivation();
+	}
+
+	/**
+	 * Flush rewrite rules on plugin deactivation.
+	 *
+	 * @return void
+	 */
+	public static function flush_rewrite_rules_on_deactivation(): void {
+		flush_rewrite_rules();
 	}
 }

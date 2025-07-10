@@ -15,6 +15,7 @@ use DebugSuite\Services\SettingsService;
 use DebugSuite\Services\OnboardingService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
+use DebugSuite\Services\FrontendRouterService;
 use DebugSuite\API\FileLogsController;
 use DebugSuite\API\FileManagerController;
 use DebugSuite\API\SettingsController;
@@ -34,6 +35,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 		SettingsService::class,
 		OnboardingService::class,
 		OverviewService::class,
+		FrontendRouterService::class,
 		FileLogsController::class,
 		FileManagerController::class,
 		SettingsController::class,
@@ -52,6 +54,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 				SettingsService::class    => $container->object( SettingsService::class ),
 				OnboardingService::class  => $container->object( OnboardingService::class ),
 				OverviewService::class    => $container->autowire( OverviewService::class ),
+				FrontendRouterService::class => $container->object( FrontendRouterService::class ),
 
 				// REST API Controllers with automatic dependency injection
 				FileLogsController::class    => $container->autowire( FileLogsController::class ),
