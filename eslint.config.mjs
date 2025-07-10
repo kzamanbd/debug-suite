@@ -141,12 +141,6 @@ export default tseslint.config([
             ...reactHooks.configs.recommended.rules,
             'react-hooks/exhaustive-deps': 'warn',
 
-            // ===== REACT REFRESH RULES =====
-            'react-refresh/only-export-components': [
-                'warn',
-                { allowConstantExport: true }
-            ],
-
             // ===== IMPORT AND MODULE ORGANIZATION =====
             'sort-imports': [
                 'error',

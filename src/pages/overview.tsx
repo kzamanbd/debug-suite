@@ -2,6 +2,7 @@ import Alert from '@/components/ui/alert';
 import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
+import { useToast } from '@/components/ui/toast';
 
 import apiFetch from '@wordpress/api-fetch';
 import { useCallback, useEffect, useState } from '@wordpress/element';
@@ -27,7 +28,6 @@ import {
     Zap
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 interface DashboardStats {
     logs: {
@@ -101,6 +101,7 @@ const Overview = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const navigate = useNavigate();
+    const toast = useToast();
 
     const fetchDashboardData = useCallback(
         async (showRefreshToast = false) => {
@@ -159,7 +160,7 @@ const Overview = () => {
                 setRefreshing(false);
             }
         },
-        [navigate]
+        [navigate, toast]
     );
 
     useEffect(() => {

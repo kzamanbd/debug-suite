@@ -1,7 +1,7 @@
 import { createHashRouter, RouterProvider } from 'react-router-dom';
-import { Slide, ToastContainer } from 'react-toastify';
 import { DialogProvider } from './components/dialog-provider';
 import Layout from './components/layout';
+import { ToastProvider } from './components/ui/toast';
 import { withRouter } from './routing';
 import type { DebugSuiteRoute } from './routing/routes';
 import routes from './routing/routes';
@@ -44,19 +44,9 @@ const App = () => {
 
     return (
         <DialogProvider>
-            <RouterProvider router={router} />
-            <ToastContainer
-                rtl={false}
-                position="bottom-center"
-                autoClose={5000}
-                hideProgressBar
-                newestOnTop={false}
-                closeOnClick={false}
-                pauseOnFocusLoss
-                pauseOnHover
-                theme="light"
-                transition={Slide}
-            />
+            <ToastProvider>
+                <RouterProvider router={router} />
+            </ToastProvider>
         </DialogProvider>
     );
 };
