@@ -31,7 +31,7 @@ const App = () => {
                 }
                 for (const node of mutation.addedNodes) {
                     if (node instanceof HTMLElement && node.id === 'headlessui-portal-root') {
-                        node.classList.add('debug-suite-admin-app');
+                        node.classList.add('debug-suite-root-app');
                         node.style.display = 'block';
                     }
                 }

@@ -40,7 +40,7 @@ wp_localize_script( 'debug-suite-script', 'debugSuite', $debug_suite_settings );
 include DEBUG_SUITE_PLUGIN_DIR . 'templates/header-debug-suite.php';
 ?>
 
-<div id="debug-suite-admin-app" class="debug-suite-admin-app"></div>
+<div id="debug-suite-root-app" class="debug-suite-root-app"></div>
 
 <?php
 // Load our custom footer template

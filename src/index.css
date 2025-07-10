@@ -17,7 +17,7 @@
     --color-primary-950: var(--color-indigo-950, #1e1b4b);
 }
 
-.debug-suite-admin-app {
+.debug-suite-root-app {
     @import 'tailwindcss/preflight.css' layer(base) important;
     @import 'tailwindcss/utilities.css' layer(utilities) important;
     @layer base {
@@ -145,12 +145,12 @@ body.debug-suite-frontend #wpbody-content {
 /* Theme container resets - more targeted */
 body.debug-suite-frontend .wrap,
 html.wp-toolbar:has(.debug-suite-frontend),
-body.debug-suite-frontend > .container:not(#debug-suite-admin-app),
-body.debug-suite-frontend > .wrapper:not(#debug-suite-admin-app),
-body.debug-suite-frontend > .site:not(#debug-suite-admin-app),
-body.debug-suite-frontend > .site-content:not(#debug-suite-admin-app),
-body.debug-suite-frontend > .content-area:not(#debug-suite-admin-app),
-body.debug-suite-frontend > .main:not(#debug-suite-admin-app) {
+body.debug-suite-frontend > .container:not(#debug-suite-root-app),
+body.debug-suite-frontend > .wrapper:not(#debug-suite-root-app),
+body.debug-suite-frontend > .site:not(#debug-suite-root-app),
+body.debug-suite-frontend > .site-content:not(#debug-suite-root-app),
+body.debug-suite-frontend > .content-area:not(#debug-suite-root-app),
+body.debug-suite-frontend > .main:not(#debug-suite-root-app) {
     margin: 0 !important;
     padding: 0 !important;
 }

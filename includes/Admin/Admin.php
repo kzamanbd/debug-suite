@@ -157,7 +157,7 @@ class Admin implements Hookable {
 		}
 
 		ob_start();
-		echo '<div class="wrap"><div id="debug-suite-admin-app" class="debug-suite-admin-app"></div></div>';
+		echo '<div class="wrap"><div id="debug-suite-root-app" class="debug-suite-root-app"></div></div>';
 		echo ob_get_clean(); // phpcs:ignore
 	}
 
