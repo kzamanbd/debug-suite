@@ -153,7 +153,7 @@ const Overview = () => {
                     toast.success(__('Dashboard data refreshed', 'debug-suite'));
                 }
             } catch (error) {
-                void navigate('/onboarding');
+                void navigate('/config');
                 console.error('Error fetching dashboard data:', error);
                 toast.error(__('Failed to load dashboard data', 'debug-suite'));
             } finally {

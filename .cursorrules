@@ -243,7 +243,6 @@ includes/
 │   ├── FileLogsController.php  # Debug log endpoints
 │   ├── FileManagerController.php # File manager endpoints
 │   ├── SettingsController.php  # Settings endpoints
-│   ├── OnboardingController.php # Onboarding endpoints
 │   └── OverviewController.php  # Dashboard endpoints
 ├── Providers/                  # Service providers
 │   ├── AppServiceProvider.php  # Main service registration

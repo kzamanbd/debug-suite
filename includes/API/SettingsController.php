@@ -61,6 +61,11 @@ class SettingsController extends RestController {
 							'required'    => false,
 							'description' => __( 'Enable or disable WP_DEBUG_DISPLAY.', 'debug-suite' ),
 						],
+						'onboarding_completed' => [
+							'type'        => 'boolean',
+							'required'    => false,
+							'description' => __( 'Mark onboarding as completed.', 'debug-suite' ),
+						],
 					],
 				],
 			]
@@ -90,9 +95,18 @@ class SettingsController extends RestController {
 	public function get_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$result = $this->service->get_settings();
 
-		return $result->is_failure()
-			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
-			: rest_ensure_response( $result->get_data() );
+		$params = $request->get_params();
+
+		if ( $result->is_failure() ) {
+			return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] );
+		}
+
+		$response = rest_ensure_response( $result->get_data() );
+		if ( isset( $params['check_onboarding'] ) ) {
+			$response->data['completed'] = get_option( 'debug_suite_onboarding_completed', false );
+		}
+
+		return $response;
 	}
 
 	public function update_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
@@ -117,14 +131,20 @@ class SettingsController extends RestController {
 
 		$result = $this->service->update_settings( $settings );
 
-		return $result->is_failure()
-			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
-			: rest_ensure_response(
-				[
-					'success' => true,
-					'message' => __( 'Settings updated successfully.', 'debug-suite' ),
-				]
-			);
+		if ( $result->is_failure() ) {
+			return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] );
+		}
+
+		if ( $params['onboarding_completed'] ) {
+			update_option( 'debug_suite_onboarding_completed', true );
+		}
+
+		return rest_ensure_response(
+			[
+				'success' => true,
+				'message' => __( 'Settings updated successfully.', 'debug-suite' ),
+			]
+		);
 	}
 
 	public function reset_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {

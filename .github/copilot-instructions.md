@@ -405,7 +405,6 @@ protected array $provides = [
 	FileLogsController::class,
 	FileManagerController::class,
 	SettingsController::class,
-	OnboardingController::class,
 	OverviewController::class,
 	ExampleController::class,   // Add new controller here
 ];
@@ -670,7 +669,6 @@ class AppServiceProvider extends AbstractServiceProvider {
         FileLogsController::class,
         FileManagerController::class,
         SettingsController::class,
-        OnboardingController::class,
         OverviewController::class,
     ];
 
@@ -689,7 +687,6 @@ class AppServiceProvider extends AbstractServiceProvider {
             FileLogsController::class    => $container->autowire(FileLogsController::class),
             FileManagerController::class => $container->autowire(FileManagerController::class),
             SettingsController::class   => $container->autowire(SettingsController::class),
-            OnboardingController::class => $container->autowire(OnboardingController::class),
             OverviewController::class   => $container->autowire(OverviewController::class),
         ]);
     }
@@ -959,7 +956,6 @@ All API endpoints are handled by controllers in `includes/API/`:
 - `FileLogsController` - Debug log API endpoints
 - `FileManagerController` - File management API endpoints
 - `SettingsController` - Settings management API endpoints
-- `OnboardingController` - Onboarding API endpoints
 - `OverviewController` - Dashboard overview API endpoints
 
 ### Testing Infrastructure
