@@ -33,7 +33,7 @@ class SettingsService implements ServiceInterface {
 	 *
 	 * @var array
 	 */
-	private array $supported_constants = [
+	public array $supported_constants = [
 		'WP_DEBUG' => 'false',
 		'WP_DEBUG_LOG' => 'false',
 		'WP_DEBUG_DISPLAY' => 'false',
@@ -118,7 +118,8 @@ class SettingsService implements ServiceInterface {
 
 		$settings = [];
 		foreach ( $this->supported_constants as $constant => $default ) {
-			$settings[ $constant ] = $this->extract_constant_value( $content, $constant, $default );
+			$value = $this->extract_constant_value( $content, $constant, $default );
+			$settings[ $constant ] = $value === 'true'; // Convert to boolean
 		}
 
 		return ServiceResponse::success( $settings );

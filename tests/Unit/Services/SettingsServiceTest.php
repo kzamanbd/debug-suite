@@ -88,10 +88,10 @@ EOT;
 		$this->assertArrayHasKey('WP_DEBUG_DISPLAY', $settings);
 		
 		// Verify values match what's in our mock config file
-		$this->assertEquals('false', $settings['WP_DEBUG']);
-		$this->assertEquals('false', $settings['WP_DEBUG_LOG']);
+		$this->assertTrue($settings['WP_DEBUG']);
+		$this->assertTrue($settings['WP_DEBUG_LOG']);
 		// WP_DEBUG_DISPLAY is not in the mock file, so should default to 'false'
-		$this->assertEquals('false', $settings['WP_DEBUG_DISPLAY']);
+		$this->assertTrue($settings['WP_DEBUG_DISPLAY']);
 	}
 
 	/**

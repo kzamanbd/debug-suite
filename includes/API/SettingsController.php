@@ -45,6 +45,23 @@ class SettingsController extends RestController {
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => [ $this, 'update_settings' ],
 					'permission_callback' => [ $this, 'permissions_check' ],
+					'args'                => [
+						'debug'          => [
+							'type'        => 'boolean',
+							'required'    => false,
+							'description' => __( 'Enable or disable WP_DEBUG.', 'debug-suite' ),
+						],
+						'debug_log'     => [
+							'type'        => 'boolean',
+							'required'    => false,
+							'description' => __( 'Enable or disable WP_DEBUG_LOG.', 'debug-suite' ),
+						],
+						'debug_display' => [
+							'type'        => 'boolean',
+							'required'    => false,
+							'description' => __( 'Enable or disable WP_DEBUG_DISPLAY.', 'debug-suite' ),
+						],
+					],
 				],
 			]
 		);
@@ -85,14 +102,17 @@ class SettingsController extends RestController {
 		}
 
 		$settings = [];
-		if ( isset( $params['debug'] ) ) {
-			$settings['WP_DEBUG'] = $params['debug'];
-		}
-		if ( isset( $params['debug_log'] ) ) {
-			$settings['WP_DEBUG_LOG'] = $params['debug_log'];
-		}
-		if ( isset( $params['debug_display'] ) ) {
-			$settings['WP_DEBUG_DISPLAY'] = $params['debug_display'];
+		// Map request parameters to settings
+		$values = [
+			'debug' => 'WP_DEBUG',
+			'debug_log' => 'WP_DEBUG_LOG',
+			'debug_display' => 'WP_DEBUG_DISPLAY',
+		];
+
+		foreach ( $values as $paramKey => $settingKey ) {
+			if ( isset( $params[ $paramKey ] ) ) {
+				$settings[ $settingKey ] = $params[ $paramKey ] ? 'true' : 'false';
+			}
 		}
 
 		$result = $this->service->update_settings( $settings );
