@@ -9,7 +9,7 @@ namespace DebugSuite\Providers;
 
 use DebugSuite\Core\Container\AbstractServiceProvider;
 use DebugSuite\Core\Container\Container;
-use DebugSuite\Core\Assets;
+use DebugSuite\Assets;
 use DebugSuite\Core\I18n;
 use DebugSuite\Core\Plugin;
 

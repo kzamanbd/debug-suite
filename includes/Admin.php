@@ -6,7 +6,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Admin;
+namespace DebugSuite;
 
 use DebugSuite\Interfaces\Hookable;
 use WP_Roles;
