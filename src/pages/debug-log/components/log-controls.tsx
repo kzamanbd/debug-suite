@@ -6,7 +6,7 @@
 import Button from '@/components/ui/button';
 import SearchableSelect from '@/components/ui/select';
 import InputField from '@/components/ui/text-input';
-import { useConfirm } from '@/hooks/useConfirm';
+import { useConfirm } from '@/hooks/use-confirm';
 import { classNames } from '@/utils';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';

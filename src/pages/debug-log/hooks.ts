@@ -3,7 +3,7 @@
  *
  * @since 1.0.0
  */
-import { useDebounce } from '@/utils/use-debounce';
+import { useDebounce } from '@/hooks/use-debounce';
 import apiFetch from '@wordpress/api-fetch';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
