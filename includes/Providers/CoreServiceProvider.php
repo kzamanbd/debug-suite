@@ -10,14 +10,12 @@ namespace DebugSuite\Providers;
 use DebugSuite\Core\Container\AbstractServiceProvider;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Assets;
-use DebugSuite\Core\I18n;
 use DebugSuite\Core\Plugin;
 
 class CoreServiceProvider extends AbstractServiceProvider {
 
 	protected array $provides = [
 		Assets::class,
-		I18n::class,
 		Plugin::class,
 	];
 
@@ -26,7 +24,6 @@ class CoreServiceProvider extends AbstractServiceProvider {
 		$container->add_definitions(
 			[
 				Assets::class => $container->object( Assets::class ),
-				I18n::class   => $container->object( I18n::class ),
 				Plugin::class => $container->object( Plugin::class ),
 			]
 		);
