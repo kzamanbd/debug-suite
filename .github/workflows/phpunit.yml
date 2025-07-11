@@ -1,21 +1,20 @@
-name: 🧪 PHPUnit Test Suite
-
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
+name: PHPUnit Tests
 jobs:
-  phpunit-tests:
-    name: 🧪 PHPUnit Tests (PHP ${{ matrix.php }} | WP ${{ matrix.wordpress }})
+  runPHPUnitTests:
+    name: Run PHPUnit Tests
     runs-on: ubuntu-latest
-
     strategy:
-      fail-fast: false
       matrix:
-        php: ['8.2']
-        wordpress: ['latest']
+        php-versions: ['8.2']
+        wp-versions: ['latest']
 
     services:
       mysql:
@@ -28,78 +27,43 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - name: 📦 Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: 🐘 Setup PHP ${{ matrix.php }}
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: ${{ matrix.php-versions }}
           coverage: xdebug
           tools: composer:v2
-          extensions: mysqli, mbstring, zip, gd, exif, fileinfo
-          ini-values: memory_limit=256M
+          extensions: mysqli, mbstring
 
-      - name: 📂 Get Composer Cache Directory
-        id: composer-cache
+      - name: Get composer cache directory
+        id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - name: 🗄️ Cache Composer Dependencies
+      - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-php${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          path: ${{ steps.composercache.outputs.dir }}
+          key: "${{ runner.os }}-php-${{ matrix.php-versions }}-composer-${{ hashFiles('**/composer.lock') }}"
           restore-keys: |
-            ${{ runner.os }}-composer-php${{ matrix.php }}-
-            ${{ runner.os }}-composer-
+            ${{ runner.os }}-php-${{ matrix.php-versions }}-composer-
 
-      - name: 🔧 Install Composer Dependencies
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Install required system packages
+        run: sudo apt-get update && sudo apt-get install -y subversion
+
+      - name: Install WordPress Test Suite
         run: |
-          echo "🚀 Installing PHP dependencies..."
-          composer install --prefer-dist --no-progress --no-dev
-          echo "✅ Dependencies installed successfully"
+          bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 ${{ matrix.wp-versions }}
 
-      - name: 📦 Install System Dependencies
+      - name: Run Unit Tests
+        run: composer run test:unit
+
+      # Conditionally run integration tests if environment is set up correctly
+      - name: Run Integration Tests
+        # TODO: Need to set up the environment for integration tests
         run: |
-          echo "🔧 Installing system packages..."
-          sudo apt-get update -qq
-          sudo apt-get install -y subversion
-          echo "✅ System packages installed"
-
-      - name: 🌐 Setup WordPress Test Environment
-        run: |
-          echo "🛠️ Setting up WordPress test suite..."
-          bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 ${{ matrix.wordpress }}
-          echo "✅ WordPress test environment ready"
-
-      - name: 🧪 Run Unit Tests
-        run: |
-          echo "🚀 Running unit tests..."
-          composer run test:unit
-          echo "✅ Unit tests completed"
-
-      - name: 🔧 Run Integration Tests
-        run: |
-          echo "🚧 Integration tests are currently being set up..."
-          echo "📝 TODO: Configure integration test environment"
-          echo "⏭️ Skipping integration tests for now"
-
-      - name: 📊 Upload Test Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results-php${{ matrix.php }}-wp${{ matrix.wordpress }}
-          path: |
-            tests/coverage/
-            tests/reports/
-          retention-days: 30
-
-      - name: 🎉 Test Summary
-        if: always()
-        run: |
-          echo "🎯 Test execution completed!"
-          echo "PHP Version: ${{ matrix.php }}"
-          echo "WordPress Version: ${{ matrix.wordpress }}"
-          echo "Check the logs above for detailed results"
+          echo "Integration tests are not set up yet. Skipping..."
