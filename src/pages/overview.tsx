@@ -5,6 +5,7 @@ import Card from '@/components/ui/card';
 import { useToast } from '@/components/ui/toast';
 
 import apiFetch from '@wordpress/api-fetch';
+import { Fill } from '@wordpress/components';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
@@ -229,7 +230,7 @@ const Overview = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <Fill name="debug-suite-layout-header-right">
                 <Button
                     onClick={() => fetchDashboardData(true)}
                     className="flex items-center gap-2"
@@ -238,7 +239,7 @@ const Overview = () => {
                     <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
                     {__('Refresh', 'debug-suite')}
                 </Button>
-            </div>
+            </Fill>
 
             {/* Quick Stats Cards */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
