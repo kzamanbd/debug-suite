@@ -7,7 +7,7 @@ export const registerLogLanguage = (monaco: Monaco) => {
     monaco.languages.setMonarchTokensProvider('log', {
         tokenizer: {
             root: [
-                [/\b(INFO|ERROR|WARN|DEBUG|NOTICE|CRITICAL)\b/, 'log-level'],
+                [/\b(INFO|ERROR|WARN|DEBUG|NOTICE|CRITICAL|E_USER_DEPRECATED|E_WARNING|E_DEPRECATED)\b/, 'log-level'],
                 [/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]/, 'timestamp'],
                 [/\b(Exception|Error|Trace|Stack|Warning|Notice)\b/, 'exception'],
                 [/\bGET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS\b/, 'http'],

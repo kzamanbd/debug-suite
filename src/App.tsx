@@ -1,3 +1,4 @@
+import { SlotFillProvider } from '@wordpress/components';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { DialogProvider } from './components/dialog-provider';
 import Layout from './components/layout';
@@ -25,9 +26,11 @@ const App = () => {
 
     return (
         <DialogProvider>
-            <ToastProvider>
-                <RouterProvider router={router} />
-            </ToastProvider>
+            <SlotFillProvider>
+                <ToastProvider>
+                    <RouterProvider router={router} />
+                </ToastProvider>
+            </SlotFillProvider>
         </DialogProvider>
     );
 };

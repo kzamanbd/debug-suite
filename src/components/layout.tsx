@@ -1,5 +1,6 @@
 import type { DebugSuiteRoute } from '@/routing/routes';
 import { classNames } from '@/utils';
+import { Slot } from '@wordpress/components';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import ViewModeSwitcher from './view-mode-switcher';
@@ -23,7 +24,10 @@ const LayoutHeader = ({ route }: { route: DebugSuiteRoute }) => {
                     ) : (
                         route.title
                     )}
-                    <ViewModeSwitcher />
+                    <div className="flex items-center gap-2">
+                        <Slot fillProps={{ route }} name="debug-suite-layout-header-right" />
+                        <ViewModeSwitcher />
+                    </div>
                 </div>
                 <div className="mt-2">
                     {typeof route.description === 'string' ? (
