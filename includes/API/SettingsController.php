@@ -123,9 +123,9 @@ class SettingsController extends RestController {
 			'debug_display' => 'WP_DEBUG_DISPLAY',
 		];
 
-		foreach ( $values as $paramKey => $settingKey ) {
-			if ( isset( $params[ $paramKey ] ) ) {
-				$settings[ $settingKey ] = $params[ $paramKey ] ? 'true' : 'false';
+		foreach ( $values as $key => $value ) {
+			if ( isset( $params[ $key ] ) ) {
+				$settings[ $value ] = $params[ $key ] ? 'true' : 'false';
 			}
 		}
 
