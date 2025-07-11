@@ -96,16 +96,16 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     - **Combobox for Dropdowns**: Use the custom `SearchableSelect` component (built on react-select) for all dropdown selections instead of native selects
     - **Toast Notifications**: Use the custom `Toast` component with variation methods for user feedback
     - **Accessibility First**: Always use Headless UI components which provide built-in accessibility features
-    - **Custom Components**: Build custom UI components in `src/components/ui/` following the established patterns
+    - **Custom Components**: Build custom UI components in `src/components/base/` following the established patterns
     - **Component Examples**:
 
         ```typescript
         // ✅ Good - Use react-select based SearchableSelect
-        import SearchableSelect from '@/components/ui/select';
+        import SearchableSelect from '@/components/base/select';
         <SearchableSelect options={options} value={selected} onChange={setSelected} />
 
         // ✅ Good - Use Toast variations
-        import { useToast } from '@/components/ui/toast';
+        import { useToast } from '@/components/base/toast';
         const { toast } = useToast();
         toast.success('Operation completed successfully!');
         toast.error('Something went wrong');
@@ -890,7 +890,7 @@ src/pages/[feature-name]/
 **Usage Example:**
 
 ```typescript
-import SearchableSelect from '@/components/ui/select';
+import SearchableSelect from '@/components/base/select';
 
 const options = [
     { value: 'option1', label: 'Option 1' },

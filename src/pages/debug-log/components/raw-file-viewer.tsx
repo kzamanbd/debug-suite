@@ -3,8 +3,8 @@
  *
  * @since 1.0.0
  */
+import Button from '@/components/base/button';
 import Editor from '@/components/editor';
-import Button from '@/components/ui/button';
 import { classNames } from '@/utils';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';

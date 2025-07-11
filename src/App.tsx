@@ -1,8 +1,8 @@
 import { SlotFillProvider } from '@wordpress/components';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
+import { ToastProvider } from './components/base/toast';
 import { DialogProvider } from './components/dialog-provider';
 import Layout from './components/layout';
-import { ToastProvider } from './components/ui/toast';
 import { withRouter } from './routing';
 import type { DebugSuiteRoute } from './routing/routes';
 import routes from './routing/routes';

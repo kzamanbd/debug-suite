@@ -1,4 +1,4 @@
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/components/base/toast';
 
 const DebugConfig = () => {
     const toast = useToast();

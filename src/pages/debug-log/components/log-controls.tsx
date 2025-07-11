@@ -3,10 +3,10 @@
  *
  * @since 1.0.0
  */
-import Button from '@/components/ui/button';
-import type { Option } from '@/components/ui/select';
-import SearchableSelect from '@/components/ui/select';
-import InputField from '@/components/ui/text-input';
+import Button from '@/components/base/button';
+import type { Option } from '@/components/base/select';
+import SearchableSelect from '@/components/base/select';
+import InputField from '@/components/base/text-input';
 import { useConfirm } from '@/hooks/use-confirm';
 import { classNames } from '@/utils';
 import { Fill } from '@wordpress/components';

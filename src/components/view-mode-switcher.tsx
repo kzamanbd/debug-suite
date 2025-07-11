@@ -1,4 +1,4 @@
-import Button from '@/components/ui/button';
+import Button from '@/components/base/button';
 import apiFetch from '@wordpress/api-fetch';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';

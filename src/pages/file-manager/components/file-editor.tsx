@@ -5,9 +5,9 @@
  *
  * @since 1.0.0
  */
+import Modal from '@/components/base/modal';
 import Editor from '@/components/editor';
 import type { ValidationError } from '@/components/editor/validators';
-import Modal from '@/components/ui/modal';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';

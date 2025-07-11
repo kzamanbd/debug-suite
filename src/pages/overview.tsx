@@ -1,8 +1,8 @@
-import Alert from '@/components/ui/alert';
-import Badge from '@/components/ui/badge';
-import Button from '@/components/ui/button';
-import Card from '@/components/ui/card';
-import { useToast } from '@/components/ui/toast';
+import Alert from '@/components/base/alert';
+import Badge from '@/components/base/badge';
+import Button from '@/components/base/button';
+import Card from '@/components/base/card';
+import { useToast } from '@/components/base/toast';
 
 import apiFetch from '@wordpress/api-fetch';
 import { Fill } from '@wordpress/components';

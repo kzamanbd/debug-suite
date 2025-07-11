@@ -226,7 +226,7 @@ const contextMessage = _x('Settings', 'navigation menu', 'debug-suite');
 
 ## Directory Structure Standards
 
-```
+```md
 includes/
 ├── Services/                    # Business logic services
 │   ├── ServiceInterface.php    # Service marker interface
@@ -378,7 +378,7 @@ return ServiceResponse::success([
 
 ```typescript
 // ✅ Handle API errors gracefully with toast notifications
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/components/base/toast';
 
 try {
     const response = await apiFetch<ApiResponse>({

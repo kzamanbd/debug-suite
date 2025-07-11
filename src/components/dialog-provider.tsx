@@ -1,6 +1,6 @@
 import type { DialogOptions, DialogState } from '@/types';
 import React, { createContext, useCallback, useState } from 'react';
-import DialogModal from './ui/dialog-modal';
+import DialogModal from './base/dialog-modal';
 
 const DialogContext = createContext<(message: string, options?: DialogOptions) => Promise<boolean>>(() => {
     throw new Error('DialogProvider is missing');

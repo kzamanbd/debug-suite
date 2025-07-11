@@ -5,11 +5,11 @@
  *
  * @since 1.0.0
  */
-import Badge from '@/components/ui/badge';
-import Button from '@/components/ui/button';
-import Card from '@/components/ui/card';
-import CustomCheckbox from '@/components/ui/checkbox';
-import TextInput from '@/components/ui/text-input';
+import Badge from '@/components/base/badge';
+import Button from '@/components/base/button';
+import Card from '@/components/base/card';
+import CustomCheckbox from '@/components/base/checkbox';
+import TextInput from '@/components/base/text-input';
 import type { ItemTree } from '@/types';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
