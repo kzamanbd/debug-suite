@@ -374,113 +374,6 @@ class WPLogReaderServiceTest extends TestCase {
 	}
 
 	/**
-	 * Test export to JSON format.
-	 *
-	 * @return void
-	 */
-	public function test_export_log_entries_json(): void {
-		$log_content = '[19-Jun-2025 01:30:45 UTC] PHP Warning: Test warning in /var/www/test.php on line 123';
-		$this->create_log_file( $log_content );
-
-		$result = $this->service->export_log_entries( [ 'format' => 'json' ] );
-
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
-
-		$this->assertArrayHasKey( 'content', $data );
-		$this->assertArrayHasKey( 'mime_type', $data );
-		$this->assertArrayHasKey( 'filename', $data );
-		$this->assertEquals( 'application/json', $data['mime_type'] );
-		$this->assertStringEndsWith( '.json', $data['filename'] );
-
-		// Verify JSON is valid
-		$decoded = json_decode( $data['content'], true );
-		$this->assertIsArray( $decoded );
-	}
-
-	/**
-	 * Test export to CSV format.
-	 *
-	 * @return void
-	 */
-	public function test_export_log_entries_csv(): void {
-		$log_content = '[19-Jun-2025 01:30:45 UTC] PHP Warning: Test warning in /var/www/test.php on line 123';
-		$this->create_log_file( $log_content );
-
-		$result = $this->service->export_log_entries( [ 'format' => 'csv' ] );
-
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
-
-		$this->assertEquals( 'text/csv', $data['mime_type'] );
-		$this->assertStringEndsWith( '.csv', $data['filename'] );
-		
-		// Check for all expected CSV columns
-		$expected_columns = [
-			'Timestamp',
-			'Level',
-			'Type',
-			'Message',
-			'File',
-			'Line',
-			'Has Stack Trace',
-			'Stack Trace Summary',
-			'Raw Line',
-		];
-		
-		$header_row = explode( ',', strtok( $data['content'], "\n" ) );
-		$header_row = array_map( fn( $col ) => trim( $col, '"' ), $header_row );
-		
-		foreach ( $expected_columns as $column ) {
-			$this->assertContains( $column, $header_row, "CSV should contain column: {$column}" );
-		}
-		
-		// Check the actual data row
-		$data_row = str_getcsv( substr( $data['content'], strpos( $data['content'], "\n" ) + 1 ) );
-		$this->assertEquals( '2025-06-19 01:30:45', $data_row[0], 'Timestamp should be formatted correctly' );
-		$this->assertEquals( 'WARNING', $data_row[1], 'Level should be uppercase' );
-		$this->assertEquals( 'PHP Warning', $data_row[2], 'Type should match the log entry' );
-		$this->assertEquals( 'Test warning', $data_row[3], 'Message should be extracted correctly' );
-		$this->assertEquals( '/var/www/test.php', $data_row[4], 'File path should be extracted correctly' );
-		$this->assertEquals( '123', $data_row[5], 'Line number should be extracted correctly' );
-		$this->assertEquals( 'No', $data_row[6], 'Has Stack Trace should be "No" for this entry' );
-	}
-
-	/**
-	 * Test export to text format.
-	 *
-	 * @return void
-	 */
-	public function test_export_log_entries_text(): void {
-		$log_content = '[19-Jun-2025 01:30:45 UTC] PHP Warning: Test warning in /var/www/test.php on line 123';
-		$this->create_log_file( $log_content );
-
-		$result = $this->service->export_log_entries( [ 'format' => 'txt' ] );
-
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
-
-		$this->assertEquals( 'text/plain', $data['mime_type'] );
-		$this->assertStringEndsWith( '.txt', $data['filename'] );
-		$this->assertStringContainsString( '# Debug Log Export', $data['content'] );
-	}
-
-	/**
-	 * Test export with invalid format.
-	 *
-	 * @return void
-	 */
-	public function test_export_log_entries_invalid_format(): void {
-		$log_content = '[19-Jun-2025 01:30:45 UTC] PHP Warning: Test warning in /var/www/test.php on line 123';
-		$this->create_log_file( $log_content );
-
-		$result = $this->service->export_log_entries( [ 'format' => 'invalid' ] );
-
-		$this->assertTrue( $result->is_failure() );
-		$this->assertEquals( 'export_error', $result->get_error_code() );
-	}
-
-	/**
 	 * Test wrapper methods for compatibility.
 	 *
 	 * @return void
@@ -498,11 +391,6 @@ class WPLogReaderServiceTest extends TestCase {
 		$result = $this->service->get_log_file_stats();
 		$this->assertTrue( $result->is_success() );
 		$this->assertArrayHasKey( 'total_entries', $result->get_data() );
-
-		// Test export_logs wrapper
-		$result = $this->service->export_logs( [ 'format' => 'json' ] );
-		$this->assertTrue( $result->is_success() );
-		$this->assertArrayHasKey( 'content', $result->get_data() );
 	}
 
 	/**

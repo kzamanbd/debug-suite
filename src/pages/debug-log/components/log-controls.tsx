@@ -4,6 +4,7 @@
  * @since 1.0.0
  */
 import Button from '@/components/ui/button';
+import type { Option } from '@/components/ui/select';
 import SearchableSelect from '@/components/ui/select';
 import InputField from '@/components/ui/text-input';
 import { useConfirm } from '@/hooks/use-confirm';
@@ -11,14 +12,14 @@ import { classNames } from '@/utils';
 import { Fill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DownloadIcon, EyeIcon, FileTextIcon, RefreshCwIcon, SearchIcon, Trash2, XIcon } from 'lucide-react';
-import { exportOptions, levelOptions, perPageOptions, sortOptions } from '../constants';
+import { levelOptions, perPageOptions, sortOptions } from '../constants';
 import type { LogFile, LogFilters, RawFileContent, ViewMode } from '../types';
 
 interface LogControlsProps {
     // File selection
     logFiles: LogFile[];
     selectedFile: string;
-    onFileChange: (filePath: string) => void;
+    onFileChange: (file: Option | null) => void;
 
     // View mode
     viewMode: ViewMode;
@@ -34,7 +35,6 @@ interface LogControlsProps {
     // Actions
     onRefresh: () => void;
     onClear: () => void;
-    onExport: (format: 'json' | 'csv' | 'txt') => void;
     clearing: boolean;
     filesLoading?: boolean;
     loading?: boolean;
@@ -54,7 +54,6 @@ const LogControls = ({
     totalEntries,
     onRefresh,
     onClear,
-    onExport,
     clearing,
     filesLoading = false,
     rawContent,
@@ -101,13 +100,6 @@ const LogControls = ({
         }
     };
 
-    const handleExport = (format: string) => {
-        if (!format) {
-            return;
-        }
-        onExport(format as 'json' | 'csv' | 'txt');
-    };
-
     const handleDownload = () => {
         if (!rawContent) return;
 
@@ -123,93 +115,63 @@ const LogControls = ({
     };
 
     return (
-        <div className="divide divide-y">
+        <>
             {/* Header with file selector */}
-            <div className="bg-white pb-4">
-                <div className="flex flex-col flex-wrap gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                        <SearchableSelect
-                            options={filteredLogFiles}
-                            value={selectedLogFile()}
-                            onChange={(option) => onFileChange(option?.value || '')}
-                            isDisabled={filesLoading}
-                            className="w-56"
-                            placeholder={__('Select a log file', 'debug-suite')}
-                        />
-                    </div>
-
-                    <div className="flex items-center gap-2 md:gap-3">
-                        {viewMode === 'parsed' && (
-                            <div className="relative flex-1 md:flex-none">
-                                <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 transform text-gray-400" />
-                                <InputField
-                                    type="text"
-                                    placeholder={__('Search in log...', 'debug-suite')}
-                                    value={filters.search}
-                                    onChange={(e) => onFiltersChange({ search: e.target.value })}
-                                    className="w-full pl-10 md:w-48"
-                                />
-                                {filters.search && (
-                                    <button
-                                        onClick={clearSearch}
-                                        className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
-                                        title={__('Clear search', 'debug-suite')}
-                                    >
-                                        <XIcon className="size-4" />
-                                    </button>
-                                )}
-                            </div>
+            <Fill name="debug-suite-layout-header-right">
+                {viewMode === 'raw' && rawContent && (
+                    <>
+                        <Button onClick={handleDownload}>
+                            <DownloadIcon className="size-4" />
+                            {__('Download', 'debug-suite')}
+                        </Button>
+                    </>
+                )}
+                <SearchableSelect
+                    options={filteredLogFiles}
+                    value={selectedLogFile()}
+                    onChange={onFileChange}
+                    isDisabled={filesLoading}
+                    className="w-56"
+                    placeholder={__('Select a log file', 'debug-suite')}
+                />
+                {/* View Mode Toggle */}
+                <nav className="flex gap-x-0.5 rounded-lg bg-gray-100 p-0.5 md:gap-x-1 dark:bg-neutral-800">
+                    <button
+                        type="button"
+                        onClick={() => onViewModeChange('parsed')}
+                        className={classNames(
+                            'flex items-center rounded-md border border-transparent px-1.5 py-2 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
+                            viewMode === 'parsed'
+                                ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
+                                : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
                         )}
-                        <Fill name="debug-suite-layout-header-right">
-                            {viewMode === 'raw' && rawContent && (
-                                <>
-                                    <Button onClick={handleDownload}>
-                                        <DownloadIcon className="size-4" />
-                                        {__('Download', 'debug-suite')}
-                                    </Button>
-                                </>
-                            )}
-                            {/* View Mode Toggle */}
-                            <nav className="flex gap-x-0.5 rounded-lg bg-gray-100 p-0.5 md:gap-x-1 dark:bg-neutral-800">
-                                <button
-                                    type="button"
-                                    onClick={() => onViewModeChange('parsed')}
-                                    className={classNames(
-                                        'flex items-center rounded-md border border-transparent px-1.5 py-2 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
-                                        viewMode === 'parsed'
-                                            ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
-                                            : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
-                                    )}
-                                >
-                                    <EyeIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
-                                    <span className="hidden sm:inline">{__('Parsed', 'debug-suite')}</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => onViewModeChange('raw')}
-                                    className={classNames(
-                                        'flex items-center rounded-md border border-transparent px-1.5 py-2 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
-                                        viewMode === 'raw'
-                                            ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
-                                            : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
-                                    )}
-                                >
-                                    <FileTextIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
-                                    <span className="hidden sm:inline">{__('Raw File', 'debug-suite')}</span>
-                                </button>
-                            </nav>
-                            <Button onClick={onRefresh} disabled={loading}>
-                                <RefreshCwIcon className={classNames('size-4', loading && 'animate-spin')} />
-                                <span className="hidden md:inline">{__('Refresh', 'debug-suite')}</span>
-                            </Button>
-                        </Fill>
-                    </div>
-                </div>
-            </div>
+                    >
+                        <EyeIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
+                        <span className="hidden sm:inline">{__('Parsed', 'debug-suite')}</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => onViewModeChange('raw')}
+                        className={classNames(
+                            'flex items-center rounded-md border border-transparent px-1.5 py-2 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
+                            viewMode === 'raw'
+                                ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
+                                : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
+                        )}
+                    >
+                        <FileTextIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
+                        <span className="hidden sm:inline">{__('Raw File', 'debug-suite')}</span>
+                    </button>
+                </nav>
+                <Button onClick={onRefresh} disabled={loading}>
+                    <RefreshCwIcon className={classNames('size-4', loading && 'animate-spin')} />
+                    <span className="hidden md:inline">{__('Refresh', 'debug-suite')}</span>
+                </Button>
+            </Fill>
 
             {/* Filters and actions - only show in parsed mode */}
             {viewMode === 'parsed' && (
-                <div className="bg-white py-4">
+                <div className="border-t bg-white py-4">
                     <div className="flex flex-col flex-wrap gap-4 md:gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:gap-4">
@@ -260,13 +222,25 @@ const LogControls = ({
                         </div>
 
                         <div className="flex items-center gap-2 md:gap-3">
-                            <SearchableSelect
-                                options={exportOptions}
-                                value={null}
-                                onChange={(option) => handleExport(option?.value || '')}
-                                placeholder={__('Export as...', 'debug-suite')}
-                                className="w-[150px]"
-                            />
+                            <div className="relative flex-1 md:flex-none">
+                                <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 transform text-gray-400" />
+                                <InputField
+                                    type="text"
+                                    placeholder={__('Search in log...', 'debug-suite')}
+                                    value={filters.search}
+                                    onChange={(e) => onFiltersChange({ search: e.target.value })}
+                                    className="w-full pl-10 md:w-48"
+                                />
+                                {filters.search && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
+                                        title={__('Clear search', 'debug-suite')}
+                                    >
+                                        <XIcon className="size-4" />
+                                    </button>
+                                )}
+                            </div>
                             <Button onClick={handleClear} variant="danger" disabled={clearing} className="shrink-0 p-2">
                                 <Trash2 className="size-4" />
                             </Button>
@@ -274,7 +248,7 @@ const LogControls = ({
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

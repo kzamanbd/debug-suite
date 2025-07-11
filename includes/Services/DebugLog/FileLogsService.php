@@ -79,16 +79,6 @@ class FileLogsService implements ServiceInterface {
 	}
 
 	/**
-	 * Export log entries to various formats.
-	 *
-	 * @param array $options Export options including format (json, csv, txt).
-	 * @return ServiceResponse
-	 */
-	public function export_logs( array $options = [] ): ServiceResponse {
-		return $this->log_reader->export_logs( $options );
-	}
-
-	/**
 	 * Get paths to supported log files.
 	 *
 	 * @return array

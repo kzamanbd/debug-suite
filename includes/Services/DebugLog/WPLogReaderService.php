@@ -2,7 +2,7 @@
 /**
  * Advanced Log Reader Service for Debug Suite.
  *
- * Provides advanced log reading, filtering, and exporting capabilities
+ * Provides advanced log reading and filtering capabilities
  * with stack trace detection and parsing.
  *
  * @package DebugSuite
@@ -611,159 +611,6 @@ class WPLogReaderService implements ServiceInterface {
 	}
 
 	/**
-	 * Export log entries to various formats.
-	 *
-	 * @param array $options Export options.
-	 * @return ServiceResponse
-	 */
-	public function export_log_entries( array $options ): ServiceResponse {
-		$format = $options['format'] ?? 'json';
-		$log_result = $this->read_log_entries( $options );
-
-		if ( $log_result->is_failure() ) {
-			return $log_result;
-		}
-
-		$data = $log_result->get_data();
-		$entries = $data['entries'];
-
-		try {
-			$result = match ( $format ) {
-				'json' => [
-					'content'   => wp_json_encode( $entries, JSON_PRETTY_PRINT ),
-					'mime_type' => 'application/json',
-					'extension' => 'json',
-				],
-				'csv' => [
-					'content'   => $this->export_to_csv( $entries ),
-					'mime_type' => 'text/csv',
-					'extension' => 'csv',
-				],
-				'txt' => [
-					'content'   => $this->export_to_text( $entries ),
-					'mime_type' => 'text/plain',
-					'extension' => 'txt',
-				],
-				default => throw new Exception(
-					// translators: %s is the unsupported format.
-					sprintf( __( 'Unsupported export format: %s', 'debug-suite' ), $format )
-				),
-			};
-
-			$result['filename'] = sprintf(
-				'debug-log-export-%s.%s',
-				gmdate( 'Y-m-d-H-i-s' ),
-				$result['extension']
-			);
-			$result['size'] = strlen( $result['content'] );
-			$result['entries'] = count( $entries );
-
-			return ServiceResponse::success( $result );
-
-		} catch ( Exception $e ) {
-			return ServiceResponse::failure(
-				// translators: %s is the error message.
-				sprintf( __( 'Export failed: %s', 'debug-suite' ), $e->getMessage() ),
-				'export_error',
-				[ 'error' => $e->getMessage() ]
-			);
-		}
-	}
-
-	/**
-	 * Export entries to CSV format.
-	 *
-	 * @param array $entries Log entries.
-	 * @return string
-	 */
-	private function export_to_csv( array $entries ): string {
-		$output = fopen( 'php://temp', 'r+' );
-
-		// CSV headers
-		fputcsv(
-			$output,
-			[
-				'Timestamp',
-				'Level',
-				'Type',
-				'Message',
-				'File',
-				'Line',
-				'Has Stack Trace',
-				'Stack Trace Summary',
-				'Raw Line',
-			]
-		);
-
-		foreach ( $entries as $entry ) {
-			fputcsv(
-				$output,
-				[
-					$entry['timestamp'],
-					strtoupper( $entry['level'] ),
-					$entry['type'],
-					$entry['message'],
-					$entry['file_path'] ?? '',
-					$entry['line'] ?? '',
-					$entry['has_stack_trace'] ? 'Yes' : 'No',
-					$entry['has_stack_trace'] ? ( $entry['stack_trace']['summary'] ?? '' ) : '',
-					$entry['raw_line'],
-				]
-			);
-		}
-
-		rewind( $output );
-		$csv_content = stream_get_contents( $output );
-		fclose( $output );
-
-		return $csv_content;
-	}
-
-	/**
-	 * Export entries to plain text format.
-	 *
-	 * @param array $entries Log entries.
-	 * @return string
-	 */
-	private function export_to_text( array $entries ): string {
-		$lines = [];
-		$lines[] = '# Debug Log Export';
-		$lines[] = sprintf( '# Generated: %s UTC', gmdate( 'Y-m-d H:i:s' ) );
-		$lines[] = sprintf( '# Total Entries: %d', count( $entries ) );
-		$lines[] = '';
-
-		foreach ( $entries as $i => $entry ) {
-			$lines[] = sprintf( '## Entry #%d', $i + 1 );
-			$lines[] = sprintf( 'Timestamp: %s', $entry['timestamp'] );
-			$lines[] = sprintf( 'Level: %s', strtoupper( $entry['level'] ) );
-			$lines[] = sprintf( 'Type: %s', $entry['type'] );
-
-			if ( ! empty( $entry['file_path'] ) ) {
-				$lines[] = sprintf( 'File: %s', $entry['file_path'] );
-				if ( ! empty( $entry['line'] ) ) {
-					$lines[] = sprintf( 'Line: %d', $entry['line'] );
-				}
-			}
-
-			$lines[] = sprintf( 'Message: %s', $entry['message'] );
-
-			if ( $entry['has_stack_trace'] ) {
-				$lines[] = '';
-				$lines[] = '### Stack Trace:';
-				foreach ( $entry['stack_trace']['frames'] as $frame ) {
-					$lines[] = sprintf( '#%d %s', $frame['number'], $frame['raw'] );
-				}
-			}
-
-			$lines[] = '';
-			$lines[] = str_repeat( '-', 80 );
-			$lines[] = '';
-		}
-
-		return implode( "\n", $lines );
-	}
-
-	/**
 	 * Get log file statistics.
 	 *
 	 * @param string|null $log_file Optional log file path.
@@ -874,17 +721,6 @@ class WPLogReaderService implements ServiceInterface {
 	 */
 	public function get_log_file_stats( ?string $log_file = null ): ServiceResponse {
 		return $this->get_log_statistics( $log_file );
-	}
-
-	/**
-	 * Wrapper method for compatibility with FileLogsService.
-	 * Delegates to export_log_entries.
-	 *
-	 * @param array $options Export options.
-	 * @return ServiceResponse
-	 */
-	public function export_logs( array $options = [] ): ServiceResponse {
-		return $this->export_log_entries( $options );
 	}
 
 	/**

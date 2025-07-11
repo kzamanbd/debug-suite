@@ -251,7 +251,7 @@ const Onboarding = () => {
                                                 {__('Log Management', 'debug-suite')}
                                             </h3>
                                             <p className="text-sm text-gray-600">
-                                                {__('Organize and export log data', 'debug-suite')}
+                                                {__('Organize log data', 'debug-suite')}
                                             </p>
                                         </div>
                                     </div>
@@ -455,7 +455,7 @@ const Onboarding = () => {
                                                 <div className="flex items-start space-x-3">
                                                     <CheckCircle2 className="mt-0.5 h-5 w-5 text-green-600" />
                                                     <span className="text-sm text-gray-700">
-                                                        {__('Easy to analyze and export', 'debug-suite')}
+                                                        {__('Easy to analyze', 'debug-suite')}
                                                     </span>
                                                 </div>
                                             </div>

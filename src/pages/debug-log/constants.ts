@@ -35,9 +35,3 @@ export const sortOptions = [
     { value: 'timestamp', label: __('Sort by Date', 'debug-suite') },
     { value: 'level', label: __('Sort by Level', 'debug-suite') }
 ];
-
-export const exportOptions = [
-    { value: 'json', label: __('Export as JSON', 'debug-suite') },
-    { value: 'csv', label: __('Export as CSV', 'debug-suite') },
-    { value: 'txt', label: __('Export as TXT', 'debug-suite') }
-];

@@ -11,7 +11,8 @@ import type { LogFilters, ViewMode } from './types';
 
 const FileLogs = () => {
     // Custom hooks for data management
-    const { logFiles, selectedFile, setSelectedFile, loading: filesLoading } = useLogFiles();
+    const { logFiles, loading: filesLoading } = useLogFiles();
+
     const {
         logs,
         loading: logsLoading,
@@ -20,9 +21,12 @@ const FileLogs = () => {
         filters,
         updateFilters,
         loadMore,
-        refetch: refetchLogs
+        refetch: refetchLogs,
+        selectedFile,
+        onFileChange
     } = useLogEntries();
-    const { clearLogs, exportLogs, clearing } = useLogActions();
+
+    const { clearLogs, clearing } = useLogActions();
     const { content: rawContent, loading: rawLoading, refetch: refetchRawContent } = useRawFileContent(selectedFile);
 
     // Local state for view mode only
@@ -43,11 +47,6 @@ const FileLogs = () => {
             window.removeEventListener('focus', handleFocus);
         };
     }, [refetchLogs, refetchRawContent, viewMode]);
-
-    // Show skeleton while initial data loads
-    if (filesLoading) {
-        return <FileLogsSkeleton />;
-    }
 
     // Handle filter changes - now uses client-side filtering
     const handleFilterChange = (newFilters: Partial<LogFilters>) => {
@@ -74,11 +73,6 @@ const FileLogs = () => {
         }
     };
 
-    // Handle export with format selection
-    const handleExport = (format: 'json' | 'csv' | 'txt') => {
-        void exportLogs(format);
-    };
-
     // Handle clearing logs with automatic refresh
     const handleClearLogs = async () => {
         try {
@@ -89,6 +83,11 @@ const FileLogs = () => {
             console.error('Error clearing logs:', error);
         }
     };
+
+    // Show skeleton while initial data loads
+    if (filesLoading) {
+        return <FileLogsSkeleton />;
+    }
 
     return (
         <div className="flex h-full flex-col">
@@ -101,13 +100,12 @@ const FileLogs = () => {
                 filesLoading={filesLoading}
                 rawContent={rawContent}
                 loading={logsLoading || rawLoading}
-                onFileChange={setSelectedFile}
+                onFileChange={onFileChange}
                 onViewModeChange={handleViewModeChange}
                 onFiltersChange={handleFilterChange}
                 totalEntries={totalEntries}
                 onRefresh={handleRefresh}
                 onClear={handleClearLogs}
-                onExport={handleExport}
             />
 
             {viewMode === 'parsed' ? (
