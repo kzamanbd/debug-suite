@@ -10,16 +10,7 @@ import { useConfirm } from '@/hooks/useConfirm';
 import { classNames } from '@/utils';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-    CopyIcon,
-    DownloadIcon,
-    EyeIcon,
-    FileTextIcon,
-    RefreshCwIcon,
-    SearchIcon,
-    TrashIcon,
-    XIcon
-} from 'lucide-react';
+import { CopyIcon, DownloadIcon, EyeIcon, FileTextIcon, RefreshCwIcon, SearchIcon, Trash2, XIcon } from 'lucide-react';
 import { exportOptions, levelOptions, perPageOptions, sortOptions } from '../constants';
 import type { LogFile, LogFilters, RawFileContent, ViewMode } from '../types';
 
@@ -297,9 +288,8 @@ const LogControls = ({
                                 placeholder={__('Export as...', 'debug-suite')}
                                 className="w-[150px]"
                             />
-                            <Button onClick={handleClear} variant="danger" disabled={clearing} className="shrink-0">
-                                <TrashIcon className="h-4 w-4" />
-                                <span className="ml-2 hidden md:inline">{__('Clear', 'debug-suite')}</span>
+                            <Button onClick={handleClear} variant="danger" disabled={clearing} className="shrink-0 p-2">
+                                <Trash2 className="h-4 w-4" />
                             </Button>
                         </div>
                     </div>

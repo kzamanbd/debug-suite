@@ -9,8 +9,19 @@ import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon, ClipboardIcon, RefreshCwIcon } from 'lucide-react';
-import { levelColors, levelIcons } from '../constants';
+import {
+    Bug,
+    CheckIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    ClipboardIcon,
+    Info,
+    OctagonAlert,
+    RefreshCwIcon,
+    TriangleAlert
+} from 'lucide-react';
+import type { ReactNode } from 'react';
+import { levelColors } from '../constants';
 import type { InfiniteScrollState, LogEntry, LogFilters } from '../types';
 
 interface LogViewerProps {
@@ -22,6 +33,15 @@ interface LogViewerProps {
 
     onFiltersChange: (newFilters: Partial<LogFilters>) => void;
 }
+
+const levelIcons: Record<string, ReactNode> = {
+    critical: <TriangleAlert className="size-3" />,
+    error: <TriangleAlert className="size-3" />,
+    warning: <TriangleAlert className="size-3" />,
+    notice: <OctagonAlert className="size-3" />,
+    info: <Info className="size-3" />,
+    debug: <Bug className="size-3" />
+};
 
 const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onLoadMore }: LogViewerProps) => {
     const tableRef = useRef<HTMLTableElement>(null);
@@ -48,17 +68,17 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                 <table ref={tableRef} className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="w-40 px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                            <th className="w-40 px-2 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                                 {__('Date/Time', 'debug-suite')}
                             </th>
-                            <th className="w-24 px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                            <th className="w-24 px-2 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                                 {__('Severity', 'debug-suite')}
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                            <th className="px-2 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                                 {__('Message', 'debug-suite')}
                             </th>
-                            <th className="w-12 px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                <div className="flex items-center gap-2">
+                            <th className="w-12 px-2 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                <div className="flex items-center justify-end gap-2">
                                     <span className="inline-flex cursor-pointer" onClick={toggleSortOrder}>
                                         {filters.sortOrder === 'asc' ? (
                                             <ChevronUpIcon className="h-4 w-4" />
@@ -107,55 +127,26 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                         open && 'bg-gray-50'
                                                     )}
                                                 >
-                                                    <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
+                                                    <td className="p-2 text-sm whitespace-nowrap text-gray-900">
                                                         <DateTimeHtml date={log.timestamp} />
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                    <td className="p-2 whitespace-nowrap">
                                                         <span
                                                             className={classNames(
-                                                                'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
+                                                                'inline-flex items-center rounded-full border px-2 py-px text-xs font-medium',
                                                                 levelColors[log.level] || levelColors.debug
                                                             )}
                                                         >
                                                             <span className="mr-1">
-                                                                {levelIcons[log.level] || '📝'}
+                                                                {levelIcons[log.level] || <Bug className="size-3" />}
                                                             </span>
                                                             {log.level.charAt(0).toUpperCase() + log.level.slice(1)}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-900">
+                                                    <td className="p-2 text-sm text-gray-900">
                                                         <div className="w-full text-left focus:outline-none">
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="line-clamp-3 flex-1 pr-4">
-                                                                    {log.message}
-                                                                </div>
-
-                                                                <div className="flex items-center gap-2">
-                                                                    {showDisclosure && (
-                                                                        <DisclosureButton className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
-                                                                            <span className="text-primary-600 text-xs">
-                                                                                {open ? hideText : showText}
-                                                                            </span>
-                                                                        </DisclosureButton>
-                                                                    )}
-                                                                    <div
-                                                                        role="button"
-                                                                        tabIndex={0}
-                                                                        onClick={(e) => {
-                                                                            e.preventDefault();
-                                                                            e.stopPropagation();
-                                                                            void handleCopy(log.message, index);
-                                                                        }}
-                                                                        className="hover:text-primary-600 text-gray-400 focus:outline-none"
-                                                                        title={__('Copy message', 'debug-suite')}
-                                                                    >
-                                                                        {copiedId === index ? (
-                                                                            <CheckIcon className="h-4 w-4 text-green-500" />
-                                                                        ) : (
-                                                                            <ClipboardIcon className="h-4 w-4" />
-                                                                        )}
-                                                                    </div>
-                                                                </div>
+                                                            <div className="line-clamp-3 flex-1 pr-4">
+                                                                {log.message}
                                                             </div>
                                                             {log.file_path && (
                                                                 <div className="mt-1 text-xs text-gray-500">
@@ -167,15 +158,43 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                             )}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-gray-500">
-                                                        {entryNumber}
+                                                    <td className="p-2 text-right text-sm whitespace-nowrap text-gray-500">
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <div className="flex items-center gap-2">
+                                                                {showDisclosure && (
+                                                                    <DisclosureButton className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
+                                                                        <span className="text-primary-600 text-xs">
+                                                                            {open ? hideText : showText}
+                                                                        </span>
+                                                                    </DisclosureButton>
+                                                                )}
+                                                                <div
+                                                                    role="button"
+                                                                    tabIndex={0}
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        e.stopPropagation();
+                                                                        void handleCopy(log.message, index);
+                                                                    }}
+                                                                    className="hover:text-primary-600 text-gray-400 focus:outline-none"
+                                                                    title={__('Copy message', 'debug-suite')}
+                                                                >
+                                                                    {copiedId === index ? (
+                                                                        <CheckIcon className="h-4 w-4 text-green-500" />
+                                                                    ) : (
+                                                                        <ClipboardIcon className="h-4 w-4" />
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <span>{entryNumber}</span>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 {showDisclosure && (
                                                     <DisclosurePanel as="tr">
                                                         <td
                                                             colSpan={4}
-                                                            className="border-t border-gray-100 bg-gray-50 px-6 py-4"
+                                                            className="border-t border-gray-100 bg-gray-50 p-2"
                                                         >
                                                             <div className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100">
                                                                 <pre className="font-mono text-xs whitespace-pre-wrap">
@@ -198,7 +217,7 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
 
                 {/* Load more section */}
                 {logs.length > 0 && (
-                    <div className="border-t border-gray-200 bg-white px-6 py-4">
+                    <div className="border-t border-gray-200 bg-white p-2">
                         {infiniteState.isLoadingMore ? (
                             <div className="flex items-center justify-center">
                                 <RefreshCwIcon className="mr-2 h-4 w-4 animate-spin" />
