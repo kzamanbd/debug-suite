@@ -1,7 +1,7 @@
 === Debug Suite ===
 Contributors: kzamanbd
 Donate link: https://kzaman.me/plugins/debug-suite/
-Tags: debug, development, tools, debugging, wordpress, error-log, php-debug, wp-debug, developer-tools
+Tags: debug, development, debugging, error-log, developer-tools
 Requires at least: 5.7
 Tested up to: 6.8
 Requires PHP: 8.2
