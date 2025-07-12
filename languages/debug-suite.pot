@@ -8,15 +8,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-12T17:38:00+00:00\n"
+"POT-Creation-Date: 2025-07-12T17:41:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: debug-suite\n"
 
 #. Plugin Name of the plugin
 #: debug-suite.php
-#: build/debug-suite/includes/Admin.php:126
-#: build/debug-suite/includes/Admin.php:127
 #: includes/Admin.php:126
 #: includes/Admin.php:127
 msgid "Debug Suite"
@@ -42,1296 +40,1031 @@ msgstr ""
 msgid "https://kzaman.me/plugins/debug-suite/"
 msgstr ""
 
-#: build/debug-suite/includes/Admin.php:53
+#: debug-suite.php:40
+msgid "Missing Dependencies Detected [Debug Suite Plugin]"
+msgstr ""
+
 #: includes/Admin.php:53
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Overview"
 msgstr ""
 
-#: build/debug-suite/includes/Admin.php:57
 #: includes/Admin.php:57
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Debug Log"
 msgstr ""
 
-#: build/debug-suite/includes/Admin.php:61
 #: includes/Admin.php:61
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "File Manager"
 msgstr ""
 
-#: build/debug-suite/includes/Admin.php:65
 #: includes/Admin.php:65
 msgid "Configuration"
 msgstr ""
 
-#: build/debug-suite/includes/Admin.php:158
 #: includes/Admin.php:158
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: build/debug-suite/includes/API/FileLogsController.php:123
 #: includes/API/FileLogsController.php:123
 msgid "Log file path. If not provided, uses the current debug log file."
 msgstr ""
 
-#: build/debug-suite/includes/API/FileLogsController.php:176
-#: build/debug-suite/includes/Services/DebugLog/WPLogReaderService.php:700
 #: includes/API/FileLogsController.php:176
 #: includes/Services/DebugLog/WPLogReaderService.php:700
 msgid "Log file cleared successfully."
 msgstr ""
 
-#: build/debug-suite/includes/API/FileManagerController.php:117
 #: includes/API/FileManagerController.php:117
 msgid "File saved successfully."
 msgstr ""
 
-#: build/debug-suite/includes/API/RestController.php:42
 #: includes/API/RestController.php:42
 msgid "You do not have permission to access this endpoint."
 msgstr ""
 
-#: build/debug-suite/includes/API/SettingsController.php:52
 #: includes/API/SettingsController.php:52
 msgid "Enable or disable WP_DEBUG."
 msgstr ""
 
-#: build/debug-suite/includes/API/SettingsController.php:57
 #: includes/API/SettingsController.php:57
 msgid "Enable or disable WP_DEBUG_LOG."
 msgstr ""
 
-#: build/debug-suite/includes/API/SettingsController.php:62
 #: includes/API/SettingsController.php:62
 msgid "Enable or disable WP_DEBUG_DISPLAY."
 msgstr ""
 
-#: build/debug-suite/includes/API/SettingsController.php:67
 #: includes/API/SettingsController.php:67
 msgid "Mark onboarding as completed."
 msgstr ""
 
-#: build/debug-suite/includes/API/SettingsController.php:115
 #: includes/API/SettingsController.php:115
 msgid "Invalid parameters provided."
 msgstr ""
 
-#: build/debug-suite/includes/API/SettingsController.php:145
 #: includes/API/SettingsController.php:145
 msgid "Settings updated successfully."
 msgstr ""
 
-#: build/debug-suite/includes/API/SettingsController.php:158
 #: includes/API/SettingsController.php:158
 msgid "Settings reset to defaults successfully."
 msgstr ""
 
-#: build/debug-suite/includes/API/SettingsController.php:171
 #: includes/API/SettingsController.php:171
 msgid "Full view request processed successfully."
 msgstr ""
 
-#: build/debug-suite/includes/Core/Plugin.php:33
 #: includes/Core/Plugin.php:33
 msgid "Settings"
 msgstr ""
 
-#: build/debug-suite/includes/Services/DebugLog/FileLogsService.php:106
 #: includes/Services/DebugLog/FileLogsService.php:106
 msgid "No log file path provided or configured."
 msgstr ""
 
-#: build/debug-suite/includes/Services/DebugLog/FileLogsService.php:114
 #: includes/Services/DebugLog/FileLogsService.php:114
 msgid "The requested log file was not found."
 msgstr ""
 
-#: build/debug-suite/includes/Services/DebugLog/FileLogsService.php:123
 #: includes/Services/DebugLog/FileLogsService.php:123
 msgid "Access to this file is not allowed."
 msgstr ""
 
-#: build/debug-suite/includes/Services/DebugLog/FileLogsService.php:145
 #: includes/Services/DebugLog/FileLogsService.php:145
 msgid "Failed to read the log file."
 msgstr ""
 
-#: build/debug-suite/includes/Services/DebugLog/WPLogReaderService.php:104
-#: build/debug-suite/includes/Services/DebugLog/WPLogReaderService.php:624
 #: includes/Services/DebugLog/WPLogReaderService.php:104
 #: includes/Services/DebugLog/WPLogReaderService.php:624
 msgid "Log file not found."
 msgstr ""
 
-#: build/debug-suite/includes/Services/DebugLog/WPLogReaderService.php:112
 #: includes/Services/DebugLog/WPLogReaderService.php:112
 msgid "Log file is not readable."
 msgstr ""
 
-#: build/debug-suite/includes/Services/DebugLog/WPLogReaderService.php:122
 #: includes/Services/DebugLog/WPLogReaderService.php:122
 msgid "Failed to read log file."
 msgstr ""
 
 #. translators: %s is the error message.
-#: build/debug-suite/includes/Services/DebugLog/WPLogReaderService.php:162
 #: includes/Services/DebugLog/WPLogReaderService.php:162
 msgid "Error reading log file: %s"
 msgstr ""
 
-#: build/debug-suite/includes/Services/DebugLog/WPLogReaderService.php:684
 #: includes/Services/DebugLog/WPLogReaderService.php:684
 msgid "Log file does not exist."
 msgstr ""
 
-#: build/debug-suite/includes/Services/DebugLog/WPLogReaderService.php:693
 #: includes/Services/DebugLog/WPLogReaderService.php:693
 msgid "Failed to clear log file."
 msgstr ""
 
-#: build/debug-suite/includes/Services/FileManagerService.php:133
-#: build/debug-suite/includes/Services/FileManagerService.php:179
-#: build/debug-suite/includes/Services/FileManagerService.php:220
 #: includes/Services/FileManagerService.php:133
 #: includes/Services/FileManagerService.php:179
 #: includes/Services/FileManagerService.php:220
 msgid "Invalid path provided."
 msgstr ""
 
-#: build/debug-suite/includes/Services/FileManagerService.php:137
 #: includes/Services/FileManagerService.php:137
 msgid "Directory not found."
 msgstr ""
 
-#: build/debug-suite/includes/Services/FileManagerService.php:183
 #: includes/Services/FileManagerService.php:183
 msgid "File not found."
 msgstr ""
 
-#: build/debug-suite/includes/Services/FileManagerService.php:187
 #: includes/Services/FileManagerService.php:187
 msgid "Path is not a file."
 msgstr ""
 
-#: build/debug-suite/includes/Services/FileManagerService.php:191
 #: includes/Services/FileManagerService.php:191
 msgid "File is not readable."
 msgstr ""
 
-#: build/debug-suite/includes/Services/FileManagerService.php:224
 #: includes/Services/FileManagerService.php:224
 msgid "File is not writable."
 msgstr ""
 
-#: build/debug-suite/includes/Services/FileManagerService.php:239
 #: includes/Services/FileManagerService.php:239
 msgid "Failed to save file."
 msgstr ""
 
-#: build/debug-suite/includes/Services/FileManagerService.php:319
 #: includes/Services/FileManagerService.php:319
 msgid "File does not exist for backup."
 msgstr ""
 
-#: build/debug-suite/includes/Services/FileManagerService.php:326
 #: includes/Services/FileManagerService.php:326
 msgid "Failed to create backup."
 msgstr ""
 
-#: build/debug-suite/includes/Services/OverviewService.php:56
 #: includes/Services/OverviewService.php:56
 msgid "Failed to retrieve log statistics."
 msgstr ""
 
-#: build/debug-suite/includes/Services/OverviewService.php:104
 #: includes/Services/OverviewService.php:104
 msgid "Not defined"
 msgstr ""
 
-#: build/debug-suite/includes/Services/SettingsService.php:59
 #: includes/Services/SettingsService.php:59
 msgid "No settings provided."
 msgstr ""
 
-#: build/debug-suite/includes/Services/SettingsService.php:63
-#: build/debug-suite/includes/Services/SettingsService.php:112
 #: includes/Services/SettingsService.php:63
 #: includes/Services/SettingsService.php:112
 msgid "wp-config.php file not found."
 msgstr ""
 
-#: build/debug-suite/includes/Services/SettingsService.php:67
 #: includes/Services/SettingsService.php:67
 msgid "wp-config.php file is not writable."
 msgstr ""
 
 #. translators: %s is the unsupported setting key.
-#: build/debug-suite/includes/Services/SettingsService.php:75
 #: includes/Services/SettingsService.php:75
 msgid "Unsupported setting: %s"
 msgstr ""
 
 #. translators: %s is the setting key that has an invalid value.
-#: build/debug-suite/includes/Services/SettingsService.php:83
 #: includes/Services/SettingsService.php:83
 msgid "Invalid value for %s. Must be \"true\" or \"false\"."
 msgstr ""
 
-#: build/debug-suite/includes/Services/SettingsService.php:92
-#: build/debug-suite/includes/Services/SettingsService.php:117
 #: includes/Services/SettingsService.php:92
 #: includes/Services/SettingsService.php:117
 msgid "Failed to read wp-config.php file."
 msgstr ""
 
-#: build/debug-suite/includes/Services/SettingsService.php:99
 #: includes/Services/SettingsService.php:99
 msgid "Failed to write wp-config.php file."
 msgstr ""
 
-#: debug-suite.php:40
-msgid "Missing Dependencies Detected [Debug Suite Plugin]"
-msgstr ""
-
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Ok"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Cancel"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Minimize"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Maximize"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Setting updated successfully!"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Failed to update setting."
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Loading debug settings..."
 msgstr ""
 
 #: assets/js/debug-suite.js:1
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Debug Mode"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "PHP notices and warnings tracked"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Enable to show PHP errors"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Error Logging"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Errors saved to debug.log"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Enable to log errors to file"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Error Display"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "⚠️ Errors visible to visitors"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Errors hidden from visitors"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Quick Actions"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Development"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Debug + Log"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Production"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Disable all"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Saving..."
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "All Levels"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Critical"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Error"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Warning"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Notice"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Info"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Debug"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "100 items"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "250 items"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "500 items"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "1000 items"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Sort by Date"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Sort by Level"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Ok, Clear"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Select a log file"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Parsed"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Raw File"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Are you sure you want to clear all log entries? This action cannot be undone."
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Showing:"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "filtered"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Total entries:"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Search in log..."
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: build/debug-suite/assets/js/debug-suite.js:1
 msgid "Clear search"
 msgstr ""
 
 #. translators: %1$s: date, %2$s: time
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "%1$s at %2$s"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Date/Time"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Severity"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Message"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "#"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Loading logs..."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "No log entries found matching your criteria."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Show Dump"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Show Trace"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Hide Dump"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Hide Trace"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Copy message"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Loading more entries..."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Load More Entries"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "All entries loaded"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Loading editor…"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Loading..."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Modified:"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "No file content available."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Retry"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Name"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Size"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Last Modified"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Actions"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Loading file details..."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "An error occurred while loading the file."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Loading file editor…"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "An error occurred while saving the file."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Save"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Loading file tree..."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Search Files & Folders"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Create new folder"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "New Folder"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Upload files"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Upload Files"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "root"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "items"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "You have selected"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "users."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Delete"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "them?"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Processing..."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Clear Selected"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Download Selected"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Archive Selected"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Back to Overview"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "View Logs"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Selected:"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "of"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "files"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Log File"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Path"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Entries"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "View"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Download"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Log Management Settings"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Archive logs older than"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "7 days"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "30 days"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "90 days"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Max Log File Size"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "MB"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Automatically rotate logs when they exceed this size."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Log Retention"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "60 days"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "180 days"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "1 year"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "How long to keep log files before permanent deletion."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Save Settings"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "404 – Page Not Found"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Sorry, the page you are looking for does not exist or has been moved."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Go to Dashboard"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Welcome"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Get started with Debug Suite"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Configure error reporting"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Set up logging"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Failed to check onboarding status."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Loading Debug Suite..."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Welcome to Debug Suite!"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Debug Suite helps you monitor and troubleshoot your WordPress site effectively. Let's set up your debugging environment with a few simple steps."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Error Monitoring"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Track and resolve issues quickly"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Real-time Logs"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Monitor your site in real-time"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Log Management"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Organize log data"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Configure Debug Mode"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "WordPress Debug Mode provides detailed error reporting to help you identify and fix issues."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Enable Debug Mode"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Show detailed error messages and warnings"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Production Warning"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Debug mode will display detailed error messages. While helpful during development, it's recommended to disable this in production."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Display Errors"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Show errors directly on the screen"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Displaying errors on screen can expose sensitive information. Consider using debug logging instead for production environments."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Debug Log Setup"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Configure debug logging to save error messages and warnings to a log file for later review."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Enable Debug Log"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Save debug messages to a log file for analysis"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Why Enable Debug Logging?"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Track errors without displaying them publicly"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Maintain detailed error history"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Safe for production environments"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Easy to analyze"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Previous"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Step"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Settings saved successfully!"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Failed to save settings."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Finish Setup"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Next"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Dashboard data refreshed"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Failed to load dashboard data"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Refresh"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Total Log Entries"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Recent Errors (24h)"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Log File Size"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Debug Status"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Active"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Inactive"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "System Configuration"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "WP Debug"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Enabled"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Disabled"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "WP Debug Log"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "WP Debug Display"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "PHP Version"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "WordPress Version"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Top Recent Errors"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "View All"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Count:"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "No recent errors found"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Top 5 Slowest Queries"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "calls"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Source:"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "total time"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "No slow queries detected"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "View Debug Logs"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Debug Settings"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Documentation"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Getting Started Guide"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Learn the basics of Debug Suite"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Best Practices"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "WordPress debugging tips and tricks"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Performance Optimization"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Speed up your WordPress site"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Support & Community"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Community Forum"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Get help from the community"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Report Bug"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Found an issue? Let us know"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Feature Request"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Suggest new features"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Unable to load dashboard"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "There was an error loading the dashboard data. Please refresh the page."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Debug Config"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Welcome! Let's set up your WordPress debugging environment in just a few steps."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Monitor your WordPress debug activity and system performance."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "View and manage your debug logs."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Manage files and directories on your server."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Manage File Logs"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-#: build/debug-suite/assets/js/debug-suite.js:4
 msgid "Manage your application's log files - clear, download, or archive them."
 msgstr ""

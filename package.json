@@ -18,7 +18,7 @@
         "version": "node bin/version.js",
         "zip": "node bin/zip.js",
         "release": "pnpm build && pnpm make:pot && npm run zip",
-        "release:prod": "npm run version && npm run release"
+        "release:org": "npm run version && npm run release"
     },
     "author": "kamruzzaman",
     "license": "MIT",
