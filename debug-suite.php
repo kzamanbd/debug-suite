@@ -139,8 +139,6 @@ final class DebugSuite {
 		$this->service_manager = new ServiceManager( $this->container );
 
 		// Enable enhanced container features
-		$container_debug_mode = get_option( 'debug_suite_container_debug_mode', false );
-		$this->container->set_debug_mode( $container_debug_mode );
 		$this->container->set_autowiring( true );
 
 		// Register the container and service manager as singletons

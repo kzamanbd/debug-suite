@@ -247,18 +247,7 @@ class FileManagerServiceTest extends TestCase {
 		$base_path = $property->getValue($this->service);
 		$this->assertNotEmpty($base_path, 'Base path is empty');
 		
-		// For debugging
-		error_log('Test directory: ' . $this->test_dir);
-		error_log('Service base path: ' . $base_path);
-		error_log('New file path: ' . $new_file_path);
-		
 		$result = $this->service->save_file_contents($new_file, $content);
-		
-		// If the test fails, output detailed error information
-		if ($result->is_failure()) {
-			error_log('Error code: ' . $result->get_error_code());
-			error_log('Error message: ' . $result->get_error_message());
-		}
 		
 		// Assert the result is successful
 		$this->assert_service_result_success($result, 'Failed to save new file: ' . ($result->get_error_message() ?? 'No error message'));

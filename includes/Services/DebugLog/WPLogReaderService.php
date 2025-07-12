@@ -57,19 +57,11 @@ class WPLogReaderService implements ServiceInterface {
 	private int $buffer_size;
 
 	/**
-	 * Debug mode flag.
-	 *
-	 * @var bool
-	 */
-	private bool $debug_mode;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->log_file_path = ini_get( 'error_log' );
 		$this->buffer_size = 1024;
-		$this->debug_mode = false;
 	}
 
 	/**

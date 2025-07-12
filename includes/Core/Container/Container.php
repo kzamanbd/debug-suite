@@ -150,14 +150,7 @@ class Container implements ContainerInterface {
 	 */
 	private array $interface_bindings = [];
 
-	/**
-	 * Debug mode flag for enhanced logging.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var bool
-	 */
-	private bool $debug_mode = false;
+
 
 	/**
 	 * Container compilation state for performance optimization.
@@ -260,10 +253,6 @@ class Container implements ContainerInterface {
 		// Remove any existing instance if rebinding
 		if ( isset( $this->instances[ $id ] ) ) {
 			unset( $this->instances[ $id ] );
-		}
-
-		if ( $this->debug_mode ) {
-			error_log( "Debug Suite Container: Set definition for service [$id]." );
 		}
 	}
 
@@ -376,11 +365,6 @@ class Container implements ContainerInterface {
 		// Remove any existing instance if rebinding
 		if ( isset( $this->instances[ $name ] ) ) {
 			unset( $this->instances[ $name ] );
-		}
-
-		if ( $this->debug_mode ) {
-			$type = $singleton ? 'singleton' : 'transient';
-			error_log( "Debug Suite Container: Bound [$name] as [$type] service." );
 		}
 	}
 
@@ -510,11 +494,6 @@ class Container implements ContainerInterface {
 
 		$key = $success ? 'success' : 'failure';
 		$this->resolution_stats[ $service ][ $key ][] = $time;
-
-		if ( $this->debug_mode ) {
-			$status = $success ? 'successfully resolved' : 'failed to resolve';
-			error_log( "Container: $status '$service' in " . ( $time * 1000 ) . 'ms' );
-		}
 	}
 
 	/**
@@ -578,10 +557,6 @@ class Container implements ContainerInterface {
 
 			$this->resolution_stats[ $service ]['success'][] = $time;
 
-			if ( $this->debug_mode ) {
-				error_log( "Container: Successfully resolved '$service' in " . ( $time * 1000 ) . 'ms' );
-			}
-
 			return $result;
 		} catch ( Throwable $e ) {
 			$time = microtime( true ) - $start;
@@ -594,10 +569,6 @@ class Container implements ContainerInterface {
 			}
 
 			$this->resolution_stats[ $service ]['failure'][] = $time;
-
-			if ( $this->debug_mode ) {
-				error_log( "Container: Failed to resolve '$service' in " . ( $time * 1000 ) . 'ms: ' . $e->getMessage() );
-			}
 
 			throw $e;
 		}
@@ -1143,10 +1114,6 @@ class Container implements ContainerInterface {
 
 		// Mark as compiled
 		$this->compiled = true;
-
-		if ( $this->debug_mode ) {
-			error_log( 'Debug Suite Container: Compiled with ' . count( $this->reflection_cache ) . ' cached reflections.' );
-		}
 	}
 
 	/**
@@ -1158,30 +1125,6 @@ class Container implements ContainerInterface {
 	 */
 	public function is_compiled(): bool {
 		return $this->compiled;
-	}
-
-	/**
-	 * Enable or disable debug mode.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param bool $enabled Whether debug mode is enabled.
-	 *
-	 * @return void
-	 */
-	public function set_debug_mode( bool $enabled ): void {
-		$this->debug_mode = $enabled;
-	}
-
-	/**
-	 * Check if debug mode is enabled.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool True if debug mode is enabled, false otherwise.
-	 */
-	public function is_debug_mode(): bool {
-		return $this->debug_mode;
 	}
 
 	/**
@@ -1205,10 +1148,6 @@ class Container implements ContainerInterface {
 		}
 
 		$this->interface_bindings[ $b_interface ] = $implementation;
-
-		if ( $this->debug_mode ) {
-			error_log( "Debug Suite Container: Bound interface [$b_interface] to implementation [$implementation]." );
-		}
 	}
 
 	/**
@@ -1226,10 +1165,6 @@ class Container implements ContainerInterface {
 	public function alias( string $alias, string $service ): void {
 		$this->ensure_not_compiled();
 		$this->aliases[ $alias ] = $service;
-
-		if ( $this->debug_mode ) {
-			error_log( "Debug Suite Container: Created alias [$alias] for service [$service]." );
-		}
 	}
 
 	/**
@@ -1310,7 +1245,6 @@ class Container implements ContainerInterface {
 			'cache_hits'         => $cache_hits,
 			'services_resolved'  => count( $this->resolution_stats ),
 			'is_compiled'        => $this->compiled,
-			'debug_mode'         => $this->debug_mode,
 			'detailed_stats'     => $this->resolution_stats,
 		];
 	}
@@ -1326,10 +1260,6 @@ class Container implements ContainerInterface {
 		$this->resolution_stats  = [];
 		$this->reflection_cache  = [];
 		$this->constructor_cache = [];
-
-		if ( $this->debug_mode ) {
-			error_log( 'Debug Suite Container: Performance data cleared.' );
-		}
 	}
 
 	/**
