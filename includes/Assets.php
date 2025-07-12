@@ -1,6 +1,6 @@
 <?php
 
-namespace DebugSuite\Core;
+namespace DebugSuite;
 
 use DebugSuite\Interfaces\Hookable;
 

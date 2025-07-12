@@ -200,7 +200,7 @@ const FileContentEditor = () => {
 ### Modal Integration
 
 ```tsx
-import Modal from '@/components/ui/modal';
+import Modal from '@/components/base/modal';
 
 const EditorModal = ({ open, onClose, file }) => (
     <Modal open={open} onClose={onClose}>

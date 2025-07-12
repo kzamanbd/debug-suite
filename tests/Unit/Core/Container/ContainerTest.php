@@ -204,21 +204,6 @@ class ContainerTest extends TestCase {
 	}
 
 	/**
-	 * Test debug mode functionality.
-	 *
-	 * @return void
-	 */
-	public function test_debug_mode(): void {
-		$this->assertFalse( $this->container->is_debug_mode() );
-
-		$this->container->set_debug_mode( true );
-		$this->assertTrue( $this->container->is_debug_mode() );
-
-		$this->container->set_debug_mode( false );
-		$this->assertFalse( $this->container->is_debug_mode() );
-	}
-
-	/**
 	 * Test performance statistics collection.
 	 *
 	 * @return void

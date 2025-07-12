@@ -3,7 +3,7 @@ function activeMenuLink(slug: string): void {
     if (!menuRoot) return;
 
     const currentUrl = window.location.href;
-    const currentPath = currentUrl.substring(currentUrl.indexOf('admin.php'));
+    const currentPath = currentUrl.substring(currentUrl.indexOf('admin.php')).replace('#/', '#');
 
     // Click handler for menu links
     const handleClick = (event: MouseEvent) => {

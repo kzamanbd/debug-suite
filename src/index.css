@@ -82,7 +82,10 @@
 .debug-suite-root-app input {
     height: auto !important;
 }
-
+.debug-suite-root-app.modal-root {
+    z-index: 99999 !important;
+    position: relative !important;
+}
 div[data-headlessui-state='open'][role='dialog'] {
     z-index: 99999 !important;
 }

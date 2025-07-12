@@ -116,22 +116,6 @@ class FileLogsServiceTest extends TestCase {
 	}
 
 	/**
-	 * Test export_logs delegates to WPLogReaderService.
-	 */
-	public function test_export_logs_delegates_to_reader(): void {
-		$options = [ 'format' => 'json' ];
-		$expected_response = ServiceResponse::success( [ 'content' => '{}' ] );
-
-		$this->log_reader->expects( $this->once() )
-			->method( 'export_logs' )
-			->with( $options )
-			->willReturn( $expected_response );
-
-		$result = $this->service->export_logs( $options );
-		$this->assertSame( $expected_response, $result );
-	}
-
-	/**
 	 * Test supported_log_files delegates to LogFileDiscoveryService.
 	 */
 	public function test_supported_log_files_delegates_to_discovery(): void {

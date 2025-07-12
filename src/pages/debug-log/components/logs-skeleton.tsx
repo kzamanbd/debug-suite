@@ -17,16 +17,13 @@ const skeleton = (extra = '') => classNames('bg-gray-200 dark:bg-gray-700 animat
 const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Element => {
     return (
         <div className={classNames('space-y-6', className)}>
-            {/* Header skeleton */}
-            <div className={skeleton('mb-4 h-5 w-80')}></div>
-            {/* Action buttons skeleton */}
-            <div className="mb-8 flex flex-wrap gap-4">
-                <div className={skeleton('h-10 w-32')}></div>
-                <div className={skeleton('h-10 w-36')}></div>
-            </div>
             {/* Filter and controls skeleton */}
-            <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                <div className={skeleton('h-6 w-48')}></div>
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                {/* Action buttons skeleton */}
+                <div className="flex flex-wrap gap-4">
+                    <div className={skeleton('h-10 w-32')}></div>
+                    <div className={skeleton('h-10 w-36')}></div>
+                </div>
                 <div className="flex items-center gap-3">
                     <div className={skeleton('h-10 w-32')}></div>
                     <div className={skeleton('h-10 w-24')}></div>

@@ -6,7 +6,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Admin;
+namespace DebugSuite;
 
 use DebugSuite\Interfaces\Hookable;
 use WP_Roles;
@@ -132,11 +132,12 @@ class Admin implements Hookable {
 			$position
 		);
 
-		foreach ( $this->get_menu_items() as $sub_menu ) {
+		foreach ( $this->get_menu_items() as $menu ) {
+			$path = str_replace( '#/', '#', 'admin.php?page=' . $slug . '#' . $menu['path'], );
 			$submenu[ $slug ][] = [
-				$sub_menu['title'],
+				$menu['title'],
 				$capability,
-				'admin.php?page=' . $slug . '#' . $sub_menu['path'],
+				$path,
 			];
 		}
 	}

@@ -3,23 +3,15 @@
  *
  * @since 1.0.0
  */
-import { useDebounce } from '@/utils/use-debounce';
+import type { Option } from '@/components/base/select';
+import { useDebounce } from '@/hooks/use-debounce';
 import apiFetch from '@wordpress/api-fetch';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
-import type {
-    InfiniteScrollState,
-    LogEntry,
-    LogFile,
-    LogFilters,
-    LogResponse,
-    LogStats,
-    RawFileContent
-} from './types';
+import type { InfiniteScrollState, LogEntry, LogFile, LogFilters, LogResponse, RawFileContent } from './types';
 
 export const useLogFiles = () => {
     const [logFiles, setLogFiles] = useState<LogFile[]>([]);
-    const [selectedFile, setSelectedFile] = useState<string>('');
     const [loading, setLoading] = useState(true);
 
     const fetchLogFiles = async () => {
@@ -29,7 +21,6 @@ export const useLogFiles = () => {
                 path: '/debug-suite/v1/logs/supported-files'
             });
             setLogFiles(response.files);
-            setSelectedFile(response.files[0].path);
         } catch (error) {
             console.error('Error fetching log files:', error);
         } finally {
@@ -42,7 +33,7 @@ export const useLogFiles = () => {
         void fetchLogFiles();
     }, []);
 
-    return { logFiles, selectedFile, setSelectedFile, loading, refetch: fetchLogFiles };
+    return { logFiles, loading, refetch: fetchLogFiles };
 };
 
 /**
@@ -106,6 +97,7 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
 export const useLogEntries = () => {
     const [allLogs, setAllLogs] = useState<LogEntry[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedFile, setSelectedFile] = useState<Option | null>(null);
     const [filters, setFilters] = useState<LogFilters>({
         level: '',
         search: '',
@@ -113,6 +105,13 @@ export const useLogEntries = () => {
         sortOrder: 'desc',
         perPage: 100
     });
+
+    const onFileChange = (file: Option | null) => {
+        if (!file) {
+            return;
+        }
+        setSelectedFile(file);
+    };
 
     // Debounce search input to improve performance
     const debouncedSearch = useDebounce(filters.search, 300);
@@ -124,7 +123,7 @@ export const useLogEntries = () => {
 
             // Fetch all logs with a high limit to get everything
             const apiPath = addQueryArgs('/debug-suite/v1/logs', {
-                per_page: 100,
+                per_page: filters.perPage,
                 page: 1
             });
 
@@ -139,7 +138,7 @@ export const useLogEntries = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [filters.perPage]);
 
     // Apply client-side filtering and pagination with debounced search
     const filteredLogs = useMemo(() => {
@@ -213,34 +212,10 @@ export const useLogEntries = () => {
         filters,
         updateFilters,
         loadMore,
-        refetch
+        refetch,
+        selectedFile,
+        onFileChange
     };
-};
-
-export const useLogStats = () => {
-    const [stats, setStats] = useState<LogStats | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    const fetchStats = async () => {
-        try {
-            setLoading(true);
-            const response = await apiFetch<LogStats>({
-                path: '/debug-suite/v1/logs/stats'
-            });
-            setStats(response);
-        } catch (error) {
-            console.error('Error fetching stats:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Fetch stats on component mount
-    useEffect(() => {
-        void fetchStats();
-    }, []);
-
-    return { stats, loading, refetch: fetchStats };
 };
 
 export const useLogActions = () => {
@@ -261,40 +236,7 @@ export const useLogActions = () => {
         }
     };
 
-    const exportLogs = async (format: 'json' | 'csv' | 'txt') => {
-        try {
-            const apiPath = addQueryArgs('/debug-suite/v1/logs/export', {
-                format,
-                limit: 1000
-            });
-
-            const response = await apiFetch<{
-                data: string;
-                filename: string;
-                format: string;
-            }>({
-                path: apiPath
-            });
-
-            // Create download
-            const blob = new Blob([response.data], {
-                type: format === 'json' ? 'application/json' : 'text/plain'
-            });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = response.filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error('Error exporting logs:', error);
-            throw error;
-        }
-    };
-
-    return { clearLogs, exportLogs, clearing };
+    return { clearLogs, clearing };
 };
 
 export const useRawFileContent = (filePath?: string) => {
@@ -323,10 +265,9 @@ export const useRawFileContent = (filePath?: string) => {
         }
     }, [filePath]);
 
-    // Refetch raw file content
-    const refetch = useCallback(() => {
+    useEffect(() => {
         void fetchRawContent();
-    }, [fetchRawContent]);
+    }, [filePath, fetchRawContent]);
 
-    return { content, loading, refetch };
+    return { content, loading, refetch: fetchRawContent };
 };

@@ -110,31 +110,6 @@ class FileLogsController extends RestController {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/export',
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'export_logs' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
-				'args'                => [
-					'format' => [
-						'type'              => 'string',
-						'default'           => 'json',
-						'enum'              => [ 'json', 'csv', 'txt' ],
-						'sanitize_callback' => 'sanitize_text_field',
-					],
-					'limit' => [
-						'type'              => 'integer',
-						'default'           => 100,
-						'minimum'           => 1,
-						'maximum'           => 1000,
-						'sanitize_callback' => 'absint',
-					],
-				],
-			]
-		);
-
-		register_rest_route(
-			$this->namespace,
 			'/' . $this->rest_base . '/raw',
 			[
 				'methods'             => WP_REST_Server::READABLE,
@@ -204,44 +179,6 @@ class FileLogsController extends RestController {
 	}
 
 
-
-	/**
-	 * Export logs in various formats.
-	 *
-	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response|WP_Error
-	 */
-	public function export_logs( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$options = [
-			'format' => $request->get_param( 'format' ) ?? 'json',
-			'limit'  => $request->get_param( 'limit' ) ?? 1000,
-		];
-
-		$result = $this->service->export_logs( $options );
-
-		if ( $result->is_failure() ) {
-			return new WP_Error(
-				$result->get_error_code(),
-				$result->get_error_message(),
-				[ 'status' => 500 ]
-			);
-		}
-
-		$data = $result->get_data();
-
-		// Set appropriate headers for download
-		$filename = 'debug-logs-' . gmdate( 'Y-m-d-H-i-s' ) . '.' . $data['format'];
-
-		return rest_ensure_response(
-			[
-				'success'  => true,
-				'data'     => $data['data'],
-				'format'   => $data['format'],
-				'count'    => $data['count'],
-				'filename' => $filename,
-			]
-		);
-	}
 
 	/**
 	 * Get available log files for sidebar navigation.

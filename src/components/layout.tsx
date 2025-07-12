@@ -1,5 +1,6 @@
 import type { DebugSuiteRoute } from '@/routing/routes';
 import { classNames } from '@/utils';
+import { Slot } from '@wordpress/components';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import ViewModeSwitcher from './view-mode-switcher';
@@ -17,13 +18,16 @@ const LayoutHeader = ({ route }: { route: DebugSuiteRoute }) => {
     return (
         <div className="mb-4 flex items-center justify-between">
             <div className="flex-1">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-wrap items-start justify-between gap-4">
                     {typeof route.title === 'string' ? (
                         <div className="text-2xl font-semibold text-gray-900 dark:text-white">{route.title}</div>
                     ) : (
                         route.title
                     )}
-                    <ViewModeSwitcher />
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Slot fillProps={{ route }} name="debug-suite-layout-header-right" />
+                        <ViewModeSwitcher />
+                    </div>
                 </div>
                 <div className="mt-2">
                     {typeof route.description === 'string' ? (

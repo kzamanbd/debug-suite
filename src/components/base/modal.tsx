@@ -15,7 +15,7 @@ export type ModalProps = {
 const Modal = ({ children, showXButton = true, className, open, fullScreen = false, onClose }: ModalProps) => {
     return (
         <Transition appear show={open} as={Fragment}>
-            <Dialog as="div" className="relative z-[99999]" onClose={onClose}>
+            <Dialog as="div" className="debug-suite-root-app modal-root" onClose={onClose}>
                 {/* Backdrop with fade transition */}
                 <TransitionChild
                     as={Fragment}

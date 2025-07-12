@@ -60,7 +60,7 @@ const Button = <T extends ElementType = 'button'>({
             data-size={size}
             data-variant={variant}
             className={classNames(
-                'flex cursor-pointer items-center justify-center gap-0.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-sm font-medium dark:border-gray-700',
+                'flex cursor-pointer items-center justify-center gap-1 rounded-md border border-gray-200 px-2.5 py-1.5 text-sm font-medium dark:border-gray-700',
                 variantClasses[variant],
                 sizeClasses[size],
                 className,
