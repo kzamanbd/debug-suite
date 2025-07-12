@@ -10,6 +10,8 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import type { InfiniteScrollState, LogEntry, LogFile, LogFilters, LogResponse, RawFileContent } from './types';
 
+const defaultPerPage = 50; // Default items per page
+
 export const useLogFiles = () => {
     const [logFiles, setLogFiles] = useState<LogFile[]>([]);
     const [loading, setLoading] = useState(true);
@@ -96,6 +98,7 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
 
 export const useLogEntries = () => {
     const [allLogs, setAllLogs] = useState<LogEntry[]>([]);
+    const [totalEntries, setTotalEntries] = useState(0);
     const [loading, setLoading] = useState(true);
     const [selectedFile, setSelectedFile] = useState<Option | null>(null);
     const [filters, setFilters] = useState<LogFilters>({
@@ -103,7 +106,14 @@ export const useLogEntries = () => {
         search: '',
         sortBy: 'timestamp',
         sortOrder: 'desc',
-        perPage: 100
+        perPage: defaultPerPage
+    });
+
+    // Infinite scroll state
+    const [infiniteState, setInfiniteState] = useState<InfiniteScrollState>({
+        page: 1,
+        hasMore: false,
+        isLoadingMore: false
     });
 
     const onFileChange = (file: Option | null) => {
@@ -116,31 +126,44 @@ export const useLogEntries = () => {
     // Debounce search input to improve performance
     const debouncedSearch = useDebounce(filters.search, 300);
 
-    // Fetch all logs without any server-side filtering
-    const fetchAllLogs = useCallback(async () => {
-        try {
-            setLoading(true);
+    // Fetch logs function
+    const fetchLogs = useCallback(
+        async (perPageOverride?: number) => {
+            try {
+                setLoading(true);
 
-            // Fetch all logs with a high limit to get everything
-            const apiPath = addQueryArgs('/debug-suite/v1/logs', {
-                per_page: filters.perPage,
-                page: 1
-            });
+                const currentPerPage = perPageOverride ?? filters.perPage;
+                const apiPath = addQueryArgs('/debug-suite/v1/logs', {
+                    per_page: currentPerPage,
+                    page: 1
+                });
 
-            const response = await apiFetch<LogResponse>({
-                path: apiPath
-            });
+                const response = await apiFetch<LogResponse>({
+                    path: apiPath
+                });
 
-            setAllLogs(response.entries);
-        } catch (error) {
-            console.error('Error fetching logs:', error);
-            setAllLogs([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [filters.perPage]);
+                setAllLogs(response.entries);
+                setTotalEntries(response.total);
 
-    // Apply client-side filtering and pagination with debounced search
+                // Update infinite scroll state
+                setInfiniteState((prev) => ({
+                    ...prev,
+                    hasMore: response.total > currentPerPage,
+                    isLoadingMore: false
+                }));
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+                setAllLogs([]);
+                setTotalEntries(0);
+                setInfiniteState((prev) => ({ ...prev, hasMore: false, isLoadingMore: false }));
+            } finally {
+                setLoading(false);
+            }
+        },
+        [filters.perPage]
+    );
+
+    // Apply client-side filtering with debounced search
     const filteredLogs = useMemo(() => {
         const filtersWithDebouncedSearch = {
             ...filters,
@@ -149,39 +172,16 @@ export const useLogEntries = () => {
         return filterLogEntries(allLogs, filtersWithDebouncedSearch);
     }, [allLogs, filters, debouncedSearch]);
 
-    // Paginated logs for display
-    const paginatedLogs = useMemo(() => {
-        const startIndex = 0;
-        const endIndex = filters.perPage;
-        return filteredLogs.slice(startIndex, endIndex);
-    }, [filteredLogs, filters.perPage]);
-
-    // Infinite scroll state for compatibility
-    const [infiniteState, setInfiniteState] = useState<InfiniteScrollState>({
-        page: 1,
-        hasMore: false,
-        isLoadingMore: false
-    });
-
-    // Update infinite scroll state based on pagination
-    useEffect(() => {
-        const hasMore = filteredLogs.length > filters.perPage;
-        setInfiniteState((prev) => ({
-            ...prev,
-            hasMore,
-            isLoadingMore: false
-        }));
-    }, [filteredLogs.length, filters.perPage]);
-
-    // Load more entries (increase perPage)
+    // Load more entries
     const loadMore = useCallback(() => {
-        if (filteredLogs.length > filters.perPage) {
-            setFilters((prev) => ({
-                ...prev,
-                perPage: prev.perPage + 100
-            }));
+        if (totalEntries > filters.perPage) {
+            setInfiniteState((prev) => ({ ...prev, isLoadingMore: true }));
+
+            const newPerPage = filters.perPage + defaultPerPage;
+            setFilters((prev) => ({ ...prev, perPage: newPerPage }));
+            void fetchLogs(newPerPage);
         }
-    }, [filteredLogs.length, filters.perPage]);
+    }, [totalEntries, filters.perPage, fetchLogs]);
 
     // Update filters
     const updateFilters = useCallback((newFilters: Partial<LogFilters>) => {
@@ -189,26 +189,26 @@ export const useLogEntries = () => {
             ...prev,
             ...newFilters,
             // Reset pagination when filters change (except perPage)
-            ...(Object.keys(newFilters).some((key) => key !== 'perPage') ? { perPage: 100 } : {})
+            ...(Object.keys(newFilters).some((key) => key !== 'perPage') ? { perPage: defaultPerPage } : {})
         }));
     }, []);
 
-    // Refetch all logs
+    // Refetch logs
     const refetch = useCallback(() => {
-        void fetchAllLogs();
-    }, [fetchAllLogs]);
+        void fetchLogs();
+    }, [fetchLogs]);
 
-    // Fetch all logs on component mount
+    // Initial fetch - runs only once on mount
     useEffect(() => {
-        void fetchAllLogs();
-    }, [fetchAllLogs]);
+        void fetchLogs(defaultPerPage);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return {
-        logs: paginatedLogs,
-        allLogs: filteredLogs,
+        logs: filteredLogs,
         loading,
         infiniteState,
-        totalEntries: filteredLogs.length,
+        totalEntries,
         filters,
         updateFilters,
         loadMore,
