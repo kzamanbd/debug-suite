@@ -13,6 +13,7 @@ namespace DebugSuite\Services\DebugLog;
 use DateTime;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
+use DebugSuite\Utils\FileSystem;
 use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -98,7 +99,7 @@ class WPLogReaderService implements ServiceInterface {
 	public function read_log_entries( array $options = [] ): ServiceResponse {
 		$log_file = $options['log_file'] ?? $this->log_file_path;
 
-		if ( ! file_exists( $log_file ) ) {
+		if ( ! FileSystem::exists( $log_file ) ) {
 			return ServiceResponse::failure(
 				__( 'Log file not found.', 'debug-suite' ),
 				'file_not_found',
@@ -106,7 +107,7 @@ class WPLogReaderService implements ServiceInterface {
 			);
 		}
 
-		if ( ! is_readable( $log_file ) ) {
+		if ( ! FileSystem::is_readable( $log_file ) ) {
 			return ServiceResponse::failure(
 				__( 'Log file is not readable.', 'debug-suite' ),
 				'file_not_readable',
@@ -115,8 +116,8 @@ class WPLogReaderService implements ServiceInterface {
 		}
 
 		try {
-			$lines = file( $log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
-			if ( false === $lines ) {
+			$content = FileSystem::get_contents( $log_file );
+			if ( false === $content ) {
 				return ServiceResponse::failure(
 					__( 'Failed to read log file.', 'debug-suite' ),
 					'read_error',
@@ -124,17 +125,24 @@ class WPLogReaderService implements ServiceInterface {
 				);
 			}
 
+			// Convert content to lines for processing
+			$lines = explode( "\n", $content );
+			$lines = array_filter( $lines, 'trim' ); // Remove empty lines
+
 			$entries = $this->parse_log_entries( $lines );
 			$filtered_entries = $this->filter_entries( $entries, $options );
 			$paginated_entries = $this->paginate_entries( $filtered_entries, $options );
+
+			$file_size = FileSystem::size( $log_file );
+			$last_modified = FileSystem::mtime( $log_file );
 
 			$stats = [
 				'total_entries'     => count( $entries ),
 				'filtered_entries'  => count( $filtered_entries ),
 				'returned_entries'  => count( $paginated_entries ),
-				'file_size'        => filesize( $log_file ),
-				'file_size_human'  => size_format( filesize( $log_file ) ),
-				'last_modified'    => filemtime( $log_file ),
+				'file_size'        => $file_size,
+				'file_size_human'  => FileSystem::format_size( $file_size ),
+				'last_modified'    => $last_modified,
 			];
 
 			return ServiceResponse::success(
@@ -142,7 +150,7 @@ class WPLogReaderService implements ServiceInterface {
 					'entries' => $paginated_entries,
 					'total'   => count( $filtered_entries ),
 					'file_path'    => $log_file,
-					'size'    => filesize( $log_file ),
+					'size'    => $file_size,
 					'labels'  => $this->get_log_levels(),
 					'stats'   => $stats,
 				]
@@ -611,7 +619,7 @@ class WPLogReaderService implements ServiceInterface {
 	public function get_log_statistics( ?string $log_file = null ): ServiceResponse {
 		$log_file = $log_file ?? $this->log_file_path;
 
-		if ( ! file_exists( $log_file ) ) {
+		if ( ! FileSystem::exists( $log_file ) ) {
 			return ServiceResponse::failure(
 				__( 'Log file not found.', 'debug-suite' ),
 				'file_not_found',
@@ -627,16 +635,18 @@ class WPLogReaderService implements ServiceInterface {
 		$data = $log_result->get_data();
 		$entries = $data['entries'];
 
-		$file_size = filesize( $log_file );
+		$file_size = FileSystem::size( $log_file );
+		$last_modified = FileSystem::mtime( $log_file );
+
 		$stats = [
 			'file_path'        => $log_file,
 			'file_size'        => $file_size,
-			'file_size_human'  => function_exists( 'size_format' ) ? size_format( $file_size ) : $this->format_bytes( $file_size ),
+			'file_size_human'  => FileSystem::format_size( $file_size ),
 			'total_entries'    => count( $entries ),
 			'entries_with_stack_traces' => 0,
 			'levels'           => [],
 			'recent_errors'    => 0,
-			'last_modified'    => filemtime( $log_file ),
+			'last_modified'    => $last_modified,
 		];
 
 		// Count entries by level and stack traces
@@ -668,7 +678,7 @@ class WPLogReaderService implements ServiceInterface {
 	public function clear_log_file( ?string $log_file = null ): ServiceResponse {
 		$log_file = $log_file ?? $this->log_file_path;
 
-		if ( ! file_exists( $log_file ) ) {
+		if ( ! FileSystem::exists( $log_file ) ) {
 			return ServiceResponse::success(
 				[
 					'message' => __( 'Log file does not exist.', 'debug-suite' ),
@@ -677,8 +687,8 @@ class WPLogReaderService implements ServiceInterface {
 			);
 		}
 
-		$result = file_put_contents( $log_file, '' );
-		if ( false === $result ) {
+		$result = FileSystem::put_contents( $log_file, '' );
+		if ( ! $result ) {
 			return ServiceResponse::failure(
 				__( 'Failed to clear log file.', 'debug-suite' ),
 				'clear_failed'

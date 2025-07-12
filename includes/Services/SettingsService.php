@@ -9,6 +9,7 @@ namespace DebugSuite\Services;
 
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
+use DebugSuite\Utils\FileSystem;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -58,11 +59,11 @@ class SettingsService implements ServiceInterface {
 			return ServiceResponse::failure( __( 'No settings provided.', 'debug-suite' ), 'empty_settings' );
 		}
 
-		if ( ! file_exists( $this->config_file_path ) ) {
+		if ( ! FileSystem::exists( $this->config_file_path ) ) {
 			return ServiceResponse::failure( __( 'wp-config.php file not found.', 'debug-suite' ), 'config_file_not_found' );
 		}
 
-		if ( ! is_writable( $this->config_file_path ) ) {
+		if ( ! FileSystem::is_writable( $this->config_file_path ) ) {
 			return ServiceResponse::failure( __( 'wp-config.php file is not writable.', 'debug-suite' ), 'config_file_not_writable' );
 		}
 
@@ -86,15 +87,15 @@ class SettingsService implements ServiceInterface {
 		}
 
 		// Read and update file
-		$content = file_get_contents( $this->config_file_path );
+		$content = FileSystem::get_contents( $this->config_file_path );
 		if ( $content === false ) {
 			return ServiceResponse::failure( __( 'Failed to read wp-config.php file.', 'debug-suite' ), 'file_read_error' );
 		}
 
 		$updated_content = $this->update_constants( $content, $settings );
 
-		$result = file_put_contents( $this->config_file_path, $updated_content );
-		if ( $result === false ) {
+		$result = FileSystem::put_contents( $this->config_file_path, $updated_content );
+		if ( ! $result ) {
 			return ServiceResponse::failure( __( 'Failed to write wp-config.php file.', 'debug-suite' ), 'file_write_error' );
 		}
 
@@ -107,11 +108,11 @@ class SettingsService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	public function get_settings(): ServiceResponse {
-		if ( ! file_exists( $this->config_file_path ) ) {
+		if ( ! FileSystem::exists( $this->config_file_path ) ) {
 			return ServiceResponse::failure( __( 'wp-config.php file not found.', 'debug-suite' ), 'config_file_not_found' );
 		}
 
-		$content = file_get_contents( $this->config_file_path );
+		$content = FileSystem::get_contents( $this->config_file_path );
 		if ( $content === false ) {
 			return ServiceResponse::failure( __( 'Failed to read wp-config.php file.', 'debug-suite' ), 'file_read_error' );
 		}
