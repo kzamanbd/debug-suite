@@ -11,14 +11,15 @@ import { useConfirm } from '@/hooks/use-confirm';
 import { classNames } from '@/utils';
 import { Fill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { DownloadIcon, EyeIcon, FileTextIcon, RefreshCwIcon, SearchIcon, Trash2, XIcon } from 'lucide-react';
+import { Copy, Download, EyeIcon, FileTextIcon, Filter, RefreshCw, SearchIcon, Trash2, XIcon } from 'lucide-react';
+import { useState } from 'react';
 import { levelOptions, perPageOptions, sortOptions } from '../constants';
 import type { LogFile, LogFilters, RawFileContent, ViewMode } from '../types';
 
 interface LogControlsProps {
     // File selection
     logFiles: LogFile[];
-    selectedFile: string;
+    selectedFile: Option | null;
     onFileChange: (file: Option | null) => void;
 
     // View mode
@@ -59,6 +60,7 @@ const LogControls = ({
     rawContent,
     loading = false
 }: LogControlsProps) => {
+    const [showFilters, setShowFilters] = useState(false);
     const confirm = useConfirm({
         type: 'confirm',
         showCancel: true,
@@ -72,19 +74,6 @@ const LogControls = ({
         label: file.name,
         ...file
     }));
-
-    const selectedLogFile = () => {
-        if (filesLoading) {
-            return { value: '', label: __('Loading...', 'debug-suite') };
-        }
-        if (!selectedFile || !logFiles.length) {
-            return null;
-        }
-        return {
-            value: selectedFile,
-            label: logFiles.find((f) => f.path === selectedFile)?.name || 'debug.log'
-        };
-    };
 
     const clearSearch = () => {
         onFiltersChange({ search: '' });
@@ -118,17 +107,9 @@ const LogControls = ({
         <>
             {/* Header with file selector */}
             <Fill name="debug-suite-layout-header-right">
-                {viewMode === 'raw' && rawContent && (
-                    <>
-                        <Button onClick={handleDownload}>
-                            <DownloadIcon className="size-4" />
-                            {__('Download', 'debug-suite')}
-                        </Button>
-                    </>
-                )}
                 <SearchableSelect
                     options={filteredLogFiles}
-                    value={selectedLogFile()}
+                    value={selectedFile}
                     onChange={onFileChange}
                     isDisabled={filesLoading}
                     className="w-56"
@@ -163,14 +144,103 @@ const LogControls = ({
                         <span className="hidden sm:inline">{__('Raw File', 'debug-suite')}</span>
                     </button>
                 </nav>
-                <Button onClick={onRefresh} disabled={loading}>
-                    <RefreshCwIcon className={classNames('size-4', loading && 'animate-spin')} />
-                    <span className="hidden md:inline">{__('Refresh', 'debug-suite')}</span>
-                </Button>
+
+                <div className="flex items-center rounded-md border">
+                    <Button
+                        onClick={onRefresh}
+                        disabled={loading}
+                        className="group relative rounded-none rounded-l-md border-0 border-r"
+                        title="Refresh"
+                    >
+                        <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[90px]">
+                            <div className="flex items-center">
+                                <RefreshCw className={classNames('size-4 shrink-0', loading && 'animate-spin')} />
+                                <span className="max-w-0 overflow-hidden text-sm whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[80px] group-hover:opacity-100">
+                                    Refresh
+                                </span>
+                            </div>
+                            <kbd className="ml-1.5 rounded px-1.5 py-0.5 text-[10px] opacity-100 transition-all duration-300 ease-in-out group-hover:opacity-50">
+                                A
+                            </kbd>
+                        </div>
+                    </Button>
+
+                    <Button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={classNames(
+                            'group relative rounded-none border-0 border-r',
+                            showFilters && 'bg-gray-100'
+                        )}
+                        title="Show/hide filters panel"
+                    >
+                        <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[60px]">
+                            <div className="flex items-center">
+                                <Filter className="size-4 shrink-0" />
+                                <span className="max-w-0 overflow-hidden text-sm whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[50px] group-hover:opacity-100">
+                                    Filters
+                                </span>
+                            </div>
+                            <kbd className="ml-1.5 rounded px-1.5 py-0.5 text-[10px] opacity-100 transition-all duration-300 ease-in-out group-hover:opacity-50">
+                                F
+                            </kbd>
+                        </div>
+                    </Button>
+
+                    <Button className="group relative rounded-none border-0 border-r" title="Copy logs to clipboard">
+                        <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[50px]">
+                            <div className="flex items-center">
+                                <Copy className="size-4 shrink-0" />
+                                <span className="max-w-0 overflow-hidden text-sm whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[40px] group-hover:opacity-100">
+                                    Copy
+                                </span>
+                            </div>
+                            <kbd className="ml-1.5 rounded px-1.5 py-0.5 text-[10px] opacity-100 transition-all duration-300 ease-in-out group-hover:opacity-50">
+                                C
+                            </kbd>
+                        </div>
+                    </Button>
+                    {viewMode === 'raw' && rawContent && (
+                        <Button
+                            onClick={handleDownload}
+                            className="group relative rounded-none border-0 border-r"
+                            title="Download logs"
+                        >
+                            <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[110px]">
+                                <div className="flex items-center">
+                                    <Download className="size-4 shrink-0" />
+                                    <span className="max-w-0 overflow-hidden text-sm whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[100px] group-hover:opacity-100">
+                                        Download Logs
+                                    </span>
+                                </div>
+                                <kbd className="ml-1.5 rounded px-1.5 py-0.5 text-[10px] opacity-100 transition-all duration-300 ease-in-out group-hover:opacity-50">
+                                    D
+                                </kbd>
+                            </div>
+                        </Button>
+                    )}
+                    <Button
+                        onClick={handleClear}
+                        disabled={clearing}
+                        className="group relative rounded-none rounded-r-md border-0"
+                        title="Clear all logs"
+                    >
+                        <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[90px]">
+                            <div className="flex items-center">
+                                <Trash2 className="size-4 shrink-0" />
+                                <span className="text-destructive max-w-0 overflow-hidden text-sm whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[80px] group-hover:opacity-100">
+                                    Clear Logs
+                                </span>
+                            </div>
+                            <kbd className="ml-1.5 rounded px-1.5 py-0.5 text-[10px] opacity-100 transition-all duration-300 ease-in-out group-hover:opacity-50">
+                                C
+                            </kbd>
+                        </div>
+                    </Button>
+                </div>
             </Fill>
 
             {/* Filters and actions - only show in parsed mode */}
-            {viewMode === 'parsed' && (
+            {viewMode === 'parsed' && showFilters && (
                 <div className="border-t bg-white py-4">
                     <div className="flex flex-col flex-wrap gap-4 md:gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
@@ -241,9 +311,6 @@ const LogControls = ({
                                     </button>
                                 )}
                             </div>
-                            <Button onClick={handleClear} variant="danger" disabled={clearing} className="shrink-0 p-2">
-                                <Trash2 className="size-4" />
-                            </Button>
                         </div>
                     </div>
                 </div>

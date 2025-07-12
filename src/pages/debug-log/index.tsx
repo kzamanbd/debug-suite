@@ -27,7 +27,11 @@ const FileLogs = () => {
     } = useLogEntries();
 
     const { clearLogs, clearing } = useLogActions();
-    const { content: rawContent, loading: rawLoading, refetch: refetchRawContent } = useRawFileContent(selectedFile);
+    const {
+        content: rawContent,
+        loading: rawLoading,
+        refetch: refetchRawContent
+    } = useRawFileContent(selectedFile?.value);
 
     // Local state for view mode only
     const [viewMode, setViewMode] = useState<ViewMode>('parsed');
@@ -38,7 +42,7 @@ const FileLogs = () => {
             if (viewMode === 'parsed') {
                 refetchLogs();
             } else {
-                refetchRawContent();
+                void refetchRawContent();
             }
         };
         window.addEventListener('focus', handleFocus);
@@ -58,7 +62,7 @@ const FileLogs = () => {
         if (viewMode === 'parsed') {
             refetchLogs();
         } else {
-            refetchRawContent();
+            void refetchRawContent();
         }
     };
 
@@ -68,7 +72,7 @@ const FileLogs = () => {
         if (mode !== 'parsed') {
             // If switching to raw view, fetch the raw content for the selected file
             if (!rawContent) {
-                refetchRawContent();
+                void refetchRawContent();
             }
         }
     };

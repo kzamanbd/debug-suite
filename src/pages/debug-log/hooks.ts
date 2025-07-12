@@ -97,7 +97,7 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
 export const useLogEntries = () => {
     const [allLogs, setAllLogs] = useState<LogEntry[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedFile, setSelectedFile] = useState<string>('');
+    const [selectedFile, setSelectedFile] = useState<Option | null>(null);
     const [filters, setFilters] = useState<LogFilters>({
         level: '',
         search: '',
@@ -110,7 +110,7 @@ export const useLogEntries = () => {
         if (!file) {
             return;
         }
-        setSelectedFile(file.value);
+        setSelectedFile(file);
     };
 
     // Debounce search input to improve performance
