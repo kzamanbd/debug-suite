@@ -1,3 +1,4 @@
+import DebugConfig from '@/pages/debug-config';
 import DebugLog from '@/pages/debug-log';
 import FileManager from '@/pages/file-manager';
 import ManageLogs from '@/pages/manage-logs';
@@ -21,6 +22,16 @@ const routes: DebugSuiteRoute[] = [
         id: 'onboarding',
         path: '/onboarding',
         element: <Onboarding />
+    },
+    {
+        id: 'config',
+        path: '/config',
+        title: __('Debug Config', 'debug-suite'),
+        description: __(
+            "Welcome! Let's set up your WordPress debugging environment in just a few steps.",
+            'debug-suite'
+        ),
+        element: <DebugConfig />
     },
     {
         id: 'overview',

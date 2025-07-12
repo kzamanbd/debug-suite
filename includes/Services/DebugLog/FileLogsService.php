@@ -9,6 +9,7 @@ namespace DebugSuite\Services\DebugLog;
 
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
+use DebugSuite\Supports\FileSystem;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -79,16 +80,6 @@ class FileLogsService implements ServiceInterface {
 	}
 
 	/**
-	 * Export log entries to various formats.
-	 *
-	 * @param array $options Export options including format (json, csv, txt).
-	 * @return ServiceResponse
-	 */
-	public function export_logs( array $options = [] ): ServiceResponse {
-		return $this->log_reader->export_logs( $options );
-	}
-
-	/**
 	 * Get paths to supported log files.
 	 *
 	 * @return array
@@ -118,7 +109,7 @@ class FileLogsService implements ServiceInterface {
 		}
 
 		// Check if file exists first
-		if ( ! file_exists( $file_path ) ) {
+		if ( ! FileSystem::exists( $file_path ) ) {
 			return ServiceResponse::failure(
 				__( 'The requested log file was not found.', 'debug-suite' ),
 				'file_not_found',
@@ -127,7 +118,7 @@ class FileLogsService implements ServiceInterface {
 		}
 
 		// Check if file is readable
-		if ( ! is_readable( $file_path ) ) {
+		if ( ! FileSystem::is_readable( $file_path ) ) {
 			return ServiceResponse::failure(
 				__( 'Access to this file is not allowed.', 'debug-suite' ),
 				'file_access_denied',
@@ -136,16 +127,16 @@ class FileLogsService implements ServiceInterface {
 		}
 
 		// Get file information
-		$file_size = filesize( $file_path );
+		$file_size = FileSystem::size( $file_path );
 		$max_size = 50 * 1024 * 1024; // 50MB limit
 
 		// For large files, limit the content to avoid memory issues
 		if ( $file_size > $max_size ) {
 			// Read only the last portion of the file
-			$content = $this->read_file_tail( $file_path, $max_size );
+			$content = FileSystem::read_tail( $file_path, $max_size );
 			$truncated = true;
 		} else {
-			$content = file_get_contents( $file_path );
+			$content = FileSystem::get_contents( $file_path );
 			$truncated = false;
 		}
 
@@ -161,34 +152,13 @@ class FileLogsService implements ServiceInterface {
 			[
 				'content'           => $content,
 				'filename'          => basename( $file_path ),
-				'size'              => size_format( $file_size ),
+				'size'              => FileSystem::format_size( $file_size ),
 				'size_bytes'        => $file_size,
-				'last_modified'     => gmdate( 'Y-m-d H:i:s', filemtime( $file_path ) ),
+				'last_modified'     => gmdate( 'Y-m-d H:i:s', FileSystem::mtime( $file_path ) ),
 				'truncated'         => $truncated,
 				'max_size_reached'  => $file_size > $max_size,
 				'max_size_limit'    => $max_size,
 			]
 		);
-	}
-
-	/**
-	 * Read the tail of a large file efficiently.
-	 *
-	 * @param string $file_path The file path.
-	 * @param int    $bytes     Number of bytes to read from the end.
-	 * @return string|false
-	 */
-	private function read_file_tail( string $file_path, int $bytes ): false|string {
-		$handle = fopen( $file_path, 'rb' );
-		if ( ! $handle ) {
-			return false;
-		}
-
-		// Seek to the position we want to start reading from
-		fseek( $handle, -$bytes, SEEK_END );
-		$content = fread( $handle, $bytes );
-		fclose( $handle );
-
-		return $content;
 	}
 }

@@ -2,7 +2,7 @@
 /**
  * Advanced Log Reader Service for Debug Suite.
  *
- * Provides advanced log reading, filtering, and exporting capabilities
+ * Provides advanced log reading and filtering capabilities
  * with stack trace detection and parsing.
  *
  * @package DebugSuite
@@ -13,6 +13,7 @@ namespace DebugSuite\Services\DebugLog;
 use DateTime;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
+use DebugSuite\Supports\FileSystem;
 use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -57,19 +58,11 @@ class WPLogReaderService implements ServiceInterface {
 	private int $buffer_size;
 
 	/**
-	 * Debug mode flag.
-	 *
-	 * @var bool
-	 */
-	private bool $debug_mode;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->log_file_path = ini_get( 'error_log' );
 		$this->buffer_size = 1024;
-		$this->debug_mode = false;
 	}
 
 	/**
@@ -106,7 +99,7 @@ class WPLogReaderService implements ServiceInterface {
 	public function read_log_entries( array $options = [] ): ServiceResponse {
 		$log_file = $options['log_file'] ?? $this->log_file_path;
 
-		if ( ! file_exists( $log_file ) ) {
+		if ( ! FileSystem::exists( $log_file ) ) {
 			return ServiceResponse::failure(
 				__( 'Log file not found.', 'debug-suite' ),
 				'file_not_found',
@@ -114,7 +107,7 @@ class WPLogReaderService implements ServiceInterface {
 			);
 		}
 
-		if ( ! is_readable( $log_file ) ) {
+		if ( ! FileSystem::is_readable( $log_file ) ) {
 			return ServiceResponse::failure(
 				__( 'Log file is not readable.', 'debug-suite' ),
 				'file_not_readable',
@@ -123,8 +116,8 @@ class WPLogReaderService implements ServiceInterface {
 		}
 
 		try {
-			$lines = file( $log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
-			if ( false === $lines ) {
+			$content = FileSystem::get_contents( $log_file );
+			if ( false === $content ) {
 				return ServiceResponse::failure(
 					__( 'Failed to read log file.', 'debug-suite' ),
 					'read_error',
@@ -132,17 +125,24 @@ class WPLogReaderService implements ServiceInterface {
 				);
 			}
 
+			// Convert content to lines for processing
+			$lines = explode( "\n", $content );
+			$lines = array_filter( $lines, 'trim' ); // Remove empty lines
+
 			$entries = $this->parse_log_entries( $lines );
 			$filtered_entries = $this->filter_entries( $entries, $options );
 			$paginated_entries = $this->paginate_entries( $filtered_entries, $options );
+
+			$file_size = FileSystem::size( $log_file );
+			$last_modified = FileSystem::mtime( $log_file );
 
 			$stats = [
 				'total_entries'     => count( $entries ),
 				'filtered_entries'  => count( $filtered_entries ),
 				'returned_entries'  => count( $paginated_entries ),
-				'file_size'        => filesize( $log_file ),
-				'file_size_human'  => size_format( filesize( $log_file ) ),
-				'last_modified'    => filemtime( $log_file ),
+				'file_size'        => $file_size,
+				'file_size_human'  => FileSystem::format_size( $file_size ),
+				'last_modified'    => $last_modified,
 			];
 
 			return ServiceResponse::success(
@@ -150,7 +150,7 @@ class WPLogReaderService implements ServiceInterface {
 					'entries' => $paginated_entries,
 					'total'   => count( $filtered_entries ),
 					'file_path'    => $log_file,
-					'size'    => filesize( $log_file ),
+					'size'    => $file_size,
 					'labels'  => $this->get_log_levels(),
 					'stats'   => $stats,
 				]
@@ -611,159 +611,6 @@ class WPLogReaderService implements ServiceInterface {
 	}
 
 	/**
-	 * Export log entries to various formats.
-	 *
-	 * @param array $options Export options.
-	 * @return ServiceResponse
-	 */
-	public function export_log_entries( array $options ): ServiceResponse {
-		$format = $options['format'] ?? 'json';
-		$log_result = $this->read_log_entries( $options );
-
-		if ( $log_result->is_failure() ) {
-			return $log_result;
-		}
-
-		$data = $log_result->get_data();
-		$entries = $data['entries'];
-
-		try {
-			$result = match ( $format ) {
-				'json' => [
-					'content'   => wp_json_encode( $entries, JSON_PRETTY_PRINT ),
-					'mime_type' => 'application/json',
-					'extension' => 'json',
-				],
-				'csv' => [
-					'content'   => $this->export_to_csv( $entries ),
-					'mime_type' => 'text/csv',
-					'extension' => 'csv',
-				],
-				'txt' => [
-					'content'   => $this->export_to_text( $entries ),
-					'mime_type' => 'text/plain',
-					'extension' => 'txt',
-				],
-				default => throw new Exception(
-					// translators: %s is the unsupported format.
-					sprintf( __( 'Unsupported export format: %s', 'debug-suite' ), $format )
-				),
-			};
-
-			$result['filename'] = sprintf(
-				'debug-log-export-%s.%s',
-				gmdate( 'Y-m-d-H-i-s' ),
-				$result['extension']
-			);
-			$result['size'] = strlen( $result['content'] );
-			$result['entries'] = count( $entries );
-
-			return ServiceResponse::success( $result );
-
-		} catch ( Exception $e ) {
-			return ServiceResponse::failure(
-				// translators: %s is the error message.
-				sprintf( __( 'Export failed: %s', 'debug-suite' ), $e->getMessage() ),
-				'export_error',
-				[ 'error' => $e->getMessage() ]
-			);
-		}
-	}
-
-	/**
-	 * Export entries to CSV format.
-	 *
-	 * @param array $entries Log entries.
-	 * @return string
-	 */
-	private function export_to_csv( array $entries ): string {
-		$output = fopen( 'php://temp', 'r+' );
-
-		// CSV headers
-		fputcsv(
-			$output,
-			[
-				'Timestamp',
-				'Level',
-				'Type',
-				'Message',
-				'File',
-				'Line',
-				'Has Stack Trace',
-				'Stack Trace Summary',
-				'Raw Line',
-			]
-		);
-
-		foreach ( $entries as $entry ) {
-			fputcsv(
-				$output,
-				[
-					$entry['timestamp'],
-					strtoupper( $entry['level'] ),
-					$entry['type'],
-					$entry['message'],
-					$entry['file_path'] ?? '',
-					$entry['line'] ?? '',
-					$entry['has_stack_trace'] ? 'Yes' : 'No',
-					$entry['has_stack_trace'] ? ( $entry['stack_trace']['summary'] ?? '' ) : '',
-					$entry['raw_line'],
-				]
-			);
-		}
-
-		rewind( $output );
-		$csv_content = stream_get_contents( $output );
-		fclose( $output );
-
-		return $csv_content;
-	}
-
-	/**
-	 * Export entries to plain text format.
-	 *
-	 * @param array $entries Log entries.
-	 * @return string
-	 */
-	private function export_to_text( array $entries ): string {
-		$lines = [];
-		$lines[] = '# Debug Log Export';
-		$lines[] = sprintf( '# Generated: %s UTC', gmdate( 'Y-m-d H:i:s' ) );
-		$lines[] = sprintf( '# Total Entries: %d', count( $entries ) );
-		$lines[] = '';
-
-		foreach ( $entries as $i => $entry ) {
-			$lines[] = sprintf( '## Entry #%d', $i + 1 );
-			$lines[] = sprintf( 'Timestamp: %s', $entry['timestamp'] );
-			$lines[] = sprintf( 'Level: %s', strtoupper( $entry['level'] ) );
-			$lines[] = sprintf( 'Type: %s', $entry['type'] );
-
-			if ( ! empty( $entry['file_path'] ) ) {
-				$lines[] = sprintf( 'File: %s', $entry['file_path'] );
-				if ( ! empty( $entry['line'] ) ) {
-					$lines[] = sprintf( 'Line: %d', $entry['line'] );
-				}
-			}
-
-			$lines[] = sprintf( 'Message: %s', $entry['message'] );
-
-			if ( $entry['has_stack_trace'] ) {
-				$lines[] = '';
-				$lines[] = '### Stack Trace:';
-				foreach ( $entry['stack_trace']['frames'] as $frame ) {
-					$lines[] = sprintf( '#%d %s', $frame['number'], $frame['raw'] );
-				}
-			}
-
-			$lines[] = '';
-			$lines[] = str_repeat( '-', 80 );
-			$lines[] = '';
-		}
-
-		return implode( "\n", $lines );
-	}
-
-	/**
 	 * Get log file statistics.
 	 *
 	 * @param string|null $log_file Optional log file path.
@@ -772,7 +619,7 @@ class WPLogReaderService implements ServiceInterface {
 	public function get_log_statistics( ?string $log_file = null ): ServiceResponse {
 		$log_file = $log_file ?? $this->log_file_path;
 
-		if ( ! file_exists( $log_file ) ) {
+		if ( ! FileSystem::exists( $log_file ) ) {
 			return ServiceResponse::failure(
 				__( 'Log file not found.', 'debug-suite' ),
 				'file_not_found',
@@ -788,16 +635,18 @@ class WPLogReaderService implements ServiceInterface {
 		$data = $log_result->get_data();
 		$entries = $data['entries'];
 
-		$file_size = filesize( $log_file );
+		$file_size = FileSystem::size( $log_file );
+		$last_modified = FileSystem::mtime( $log_file );
+
 		$stats = [
 			'file_path'        => $log_file,
 			'file_size'        => $file_size,
-			'file_size_human'  => function_exists( 'size_format' ) ? size_format( $file_size ) : $this->format_bytes( $file_size ),
+			'file_size_human'  => FileSystem::format_size( $file_size ),
 			'total_entries'    => count( $entries ),
 			'entries_with_stack_traces' => 0,
 			'levels'           => [],
 			'recent_errors'    => 0,
-			'last_modified'    => filemtime( $log_file ),
+			'last_modified'    => $last_modified,
 		];
 
 		// Count entries by level and stack traces
@@ -829,7 +678,7 @@ class WPLogReaderService implements ServiceInterface {
 	public function clear_log_file( ?string $log_file = null ): ServiceResponse {
 		$log_file = $log_file ?? $this->log_file_path;
 
-		if ( ! file_exists( $log_file ) ) {
+		if ( ! FileSystem::exists( $log_file ) ) {
 			return ServiceResponse::success(
 				[
 					'message' => __( 'Log file does not exist.', 'debug-suite' ),
@@ -838,8 +687,8 @@ class WPLogReaderService implements ServiceInterface {
 			);
 		}
 
-		$result = file_put_contents( $log_file, '' );
-		if ( false === $result ) {
+		$result = FileSystem::put_contents( $log_file, '' );
+		if ( ! $result ) {
 			return ServiceResponse::failure(
 				__( 'Failed to clear log file.', 'debug-suite' ),
 				'clear_failed'
@@ -874,17 +723,6 @@ class WPLogReaderService implements ServiceInterface {
 	 */
 	public function get_log_file_stats( ?string $log_file = null ): ServiceResponse {
 		return $this->get_log_statistics( $log_file );
-	}
-
-	/**
-	 * Wrapper method for compatibility with FileLogsService.
-	 * Delegates to export_log_entries.
-	 *
-	 * @param array $options Export options.
-	 * @return ServiceResponse
-	 */
-	public function export_logs( array $options = [] ): ServiceResponse {
-		return $this->export_log_entries( $options );
 	}
 
 	/**

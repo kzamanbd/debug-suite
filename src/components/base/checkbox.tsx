@@ -32,10 +32,7 @@ const CustomCheckbox = ({ className = '', label, ...props }: CustomCheckboxProps
                             : 'hover:border-gray-400 dark:hover:border-gray-500'
                     )}
                 >
-                    <Check
-                        size={12}
-                        className="text-white opacity-0 transition-opacity duration-200 peer-checked:opacity-100"
-                    />
+                    <Check size={12} className="text-white transition-opacity duration-200" />
                 </span>
             </label>
             {label && (

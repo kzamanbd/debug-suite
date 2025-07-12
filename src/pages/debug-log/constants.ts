@@ -14,15 +14,6 @@ export const levelColors: Record<string, string> = {
     debug: 'bg-gray-100 text-gray-800 border-gray-200'
 };
 
-export const levelIcons: Record<string, string> = {
-    critical: '🔴',
-    error: '❌',
-    warning: '⚠️',
-    notice: 'ℹ️',
-    info: '📝',
-    debug: '🐛'
-};
-
 export const levelOptions = [
     { value: '', label: __('All Levels', 'debug-suite') },
     { value: 'critical', label: __('Critical', 'debug-suite') },
@@ -43,10 +34,4 @@ export const perPageOptions = [
 export const sortOptions = [
     { value: 'timestamp', label: __('Sort by Date', 'debug-suite') },
     { value: 'level', label: __('Sort by Level', 'debug-suite') }
-];
-
-export const exportOptions = [
-    { value: 'json', label: __('Export as JSON', 'debug-suite') },
-    { value: 'csv', label: __('Export as CSV', 'debug-suite') },
-    { value: 'txt', label: __('Export as TXT', 'debug-suite') }
 ];

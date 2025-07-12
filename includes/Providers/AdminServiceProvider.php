@@ -9,7 +9,7 @@ namespace DebugSuite\Providers;
 
 use DebugSuite\Core\Container\AbstractServiceProvider;
 use DebugSuite\Core\Container\Container;
-use DebugSuite\Admin\Admin;
+use DebugSuite\Admin;
 
 class AdminServiceProvider extends AbstractServiceProvider {
 

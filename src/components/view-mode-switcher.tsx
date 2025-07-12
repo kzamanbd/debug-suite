@@ -1,4 +1,4 @@
-import Button from '@/components/ui/button';
+import Button from '@/components/base/button';
 import apiFetch from '@wordpress/api-fetch';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -29,14 +29,14 @@ const ViewModeSwitcher = () => {
     };
 
     return (
-        <Button loading={isLoading} onClick={toggleFullScreen} className="flex items-center p-2">
+        <Button loading={isLoading} onClick={toggleFullScreen} className="p-2">
             {isMaximize ? (
                 <div title={__('Minimize', 'debug-suite')}>
-                    <Minimize className="size-4" />
+                    <Minimize className="size-5" />
                 </div>
             ) : (
                 <div title={__('Maximize', 'debug-suite')}>
-                    <Maximize className="size-4" />
+                    <Maximize className="size-5" />
                 </div>
             )}
         </Button>

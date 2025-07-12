@@ -16,8 +16,9 @@
         "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
         "make:pot": "wp i18n make-pot --domain='debug-suite' --include='assets/js,includes,templates,debug-suite.php' . --headers='{\"Report-Msgid-Bugs-To\":\"https://kzaman.me/contact/\"}' --file-comment=\"Copyright (c) $(date +'%Y') Kamruzzaman. All Rights Reserved.\" languages/debug-suite.pot",
         "version": "node bin/version.js",
-        "release": "npm run build && npm run make:pot && bin/build.sh",
-        "release:prod": "npm run version && npm run release"
+        "zip": "node bin/zip.js",
+        "release": "pnpm build && pnpm make:pot && npm run zip",
+        "release:org": "npm run version && npm run release"
     },
     "author": "kamruzzaman",
     "license": "MIT",

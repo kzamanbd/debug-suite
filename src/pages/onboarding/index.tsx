@@ -1,7 +1,7 @@
-import Button from '@/components/ui/button';
-import Card from '@/components/ui/card';
-import CustomSwitch from '@/components/ui/switch';
-import { useToast } from '@/components/ui/toast';
+import Button from '@/components/base/button';
+import Card from '@/components/base/card';
+import CustomSwitch from '@/components/base/switch';
+import { useToast } from '@/components/base/toast';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
@@ -11,15 +11,9 @@ import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface OnboardingSettings {
-    debug_mode: string | boolean;
+    debug: string | boolean;
     debug_log: string | boolean;
     debug_display: string | boolean;
-}
-
-interface OnboardingResponse {
-    success: boolean;
-    completed: boolean;
-    settings: OnboardingSettings;
 }
 
 const steps = [
@@ -50,7 +44,7 @@ const Onboarding = () => {
     const [saving, setSaving] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [settings, setSettings] = useState<OnboardingSettings>({
-        debug_mode: false,
+        debug: false,
         debug_log: false,
         debug_display: false
     });
@@ -58,22 +52,27 @@ const Onboarding = () => {
     useEffect(() => {
         const checkOnboardingStatus = async () => {
             try {
-                const response = await apiFetch<OnboardingResponse>({
-                    path: '/debug-suite/v1/onboarding/status',
+                const response = await apiFetch<{
+                    WP_DEBUG: boolean;
+                    WP_DEBUG_LOG: boolean;
+                    WP_DEBUG_DISPLAY: boolean;
+                    completed: boolean;
+                }>({
+                    path: '/debug-suite/v1/settings?check_onboarding=true',
                     method: 'GET'
                 });
-
                 if (response.completed) {
                     void navigate('/');
                     return;
                 }
+
+                setSettings({
+                    debug: response.WP_DEBUG,
+                    debug_log: response.WP_DEBUG_LOG,
+                    debug_display: response.WP_DEBUG_DISPLAY
+                });
+
                 setLoading(false);
-                setSettings((prev) => ({
-                    ...prev,
-                    debug_mode: response.settings.debug_mode === 'true',
-                    debug_log: response.settings.debug_log === 'true',
-                    debug_display: response.settings.debug_display === 'true'
-                }));
             } catch (error) {
                 console.error('Error checking onboarding status:', error);
                 toast.error(__('Failed to check onboarding status.', 'debug-suite'));
@@ -89,9 +88,9 @@ const Onboarding = () => {
             setSaving(true);
             try {
                 await apiFetch({
-                    path: '/debug-suite/v1/onboarding/settings',
+                    path: '/debug-suite/v1/settings',
                     method: 'POST',
-                    data: settings
+                    data: { ...settings, onboarding_completed: true }
                 });
 
                 toast.success(__('Settings saved successfully!', 'debug-suite'));
@@ -115,11 +114,8 @@ const Onboarding = () => {
         return (
             <div className="-m-5 flex h-screen items-center justify-center rounded-lg bg-gradient-to-br from-blue-50 to-indigo-100">
                 <div className="text-center">
-                    <div className="relative">
+                    <div className="relative flex items-center justify-center">
                         <div className="border-primary h-16 w-16 animate-spin rounded-full border-4 border-t-transparent"></div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <Zap className="text-primary h-6 w-6" />
-                        </div>
                     </div>
                     <div className="mt-4 text-sm font-medium text-gray-600">
                         {__('Loading Debug Suite...', 'debug-suite')}
@@ -251,7 +247,7 @@ const Onboarding = () => {
                                                 {__('Log Management', 'debug-suite')}
                                             </h3>
                                             <p className="text-sm text-gray-600">
-                                                {__('Organize and export log data', 'debug-suite')}
+                                                {__('Organize log data', 'debug-suite')}
                                             </p>
                                         </div>
                                     </div>
@@ -297,11 +293,11 @@ const Onboarding = () => {
                                                     </div>
                                                 </div>
                                                 <CustomSwitch
-                                                    checked={Boolean(settings.debug_mode)}
+                                                    checked={Boolean(settings.debug)}
                                                     onChange={(event: ChangeEvent<HTMLInputElement>) =>
                                                         setSettings((prev) => ({
                                                             ...prev,
-                                                            debug_mode: event.target.checked
+                                                            debug: event.target.checked
                                                         }))
                                                     }
                                                 />
@@ -309,7 +305,7 @@ const Onboarding = () => {
                                         </div>
 
                                         {/* Debug Display Option - Only shown when debug mode is enabled */}
-                                        {settings.debug_mode && (
+                                        {settings.debug && (
                                             <div className="animate-in slide-in-from-top-2 duration-300">
                                                 <div className="rounded-2xl border border-yellow-200 bg-gradient-to-r from-yellow-50 to-orange-50 p-6">
                                                     <div className="mb-4 flex items-start space-x-3">
@@ -455,7 +451,7 @@ const Onboarding = () => {
                                                 <div className="flex items-start space-x-3">
                                                     <CheckCircle2 className="mt-0.5 h-5 w-5 text-green-600" />
                                                     <span className="text-sm text-gray-700">
-                                                        {__('Easy to analyze and export', 'debug-suite')}
+                                                        {__('Easy to analyze', 'debug-suite')}
                                                     </span>
                                                 </div>
                                             </div>

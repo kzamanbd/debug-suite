@@ -12,14 +12,12 @@ use DebugSuite\Core\Container\Container;
 use DebugSuite\Services\DebugLog\FileLogsService;
 use DebugSuite\Services\FileManagerService;
 use DebugSuite\Services\SettingsService;
-use DebugSuite\Services\OnboardingService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Services\FrontendRouterService;
 use DebugSuite\API\FileLogsController;
 use DebugSuite\API\FileManagerController;
 use DebugSuite\API\SettingsController;
-use DebugSuite\API\OnboardingController;
 use DebugSuite\API\OverviewController;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,13 +31,11 @@ class AppServiceProvider extends AbstractServiceProvider {
 		FileLogsService::class,
 		FileManagerService::class,
 		SettingsService::class,
-		OnboardingService::class,
 		OverviewService::class,
 		FrontendRouterService::class,
 		FileLogsController::class,
 		FileManagerController::class,
 		SettingsController::class,
-		OnboardingController::class,
 		OverviewController::class,
 	];
 
@@ -52,7 +48,6 @@ class AppServiceProvider extends AbstractServiceProvider {
 				FileLogsService::class    => $container->object( FileLogsService::class ),
 				FileManagerService::class => $container->object( FileManagerService::class ),
 				SettingsService::class    => $container->object( SettingsService::class ),
-				OnboardingService::class  => $container->object( OnboardingService::class ),
 				OverviewService::class    => $container->autowire( OverviewService::class ),
 				FrontendRouterService::class => $container->object( FrontendRouterService::class ),
 
@@ -60,7 +55,6 @@ class AppServiceProvider extends AbstractServiceProvider {
 				FileLogsController::class    => $container->autowire( FileLogsController::class ),
 				FileManagerController::class => $container->autowire( FileManagerController::class ),
 				SettingsController::class    => $container->autowire( SettingsController::class ),
-				OnboardingController::class  => $container->autowire( OnboardingController::class ),
 				OverviewController::class    => $container->autowire( OverviewController::class ),
 			]
 		);

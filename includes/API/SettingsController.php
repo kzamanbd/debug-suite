@@ -45,6 +45,28 @@ class SettingsController extends RestController {
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => [ $this, 'update_settings' ],
 					'permission_callback' => [ $this, 'permissions_check' ],
+					'args'                => [
+						'debug'          => [
+							'type'        => 'boolean',
+							'required'    => false,
+							'description' => __( 'Enable or disable WP_DEBUG.', 'debug-suite' ),
+						],
+						'debug_log'     => [
+							'type'        => 'boolean',
+							'required'    => false,
+							'description' => __( 'Enable or disable WP_DEBUG_LOG.', 'debug-suite' ),
+						],
+						'debug_display' => [
+							'type'        => 'boolean',
+							'required'    => false,
+							'description' => __( 'Enable or disable WP_DEBUG_DISPLAY.', 'debug-suite' ),
+						],
+						'onboarding_completed' => [
+							'type'        => 'boolean',
+							'required'    => false,
+							'description' => __( 'Mark onboarding as completed.', 'debug-suite' ),
+						],
+					],
 				],
 			]
 		);
@@ -73,9 +95,18 @@ class SettingsController extends RestController {
 	public function get_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$result = $this->service->get_settings();
 
-		return $result->is_failure()
-			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
-			: rest_ensure_response( $result->get_data() );
+		$params = $request->get_params();
+
+		if ( $result->is_failure() ) {
+			return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] );
+		}
+
+		$response = rest_ensure_response( $result->get_data() );
+		if ( isset( $params['check_onboarding'] ) ) {
+			$response->data['completed'] = get_option( 'debug_suite_onboarding_completed', false );
+		}
+
+		return $response;
 	}
 
 	public function update_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
@@ -85,26 +116,35 @@ class SettingsController extends RestController {
 		}
 
 		$settings = [];
-		if ( isset( $params['debug'] ) ) {
-			$settings['WP_DEBUG'] = $params['debug'];
-		}
-		if ( isset( $params['debug_log'] ) ) {
-			$settings['WP_DEBUG_LOG'] = $params['debug_log'];
-		}
-		if ( isset( $params['debug_display'] ) ) {
-			$settings['WP_DEBUG_DISPLAY'] = $params['debug_display'];
+		// Map request parameters to settings
+		$values = [
+			'debug' => 'WP_DEBUG',
+			'debug_log' => 'WP_DEBUG_LOG',
+			'debug_display' => 'WP_DEBUG_DISPLAY',
+		];
+
+		foreach ( $values as $key => $value ) {
+			if ( isset( $params[ $key ] ) ) {
+				$settings[ $value ] = $params[ $key ] ? 'true' : 'false';
+			}
 		}
 
 		$result = $this->service->update_settings( $settings );
 
-		return $result->is_failure()
-			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
-			: rest_ensure_response(
-				[
-					'success' => true,
-					'message' => __( 'Settings updated successfully.', 'debug-suite' ),
-				]
-			);
+		if ( $result->is_failure() ) {
+			return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] );
+		}
+
+		if ( $params['onboarding_completed'] ) {
+			update_option( 'debug_suite_onboarding_completed', true );
+		}
+
+		return rest_ensure_response(
+			[
+				'success' => true,
+				'message' => __( 'Settings updated successfully.', 'debug-suite' ),
+			]
+		);
 	}
 
 	public function reset_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
