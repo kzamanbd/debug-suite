@@ -3,7 +3,7 @@ import { useToast } from '@/components/base/toast';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Loader2 } from 'lucide-react';
+import { AlertTriangle, Bug, CheckCircle2, Eye, EyeOff, FileText, Loader2, Shield, Zap } from 'lucide-react';
 
 interface DebugSettings {
     debug: boolean;
@@ -96,197 +96,205 @@ const DebugConfig = () => {
 
     return (
         <div className="space-y-4">
+            {/* Compact Configuration Cards */}
             <div className="space-y-3">
                 {/* Debug Mode Card */}
                 <div
-                    className={`relative rounded-md p-3 pl-8 ${
+                    className={`rounded-lg border transition-all duration-200 ${
                         settings.debug
-                            ? 'cursor-not-allowed bg-[#e83f94]/5 opacity-80 dark:bg-[#e83f94]/10'
-                            : 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                            ? 'border-primary/40 bg-primary/5 shadow-primary/5 shadow-md'
+                            : 'hover:border-primary/30 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'
                     }`}
                 >
-                    <div className="absolute top-3 left-3">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className={`lucide lucide-check-circle2 size-5 ${
-                                settings.debug ? 'text-[#e83f94]' : 'text-muted-foreground/30'
-                            }`}
-                        >
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="m9 12 2 2 4-4"></path>
-                        </svg>
-                    </div>
-                    <div className="ml-8 flex items-center justify-between">
-                        <div>
-                            <h2 className="text-lg font-semibold">WordPress Debug Mode</h2>
-                            <p className="text-muted-foreground text-sm">
-                                {settings.debug
-                                    ? 'Debug mode is enabled. This helps identify issues by showing PHP notices and warnings.'
-                                    : 'Debug mode is disabled. Enable to show PHP notices and warnings.'}
-                            </p>
-                            {settings.debug && (
-                                <p className="mt-1 text-xs font-medium text-[#e83f94]">Required for viewer</p>
-                            )}
+                    <div className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div
+                                    className={`rounded-lg p-2 transition-colors duration-200 ${
+                                        settings.debug
+                                            ? 'bg-primary/20 text-primary'
+                                            : 'bg-gray-100 text-gray-400 dark:bg-gray-700'
+                                    }`}
+                                >
+                                    <Bug className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="font-medium text-gray-900 dark:text-white">
+                                            {__('Debug Mode', 'debug-suite')}
+                                        </h3>
+                                        {settings.debug && <CheckCircle2 className="text-primary h-4 w-4" />}
+                                    </div>
+                                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                                        {settings.debug
+                                            ? __('PHP notices and warnings tracked', 'debug-suite')
+                                            : __('Enable to show PHP errors', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <CustomSwitch
+                                checked={Boolean(settings.debug)}
+                                onChange={(event) => {
+                                    const target = event.target as HTMLInputElement;
+                                    void updateSetting('debug', target.checked);
+                                }}
+                                disabled={saving}
+                            />
                         </div>
-                        <CustomSwitch
-                            checked={Boolean(settings.debug)}
-                            onChange={(event) => {
-                                const target = event.target as HTMLInputElement;
-                                void updateSetting('debug', target.checked);
-                            }}
-                            disabled={saving}
-                        />
                     </div>
                 </div>
 
                 {/* Debug Log Card */}
                 <div
-                    className={`relative rounded-md p-3 pl-8 ${
+                    className={`rounded-lg border transition-all duration-200 ${
                         settings.debug_log
-                            ? 'cursor-not-allowed bg-[#e83f94]/5 opacity-80 dark:bg-[#e83f94]/10'
-                            : 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                            ? 'border-primary/40 bg-primary/5 shadow-primary/5 shadow-md'
+                            : 'hover:border-primary/30 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'
                     }`}
                 >
-                    <div className="absolute top-3 left-3">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className={`lucide lucide-check-circle2 size-5 ${
-                                settings.debug_log ? 'text-[#e83f94]' : 'text-muted-foreground/30'
-                            }`}
-                        >
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="m9 12 2 2 4-4"></path>
-                        </svg>
-                    </div>
-                    <div className="ml-8 flex items-center justify-between">
-                        <div>
-                            <h2 className="text-lg font-semibold">Error Logging</h2>
-                            <p className="text-muted-foreground text-sm">
-                                {settings.debug_log
-                                    ? 'Error logging is enabled. All errors will be saved to debug.log for review.'
-                                    : 'Error logging is disabled. Enable to save errors to debug.log for review.'}
-                            </p>
-                            {settings.debug_log && (
-                                <p className="mt-1 text-xs font-medium text-[#e83f94]">Required for viewer</p>
-                            )}
+                    <div className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div
+                                    className={`rounded-lg p-2 transition-colors duration-200 ${
+                                        settings.debug_log
+                                            ? 'bg-primary/20 text-primary'
+                                            : 'bg-gray-100 text-gray-400 dark:bg-gray-700'
+                                    }`}
+                                >
+                                    <FileText className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="font-medium text-gray-900 dark:text-white">
+                                            {__('Error Logging', 'debug-suite')}
+                                        </h3>
+                                        {settings.debug_log && <CheckCircle2 className="text-primary h-4 w-4" />}
+                                    </div>
+                                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                                        {settings.debug_log
+                                            ? __('Errors saved to debug.log', 'debug-suite')
+                                            : __('Enable to log errors to file', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <CustomSwitch
+                                checked={settings.debug_log}
+                                onChange={(event) => {
+                                    const target = event.target as HTMLInputElement;
+                                    void updateSetting('debug_log', target.checked);
+                                }}
+                                disabled={saving}
+                            />
                         </div>
-                        <CustomSwitch
-                            checked={settings.debug_log}
-                            onChange={(event) => {
-                                const target = event.target as HTMLInputElement;
-                                void updateSetting('debug_log', target.checked);
-                            }}
-                            disabled={saving}
-                        />
                     </div>
                 </div>
 
                 {/* Debug Display Card */}
                 <div
-                    className={`relative rounded-md p-3 pl-8 ${
+                    className={`rounded-lg border transition-all duration-200 ${
                         settings.debug_display
-                            ? 'cursor-not-allowed bg-[#e83f94]/5 opacity-80 dark:bg-[#e83f94]/10'
-                            : 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                            ? 'border-amber-400/40 bg-amber-50/50 shadow-md shadow-amber-500/5 dark:bg-amber-900/10'
+                            : 'border-gray-200 bg-white hover:border-amber-400/30 dark:border-gray-700 dark:bg-gray-800'
                     }`}
                 >
-                    <div className="absolute top-3 left-3">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className={`lucide lucide-check-circle2 size-5 ${
-                                settings.debug_display ? 'text-[#e83f94]' : 'text-muted-foreground/30'
-                            }`}
-                        >
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="m9 12 2 2 4-4"></path>
-                        </svg>
-                    </div>
-                    <div className="ml-8 flex items-center justify-between">
-                        <div>
-                            <h2 className="text-lg font-semibold">Error Display</h2>
-                            <p className="text-muted-foreground text-sm">
-                                {settings.debug_display
-                                    ? 'Error display is enabled. Errors will be visible to visitors.'
-                                    : 'Error display is disabled. Errors will be hidden from visitors.'}
-                            </p>
-                            {settings.debug_display && (
-                                <p className="mt-1 text-xs font-medium text-yellow-600">
-                                    ⚠️ Errors visible to all visitors
-                                </p>
-                            )}
+                    <div className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div
+                                    className={`rounded-lg p-2 transition-colors duration-200 ${
+                                        settings.debug_display
+                                            ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                                            : 'bg-gray-100 text-gray-400 dark:bg-gray-700'
+                                    }`}
+                                >
+                                    {settings.debug_display ? (
+                                        <Eye className="h-4 w-4" />
+                                    ) : (
+                                        <EyeOff className="h-4 w-4" />
+                                    )}
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="font-medium text-gray-900 dark:text-white">
+                                            {__('Error Display', 'debug-suite')}
+                                        </h3>
+                                        {settings.debug_display && <AlertTriangle className="h-4 w-4 text-amber-500" />}
+                                    </div>
+                                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                                        {settings.debug_display
+                                            ? __('⚠️ Errors visible to visitors', 'debug-suite')
+                                            : __('Errors hidden from visitors', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <CustomSwitch
+                                checked={Boolean(settings.debug_display)}
+                                onChange={(event) => {
+                                    const target = event.target as HTMLInputElement;
+                                    void updateSetting('debug_display', target.checked);
+                                }}
+                                disabled={saving}
+                            />
                         </div>
-                        <CustomSwitch
-                            checked={Boolean(settings.debug_display)}
-                            onChange={(event) => {
-                                const target = event.target as HTMLInputElement;
-                                void updateSetting('debug_display', target.checked);
-                            }}
-                            disabled={saving}
-                        />
-                    </div>
-                </div>
-
-                {/* Log Viewer Card */}
-                <div className="relative rounded-md p-3 pl-8">
-                    <div className="absolute top-3 left-3">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="lucide lucide-check-circle2 size-5 text-[#e83f94]"
-                        >
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="m9 12 2 2 4-4"></path>
-                        </svg>
-                    </div>
-                    <div className="ml-8">
-                        <h2 className="text-lg font-semibold">Log Viewer</h2>
-                        <p className="text-muted-foreground mb-4 text-sm">
-                            Log viewer is installed and ready to use. You can access it using the button below.
-                        </p>
-                        <div className="my-4 border-t border-gray-200 pt-2 dark:border-gray-800"></div>
                     </div>
                 </div>
             </div>
 
-            {/* Saving indicator */}
+            {/* Compact Quick Actions */}
+            <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+                <div className="mb-3 flex items-center gap-2">
+                    <Zap className="text-primary h-4 w-4" />
+                    <h3 className="font-medium text-gray-900 dark:text-white">{__('Quick Actions', 'debug-suite')}</h3>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <button
+                        onClick={() => {
+                            void updateSetting('debug', true);
+                            void updateSetting('debug_log', true);
+                        }}
+                        disabled={saving}
+                        className="border-primary/20 bg-primary/5 hover:bg-primary/10 flex items-center gap-2 rounded-md border p-2 text-left text-sm transition-colors duration-200 disabled:opacity-50"
+                    >
+                        <CheckCircle2 className="text-primary h-3 w-3 flex-shrink-0" />
+                        <div>
+                            <div className="text-xs font-medium text-gray-900 dark:text-white">
+                                {__('Development', 'debug-suite')}
+                            </div>
+                            <div className="text-xs text-gray-600 dark:text-gray-300">
+                                {__('Debug + Log', 'debug-suite')}
+                            </div>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            void updateSetting('debug', false);
+                            void updateSetting('debug_log', false);
+                            void updateSetting('debug_display', false);
+                        }}
+                        disabled={saving}
+                        className="flex items-center gap-2 rounded-md border border-gray-200 p-2 text-left text-sm transition-colors duration-200 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:hover:bg-gray-700"
+                    >
+                        <Shield className="h-3 w-3 flex-shrink-0 text-gray-500" />
+                        <div>
+                            <div className="text-xs font-medium text-gray-900 dark:text-white">
+                                {__('Production', 'debug-suite')}
+                            </div>
+                            <div className="text-xs text-gray-600 dark:text-gray-300">
+                                {__('Disable all', 'debug-suite')}
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            {/* Compact Saving Indicator */}
             {saving && (
-                <div className="rounded-lg bg-blue-50 p-4">
-                    <div className="flex items-center space-x-3">
-                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                        <p className="text-sm font-medium text-blue-900">
-                            {__('Saving configuration...', 'debug-suite')}
-                        </p>
-                    </div>
+                <div className="fixed right-4 bottom-4 z-50 flex items-center gap-2 rounded-md border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                    <Loader2 className="text-primary h-4 w-4 animate-spin" />
+                    <span className="text-sm text-gray-900 dark:text-white">{__('Saving...', 'debug-suite')}</span>
                 </div>
             )}
         </div>
