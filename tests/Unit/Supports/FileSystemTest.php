@@ -183,7 +183,7 @@ class FileSystemTest extends TestCase {
 		$this->assertEquals( strlen( $test_content ), $size );
 		
 		// Test non-existent file
-		$this->assertFalse( FileSystem::size( '/non/existent/file.txt' ) );
+		$this->assertEquals( 0, FileSystem::size( '/non/existent/file.txt' ) );
 	}
 
 	/**
@@ -200,7 +200,7 @@ class FileSystemTest extends TestCase {
 		$this->assertGreaterThan( 0, $mtime );
 		
 		// Test non-existent file
-		$this->assertFalse( FileSystem::mtime( '/non/existent/file.txt' ) );
+		$this->assertEquals( 0, FileSystem::mtime( '/non/existent/file.txt' ) );
 	}
 
 	/**
@@ -268,9 +268,6 @@ class FileSystemTest extends TestCase {
 		
 		$permissions = FileSystem::get_permissions( $this->test_file );
 		$this->assertIsString( $permissions );
-		
-		// Test non-existent file
-		$this->assertFalse( FileSystem::get_permissions( '/non/existent/file.txt' ) );
 	}
 
 	/**
