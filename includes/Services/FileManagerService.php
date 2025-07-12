@@ -9,6 +9,7 @@ namespace DebugSuite\Services;
 
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
+use DebugSuite\Supports\FileSystem;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 
@@ -53,21 +54,7 @@ class FileManagerService implements ServiceInterface {
 	 * @return string
 	 */
 	private function format_size_units( int $bytes ): string {
-		if ( $bytes >= 1073741824 ) {
-			$bytes = number_format( $bytes / 1073741824, 2 ) . ' GB';
-		} elseif ( $bytes >= 1048576 ) {
-			$bytes = number_format( $bytes / 1048576, 2 ) . ' MB';
-		} elseif ( $bytes >= 1024 ) {
-			$bytes = number_format( $bytes / 1024, 2 ) . ' KB';
-		} elseif ( $bytes > 1 ) {
-			$bytes = $bytes . ' bytes';
-		} elseif ( $bytes === 1 ) {
-			$bytes = '1 byte';
-		} else {
-			$bytes = 'N/A';
-		}
-
-		return $bytes;
+		return FileSystem::format_size( $bytes );
 	}
 
 	/**
@@ -146,7 +133,7 @@ class FileManagerService implements ServiceInterface {
 			return ServiceResponse::failure( __( 'Invalid path provided.', 'debug-suite' ), 'invalid_path' );
 		}
 
-		if ( ! is_dir( $full_path ) ) {
+		if ( ! FileSystem::is_dir( $full_path ) ) {
 			return ServiceResponse::failure( __( 'Directory not found.', 'debug-suite' ), 'directory_not_found' );
 		}
 
@@ -192,19 +179,19 @@ class FileManagerService implements ServiceInterface {
 			return ServiceResponse::failure( __( 'Invalid path provided.', 'debug-suite' ), 'invalid_path' );
 		}
 
-		if ( ! file_exists( $full_path ) ) {
+		if ( ! FileSystem::exists( $full_path ) ) {
 			return ServiceResponse::failure( __( 'File not found.', 'debug-suite' ), 'file_not_found' );
 		}
 
-		if ( ! is_file( $full_path ) ) {
+		if ( ! FileSystem::is_file( $full_path ) ) {
 			return ServiceResponse::failure( __( 'Path is not a file.', 'debug-suite' ), 'not_a_file' );
 		}
 
-		if ( ! is_readable( $full_path ) ) {
+		if ( ! FileSystem::is_readable( $full_path ) ) {
 			return ServiceResponse::failure( __( 'File is not readable.', 'debug-suite' ), 'file_not_readable' );
 		}
 
-		$contents = file_get_contents( $full_path );
+		$contents = FileSystem::get_contents( $full_path );
 		$metadata = $this->get_file_metadata( $full_path );
 
 		return ServiceResponse::success(
@@ -233,13 +220,13 @@ class FileManagerService implements ServiceInterface {
 			return ServiceResponse::failure( __( 'Invalid path provided.', 'debug-suite' ), 'invalid_path' );
 		}
 
-		if ( file_exists( $full_path ) && ! is_writable( $full_path ) ) {
+		if ( FileSystem::exists( $full_path ) && ! FileSystem::is_writable( $full_path ) ) {
 			return ServiceResponse::failure( __( 'File is not writable.', 'debug-suite' ), 'file_not_writable' );
 		}
 
 		// Create backup if requested
 		$backup_path = null;
-		if ( $options['create_backup'] ?? false ) {
+		if ( isset( $options['create_backup'] ) ) {
 			$backup_result = $this->create_backup( $full_path );
 			if ( $backup_result->is_success() ) {
 				$backup_path = $backup_result->get_data();
@@ -247,14 +234,14 @@ class FileManagerService implements ServiceInterface {
 		}
 
 		// Write the file
-		$result = file_put_contents( $full_path, $contents );
-		if ( $result === false ) {
+		$result = FileSystem::put_contents( $full_path, $contents );
+		if ( ! $result ) {
 			return ServiceResponse::failure( __( 'Failed to save file.', 'debug-suite' ), 'file_save_failed' );
 		}
 
 		return ServiceResponse::success(
 			[
-				'bytes_written' => $result,
+				'bytes_written' => strlen( $contents ),
 				'backup_path' => $backup_path,
 				'path' => $relative_path,
 			]
@@ -289,7 +276,7 @@ class FileManagerService implements ServiceInterface {
 			return false;
 		}
 
-		if ( file_exists( $full_path ) ) {
+		if ( FileSystem::exists( $full_path ) ) {
 			// For existing paths, verify the resolved path starts with base path
 			$real_path = realpath( $full_path );
 			return $real_path && str_starts_with( $real_path, $real_base );
@@ -307,16 +294,17 @@ class FileManagerService implements ServiceInterface {
 	 * @return array
 	 */
 	private function get_file_metadata( string $full_path ): array {
-		$stat = stat( $full_path );
+		$size = FileSystem::size( $full_path );
+		$mtime = FileSystem::mtime( $full_path );
 
 		return [
-			'size' => $stat['size'] ?? 0,
-			'size_mb' => round( ( $stat['size'] ?? 0 ) / 1024 / 1024, 2 ),
-			'modified' => $stat['mtime'] ?? 0,
-			'modified_date' => wp_date( 'Y-m-d H:i:s', $stat['mtime'] ?? 0 ),
-			'permissions' => substr( sprintf( '%o', fileperms( $full_path ) ), -4 ),
-			'is_readable' => is_readable( $full_path ),
-			'is_writable' => is_writable( $full_path ),
+			'size' => $size,
+			'size_mb' => round( ( $size ) / 1024 / 1024, 2 ),
+			'modified' => $mtime,
+			'modified_date' => wp_date( 'Y-m-d H:i:s', $mtime ),
+			'permissions' => FileSystem::get_permissions( $full_path ),
+			'is_readable' => FileSystem::is_readable( $full_path ),
+			'is_writable' => FileSystem::is_writable( $full_path ),
 		];
 	}
 
@@ -327,12 +315,12 @@ class FileManagerService implements ServiceInterface {
 	 * @return ServiceResponse
 	 */
 	private function create_backup( string $file_path ): ServiceResponse {
-		if ( ! file_exists( $file_path ) ) {
+		if ( ! FileSystem::exists( $file_path ) ) {
 			return ServiceResponse::failure( __( 'File does not exist for backup.', 'debug-suite' ), 'file_not_found' );
 		}
 
 		$backup_path = $file_path . '.backup.' . gmdate( 'Y-m-d-H-i-s' );
-		$result = copy( $file_path, $backup_path );
+		$result = FileSystem::copy( $file_path, $backup_path );
 
 		if ( ! $result ) {
 			return ServiceResponse::failure( __( 'Failed to create backup.', 'debug-suite' ), 'backup_failed' );

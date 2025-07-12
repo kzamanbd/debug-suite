@@ -9,6 +9,7 @@ namespace DebugSuite\Services\DebugLog;
 
 use Automattic\WooCommerce\Utilities\LoggingUtil;
 use DebugSuite\Interfaces\ServiceInterface;
+use DebugSuite\Supports\FileSystem;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -75,12 +76,15 @@ class LogFileDiscoveryService implements ServiceInterface {
 		$log_files = array_filter(
 			array_map(
 				function ( $path ) {
+					$file_size = FileSystem::size( $path );
+					$file_mtime = FileSystem::mtime( $path );
+
 					return [
 						'name'        => basename( $path ),
 						'path'        => $path,
-						'size'        => size_format( filesize( $path ) ),
-						'size_bytes'  => filesize( $path ),
-						'modified'    => gmdate( 'Y-m-d H:i:s', filemtime( $path ) ),
+						'size'        => FileSystem::format_size( $file_size ),
+						'size_bytes'  => $file_size,
+						'modified'    => gmdate( 'Y-m-d H:i:s', $file_mtime ),
 						'type'        => $this->detect_log_type( $path ),
 					];
 				},
@@ -138,7 +142,7 @@ class LogFileDiscoveryService implements ServiceInterface {
 		$candidates = array_merge( $candidates, glob( '/var/log/php*.log' ) );
 
 		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
+			if ( FileSystem::is_readable( $path ) ) {
 				return $path;
 			}
 		}
@@ -160,7 +164,7 @@ class LogFileDiscoveryService implements ServiceInterface {
 			'/opt/bitnami/apache2/logs/error_log',
 		];
 		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
+			if ( FileSystem::is_readable( $path ) ) {
 				return $path;
 			}
 		}
@@ -180,7 +184,7 @@ class LogFileDiscoveryService implements ServiceInterface {
 			'/opt/bitnami/nginx/logs/error.log',
 		];
 		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
+			if ( FileSystem::is_readable( $path ) ) {
 				return $path;
 			}
 		}
@@ -199,7 +203,7 @@ class LogFileDiscoveryService implements ServiceInterface {
 			'/var/log/redis.log',
 		];
 		foreach ( $candidates as $path ) {
-			if ( is_readable( $path ) ) {
+			if ( FileSystem::is_readable( $path ) ) {
 				return $path;
 			}
 		}
