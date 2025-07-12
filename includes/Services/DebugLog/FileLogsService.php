@@ -9,7 +9,7 @@ namespace DebugSuite\Services\DebugLog;
 
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Utils\FileSystem;
+use DebugSuite\Supports\FileSystem;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.

@@ -9,7 +9,7 @@ namespace DebugSuite\Services;
 
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Utils\FileSystem;
+use DebugSuite\Supports\FileSystem;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 
@@ -226,7 +226,7 @@ class FileManagerService implements ServiceInterface {
 
 		// Create backup if requested
 		$backup_path = null;
-		if ( $options['create_backup'] ?? false ) {
+		if ( $options['create_backup'] ) {
 			$backup_result = $this->create_backup( $full_path );
 			if ( $backup_result->is_success() ) {
 				$backup_path = $backup_result->get_data();
