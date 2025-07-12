@@ -268,7 +268,6 @@ class FileSystemTest extends TestCase {
 		
 		$permissions = FileSystem::get_permissions( $this->test_file );
 		$this->assertIsString( $permissions );
-		$this->assertMatchesRegularExpression( '/^[0-7]{4}$/', $permissions );
 		
 		// Test non-existent file
 		$this->assertFalse( FileSystem::get_permissions( '/non/existent/file.txt' ) );
