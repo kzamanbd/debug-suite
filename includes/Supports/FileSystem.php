@@ -182,7 +182,9 @@ class FileSystem {
 			return filesize( $file_path );
 		}
 
-		return $filesystem->size( $file_path );
+		$size = $filesystem->size( $file_path );
+
+		return $size !== false ? $size : 0;
 	}
 
 	/**
@@ -197,8 +199,8 @@ class FileSystem {
 		if ( ! $filesystem ) {
 			return filemtime( $file_path );
 		}
-
-		return $filesystem->mtime( $file_path );
+		$mtime = $filesystem->mtime( $file_path );
+		return $mtime !== false ? $mtime : 0;
 	}
 
 	/**

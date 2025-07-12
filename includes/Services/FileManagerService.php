@@ -226,7 +226,7 @@ class FileManagerService implements ServiceInterface {
 
 		// Create backup if requested
 		$backup_path = null;
-		if ( $options['create_backup'] ) {
+		if ( isset( $options['create_backup'] ) ) {
 			$backup_result = $this->create_backup( $full_path );
 			if ( $backup_result->is_success() ) {
 				$backup_path = $backup_result->get_data();
@@ -298,11 +298,11 @@ class FileManagerService implements ServiceInterface {
 		$mtime = FileSystem::mtime( $full_path );
 
 		return [
-			'size' => $size ?: 0,
-			'size_mb' => round( ( $size ?: 0 ) / 1024 / 1024, 2 ),
-			'modified' => $mtime ?: 0,
-			'modified_date' => wp_date( 'Y-m-d H:i:s', $mtime ?: 0 ),
-			'permissions' => FileSystem::get_permissions( $full_path ) ?: '0000',
+			'size' => $size,
+			'size_mb' => round( ( $size ) / 1024 / 1024, 2 ),
+			'modified' => $mtime,
+			'modified_date' => wp_date( 'Y-m-d H:i:s', $mtime ),
+			'permissions' => FileSystem::get_permissions( $full_path ),
 			'is_readable' => FileSystem::is_readable( $full_path ),
 			'is_writable' => FileSystem::is_writable( $full_path ),
 		];
