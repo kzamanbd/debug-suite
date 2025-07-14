@@ -9,41 +9,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Force asset registration if not already done
 if ( ! wp_script_is( 'debug-suite-script', 'registered' ) || ! wp_style_is( 'debug-suite-style', 'registered' ) ) {
-	$assets = debug_suite_resolve( 'DebugSuite\Core\Assets' );
-	$assets->register_all_scripts();
+	debug_suite_resolve( 'DebugSuite\Assets' )->register_all_scripts();
 }
 
-// Prepare settings for frontend (same as admin but with frontend flag)
-global $wp_roles;
-if ( ! isset( $wp_roles ) ) {
-	$wp_roles = new WP_Roles();
-}
-
-$roles = array_map(
-	function ( $role ) {
-		return [
-			'name' => $role['name'],
-		];
-	},
-	$wp_roles->roles
-);
-
-$favicon = DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png';
-$constants = [
+$debug_suite_settings = get_option( 'debug_suite_settings', [] );
+$debug_suite_settings = array_merge( $debug_suite_settings, [
 	'wpDebug'        => WP_DEBUG,
 	'wpDebugLog'     => WP_DEBUG_LOG,
 	'wpDebugDisplay' => WP_DEBUG_DISPLAY,
 	'publicRootPath' => ABSPATH,
 	'filesUrl'       => content_url(),
-	'roles'          => $roles,
-	'favicon'        => $favicon,
+	'favicon'        => DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png',
 	'wpVersion'      => get_bloginfo( 'version' ),
 	'phpVersion'     => phpversion(),
 	'isFrontend'     => true,
-];
-
-$settings = get_option( 'debug_suite_settings', [] );
-$settings = array_merge( $constants, $settings );
+] );
 
 // Ensure assets are enqueued
 wp_enqueue_script( 'debug-suite-script' );
