@@ -201,21 +201,6 @@ class Admin implements Hookable {
 		if ( 'toplevel_page_debug-suite' !== $hook_suffix ) {
 			return;
 		}
-
-		global $wp_roles;
-
-		if ( ! isset( $wp_roles ) ) {
-			$wp_roles = new WP_Roles();
-		}
-
-		$roles     = array_map(
-			function ( $role ) {
-				return [
-					'name' => $role['name'],
-				];
-			},
-			$wp_roles->roles
-		);
 		$favicon   = DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png';
 		$constants = [
 			'wpDebug'        => WP_DEBUG,
@@ -223,7 +208,6 @@ class Admin implements Hookable {
 			'wpDebugDisplay' => WP_DEBUG_DISPLAY,
 			'publicRootPath' => ABSPATH,
 			'filesUrl'       => content_url(),
-			'roles'          => $roles,
 			'favicon'       => $favicon,
 			'wpVersion'      => get_bloginfo( 'version' ),
 			'phpVersion'     => phpversion(),
@@ -233,6 +217,7 @@ class Admin implements Hookable {
 
 		wp_enqueue_script( 'debug-suite-script' );
 		wp_enqueue_style( 'debug-suite-style' );
+		wp_set_script_translations( 'debug-suite-script', 'debug-suite' );
 		wp_localize_script(
 			'debug-suite-script',
 			'debugSuite',

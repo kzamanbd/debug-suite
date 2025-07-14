@@ -19,7 +19,7 @@ class FrontendServiceProvider extends AbstractServiceProvider {
 
 	public function register( Container $container ): void {
 		// Simple frontend service registration
-		$container->add_definitions(
+		$container->add(
 			[
 				Frontend::class => $container->object( Frontend::class ),
 			]

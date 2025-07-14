@@ -44,7 +44,6 @@ use DebugSuite\Core\Activator;
 use DebugSuite\Core\Deactivator;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
-use DebugSuite\Providers\CoreServiceProvider;
 use DebugSuite\Providers\AdminServiceProvider;
 use DebugSuite\Providers\FrontendServiceProvider;
 use DebugSuite\Providers\AppServiceProvider;
@@ -161,7 +160,6 @@ final class DebugSuite {
 	 */
 	private function register_providers(): void {
 		$providers = [
-			CoreServiceProvider::class,
 			AppServiceProvider::class,
 			AdminServiceProvider::class,
 			FrontendServiceProvider::class,

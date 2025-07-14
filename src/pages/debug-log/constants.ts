@@ -25,8 +25,8 @@ export const levelOptions = [
 ];
 
 export const perPageOptions = [
+    { value: '50', label: __('50 items', 'debug-suite') },
     { value: '100', label: __('100 items', 'debug-suite') },
-    { value: '250', label: __('250 items', 'debug-suite') },
     { value: '500', label: __('500 items', 'debug-suite') },
     { value: '1000', label: __('1000 items', 'debug-suite') }
 ];

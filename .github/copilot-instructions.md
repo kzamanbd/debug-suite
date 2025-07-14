@@ -177,7 +177,7 @@ npm run tailwind:build
 
 ```php
 // ✅ CORRECT - Current service registration in AppServiceProvider
-$container->add_definitions([
+$container->add([
     // Use object() for simple services (singletons)
     MyService::class => $container->object(MyService::class),
 
@@ -197,7 +197,7 @@ $container->add_definitions([
 
 **✅ Current Service Registration Pattern:**
 
-- All business services registered in `AppServiceProvider` using `add_definitions()`
+- All business services registered in `AppServiceProvider` using `add()`
 - Services use `object()` for simple singletons
 - Controllers use `autowire()` for dependency injection
 - Service classes implement `ServiceInterface` marker interface
@@ -237,7 +237,7 @@ $container->add_definitions([
         ];
 
         public function register( Container $container ): void {
-            $container->add_definitions([
+            $container->add([
                 ExampleService::class => $container->object( ExampleService::class ),
                 ExampleController::class => $container->autowire( ExampleController::class ),
             ]);
@@ -388,7 +388,7 @@ class ExampleService implements ServiceInterface {
 
 ```php
 // In AppServiceProvider::register()
-$container->add_definitions([
+$container->add([
     ExampleService::class => $container->object( ExampleService::class ),
     ExampleController::class => $container->autowire( ExampleController::class ),
 ]);
@@ -674,7 +674,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 
     public function register(Container $container): void {
         // Modern definition array approach
-        $container->add_definitions([
+        $container->add([
             // Services with simple autowiring
             WPLogReaderService::class    => $container->object(WPLogReaderService::class),
             FileLogsService::class       => $container->object(FileLogsService::class),

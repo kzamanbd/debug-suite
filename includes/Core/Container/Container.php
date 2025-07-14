@@ -1007,7 +1007,7 @@ class Container implements ContainerInterface {
 	 *
 	 * @example
 	 * ```php
-	 * $container->add_definitions([
+	 * $container->add([
 	 *     MyService::class => DI::autowire(),
 	 *     'config.debug' => DI::value(true),
 	 *     LoggerInterface::class => DI::factory(function() {
@@ -1016,7 +1016,7 @@ class Container implements ContainerInterface {
 	 * ]);
 	 * ```
 	 */
-	public function add_definitions( array $definitions ): void {
+	public function add( array $definitions ): void {
 		foreach ( $definitions as $id => $definition ) {
 			if ( $definition instanceof DefinitionInterface ) {
 				$this->set( $id, $definition );

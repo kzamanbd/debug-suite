@@ -214,19 +214,14 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
             {/* Load more section */}
             {logs.length > 0 && (
                 <div className="border-t border-gray-200 bg-white p-2">
-                    {infiniteState.isLoadingMore ? (
-                        <div className="flex items-center justify-center">
-                            <RefreshCwIcon className="mr-2 h-4 w-4 animate-spin" />
-                            <span className="text-sm text-gray-600">
-                                {__('Loading more entries...', 'debug-suite')}
-                            </span>
-                        </div>
-                    ) : infiniteState.hasMore ? (
-                        <div className="flex items-center justify-center">
-                            <Button onClick={onLoadMore} className="flex items-center space-x-2">
-                                <ChevronDownIcon className="h-4 w-4" />
+                    {infiniteState.hasMore ? (
+                        <div className="flex items-center justify-center gap-4">
+                            <Button onClick={onLoadMore} loading={infiniteState.isLoadingMore}>
                                 <span>{__('Load More Entries', 'debug-suite')}</span>
                             </Button>
+                            <span className="text-xs text-gray-400">
+                                {__('Showing', 'debug-suite')} {logs.length} {__('entries', 'debug-suite')}
+                            </span>
                         </div>
                     ) : (
                         <div className="flex items-center justify-center">
