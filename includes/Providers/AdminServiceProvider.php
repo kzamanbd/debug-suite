@@ -19,7 +19,7 @@ class AdminServiceProvider extends AbstractServiceProvider {
 
 	public function register( Container $container ): void {
 		// Simple admin service registration
-		$container->add_definitions(
+		$container->add(
 			[
 				Admin::class => $container->object( Admin::class ),
 			]
