@@ -60,7 +60,7 @@ class ContainerBuilder {
 	 *
 	 * @return static
 	 */
-	public function add_definitions( array $definitions ): static {
+	public function add( array $definitions ): static {
 		$this->definitions = array_merge( $this->definitions, $definitions );
 		return $this;
 	}

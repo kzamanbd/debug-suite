@@ -469,7 +469,7 @@ if (!current_user_can('manage_options')) {
 
 ```php
 // ✅ Use container singleton pattern for expensive operations
-$container->add_definitions([
+$container->add([
     ExpensiveService::class => $container->object(ExpensiveService::class)
 ]);
 

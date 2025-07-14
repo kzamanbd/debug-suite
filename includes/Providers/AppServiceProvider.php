@@ -7,6 +7,8 @@
 
 namespace DebugSuite\Providers;
 
+use DebugSuite\Assets;
+use DebugSuite\Core\Plugin;
 use DebugSuite\Core\Container\AbstractServiceProvider;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Services\DebugLog\FileLogsService;
@@ -26,6 +28,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AppServiceProvider extends AbstractServiceProvider {
 
 	protected array $provides = [
+		Assets::class,
+		Plugin::class,
 		WPLogReaderService::class,
 		FileLogsService::class,
 		FileManagerService::class,
@@ -39,8 +43,10 @@ class AppServiceProvider extends AbstractServiceProvider {
 
 	public function register( Container $container ): void {
 		// Simple service registration - merged from ServicesServiceProvider
-		$container->add_definitions(
+		$container->add(
 			[
+				Assets::class => $container->object( Assets::class ),
+				Plugin::class => $container->object( Plugin::class ),
 				// Core services as singletons
 				WPLogReaderService::class => $container->object( WPLogReaderService::class ),
 				FileLogsService::class    => $container->object( FileLogsService::class ),
