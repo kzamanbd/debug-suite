@@ -7,7 +7,7 @@
 
 namespace DebugSuite\API;
 
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\DebugLog\LogsService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -22,12 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class FileLogsController extends RestController {
+class LogsController extends RestController {
 
-	private FileLogsService $service;
+	private LogsService $service;
 	protected $rest_base = 'logs';
 
-	public function __construct( FileLogsService $service ) {
+	public function __construct( LogsService $service ) {
 		$this->service = $service;
 	}
 
@@ -85,16 +85,6 @@ class FileLogsController extends RestController {
 						'sanitize_callback' => 'sanitize_text_field',
 					],
 				],
-			]
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/supported-files',
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_supported_log_files' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
 			]
 		);
 
@@ -176,25 +166,6 @@ class FileLogsController extends RestController {
 					'message' => __( 'Log file cleared successfully.', 'debug-suite' ),
 				]
 			);
-	}
-
-
-
-	/**
-	 * Get available log files for sidebar navigation.
-	 *
-	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response|WP_Error
-	 */
-	public function get_supported_log_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$supported_log_files = $this->service->supported_log_files();
-
-		return rest_ensure_response(
-			[
-				'files' => $supported_log_files,
-				'count' => count( $supported_log_files ),
-			]
-		);
 	}
 
 	/**

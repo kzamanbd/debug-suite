@@ -11,7 +11,7 @@ namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Tests\Helpers\TestCase;
 use DebugSuite\Services\OverviewService;
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Core\ServiceResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -28,9 +28,9 @@ class OverviewServiceTest extends TestCase {
 	private $service;
 
 	/**
-	 * Mock FileLogsService instance.
+	 * Mock LogsService instance.
 	 *
-	 * @var FileLogsService&MockObject
+	 * @var LogsService&MockObject
 	 */
 	private $mock_file_logs_service;
 
@@ -40,8 +40,8 @@ class OverviewServiceTest extends TestCase {
 	public function set_up() {
 		parent::set_up();
 
-		// Create mock FileLogsService
-		$this->mock_file_logs_service = $this->createMock( FileLogsService::class );
+		// Create mock LogsService
+		$this->mock_file_logs_service = $this->createMock( LogsService::class );
 
 		// Create service instance with mock dependency
 		$this->service = new OverviewService( $this->mock_file_logs_service );

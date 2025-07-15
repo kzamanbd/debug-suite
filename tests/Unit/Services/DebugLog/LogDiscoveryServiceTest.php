@@ -1,35 +1,35 @@
 <?php
 /**
- * Tests for LogFileDiscoveryService.
+ * Tests for LogDiscoveryService.
  *
  * @package DebugSuite\Tests\Unit\Services\DebugLog
  */
 
 namespace DebugSuite\Tests\Unit\Services\DebugLog;
 
-use DebugSuite\Services\DebugLog\LogFileDiscoveryService;
+use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 
 /**
- * @covers \DebugSuite\Services\DebugLog\LogFileDiscoveryService
+ * @covers \DebugSuite\Services\DebugLog\LogDiscoveryService
  * @group services
  * @group unit
  */
-class LogFileDiscoveryServiceTest extends DebugSuiteTestCase {
+class LogDiscoveryServiceTest extends DebugSuiteTestCase {
 
 	/**
 	 * Test service instance.
 	 *
-	 * @var LogFileDiscoveryService
+	 * @var LogDiscoveryService
 	 */
-	private LogFileDiscoveryService $service;
+	private LogDiscoveryService $service;
 
 	/**
 	 * Set up test environment.
 	 */
 	protected function setUp(): void {
 		parent::setUp();
-		$this->service = new LogFileDiscoveryService();
+		$this->service = new LogDiscoveryService();
 	}
 
 	/**

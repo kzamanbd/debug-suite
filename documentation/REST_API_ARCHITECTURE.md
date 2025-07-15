@@ -62,7 +62,7 @@ The plugin includes a comprehensive testing framework for REST API controllers. 
 
 ```php
 /**
- * @covers \DebugSuite\API\FileLogsController
+ * @covers \DebugSuite\API\LogsController
  * @group api
  * @group integration
  */

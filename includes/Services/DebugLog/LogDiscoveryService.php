@@ -8,8 +8,8 @@
 namespace DebugSuite\Services\DebugLog;
 
 use Automattic\WooCommerce\Utilities\LoggingUtil;
+use DebugSuite\Core\FileSystem;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Supports\FileSystem;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class LogFileDiscoveryService implements ServiceInterface {
+class LogDiscoveryService implements ServiceInterface {
 
 	/**
 	 * Get paths to supported log files.

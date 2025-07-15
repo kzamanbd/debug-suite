@@ -8,35 +8,9 @@ import { useDebounce } from '@/hooks/use-debounce';
 import apiFetch from '@wordpress/api-fetch';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
-import type { InfiniteScrollState, LogEntry, LogFile, LogFilters, LogResponse, RawFileContent } from './types';
+import type { InfiniteScrollState, LogEntry, LogFilters, LogResponse, RawFileContent } from './types';
 
 const defaultPerPage = 50; // Default items per page
-
-export const useLogFiles = () => {
-    const [logFiles, setLogFiles] = useState<LogFile[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    const fetchLogFiles = async () => {
-        try {
-            setLoading(true);
-            const response = await apiFetch<{ files: LogFile[] }>({
-                path: '/debug-suite/v1/logs/supported-files'
-            });
-            setLogFiles(response.files);
-        } catch (error) {
-            console.error('Error fetching log files:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Fetch log files on component mount
-    useEffect(() => {
-        void fetchLogFiles();
-    }, []);
-
-    return { logFiles, loading, refetch: fetchLogFiles };
-};
 
 /**
  * Client-side filtering function for log entries
@@ -96,11 +70,17 @@ const filterLogEntries = (logs: LogEntry[], filters: LogFilters): LogEntry[] => 
     return filtered;
 };
 
+const { logs } = window.debugSuite;
+const defaultLog: Option = {
+    label: logs.length > 0 ? logs[0].name : 'No logs available',
+    value: logs.length > 0 ? logs[0].path : ''
+};
+
 export const useLogEntries = () => {
     const [allLogs, setAllLogs] = useState<LogEntry[]>([]);
     const [totalEntries, setTotalEntries] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [selectedFile, setSelectedFile] = useState<Option | null>(null);
+    const [selectedFile, setSelectedFile] = useState<Option | null>(defaultLog);
     const [filters, setFilters] = useState<LogFilters>({
         level: '',
         search: '',

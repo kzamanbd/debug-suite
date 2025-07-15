@@ -1,10 +1,10 @@
 <?php
 
-namespace DebugSuite\Core;
+namespace DebugSuite\Internal;
 
 use DebugSuite\Interfaces\Hookable;
 
-class Plugin implements Hookable {
+class HookManager implements Hookable {
 
 	public function register_hooks(): void {
 		add_filter( 'plugin_action_links_' . plugin_basename( DEBUG_SUITE_FILE ), [ $this, 'plugin_action_links' ] );

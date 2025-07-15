@@ -50,28 +50,29 @@ export interface ItemTree {
     children?: ItemTree[];
 }
 
-export interface SettingsState {
-    fileManagerAccess: string;
-    publicRootPath: string;
-    filesUrl: string;
-    defaultViewType: string;
-    enableTrash: boolean;
-    hideHtaccess: boolean;
-    logQueries: boolean;
-    logErrors: boolean;
+export interface LogFile {
+    name: string;
+    path: string;
+    size: string;
+    size_bytes: number;
+    modified: string;
+    type: string;
 }
 
 // global window type
 declare global {
     interface Window {
         debugSuite: {
-            wpDebug: boolean;
-            wpDebugLog: boolean;
-            wpDebugDisplay: boolean;
-            wpVersion: string;
-            phpVersion: string;
+            debug: boolean;
+            debug_log: boolean;
+            debug_display: boolean;
+            root_path: string;
+            content_url: string;
+            wp_version: string;
+            php_version: string;
             favicon: string;
-            roles: Record<string, { name: string }>;
-        } & SettingsState;
+            site_name: string;
+            logs: LogFile[];
+        };
     }
 }

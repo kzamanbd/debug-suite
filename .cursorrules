@@ -50,7 +50,7 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 
 - Use `DebugSuite\Core\Container\Container` singleton for service management
 - Support for simple object (`$container->object()`) and autowired (`$container->autowire()`) service registration
-- Container accessible via `Container::get_instance()` or `debug_suite_container()` helper
+- Container accessible via `Container::get_instance()` or `debug_suite()->container()` helper
 - Service providers extend `AbstractServiceProvider` with registration and booting phases
 - Automatic hook registration for services implementing `Hookable` interface via `ServiceManager`
 
@@ -332,8 +332,8 @@ tests/
 
 ```php
 // ✅ Use debug suite helpers for DI container access
-$service = debug_suite_resolve(FileLogsService::class);
-$container = debug_suite_container();
+$service = debug_suite()->resolve(FileLogsService::class);
+$container = debug_suite()->container();
 $service_manager = debug_suite_service_manager();
 $plugin_instance = debug_suite();
 ```

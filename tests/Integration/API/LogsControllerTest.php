@@ -1,6 +1,6 @@
 <?php
 /**
- * Integration tests for FileLogsController REST API.
+ * Integration tests for LogsController REST API.
  *
  * @package DebugSuite\Tests\Integration\API
  * @group api
@@ -11,29 +11,29 @@
 namespace DebugSuite\Tests\Integration\API;
 
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
-use DebugSuite\API\FileLogsController;
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\API\LogsController;
+use DebugSuite\Services\DebugLog\LogsService;
 use WP_REST_Request;
 use WP_REST_Server;
 
 /**
- * Test FileLogsController REST API endpoints.
+ * Test LogsController REST API endpoints.
  *
  * @since 1.0.0
  */
-class FileLogsControllerTest extends DebugSuiteTestCase {
+class LogsControllerTest extends DebugSuiteTestCase {
 
 	/**
 	 * Controller instance for testing.
 	 *
-	 * @var FileLogsController
+	 * @var LogsController
 	 */
-	private $controller;
+	private LogsController $controller;
 
 	/**
 	 * Service instance for testing.
 	 *
-	 * @var FileLogsService
+	 * @var LogsService
 	 */
 	private $service;
 
@@ -55,9 +55,9 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 		$wp_rest_server = new WP_REST_Server();
 		do_action( 'rest_api_init' );
 
-		// Create service and controller (FileLogsService has no constructor parameters)
-		$this->service = new FileLogsService();
-		$this->controller = new FileLogsController( $this->service );
+		// Create service and controller (LogsService has no constructor parameters)
+		$this->service = new LogsService();
+		$this->controller = new LogsController( $this->service );
 		
 		// Register routes
 		$this->controller->register_routes();
@@ -107,7 +107,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
 		
 		if ( $response->get_status() === 200 ) {
 			$data = $response->get_data();
-			// Check for actual response structure from FileLogsController
+			// Check for actual response structure from LogsController
 			$this->assertArrayHasKey( 'entries', $data );
 			$this->assertArrayHasKey( 'total', $data );
 			$this->assertArrayHasKey( 'current_page', $data );

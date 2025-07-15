@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Supports;
+namespace DebugSuite\Core;
 
 use WP_Filesystem_Base;
 

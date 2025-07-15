@@ -6,13 +6,10 @@
 import { useEffect, useState } from '@wordpress/element';
 import { LogControls, LogViewer, RawFileViewer } from './components';
 import FileLogsSkeleton from './components/logs-skeleton';
-import { useLogActions, useLogEntries, useLogFiles, useRawFileContent } from './hooks';
+import { useLogActions, useLogEntries, useRawFileContent } from './hooks';
 import type { LogFilters, ViewMode } from './types';
 
 const FileLogs = () => {
-    // Custom hooks for data management
-    const { logFiles, loading: filesLoading } = useLogFiles();
-
     const {
         logs,
         loading: logsLoading,
@@ -89,7 +86,7 @@ const FileLogs = () => {
     };
 
     // Show skeleton while initial data loads
-    if (filesLoading) {
+    if (logsLoading) {
         return <FileLogsSkeleton />;
     }
 
@@ -97,13 +94,11 @@ const FileLogs = () => {
         <div className="flex h-full flex-col">
             <LogControls
                 filters={filters}
-                logFiles={logFiles}
                 viewMode={viewMode}
                 selectedFile={selectedFile}
                 clearing={clearing}
-                filesLoading={filesLoading}
                 rawContent={rawContent}
-                loading={logsLoading || rawLoading}
+                loading={rawLoading}
                 onFileChange={onFileChange}
                 onViewModeChange={handleViewModeChange}
                 onFiltersChange={handleFilterChange}
