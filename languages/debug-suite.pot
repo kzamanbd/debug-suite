@@ -72,7 +72,7 @@ msgid "Log file path. If not provided, uses the current debug log file."
 msgstr ""
 
 #: includes/API/FileLogsController.php:176
-#: includes/Services/Logs/WPLogReaderService.php:700
+#: includes/Services/DebugLog/WPLogReaderService.php:700
 msgid "Log file cleared successfully."
 msgstr ""
 
@@ -120,45 +120,45 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: includes/Services/Logs/FileLogsService.php:106
+#: includes/Services/DebugLog/FileLogsService.php:106
 msgid "No log file path provided or configured."
 msgstr ""
 
-#: includes/Services/Logs/FileLogsService.php:114
+#: includes/Services/DebugLog/FileLogsService.php:114
 msgid "The requested log file was not found."
 msgstr ""
 
-#: includes/Services/Logs/FileLogsService.php:123
+#: includes/Services/DebugLog/FileLogsService.php:123
 msgid "Access to this file is not allowed."
 msgstr ""
 
-#: includes/Services/Logs/FileLogsService.php:145
+#: includes/Services/DebugLog/FileLogsService.php:145
 msgid "Failed to read the log file."
 msgstr ""
 
-#: includes/Services/Logs/WPLogReaderService.php:104
-#: includes/Services/Logs/WPLogReaderService.php:624
+#: includes/Services/DebugLog/WPLogReaderService.php:104
+#: includes/Services/DebugLog/WPLogReaderService.php:624
 msgid "Log file not found."
 msgstr ""
 
-#: includes/Services/Logs/WPLogReaderService.php:112
+#: includes/Services/DebugLog/WPLogReaderService.php:112
 msgid "Log file is not readable."
 msgstr ""
 
-#: includes/Services/Logs/WPLogReaderService.php:122
+#: includes/Services/DebugLog/WPLogReaderService.php:122
 msgid "Failed to read log file."
 msgstr ""
 
 #. translators: %s is the error message.
-#: includes/Services/Logs/WPLogReaderService.php:162
+#: includes/Services/DebugLog/WPLogReaderService.php:162
 msgid "Error reading log file: %s"
 msgstr ""
 
-#: includes/Services/Logs/WPLogReaderService.php:684
+#: includes/Services/DebugLog/WPLogReaderService.php:684
 msgid "Log file does not exist."
 msgstr ""
 
-#: includes/Services/Logs/WPLogReaderService.php:693
+#: includes/Services/DebugLog/WPLogReaderService.php:693
 msgid "Failed to clear log file."
 msgstr ""
 

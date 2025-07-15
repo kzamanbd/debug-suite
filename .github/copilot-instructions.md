@@ -940,7 +940,7 @@ The project follows a clean service provider architecture:
 
 All business logic is implemented in the `includes/Services/` directory:
 
-- **Logs/** - Debug log related services
+- **DebugLog/** - Debug log related services
     - `FileLogsService` - Debug log operations
     - `WPLogReaderService` - WordPress log file reading
     - `LogFileDiscoveryService` - Log file discovery
