@@ -7,13 +7,13 @@
  * @group   logs
  */
 
-namespace DebugSuite\Tests\Unit\Services;
+namespace DebugSuite\Tests\Unit\Services\DebugLog;
 
-use DebugSuite\Tests\Helpers\TestCase;
-use DebugSuite\Services\DebugLog\FileLogsService;
-use DebugSuite\Services\DebugLog\WPLogReaderService;
-use DebugSuite\Services\DebugLog\LogFileDiscoveryService;
 use DebugSuite\Core\ServiceResponse;
+use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\DebugLog\LogDiscoveryService;
+use DebugSuite\Services\DebugLog\WPLogReaderService;
+use DebugSuite\Tests\Helpers\TestCase;
 use ReflectionClass;
 
 /**
@@ -36,9 +36,9 @@ class FileLogsServiceTest extends TestCase {
 	private $log_reader;
 
 	/**
-	 * LogFileDiscoveryService mock.
+	 * LogDiscoveryService mock.
 	 *
-	 * @var LogFileDiscoveryService|\PHPUnit\Framework\MockObject\MockObject
+	 * @var LogDiscoveryService|\PHPUnit\Framework\MockObject\MockObject
 	 */
 	private $file_discovery;
 
@@ -60,7 +60,7 @@ class FileLogsServiceTest extends TestCase {
 
 		// Create mocks
 		$this->log_reader = $this->createMock( WPLogReaderService::class );
-		$this->file_discovery = $this->createMock( LogFileDiscoveryService::class );
+		$this->file_discovery = $this->createMock( LogDiscoveryService::class );
 
 		// Create service instance with mocked dependencies
 		$this->service = new FileLogsService();
@@ -116,7 +116,7 @@ class FileLogsServiceTest extends TestCase {
 	}
 
 	/**
-	 * Test supported_log_files delegates to LogFileDiscoveryService.
+	 * Test supported_log_files delegates to LogDiscoveryService.
 	 */
 	public function test_supported_log_files_delegates_to_discovery(): void {
 		$expected_files = [
@@ -151,7 +151,7 @@ class FileLogsServiceTest extends TestCase {
 		$this->assertInstanceOf( WPLogReaderService::class, $log_reader_prop->getValue( $service ) );
 
 		$file_discovery_prop = $reflection->getProperty( 'file_discovery' );
-		$this->assertInstanceOf( LogFileDiscoveryService::class, $file_discovery_prop->getValue( $service ) );
+		$this->assertInstanceOf( LogDiscoveryService::class, $file_discovery_prop->getValue( $service ) );
 	}
 
 	/**

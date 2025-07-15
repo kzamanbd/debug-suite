@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class LogFileDiscoveryService implements ServiceInterface {
+class LogDiscoveryService implements ServiceInterface {
 
 	/**
 	 * Get paths to supported log files.
