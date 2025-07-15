@@ -113,7 +113,7 @@ final class DebugSuite {
 		$this->define_constants();
 		$this->init_container();
 		$this->register_providers();
-		$this->boot_services();
+		$this->boot();
 
 		// Activation hook
 		register_activation_hook( __FILE__, [ Activator::class, 'activate' ] );
@@ -177,7 +177,7 @@ final class DebugSuite {
 	 * @access   private
 	 * @return void
 	 */
-	private function boot_services(): void {
+	private function boot(): void {
 		$this->service_manager->boot();
 	}
 
@@ -221,7 +221,7 @@ final class DebugSuite {
 	 * @return   Container
 	 * @since    1.0.0
 	 */
-	public function get_container(): Container {
+	public function container(): Container {
 		return $this->container;
 	}
 
@@ -241,7 +241,7 @@ final class DebugSuite {
 	 * @param string $service Service name.
 	 *
 	 * @return   mixed
-	 * @throws   Exception If the service cannot be resolved.
+	 * @throws   Exception|Throwable If the service cannot be resolved.
 	 * @since    1.0.0
 	 */
 	public function resolve( string $service ): mixed {

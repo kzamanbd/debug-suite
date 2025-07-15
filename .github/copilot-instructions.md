@@ -277,12 +277,12 @@ $container->add([
         - `WPLogReaderService` (WordPress log file reading)
         - `LogFileDiscoveryService` (log file discovery)
     - **Service Dependencies**: Services accept optional constructor parameters for configuration (log file paths, base directories, config files)
-    - **Container Integration**: Services are resolved via `debug_suite_resolve()` helper or direct container access
+    - **Container Integration**: Services are resolved via `debug_suite()->resolve()` helper or direct container access
     - **Testing Architecture**: Services are easily unit testable without WordPress dependencies or global state
 
 7. **Helper Functions and Global Access**:
-    - **Container Access**: Use `debug_suite_container()` to get container instance
-    - **Service Resolution**: Use `debug_suite_resolve(string $service)` to resolve services
+    - **Container Access**: Use `debug_suite()->container()` to get container instance
+    - **Service Resolution**: Use `debug_suite()->resolve(string $service)` to resolve services
     - **Service Manager**: Use `debug_suite_service_manager()` to get service manager instance
     - **Main Instance**: Use `debug_suite()` to get main plugin instance
     - **Date Utility**: Use `debug_suite_date(string $timestamp)` for consistent date formatting
@@ -290,8 +290,8 @@ $container->add([
 **Note**: The helper functions available are:
 
 - `debug_suite()` - Main plugin instance
-- `debug_suite_container()` - DI Container instance
-- `debug_suite_resolve($service)` - Resolve service from container
+- `debug_suite()->container()` - DI Container instance
+- `debug_suite()->resolve($service)` - Resolve service from container
 - `debug_suite_service_manager()` - Service manager instance
 - `debug_suite_date($timestamp)` - Date formatting utility
 
@@ -774,10 +774,10 @@ $container->set(LogsApiController::class, $container->autowire(LogsApiController
 
 ```php
 // Quick service resolution
-$logger = debug_suite_resolve(LoggerInterface::class);
+$logger = debug_suite()->resolve(LoggerInterface::class);
 
 // Container access
-$container = debug_suite_container();
+$container = debug_suite()->container();
 
 // Service manager access
 $service_manager = debug_suite_service_manager();

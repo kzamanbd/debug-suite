@@ -30,34 +30,6 @@ if ( ! function_exists( 'debug_suite' ) ) {
 	}
 }
 
-if ( ! function_exists( 'debug_suite_container' ) ) {
-	/**
-	 * Get the Debug Suite container instance.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return Container The DI Container instance.
-	 */
-	function debug_suite_container(): Container {
-		return debug_suite()->get_container();
-	}
-}
-
-if ( ! function_exists( 'debug_suite_resolve' ) ) {
-	/**
-	 * Resolve a service from the Debug Suite container.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $service Service name or class name.
-	 *
-	 * @throws Exception If the service cannot be resolved.
-	 */
-	function debug_suite_resolve( string $service ): mixed {
-		return debug_suite_container()->resolve( $service );
-	}
-}
-
 if ( ! function_exists( 'debug_suite_service_manager' ) ) {
 	/**
 	 * Get the Debug Suite service manager instance.
