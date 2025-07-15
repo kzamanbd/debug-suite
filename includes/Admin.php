@@ -9,7 +9,6 @@
 namespace DebugSuite;
 
 use DebugSuite\Interfaces\Hookable;
-use DebugSuite\Services\DebugLog\LogsService;
 
 /**
  * Admin functionality for the Debug Suite plugin.
@@ -201,21 +200,6 @@ class Admin implements Hookable {
 		if ( 'toplevel_page_debug-suite' !== $hook_suffix ) {
 			return;
 		}
-		$favicon   = DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png';
-		$files = debug_suite()->resolve( LogsService::class )->supported_log_files();
-		$constants = [
-			'debug'         => WP_DEBUG,
-			'debug_log'     => WP_DEBUG_LOG,
-			'debug_display' => WP_DEBUG_DISPLAY,
-			'root_path'     => ABSPATH,
-			'content_url'   => content_url(),
-			'favicon'       => $favicon,
-			'wp_version'    => get_bloginfo( 'version' ),
-			'php_version'   => phpversion(),
-			'logs'          => $files,
-		];
-		$settings  = get_option( 'debug_suite_settings', [] );
-		$settings  = array_merge( $constants, $settings );
 
 		wp_enqueue_script( 'debug-suite-script' );
 		wp_enqueue_style( 'debug-suite-style' );
@@ -223,7 +207,7 @@ class Admin implements Hookable {
 		wp_localize_script(
 			'debug-suite-script',
 			'debugSuite',
-			$settings
+			Assets::get_localized_data()
 		);
 	}
 }

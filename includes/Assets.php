@@ -3,6 +3,7 @@
 namespace DebugSuite;
 
 use DebugSuite\Interfaces\Hookable;
+use DebugSuite\Services\DebugLog\LogsService;
 
 class Assets implements Hookable {
 
@@ -99,5 +100,24 @@ class Assets implements Hookable {
 
 			wp_register_style( $handle, $style['src'], $deps, $style['version'] );
 		}
+	}
+
+	public static function get_localized_data(): array {
+		$files = debug_suite()->resolve( LogsService::class )->supported_log_files();
+		$constants = [
+			'debug'         => WP_DEBUG,
+			'debug_log'     => WP_DEBUG_LOG,
+			'debug_display' => WP_DEBUG_DISPLAY,
+			'root_path'     => ABSPATH,
+			'content_url'   => content_url(),
+			'favicon'       => DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png',
+			'wp_version'    => get_bloginfo( 'version' ),
+			'php_version'   => phpversion(),
+			'logs'          => $files,
+		];
+		$settings  = get_option( 'debug_suite_settings', [] );
+		$settings  = array_merge( $constants, $settings );
+
+		return apply_filters( 'debug_suite_localized_data', $settings );
 	}
 }
