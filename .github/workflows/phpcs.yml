@@ -2,7 +2,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - develop
 
 name: PHPCS Inspection
 jobs:
