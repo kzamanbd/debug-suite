@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class FileLogsService implements ServiceInterface {
+class LogsService implements ServiceInterface {
 
 	/**
 	 * Advanced log reader service.

@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit tests for FileLogsService class.
+ * Unit tests for LogsService class.
  *
  * @package DebugSuite\Tests\Unit\Services
  * @group   services
@@ -10,21 +10,21 @@
 namespace DebugSuite\Tests\Unit\Services\DebugLog;
 
 use DebugSuite\Core\ServiceResponse;
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Tests\Helpers\TestCase;
 use ReflectionClass;
 
 /**
- * Test FileLogsService functionality.
+ * Test LogsService functionality.
  */
-class FileLogsServiceTest extends TestCase {
+class LogsServiceTest extends TestCase {
 
 	/**
-	 * FileLogsService instance for testing.
+	 * LogsService instance for testing.
 	 *
-	 * @var FileLogsService
+	 * @var LogsService
 	 */
 	private $service;
 
@@ -63,7 +63,7 @@ class FileLogsServiceTest extends TestCase {
 		$this->file_discovery = $this->createMock( LogDiscoveryService::class );
 
 		// Create service instance with mocked dependencies
-		$this->service = new FileLogsService();
+		$this->service = new LogsService();
 		$reflection = new ReflectionClass( $this->service );
 		$log_reader_prop = $reflection->getProperty( 'log_reader' );
 		$log_reader_prop->setValue( $this->service, $this->log_reader );
@@ -142,8 +142,8 @@ class FileLogsServiceTest extends TestCase {
 	 * Test constructor with default dependencies.
 	 */
 	public function test_constructor_with_default_dependencies(): void {
-		$service = new FileLogsService();
-		$this->assertInstanceOf( FileLogsService::class, $service );
+		$service = new LogsService();
+		$this->assertInstanceOf( LogsService::class, $service );
 
 		$reflection = new ReflectionClass( $service );
 

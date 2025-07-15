@@ -45,7 +45,6 @@ use DebugSuite\Core\Deactivator;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
 use DebugSuite\Providers\AdminServiceProvider;
-use DebugSuite\Providers\FrontendServiceProvider;
 use DebugSuite\Providers\AppServiceProvider;
 
 /**
@@ -162,7 +161,6 @@ final class DebugSuite {
 		$providers = [
 			AppServiceProvider::class,
 			AdminServiceProvider::class,
-			FrontendServiceProvider::class,
 		];
 
 		$this->service_manager->register_providers( $providers );

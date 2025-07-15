@@ -51,18 +51,10 @@ class WPLogReaderService implements ServiceInterface {
 	private string $log_file_path;
 
 	/**
-	 * Buffer size for reading log files.
-	 *
-	 * @var int
-	 */
-	private int $buffer_size;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->log_file_path = ini_get( 'error_log' );
-		$this->buffer_size = 1024;
 	}
 
 	/**
@@ -704,7 +696,7 @@ class WPLogReaderService implements ServiceInterface {
 	}
 
 	/**
-	 * Wrapper method for compatibility with FileLogsService.
+	 * Wrapper method for compatibility with LogsService.
 	 * Delegates to read_log_entries.
 	 *
 	 * @param array $options Log reading options.
@@ -715,7 +707,7 @@ class WPLogReaderService implements ServiceInterface {
 	}
 
 	/**
-	 * Wrapper method for compatibility with FileLogsService.
+	 * Wrapper method for compatibility with LogsService.
 	 * Delegates to get_log_statistics.
 	 *
 	 * @param string|null $log_file Optional log file path.

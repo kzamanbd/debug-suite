@@ -11,12 +11,12 @@ use DebugSuite\Assets;
 use DebugSuite\Core\Plugin;
 use DebugSuite\Core\Container\AbstractServiceProvider;
 use DebugSuite\Core\Container\Container;
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\FileManagerService;
 use DebugSuite\Services\SettingsService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
-use DebugSuite\API\FileLogsController;
+use DebugSuite\API\LogsController;
 use DebugSuite\API\FileManagerController;
 use DebugSuite\API\SettingsController;
 use DebugSuite\API\OverviewController;
@@ -31,11 +31,11 @@ class AppServiceProvider extends AbstractServiceProvider {
 		Assets::class,
 		Plugin::class,
 		WPLogReaderService::class,
-		FileLogsService::class,
+		LogsService::class,
 		FileManagerService::class,
 		SettingsService::class,
 		OverviewService::class,
-		FileLogsController::class,
+		LogsController::class,
 		FileManagerController::class,
 		SettingsController::class,
 		OverviewController::class,
@@ -45,17 +45,17 @@ class AppServiceProvider extends AbstractServiceProvider {
 		// Simple service registration - merged from ServicesServiceProvider
 		$container->add(
 			[
-				Assets::class => $container->object( Assets::class ),
-				Plugin::class => $container->object( Plugin::class ),
+				Assets::class                => $container->object( Assets::class ),
+				Plugin::class                => $container->object( Plugin::class ),
 				// Core services as singletons
-				WPLogReaderService::class => $container->object( WPLogReaderService::class ),
-				FileLogsService::class    => $container->object( FileLogsService::class ),
-				FileManagerService::class => $container->object( FileManagerService::class ),
-				SettingsService::class    => $container->object( SettingsService::class ),
-				OverviewService::class    => $container->autowire( OverviewService::class ),
+				WPLogReaderService::class    => $container->object( WPLogReaderService::class ),
+				LogsService::class           => $container->object( LogsService::class ),
+				FileManagerService::class    => $container->object( FileManagerService::class ),
+				SettingsService::class       => $container->object( SettingsService::class ),
+				OverviewService::class       => $container->autowire( OverviewService::class ),
 
 				// REST API Controllers with automatic dependency injection
-				FileLogsController::class    => $container->autowire( FileLogsController::class ),
+				LogsController::class        => $container->autowire( LogsController::class ),
 				FileManagerController::class => $container->autowire( FileManagerController::class ),
 				SettingsController::class    => $container->autowire( SettingsController::class ),
 				OverviewController::class    => $container->autowire( OverviewController::class ),

@@ -532,7 +532,7 @@ class ExampleController extends RestController {
 - **Return ServiceResponse**: Always return `ServiceResponse` objects, never throw exceptions to controllers
 
     ```php
-    // ✅ Good - From FileLogsService
+    // ✅ Good - From LogsService
     if ( ! file_exists( $this->log_file_path ) ) {
         return ServiceResponse::failure(
             __( 'Debug log file not found.', 'debug-suite' ),

@@ -7,7 +7,7 @@
 
 namespace DebugSuite\API;
 
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\DebugLog\LogsService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -22,12 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class FileLogsController extends RestController {
+class LogsController extends RestController {
 
-	private FileLogsService $service;
+	private LogsService $service;
 	protected $rest_base = 'logs';
 
-	public function __construct( FileLogsService $service ) {
+	public function __construct( LogsService $service ) {
 		$this->service = $service;
 	}
 
