@@ -28,7 +28,7 @@ class LogsControllerTest extends DebugSuiteTestCase {
 	 *
 	 * @var LogsController
 	 */
-	private $controller;
+	private LogsController $controller;
 
 	/**
 	 * Service instance for testing.

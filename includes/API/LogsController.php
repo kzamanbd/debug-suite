@@ -90,16 +90,6 @@ class LogsController extends RestController {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/supported-files',
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_supported_log_files' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
-			]
-		);
-
-		register_rest_route(
-			$this->namespace,
 			'/' . $this->rest_base . '/clear',
 			[
 				'methods'             => WP_REST_Server::DELETABLE,
@@ -176,25 +166,6 @@ class LogsController extends RestController {
 					'message' => __( 'Log file cleared successfully.', 'debug-suite' ),
 				]
 			);
-	}
-
-
-
-	/**
-	 * Get available log files for sidebar navigation.
-	 *
-	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response|WP_Error
-	 */
-	public function get_supported_log_files( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$supported_log_files = $this->service->supported_log_files();
-
-		return rest_ensure_response(
-			[
-				'files' => $supported_log_files,
-				'count' => count( $supported_log_files ),
-			]
-		);
 	}
 
 	/**
