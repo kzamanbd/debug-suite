@@ -9,8 +9,8 @@
 
 namespace DebugSuite\Tests\Unit\Supports;
 
+use DebugSuite\Core\FileSystem;
 use DebugSuite\Tests\Helpers\TestCase;
-use DebugSuite\Supports\FileSystem;
 use ReflectionClass;
 
 /**
@@ -64,7 +64,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test FileSystem availability check.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::is_available
+	 * @covers \DebugSuite\Core\FileSystem::is_available
 	 */
 	public function test_is_available(): void {
 		$is_available = FileSystem::is_available();
@@ -74,7 +74,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test file existence check.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::exists
+	 * @covers \DebugSuite\Core\FileSystem::exists
 	 */
 	public function test_file_exists(): void {
 		// Test non-existent file
@@ -88,7 +88,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test file readability check.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::is_readable
+	 * @covers \DebugSuite\Core\FileSystem::is_readable
 	 */
 	public function test_is_readable(): void {
 		// Create test file
@@ -101,7 +101,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test file writability check.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::is_writable
+	 * @covers \DebugSuite\Core\FileSystem::is_writable
 	 */
 	public function test_is_writable(): void {
 		// Create test file
@@ -114,7 +114,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test reading file contents.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::get_contents
+	 * @covers \DebugSuite\Core\FileSystem::get_contents
 	 */
 	public function test_get_contents(): void {
 		$test_content = 'This is test content for FileSystem class.';
@@ -132,7 +132,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test writing file contents.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::put_contents
+	 * @covers \DebugSuite\Core\FileSystem::put_contents
 	 */
 	public function test_put_contents(): void {
 		$test_content = 'This is new test content.';
@@ -148,7 +148,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test copying files.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::copy
+	 * @covers \DebugSuite\Core\FileSystem::copy
 	 */
 	public function test_copy(): void {
 		$test_content = 'Content to copy';
@@ -171,7 +171,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test getting file size.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::size
+	 * @covers \DebugSuite\Core\FileSystem::size
 	 */
 	public function test_size(): void {
 		$test_content = 'This content has a specific length.';
@@ -189,7 +189,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test getting file modification time.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::mtime
+	 * @covers \DebugSuite\Core\FileSystem::mtime
 	 */
 	public function test_mtime(): void {
 		// Create test file
@@ -206,7 +206,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test directory checks.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::is_dir
+	 * @covers \DebugSuite\Core\FileSystem::is_dir
 	 */
 	public function test_is_dir(): void {
 		$this->assertTrue( FileSystem::is_dir( $this->test_dir ) );
@@ -221,7 +221,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test file checks.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::is_file
+	 * @covers \DebugSuite\Core\FileSystem::is_file
 	 */
 	public function test_is_file(): void {
 		$this->assertFalse( FileSystem::is_file( $this->test_dir ) );
@@ -236,7 +236,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test reading file tail.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::read_tail
+	 * @covers \DebugSuite\Core\FileSystem::read_tail
 	 */
 	public function test_read_file_tail(): void {
 		$test_content = str_repeat( 'This is a line of content.' . PHP_EOL, 10 );
@@ -260,7 +260,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test getting file permissions.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::get_permissions
+	 * @covers \DebugSuite\Core\FileSystem::get_permissions
 	 */
 	public function test_get_permissions(): void {
 		// Create test file
@@ -273,7 +273,7 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test formatting file size.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::format_size
+	 * @covers \DebugSuite\Core\FileSystem::format_size
 	 */
 	public function test_format_size(): void {
 		$this->assertEquals( 'N/A', FileSystem::format_size( 0 ) );
@@ -287,9 +287,9 @@ class FileSystemTest extends TestCase {
 	/**
 	 * Test fallback to PHP functions when WordPress filesystem is not available.
 	 * 
-	 * @covers \DebugSuite\Supports\FileSystem::exists
-	 * @covers \DebugSuite\Supports\FileSystem::is_readable
-	 * @covers \DebugSuite\Supports\FileSystem::get_contents
+	 * @covers \DebugSuite\Core\FileSystem::exists
+	 * @covers \DebugSuite\Core\FileSystem::is_readable
+	 * @covers \DebugSuite\Core\FileSystem::get_contents
 	 */
 	public function test_fallback_to_php_functions(): void {
 		// Create test file

@@ -8,8 +8,8 @@
 namespace DebugSuite\Services\DebugLog;
 
 use Automattic\WooCommerce\Utilities\LoggingUtil;
+use DebugSuite\Core\FileSystem;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Supports\FileSystem;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.

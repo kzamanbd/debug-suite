@@ -7,9 +7,9 @@
 
 namespace DebugSuite\Services;
 
+use DebugSuite\Core\FileSystem;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Supports\FileSystem;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.

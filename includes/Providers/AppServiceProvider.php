@@ -7,19 +7,19 @@
 
 namespace DebugSuite\Providers;
 
+use DebugSuite\API\FileManagerController;
+use DebugSuite\API\LogsController;
+use DebugSuite\API\OverviewController;
+use DebugSuite\API\SettingsController;
 use DebugSuite\Assets;
-use DebugSuite\Core\Plugin;
 use DebugSuite\Core\Container\AbstractServiceProvider;
 use DebugSuite\Core\Container\Container;
+use DebugSuite\Internal\HookManager;
 use DebugSuite\Services\DebugLog\LogsService;
-use DebugSuite\Services\FileManagerService;
-use DebugSuite\Services\SettingsService;
-use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
-use DebugSuite\API\LogsController;
-use DebugSuite\API\FileManagerController;
-use DebugSuite\API\SettingsController;
-use DebugSuite\API\OverviewController;
+use DebugSuite\Services\FileManagerService;
+use DebugSuite\Services\OverviewService;
+use DebugSuite\Services\SettingsService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -29,7 +29,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 
 	protected array $provides = [
 		Assets::class,
-		Plugin::class,
+		HookManager::class,
 		WPLogReaderService::class,
 		LogsService::class,
 		FileManagerService::class,
@@ -46,7 +46,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 		$container->add(
 			[
 				Assets::class                => $container->object( Assets::class ),
-				Plugin::class                => $container->object( Plugin::class ),
+				HookManager::class           => $container->object( HookManager::class ),
 				// Core services as singletons
 				WPLogReaderService::class    => $container->object( WPLogReaderService::class ),
 				LogsService::class           => $container->object( LogsService::class ),

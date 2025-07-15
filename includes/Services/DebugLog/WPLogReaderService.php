@@ -11,9 +11,9 @@
 namespace DebugSuite\Services\DebugLog;
 
 use DateTime;
+use DebugSuite\Core\FileSystem;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Supports\FileSystem;
 use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {

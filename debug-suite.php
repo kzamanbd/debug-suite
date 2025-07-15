@@ -40,8 +40,8 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	die( esc_html__( 'Missing Dependencies Detected [Debug Suite Plugin]', 'debug-suite' ) );
 }
 
-use DebugSuite\Core\Activator;
-use DebugSuite\Core\Deactivator;
+use DebugSuite\Internal\Activator;
+use DebugSuite\Internal\Deactivator;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
 use DebugSuite\Providers\AdminServiceProvider;
