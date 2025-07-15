@@ -40,7 +40,7 @@ class LogsServiceTest extends TestCase {
 	 *
 	 * @var LogDiscoveryService|\PHPUnit\Framework\MockObject\MockObject
 	 */
-	private $file_discovery;
+	private $log_discovery;
 
 	/**
 	 * Temporary log file path.
@@ -60,15 +60,15 @@ class LogsServiceTest extends TestCase {
 
 		// Create mocks
 		$this->log_reader = $this->createMock( WPLogReaderService::class );
-		$this->file_discovery = $this->createMock( LogDiscoveryService::class );
+		$this->log_discovery = $this->createMock( LogDiscoveryService::class );
 
 		// Create service instance with mocked dependencies
 		$this->service = new LogsService();
 		$reflection = new ReflectionClass( $this->service );
 		$log_reader_prop = $reflection->getProperty( 'log_reader' );
 		$log_reader_prop->setValue( $this->service, $this->log_reader );
-		$file_discovery_prop = $reflection->getProperty( 'file_discovery' );
-		$file_discovery_prop->setValue( $this->service, $this->file_discovery );
+		$file_discovery_prop = $reflection->getProperty( 'log_discovery' );
+		$file_discovery_prop->setValue( $this->service, $this->log_discovery );
 	}
 
 	/**
