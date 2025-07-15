@@ -234,7 +234,7 @@ includes/
 │   ├── FileManagerService.php  # File operations service
 │   ├── SettingsService.php     # WordPress config management
 │   ├── OnboardingService.php   # Plugin setup and onboarding
-│   └── DebugLog/               # Debug log specific services
+│   └── Logs/               # Debug log specific services
 │       ├── FileLogsService.php      # Log file operations
 │       ├── WPLogReaderService.php   # Advanced log parsing
 │       └── LogFileDiscoveryService.php # Log file discovery

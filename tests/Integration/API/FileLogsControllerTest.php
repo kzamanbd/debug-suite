@@ -12,7 +12,7 @@ namespace DebugSuite\Tests\Integration\API;
 
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\API\FileLogsController;
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\Logs\FileLogsService;
 use WP_REST_Request;
 use WP_REST_Server;
 

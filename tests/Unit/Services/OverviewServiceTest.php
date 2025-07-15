@@ -11,7 +11,7 @@ namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Tests\Helpers\TestCase;
 use DebugSuite\Services\OverviewService;
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\Logs\FileLogsService;
 use DebugSuite\Core\ServiceResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 
