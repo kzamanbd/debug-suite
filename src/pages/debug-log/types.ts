@@ -16,15 +16,6 @@ export interface LogEntry {
     raw_line?: string;
 }
 
-export interface LogFile {
-    name: string;
-    path: string;
-    size: string;
-    size_bytes: number;
-    modified: string;
-    type: string;
-}
-
 export interface LogResponse {
     entries: LogEntry[];
     total: number;

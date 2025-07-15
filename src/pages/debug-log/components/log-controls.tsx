@@ -14,11 +14,10 @@ import { __ } from '@wordpress/i18n';
 import { Copy, Download, EyeIcon, FileTextIcon, Filter, RefreshCw, SearchIcon, Trash2, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { levelOptions, perPageOptions, sortOptions } from '../constants';
-import type { LogFile, LogFilters, RawFileContent, ViewMode } from '../types';
+import type { LogFilters, RawFileContent, ViewMode } from '../types';
 
 interface LogControlsProps {
     // File selection
-    logFiles: LogFile[];
     selectedFile: Option | null;
     onFileChange: (file: Option | null) => void;
 
@@ -37,7 +36,6 @@ interface LogControlsProps {
     onRefresh: () => void;
     onClear: () => void;
     clearing: boolean;
-    filesLoading?: boolean;
     loading?: boolean;
 
     // Raw file content (only used in raw mode)
@@ -45,7 +43,6 @@ interface LogControlsProps {
 }
 
 const LogControls = ({
-    logFiles,
     selectedFile,
     onFileChange,
     viewMode,
@@ -56,7 +53,6 @@ const LogControls = ({
     onRefresh,
     onClear,
     clearing,
-    filesLoading = false,
     rawContent,
     loading = false
 }: LogControlsProps) => {
@@ -69,7 +65,7 @@ const LogControls = ({
         cancelText: __('Cancel', 'debug-suite')
     });
 
-    const filteredLogFiles = logFiles.map((file) => ({
+    const filteredLogFiles = window.debugSuite.logs.map((file) => ({
         value: file.path,
         label: file.name,
         ...file
@@ -111,7 +107,6 @@ const LogControls = ({
                     options={filteredLogFiles}
                     value={selectedFile}
                     onChange={onFileChange}
-                    isDisabled={filesLoading}
                     className="w-56"
                     placeholder={__('Select a log file', 'debug-suite')}
                 />
