@@ -1,18 +1,22 @@
+name: 🧪 PHPCS Inspection
+
 on:
   pull_request:
   push:
     branches:
       - develop
 
-name: PHPCS Inspection
 jobs:
-  runPHPCSInspection:
+  php-cs-inspection:
     name: Run PHPCS inspection
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup PHP
+      - name: 🐘 Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
@@ -27,12 +31,12 @@ jobs:
           key: ${{ runner.os }}-php-ext-${{ hashFiles('.github/workflows/phpcs.yml') }}
 
       # Get Composer cache directory
-      - name: Get composer cache directory
+      - name: 📂 Get Composer Cache Directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       # Cache Composer dependencies
-      - name: Cache dependencies
+      - name: 🗄️ Cache Composer Dependencies
         uses: actions/cache@v4
         with:
           path: ${{ steps.composercache.outputs.dir }}
@@ -48,8 +52,11 @@ jobs:
           restore-keys: |
             phpcs-cache-
 
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+      - name: 🔧 Install Composer Dependencies
+        run: |
+          echo "🚀 Installing PHP dependencies..."
+          composer install --prefer-dist --no-progress
+          echo "✅ Dependencies installed successfully"
 
       - id: changes
         run: |
@@ -57,5 +64,5 @@ jobs:
           FILES=$(curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -s -X GET -G $URL | jq -r '.[] | .filename' | xargs)
           echo "files=$FILES" >> $GITHUB_OUTPUT
 
-      - name: Detect coding standard violations
+      - name: 🚀 Detect coding standard violations
         run: vendor/bin/phpcs ${{ steps.changes.outputs.files }} -q --report=checkstyle --cache=.phpcs.cache | cs2pr --graceful-warnings
