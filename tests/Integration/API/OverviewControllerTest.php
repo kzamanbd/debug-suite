@@ -13,7 +13,7 @@ namespace DebugSuite\Tests\Integration\API;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\API\OverviewController;
 use DebugSuite\Services\OverviewService;
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\DebugLog\LogsService;
 use WP_REST_Request;
 use WP_REST_Server;
 
@@ -64,10 +64,10 @@ class OverviewControllerTest extends DebugSuiteTestCase {
 		}
 
 		// Create service instances
-		if ( class_exists( 'DebugSuite\Services\DebugLog\FileLogsService' ) && 
-			 class_exists( 'DebugSuite\Services\OverviewService' ) ) {
+		if ( class_exists( 'DebugSuite\Services\DebugLog\LogsService' ) &&
+		     class_exists( 'DebugSuite\Services\OverviewService' ) ) {
 			
-			$file_logs_service = new FileLogsService();
+			$file_logs_service = new LogsService();
 			$this->service = new OverviewService( $file_logs_service );
 		}
 		

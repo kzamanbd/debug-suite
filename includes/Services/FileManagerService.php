@@ -7,9 +7,9 @@
 
 namespace DebugSuite\Services;
 
+use DebugSuite\Core\FileSystem;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Supports\FileSystem;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 

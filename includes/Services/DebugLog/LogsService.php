@@ -7,9 +7,9 @@
 
 namespace DebugSuite\Services\DebugLog;
 
+use DebugSuite\Core\FileSystem;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Supports\FileSystem;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class FileLogsService implements ServiceInterface {
+class LogsService implements ServiceInterface {
 
 	/**
 	 * Advanced log reader service.
@@ -32,16 +32,16 @@ class FileLogsService implements ServiceInterface {
 	/**
 	 * Log file discovery service.
 	 *
-	 * @var LogFileDiscoveryService
+	 * @var LogDiscoveryService
 	 */
-	private LogFileDiscoveryService $file_discovery;
+	private LogDiscoveryService $log_discovery;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->log_reader = new WPLogReaderService();
-		$this->file_discovery = new LogFileDiscoveryService();
+		$this->log_reader    = new WPLogReaderService();
+		$this->log_discovery = new LogDiscoveryService();
 	}
 
 	/**
@@ -85,7 +85,7 @@ class FileLogsService implements ServiceInterface {
 	 * @return array
 	 */
 	public function supported_log_files(): array {
-		return $this->file_discovery->get_supported_log_files();
+		return $this->log_discovery->get_supported_log_files();
 	}
 
 	/**

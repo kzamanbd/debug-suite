@@ -1,46 +1,47 @@
 <?php
 /**
- * Unit tests for FileLogsService class.
+ * Unit tests for LogsService class.
  *
  * @package DebugSuite\Tests\Unit\Services
  * @group   services
  * @group   logs
  */
 
-namespace DebugSuite\Tests\Unit\Services;
+namespace DebugSuite\Tests\Unit\Services\DebugLog;
 
-use DebugSuite\Tests\Helpers\TestCase;
-use DebugSuite\Services\DebugLog\FileLogsService;
-use DebugSuite\Services\DebugLog\WPLogReaderService;
-use DebugSuite\Services\DebugLog\LogFileDiscoveryService;
 use DebugSuite\Core\ServiceResponse;
+use DebugSuite\Services\DebugLog\LogsService;
+use DebugSuite\Services\DebugLog\LogDiscoveryService;
+use DebugSuite\Services\DebugLog\WPLogReaderService;
+use DebugSuite\Tests\Helpers\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
 
 /**
- * Test FileLogsService functionality.
+ * Test LogsService functionality.
  */
-class FileLogsServiceTest extends TestCase {
+class LogsServiceTest extends TestCase {
 
 	/**
-	 * FileLogsService instance for testing.
+	 * LogsService instance for testing.
 	 *
-	 * @var FileLogsService
+	 * @var LogsService
 	 */
-	private $service;
+	private LogsService $service;
 
 	/**
 	 * WPLogReaderService mock.
 	 *
-	 * @var WPLogReaderService|\PHPUnit\Framework\MockObject\MockObject
+	 * @var WPLogReaderService|MockObject
 	 */
-	private $log_reader;
+	private MockObject|WPLogReaderService $log_reader;
 
 	/**
-	 * LogFileDiscoveryService mock.
+	 * LogDiscoveryService mock.
 	 *
-	 * @var LogFileDiscoveryService|\PHPUnit\Framework\MockObject\MockObject
+	 * @var LogDiscoveryService|MockObject
 	 */
-	private $file_discovery;
+	private MockObject|LogDiscoveryService $log_discovery;
 
 	/**
 	 * Temporary log file path.
@@ -60,15 +61,15 @@ class FileLogsServiceTest extends TestCase {
 
 		// Create mocks
 		$this->log_reader = $this->createMock( WPLogReaderService::class );
-		$this->file_discovery = $this->createMock( LogFileDiscoveryService::class );
+		$this->log_discovery = $this->createMock( LogDiscoveryService::class );
 
 		// Create service instance with mocked dependencies
-		$this->service = new FileLogsService();
+		$this->service = new LogsService();
 		$reflection = new ReflectionClass( $this->service );
 		$log_reader_prop = $reflection->getProperty( 'log_reader' );
 		$log_reader_prop->setValue( $this->service, $this->log_reader );
-		$file_discovery_prop = $reflection->getProperty( 'file_discovery' );
-		$file_discovery_prop->setValue( $this->service, $this->file_discovery );
+		$log_discovery_prop = $reflection->getProperty( 'log_discovery' );
+		$log_discovery_prop->setValue( $this->service, $this->log_discovery );
 	}
 
 	/**
@@ -116,7 +117,7 @@ class FileLogsServiceTest extends TestCase {
 	}
 
 	/**
-	 * Test supported_log_files delegates to LogFileDiscoveryService.
+	 * Test supported_log_files delegates to LogDiscoveryService.
 	 */
 	public function test_supported_log_files_delegates_to_discovery(): void {
 		$expected_files = [
@@ -130,7 +131,7 @@ class FileLogsServiceTest extends TestCase {
 			],
 		];
 
-		$this->file_discovery->expects( $this->once() )
+		$this->log_discovery->expects( $this->once() )
 			->method( 'get_supported_log_files' )
 			->willReturn( $expected_files );
 
@@ -142,16 +143,16 @@ class FileLogsServiceTest extends TestCase {
 	 * Test constructor with default dependencies.
 	 */
 	public function test_constructor_with_default_dependencies(): void {
-		$service = new FileLogsService();
-		$this->assertInstanceOf( FileLogsService::class, $service );
+		$service = new LogsService();
+		$this->assertInstanceOf( LogsService::class, $service );
 
 		$reflection = new ReflectionClass( $service );
 
 		$log_reader_prop = $reflection->getProperty( 'log_reader' );
 		$this->assertInstanceOf( WPLogReaderService::class, $log_reader_prop->getValue( $service ) );
 
-		$file_discovery_prop = $reflection->getProperty( 'file_discovery' );
-		$this->assertInstanceOf( LogFileDiscoveryService::class, $file_discovery_prop->getValue( $service ) );
+		$log_discovery_prop = $reflection->getProperty( 'log_discovery' );
+		$this->assertInstanceOf( LogDiscoveryService::class, $log_discovery_prop->getValue( $service ) );
 	}
 
 	/**

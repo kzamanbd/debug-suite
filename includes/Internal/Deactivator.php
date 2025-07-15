@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Core;
+namespace DebugSuite\Internal;
 
 /**
  * Plugin deactivation handler for Debug Suite.

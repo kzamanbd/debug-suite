@@ -9,7 +9,7 @@ namespace DebugSuite\Services;
 
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Services\DebugLog\FileLogsService;
+use DebugSuite\Services\DebugLog\LogsService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -27,16 +27,16 @@ class OverviewService implements ServiceInterface {
 	/**
 	 * File logs service for log-related statistics.
 	 *
-	 * @var FileLogsService
+	 * @var LogsService
 	 */
-	private FileLogsService $file_logs_service;
+	private LogsService $file_logs_service;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param FileLogsService $file_logs_service File logs service.
+	 * @param LogsService $file_logs_service File logs service.
 	 */
-	public function __construct( FileLogsService $file_logs_service ) {
+	public function __construct( LogsService $file_logs_service ) {
 		$this->file_logs_service = $file_logs_service;
 	}
 
