@@ -86,7 +86,7 @@ const FileLogs = () => {
     };
 
     // Show skeleton while initial data loads
-    if (logsLoading) {
+    if (logsLoading && !logs.length) {
         return <FileLogsSkeleton />;
     }
 
