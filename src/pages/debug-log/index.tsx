@@ -98,7 +98,7 @@ const FileLogs = () => {
                 selectedFile={selectedFile}
                 clearing={clearing}
                 rawContent={rawContent}
-                loading={rawLoading}
+                loading={rawLoading || logsLoading}
                 onFileChange={onFileChange}
                 onViewModeChange={handleViewModeChange}
                 onFiltersChange={handleFilterChange}
