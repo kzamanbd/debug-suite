@@ -19,7 +19,6 @@
     "require": {
         "php": ">=8.2",
         "nikic/php-parser": "^5.5",
-        "psr/container": "^2.0",
         "symfony/finder": "^7.3"
     },
     "require-dev": {

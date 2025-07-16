@@ -7,13 +7,13 @@
 
 namespace DebugSuite\Core\Container\Exceptions;
 
-use Psr\Container\NotFoundExceptionInterface;
+use DebugSuite\Core\Container\NotFoundExceptionInterface;
 
 /**
  * Not found exception for DI compliance.
  *
  * Thrown when a service identifier is not found in the container.
- * Implements the NotFoundExceptionInterface for standard compliance.
+ * Implement the NotFoundExceptionInterface for standard compliance.
  *
  * @since 1.0.0
  */
