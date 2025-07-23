@@ -8,15 +8,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-23T17:47:46+00:00\n"
+"POT-Creation-Date: 2025-07-23T19:04:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: debug-suite\n"
 
 #. Plugin Name of the plugin
 #: debug-suite.php
-#: includes/Admin.php:125
-#: includes/Admin.php:126
+#: includes/Admin.php:121
+#: includes/Admin.php:122
 msgid "Debug Suite"
 msgstr ""
 
@@ -55,15 +55,10 @@ msgid "Debug Log"
 msgstr ""
 
 #: includes/Admin.php:60
-#: assets/js/debug-suite.js:4
-msgid "File Manager"
-msgstr ""
-
-#: includes/Admin.php:64
 msgid "Configuration"
 msgstr ""
 
-#: includes/Admin.php:157
+#: includes/Admin.php:153
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
@@ -203,7 +198,6 @@ msgid "Ok"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-#: assets/js/debug-suite.js:4
 msgid "Cancel"
 msgstr ""
 
@@ -468,90 +462,6 @@ msgid "Retry"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-msgid "Name"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Size"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Last Modified"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Actions"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Loading file details..."
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "An error occurred while loading the file."
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Loading file editor…"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "An error occurred while saving the file."
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Save"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Loading file tree..."
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Search Files & Folders"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Create new folder"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "New Folder"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Upload files"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Upload Files"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "root"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "items"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "You have selected"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "users."
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Delete"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "them?"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
 msgid "Processing..."
 msgstr ""
 
@@ -596,7 +506,19 @@ msgid "Path"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
+msgid "Size"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Last Modified"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
 msgid "Entries"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Actions"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
@@ -1017,10 +939,6 @@ msgstr ""
 
 #: assets/js/debug-suite.js:4
 msgid "View and manage your debug logs."
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Manage files and directories on your server."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
