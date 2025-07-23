@@ -692,7 +692,6 @@ class AppServiceProvider extends AbstractServiceProvider {
 class RestControllerProvider extends AbstractServiceProvider {
     protected array $provides = [
         FileLogsController::class,
-        FileManagerController::class,
         SettingsController::class,
         OverviewController::class,
     ];
