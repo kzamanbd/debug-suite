@@ -18,6 +18,7 @@ use DebugSuite\Core\Container\Container;
 use DebugSuite\Internal\HookManager;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
+use DebugSuite\Services\FileManagerService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;
 
@@ -43,6 +44,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 		HookManager::class,
 		WPLogReaderService::class,
 		LogsService::class,
+		FileManagerService::class,
 		SettingsService::class,
 		OverviewService::class,
 	];
@@ -57,6 +59,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 				// Core services as singletons
 				WPLogReaderService::class   => $container->object( WPLogReaderService::class ),
 				LogsService::class          => $container->object( LogsService::class ),
+				FileManagerService::class   => $container->object( FileManagerService::class ),
 				SettingsService::class      => $container->object( SettingsService::class ),
 				OverviewService::class      => $container->autowire( OverviewService::class ),
 			]

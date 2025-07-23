@@ -25,7 +25,15 @@ Debug Suite is a comprehensive, all-in-one WordPress development toolkit designe
 - **Auto-Discovery**: Automatically detect debug log files across different WordPress configurations
 - **Safe Log Operations**: Clear logs with automatic backup creation
 
-### Dashboard Overview
+### 📁 File Manager
+
+- **Visual File Browser**: Navigate your WordPress file structure with an intuitive tree view
+- **Syntax-Highlighted Editor**: Edit files with Monaco Editor featuring syntax highlighting for PHP, JavaScript, CSS, and more
+- **Automatic Backups**: Every file edit creates an automatic backup for safety
+- **Secure Operations**: Comprehensive permission checks and path validation prevent unauthorized access
+- **Multi-Format Support**: View and edit various file types including PHP, JS, CSS, JSON, XML, and configuration files
+
+### 📊 Dashboard Overview
 
 - **System Health**: Real-time display of PHP version, WordPress version, and debug status
 - **Quick Statistics**: Instant overview of log activity and system health indicators
@@ -114,6 +122,7 @@ Debug Suite is a comprehensive, all-in-one WordPress development toolkit designe
 ### Quick Actions
 
 - **View Debug Logs**: Navigate to `Debug Suite > Manage Logs`
+- **Edit Files**: Go to `Debug Suite > File Manager`
 - **Configure Settings**: Visit `Debug Suite > Debug Config`
 - **Dashboard Overview**: Check `Debug Suite > Overview`
 

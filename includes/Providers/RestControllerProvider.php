@@ -10,6 +10,7 @@
 
 namespace DebugSuite\Providers;
 
+use DebugSuite\API\FileManagerController;
 use DebugSuite\API\LogsController;
 use DebugSuite\API\OverviewController;
 use DebugSuite\API\SettingsController;
@@ -34,6 +35,7 @@ class RestControllerProvider extends AbstractServiceProvider {
 
 	protected array $provides = [
 		LogsController::class,
+		FileManagerController::class,
 		SettingsController::class,
 		OverviewController::class,
 	];
@@ -43,6 +45,7 @@ class RestControllerProvider extends AbstractServiceProvider {
 		$container->add(
 			[
 				LogsController::class        => $container->autowire( LogsController::class ),
+				FileManagerController::class => $container->autowire( FileManagerController::class ),
 				SettingsController::class    => $container->autowire( SettingsController::class ),
 				OverviewController::class    => $container->autowire( OverviewController::class ),
 			]
