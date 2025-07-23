@@ -120,13 +120,15 @@ $myVariableName = 'value';        // Wrong
 
 ### Service Provider Registration
 
-**Register services and controllers in AppServiceProvider:**
+**Register services and controllers in appropriate providers:**
 
 - **Provides Array**: List all services provided by the provider in `$provides` property
 - **Simple Registration**: Use `$container->object()` for services without dependencies
 - **Autowired Registration**: Use `$container->autowire()` for services with dependencies
 - **Clean Structure**: Maintain minimal boilerplate with focused registration
 - **Service Dependencies**: Services with constructor dependencies are automatically resolved
+- **Business Services**: Register in `AppServiceProvider` for business logic services
+- **REST Controllers**: Register in `RestControllerProvider` for REST API controllers
 
 ### WordPress Hooks with Hookable Interface
 
@@ -243,8 +245,8 @@ includes/
 │   ├── SettingsController.php  # Settings endpoints
 │   └── OverviewController.php  # Dashboard endpoints
 ├── Providers/                  # Service providers
-│   ├── AppServiceProvider.php  # Main service registration
-│   ├── CoreServiceProvider.php # Core WordPress services
+│   ├── AppServiceProvider.php  # Business service registration
+│   ├── RestControllerProvider.php  # REST controller registration
 │   ├── AdminServiceProvider.php # Admin-specific services
 │   └── FrontendServiceProvider.php # Frontend services
 ├── Admin/                      # WordPress admin integration

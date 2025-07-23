@@ -187,25 +187,36 @@ class ExampleController extends RestController {
 }
 ```
 
-**Example Controller Registration**:
+**Example Service and Controller Registration**:
 
 ```php
-// In AppServiceProvider
+// In AppServiceProvider - for business services
 protected array $provides = [
     // ...existing services
     ExampleService::class,
-    ExampleController::class,
 ];
 
 public function register(Container $container): void {
     // ...existing registrations
     
     // Register service
-    $container->singleton(ExampleService::class, fn() => new ExampleService());
+    $container->add([
+        ExampleService::class => $container->object(ExampleService::class),
+    ]);
+}
+
+// In RestControllerProvider - for REST controllers
+protected array $provides = [
+    // ...existing controllers
+    ExampleController::class,
+];
+
+public function register(Container $container): void {
+    // ...existing registrations
     
     // Register controller with dependency injection
-    $container->singleton(ExampleController::class, fn($c) => 
-        new ExampleController($c->get(ExampleService::class))
-    );
+    $container->add([
+        ExampleController::class => $container->autowire(ExampleController::class),
+    ]);
 }
 ```
