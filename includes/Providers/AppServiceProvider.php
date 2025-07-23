@@ -53,15 +53,15 @@ class AppServiceProvider extends AbstractServiceProvider {
 		// Simple service registration - merged from ServicesServiceProvider
 		$container->add(
 			[
-				Admin::class               	 => $container->object( Admin::class ),
-				Assets::class                => $container->object( Assets::class ),
-				HookManager::class           => $container->object( HookManager::class ),
+				Admin::class                => $container->object( Admin::class ),
+				Assets::class               => $container->object( Assets::class ),
+				HookManager::class          => $container->object( HookManager::class ),
 				// Core services as singletons
-				WPLogReaderService::class    => $container->object( WPLogReaderService::class ),
-				LogsService::class           => $container->object( LogsService::class ),
-				FileManagerService::class    => $container->object( FileManagerService::class ),
-				SettingsService::class       => $container->object( SettingsService::class ),
-				OverviewService::class       => $container->autowire( OverviewService::class ),
+				WPLogReaderService::class   => $container->object( WPLogReaderService::class ),
+				LogsService::class          => $container->object( LogsService::class ),
+				FileManagerService::class   => $container->object( FileManagerService::class ),
+				SettingsService::class      => $container->object( SettingsService::class ),
+				OverviewService::class      => $container->autowire( OverviewService::class ),
 			]
 		);
 	}
