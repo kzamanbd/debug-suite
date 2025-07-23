@@ -1,6 +1,5 @@
 import DebugConfig from '@/pages/debug-config';
 import DebugLog from '@/pages/debug-log';
-import FileManager from '@/pages/file-manager';
 import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
 import Onboarding from '@/pages/onboarding';
@@ -46,13 +45,6 @@ const routes: DebugSuiteRoute[] = [
         description: __('View and manage your debug logs.', 'debug-suite'),
         path: '/debug-log',
         element: <DebugLog />
-    },
-    {
-        id: 'file-manager',
-        title: __('File Manager', 'debug-suite'),
-        description: __('Manage files and directories on your server.', 'debug-suite'),
-        path: '/file-manager',
-        element: <FileManager />
     },
     {
         id: 'file-logs-manage',

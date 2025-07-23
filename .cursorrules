@@ -231,7 +231,6 @@ includes/
 ├── Services/                    # Business logic services
 │   ├── ServiceInterface.php    # Service marker interface
 │   ├── OverviewService.php     # Dashboard overview service
-│   ├── FileManagerService.php  # File operations service
 │   ├── SettingsService.php     # WordPress config management
 │   ├── OnboardingService.php   # Plugin setup and onboarding
 │   └── DebugLog/               # Debug log specific services
@@ -241,7 +240,6 @@ includes/
 ├── API/                        # REST controllers only
 │   ├── RestController.php      # Base controller with Hookable
 │   ├── FileLogsController.php  # Debug log endpoints
-│   ├── FileManagerController.php # File manager endpoints
 │   ├── SettingsController.php  # Settings endpoints
 │   └── OverviewController.php  # Dashboard endpoints
 ├── Providers/                  # Service providers
@@ -270,12 +268,6 @@ src/
 │   │       ├── log-controls.tsx    # Filter controls
 │   │       ├── raw-file-viewer.tsx # Raw file viewer
 │   │       └── logs-skeleton.tsx   # Loading states
-│   ├── file-manager/          # File management interface
-│   │   ├── index.tsx          # Main component
-│   │   └── components/        # File manager components
-│   │       ├── file-tree.tsx       # Directory tree
-│   │       ├── file-editor.tsx     # Monaco-based editor
-│   │       └── file-icon.tsx       # File type icons
 │   ├── overview.tsx           # Dashboard overview
 │   ├── onboarding/            # Setup wizard
 │   │   └── index.tsx          # Onboarding flow

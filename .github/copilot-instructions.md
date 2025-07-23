@@ -8,7 +8,12 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 
 **Current Version**: 1.0.0  
 **PHP Requirements**: PHP 8.2+  
-**Node/NPM**: Uses pnpm for package management
+**Node/NPM**: Uses pnpm for pac OverviewService::class => $container->autowire(OverviewService::class),
+
+            // Controllers with dependency injection
+            FileLogsController::class    => $container->autowire(FileLogsController::class),
+            SettingsController::class   => $container->autowire(SettingsController::class),
+            OverviewController::class   => $container->autowire(OverviewController::class),agement
 
 ### Core Architecture
 
@@ -271,7 +276,6 @@ $container->add([
     - **Implemented Services**:
         - `FileLogsService` (debug log operations)
         - `SettingsService` (wp-config.php management)
-        - `FileManagerService` (file system operations)
         - `OnboardingService` (onboarding flow)
         - `OverviewService` (dashboard overview)
         - `WPLogReaderService` (WordPress log file reading)
@@ -397,13 +401,11 @@ $container->add([
 protected array $provides = [
 	WPLogReaderService::class,
 	FileLogsService::class,
-	FileManagerService::class,
 	SettingsService::class,
 	OnboardingService::class,
 	OverviewService::class,
 	ExampleService::class,      // Add new service here
 	FileLogsController::class,
-	FileManagerController::class,
 	SettingsController::class,
 	OverviewController::class,
 	ExampleController::class,   // Add new controller here
@@ -527,7 +529,6 @@ class ExampleController extends RestController {
 - **Single Responsibility**: Each service handles one domain of business logic
     - `FileLogsService`: Debug log operations only
     - `SettingsService`: wp-config.php management only
-    - `FileManagerService`: File system operations only
 
 - **Return ServiceResponse**: Always return `ServiceResponse` objects, never throw exceptions to controllers
 
@@ -571,10 +572,7 @@ class ExampleController extends RestController {
 - **Configuration**: Accept dependencies through constructor for testability
 
     ```php
-    // From FileManagerService - accepts custom base path
-    public function __construct( ?string $base_path = null ) {
-        $this->base_path = $base_path ?? ABSPATH;
-    }
+
     ```
 
 - **Documentation**: Fully document all public methods with PHPDoc
@@ -662,12 +660,10 @@ class AppServiceProvider extends AbstractServiceProvider {
     protected array $provides = [
         WPLogReaderService::class,
         FileLogsService::class,
-        FileManagerService::class,
         SettingsService::class,
         OnboardingService::class,
         OverviewService::class,
         FileLogsController::class,
-        FileManagerController::class,
         SettingsController::class,
         OverviewController::class,
     ];
@@ -678,14 +674,12 @@ class AppServiceProvider extends AbstractServiceProvider {
             // Services with simple autowiring
             WPLogReaderService::class    => $container->object(WPLogReaderService::class),
             FileLogsService::class       => $container->object(FileLogsService::class),
-            FileManagerService::class    => $container->object(FileManagerService::class),
             SettingsService::class       => $container->object(SettingsService::class),
             OnboardingService::class     => $container->object(OnboardingService::class),
             OverviewService::class       => $container->autowire(OverviewService::class),
 
             // Controllers with dependency injection
             FileLogsController::class    => $container->autowire(FileLogsController::class),
-            FileManagerController::class => $container->autowire(FileManagerController::class),
             SettingsController::class   => $container->autowire(SettingsController::class),
             OverviewController::class   => $container->autowire(OverviewController::class),
         ]);
@@ -944,7 +938,6 @@ All business logic is implemented in the `includes/Services/` directory:
     - `FileLogsService` - Debug log operations
     - `WPLogReaderService` - WordPress log file reading
     - `LogFileDiscoveryService` - Log file discovery
-- **FileManagerService** - File system operations
 - **SettingsService** - wp-config.php management
 - **OnboardingService** - Onboarding flow management
 - **OverviewService** - Dashboard overview functionality
@@ -954,7 +947,6 @@ All business logic is implemented in the `includes/Services/` directory:
 All API endpoints are handled by controllers in `includes/API/`:
 
 - `FileLogsController` - Debug log API endpoints
-- `FileManagerController` - File management API endpoints
 - `SettingsController` - Settings management API endpoints
 - `OverviewController` - Dashboard overview API endpoints
 

@@ -29,15 +29,6 @@ Debug Suite v1.0.0 is the first stable release of this comprehensive WordPress d
 - **Log Clearing**: Safe log file clearing with backup functionality
 - **Supported Log Files**: Support for `debug.log`, `wp-errors.log`, and custom log file paths
 
-#### File Manager
-
-- **Directory Navigation**: Browse WordPress file structure with tree view
-- **File Content Viewing**: View file contents with syntax highlighting for PHP, JavaScript, CSS, and other formats
-- **File Editing**: Edit files directly with Monaco Editor integration
-- **File Backup**: Automatic backup creation before file modifications
-- **Permission Management**: Secure file operations with proper permission checks
-- **Path Validation**: Comprehensive path validation and security checks
-
 #### Dashboard Overview
 
 - **System Information**: Display PHP version, WordPress version, and debug configuration status
@@ -115,7 +106,6 @@ Debug Suite v1.0.0 is the first stable release of this comprehensive WordPress d
 - **FileLogsService**: Debug log file operations and parsing
 - **WPLogReaderService**: WordPress-specific log file reading
 - **LogFileDiscoveryService**: Automatic log file discovery
-- **FileManagerService**: File system operations and management
 - **SettingsService**: wp-config.php settings management
 - **OverviewService**: Dashboard overview data aggregation
 - **OnboardingService**: User onboarding flow management
@@ -123,7 +113,6 @@ Debug Suite v1.0.0 is the first stable release of this comprehensive WordPress d
 #### API Controllers
 
 - **FileLogsController**: Debug log REST API endpoints
-- **FileManagerController**: File management REST API endpoints
 - **SettingsController**: Settings management REST API endpoints
 - **OverviewController**: Dashboard overview REST API endpoints
 - **OnboardingController**: Onboarding flow REST API endpoints

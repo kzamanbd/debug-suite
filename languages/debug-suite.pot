@@ -8,15 +8,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-12T18:03:19+00:00\n"
+"POT-Creation-Date: 2025-07-23T17:47:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: debug-suite\n"
 
 #. Plugin Name of the plugin
 #: debug-suite.php
+#: includes/Admin.php:125
 #: includes/Admin.php:126
-#: includes/Admin.php:127
 msgid "Debug Suite"
 msgstr ""
 
@@ -44,40 +44,36 @@ msgstr ""
 msgid "Missing Dependencies Detected [Debug Suite Plugin]"
 msgstr ""
 
-#: includes/Admin.php:53
+#: includes/Admin.php:52
 #: assets/js/debug-suite.js:4
 msgid "Overview"
 msgstr ""
 
-#: includes/Admin.php:57
+#: includes/Admin.php:56
 #: assets/js/debug-suite.js:4
 msgid "Debug Log"
 msgstr ""
 
-#: includes/Admin.php:61
+#: includes/Admin.php:60
 #: assets/js/debug-suite.js:4
 msgid "File Manager"
 msgstr ""
 
-#: includes/Admin.php:65
+#: includes/Admin.php:64
 msgid "Configuration"
 msgstr ""
 
-#: includes/Admin.php:158
+#: includes/Admin.php:157
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: includes/API/FileLogsController.php:123
+#: includes/API/LogsController.php:113
 msgid "Log file path. If not provided, uses the current debug log file."
 msgstr ""
 
-#: includes/API/FileLogsController.php:176
-#: includes/Services/DebugLog/WPLogReaderService.php:700
+#: includes/API/LogsController.php:166
+#: includes/Services/DebugLog/WPLogReaderService.php:693
 msgid "Log file cleared successfully."
-msgstr ""
-
-#: includes/API/FileManagerController.php:117
-msgid "File saved successfully."
 msgstr ""
 
 #: includes/API/RestController.php:42
@@ -116,88 +112,50 @@ msgstr ""
 msgid "Full view request processed successfully."
 msgstr ""
 
-#: includes/Core/Plugin.php:14
+#: includes/Internal/HookManager.php:14
 msgid "Settings"
 msgstr ""
 
-#: includes/Services/DebugLog/FileLogsService.php:106
+#: includes/Services/DebugLog/LogsService.php:106
 msgid "No log file path provided or configured."
 msgstr ""
 
-#: includes/Services/DebugLog/FileLogsService.php:114
+#: includes/Services/DebugLog/LogsService.php:114
 msgid "The requested log file was not found."
 msgstr ""
 
-#: includes/Services/DebugLog/FileLogsService.php:123
+#: includes/Services/DebugLog/LogsService.php:123
 msgid "Access to this file is not allowed."
 msgstr ""
 
-#: includes/Services/DebugLog/FileLogsService.php:145
+#: includes/Services/DebugLog/LogsService.php:145
 msgid "Failed to read the log file."
 msgstr ""
 
-#: includes/Services/DebugLog/WPLogReaderService.php:104
-#: includes/Services/DebugLog/WPLogReaderService.php:624
+#: includes/Services/DebugLog/WPLogReaderService.php:97
+#: includes/Services/DebugLog/WPLogReaderService.php:617
 msgid "Log file not found."
 msgstr ""
 
-#: includes/Services/DebugLog/WPLogReaderService.php:112
+#: includes/Services/DebugLog/WPLogReaderService.php:105
 msgid "Log file is not readable."
 msgstr ""
 
-#: includes/Services/DebugLog/WPLogReaderService.php:122
+#: includes/Services/DebugLog/WPLogReaderService.php:115
 msgid "Failed to read log file."
 msgstr ""
 
 #. translators: %s is the error message.
-#: includes/Services/DebugLog/WPLogReaderService.php:162
+#: includes/Services/DebugLog/WPLogReaderService.php:155
 msgid "Error reading log file: %s"
 msgstr ""
 
-#: includes/Services/DebugLog/WPLogReaderService.php:684
+#: includes/Services/DebugLog/WPLogReaderService.php:677
 msgid "Log file does not exist."
 msgstr ""
 
-#: includes/Services/DebugLog/WPLogReaderService.php:693
+#: includes/Services/DebugLog/WPLogReaderService.php:686
 msgid "Failed to clear log file."
-msgstr ""
-
-#: includes/Services/FileManagerService.php:133
-#: includes/Services/FileManagerService.php:179
-#: includes/Services/FileManagerService.php:220
-msgid "Invalid path provided."
-msgstr ""
-
-#: includes/Services/FileManagerService.php:137
-msgid "Directory not found."
-msgstr ""
-
-#: includes/Services/FileManagerService.php:183
-msgid "File not found."
-msgstr ""
-
-#: includes/Services/FileManagerService.php:187
-msgid "Path is not a file."
-msgstr ""
-
-#: includes/Services/FileManagerService.php:191
-msgid "File is not readable."
-msgstr ""
-
-#: includes/Services/FileManagerService.php:224
-msgid "File is not writable."
-msgstr ""
-
-#: includes/Services/FileManagerService.php:239
-msgid "Failed to save file."
-msgstr ""
-
-#: includes/Services/FileManagerService.php:319
-msgid "File does not exist for backup."
-msgstr ""
-
-#: includes/Services/FileManagerService.php:326
-msgid "Failed to create backup."
 msgstr ""
 
 #: includes/Services/OverviewService.php:56
@@ -361,11 +319,11 @@ msgid "Debug"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-msgid "100 items"
+msgid "50 items"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-msgid "250 items"
+msgid "100 items"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
@@ -474,11 +432,15 @@ msgid "Copy message"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-msgid "Loading more entries..."
+msgid "Load More Entries"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-msgid "Load More Entries"
+msgid "Showing"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "entries"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
