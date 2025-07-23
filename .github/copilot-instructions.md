@@ -197,7 +197,8 @@ $container->add([
 
 **✅ Current Service Registration Pattern:**
 
-- All business services registered in `AppServiceProvider` using `add()`
+- Business services registered in `AppServiceProvider` using `add()`
+- REST API controllers registered in `ApiServiceProvider` using `add()`
 - Services use `object()` for simple singletons
 - Controllers use `autowire()` for dependency injection
 - Service classes implement `ServiceInterface` marker interface
@@ -212,7 +213,7 @@ $container->add([
     - **Object Registration**: Use `$container->object(Class::class)` for simple service registration
     - **Autowired Registration**: Use `$container->autowire(Class::class)` for services with dependencies
     - **Clean Structure**: Use minimal boilerplate with focused, readable code
-    - **Single Provider**: Register all business services in `AppServiceProvider` only
+    - **Separated Providers**: Register business services in `AppServiceProvider`, REST controllers in `ApiServiceProvider`
 
 3. **Service Provider System**:
     - **Base Class**: Extend `DebugSuite\Core\Container\AbstractServiceProvider` for new service providers
@@ -268,6 +269,7 @@ $container->add([
     - **Dependency Injection**: Services are registered as singletons in the container via `AppServiceProvider`
     - **Error Handling**: Use `ServiceResponse::success($data)` and `ServiceResponse::failure($message, $code)` for consistent responses
     - **Service Registration**: Add new services to `AppServiceProvider::$provides` array and register in `register()` method
+    - **Controller Registration**: Add new REST controllers to `ApiServiceProvider::$provides` array and register in `register()` method
     - **Implemented Services**:
         - `FileLogsService` (debug log operations)
         - `SettingsService` (wp-config.php management)
@@ -387,13 +389,18 @@ class ExampleService implements ServiceInterface {
 **Step 2: Register Service with DI Container**
 
 ```php
-// In AppServiceProvider::register()
+// In AppServiceProvider::register() - for business services
 $container->add([
     ExampleService::class => $container->object( ExampleService::class ),
+]);
+
+// In ApiServiceProvider::register() - for REST controllers
+$container->add([
     ExampleController::class => $container->autowire( ExampleController::class ),
 ]);
 
-// Add to $provides array (follow existing pattern)
+// Add to respective $provides arrays
+// AppServiceProvider::$provides
 protected array $provides = [
 	WPLogReaderService::class,
 	FileLogsService::class,
@@ -402,6 +409,10 @@ protected array $provides = [
 	OnboardingService::class,
 	OverviewService::class,
 	ExampleService::class,      // Add new service here
+];
+
+// ApiServiceProvider::$provides
+protected array $provides = [
 	FileLogsController::class,
 	FileManagerController::class,
 	SettingsController::class,
@@ -666,14 +677,10 @@ class AppServiceProvider extends AbstractServiceProvider {
         SettingsService::class,
         OnboardingService::class,
         OverviewService::class,
-        FileLogsController::class,
-        FileManagerController::class,
-        SettingsController::class,
-        OverviewController::class,
     ];
 
     public function register(Container $container): void {
-        // Modern definition array approach
+        // Modern definition array approach - Business Services Only
         $container->add([
             // Services with simple autowiring
             WPLogReaderService::class    => $container->object(WPLogReaderService::class),
@@ -682,8 +689,21 @@ class AppServiceProvider extends AbstractServiceProvider {
             SettingsService::class       => $container->object(SettingsService::class),
             OnboardingService::class     => $container->object(OnboardingService::class),
             OverviewService::class       => $container->autowire(OverviewService::class),
+        ]);
+    }
+}
 
-            // Controllers with dependency injection
+class ApiServiceProvider extends AbstractServiceProvider {
+    protected array $provides = [
+        FileLogsController::class,
+        FileManagerController::class,
+        SettingsController::class,
+        OverviewController::class,
+    ];
+
+    public function register(Container $container): void {
+        // REST API Controllers with dependency injection
+        $container->add([
             FileLogsController::class    => $container->autowire(FileLogsController::class),
             FileManagerController::class => $container->autowire(FileManagerController::class),
             SettingsController::class   => $container->autowire(SettingsController::class),
@@ -932,7 +952,8 @@ const options = [
 The project follows a clean service provider architecture:
 
 - **CoreServiceProvider**: Registers core services (`Assets`, `I18n`, `Plugin`)
-- **AppServiceProvider**: Registers business logic services and REST controllers
+- **AppServiceProvider**: Registers business logic services only
+- **ApiServiceProvider**: Registers REST API controllers only
 - **AdminServiceProvider**: Registers admin-specific services (`Admin`)
 - **FrontendServiceProvider**: Registers frontend services (`Frontend`)
 
