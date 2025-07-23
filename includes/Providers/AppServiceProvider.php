@@ -20,6 +20,7 @@ use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;
+use DebugSuite\Services\FrontendRouterService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -45,6 +46,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 		LogsService::class,
 		SettingsService::class,
 		OverviewService::class,
+		FrontendRouterService::class,
 	];
 
 	public function register( Container $container ): void {
@@ -59,6 +61,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 				LogsService::class          => $container->object( LogsService::class ),
 				SettingsService::class      => $container->object( SettingsService::class ),
 				OverviewService::class      => $container->autowire( OverviewService::class ),
+				FrontendRouterService::class => $container->autowire( FrontendRouterService::class ),
 			]
 		);
 	}
