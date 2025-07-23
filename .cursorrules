@@ -120,13 +120,15 @@ $myVariableName = 'value';        // Wrong
 
 ### Service Provider Registration
 
-**Register services and controllers in AppServiceProvider:**
+**Register services and controllers in appropriate providers:**
 
 - **Provides Array**: List all services provided by the provider in `$provides` property
 - **Simple Registration**: Use `$container->object()` for services without dependencies
 - **Autowired Registration**: Use `$container->autowire()` for services with dependencies
 - **Clean Structure**: Maintain minimal boilerplate with focused registration
 - **Service Dependencies**: Services with constructor dependencies are automatically resolved
+- **Business Services**: Register in `AppServiceProvider` for business logic services
+- **REST Controllers**: Register in `RestControllerProvider` for REST API controllers
 
 ### WordPress Hooks with Hookable Interface
 
@@ -231,7 +233,6 @@ includes/
 ├── Services/                    # Business logic services
 │   ├── ServiceInterface.php    # Service marker interface
 │   ├── OverviewService.php     # Dashboard overview service
-│   ├── FileManagerService.php  # File operations service
 │   ├── SettingsService.php     # WordPress config management
 │   ├── OnboardingService.php   # Plugin setup and onboarding
 │   └── DebugLog/               # Debug log specific services
@@ -241,12 +242,11 @@ includes/
 ├── API/                        # REST controllers only
 │   ├── RestController.php      # Base controller with Hookable
 │   ├── FileLogsController.php  # Debug log endpoints
-│   ├── FileManagerController.php # File manager endpoints
 │   ├── SettingsController.php  # Settings endpoints
 │   └── OverviewController.php  # Dashboard endpoints
 ├── Providers/                  # Service providers
-│   ├── AppServiceProvider.php  # Main service registration
-│   ├── CoreServiceProvider.php # Core WordPress services
+│   ├── AppServiceProvider.php  # Business service registration
+│   ├── RestControllerProvider.php  # REST controller registration
 │   ├── AdminServiceProvider.php # Admin-specific services
 │   └── FrontendServiceProvider.php # Frontend services
 ├── Admin/                      # WordPress admin integration
@@ -270,12 +270,6 @@ src/
 │   │       ├── log-controls.tsx    # Filter controls
 │   │       ├── raw-file-viewer.tsx # Raw file viewer
 │   │       └── logs-skeleton.tsx   # Loading states
-│   ├── file-manager/          # File management interface
-│   │   ├── index.tsx          # Main component
-│   │   └── components/        # File manager components
-│   │       ├── file-tree.tsx       # Directory tree
-│   │       ├── file-editor.tsx     # Monaco-based editor
-│   │       └── file-icon.tsx       # File type icons
 │   ├── overview.tsx           # Dashboard overview
 │   ├── onboarding/            # Setup wizard
 │   │   └── index.tsx          # Onboarding flow

@@ -7,7 +7,6 @@
 
 namespace DebugSuite\Core\Container;
 
-use Psr\Container\ContainerInterface;
 use DebugSuite\Core\Container\Exceptions\ContainerException;
 use DebugSuite\Core\Container\Exceptions\NotFoundException;
 use DebugSuite\Core\Container\Definitions\DefinitionInterface;

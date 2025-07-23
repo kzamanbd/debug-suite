@@ -57,10 +57,6 @@ class Admin implements Hookable {
 				'path' => 'debug-log',
 			],
 			[
-				'title' => __( 'File Manager', 'debug-suite' ),
-				'path' => 'file-manager',
-			],
-			[
 				'title' => __( 'Configuration', 'debug-suite' ),
 				'path' => 'config',
 			],
@@ -107,7 +103,7 @@ class Admin implements Hookable {
 	 * Add an admin menu and initialize settings.
 	 *
 	 * Creates the main Debug Suite admin menu and submenus for different
-	 * sections like file manager, error logs, and log management.
+	 * sections like error logs, and log management.
 	 *
 	 * @since 1.0.0
 	 *

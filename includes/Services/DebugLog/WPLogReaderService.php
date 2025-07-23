@@ -32,7 +32,7 @@ class WPLogReaderService implements ServiceInterface {
 	 *
 	 * @var array<string, int>
 	 */
-	private array $log_levels = [
+	protected array $log_levels = [
 		'emergency' => 0,
 		'alert'     => 1,
 		'critical'  => 2,
@@ -41,6 +41,7 @@ class WPLogReaderService implements ServiceInterface {
 		'notice'    => 5,
 		'info'      => 6,
 		'debug'     => 7,
+		'trace'     => 8,
 	];
 
 	/**
@@ -48,7 +49,7 @@ class WPLogReaderService implements ServiceInterface {
 	 *
 	 * @var string
 	 */
-	private string $log_file_path;
+	protected string $log_file_path;
 
 	/**
 	 * Constructor.
@@ -164,7 +165,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * @param array $lines Array of log lines.
 	 * @return array
 	 */
-	private function parse_log_entries( array $lines ): array {
+	protected function parse_log_entries( array $lines ): array {
 		$entries = [];
 		$entry = null;
 
@@ -274,7 +275,7 @@ class WPLogReaderService implements ServiceInterface {
 	 *
 	 * @return string The determined type.
 	 */
-	private function determine_type_from_content( string $content ): string {
+	protected function determine_type_from_content( string $content ): string {
 		$content_lower = strtolower( $content );
 
 		// Check for specific patterns
@@ -321,7 +322,7 @@ class WPLogReaderService implements ServiceInterface {
 	 *
 	 * @return string
 	 */
-	private function determine_log_level( string $type ): string {
+	protected function determine_log_level( string $type ): string {
 		$type_lower = strtolower( $type );
 
 		// Check for critical level errors first (fatal errors are critical)
@@ -376,7 +377,7 @@ class WPLogReaderService implements ServiceInterface {
 	 *
 	 * @return array
 	 */
-	private function process_stack_trace( array $entry ): array {
+	protected function process_stack_trace( array $entry ): array {
 		if ( empty( $entry['stack_trace'] ) ) {
 			return $entry;
 		}
@@ -403,7 +404,7 @@ class WPLogReaderService implements ServiceInterface {
 	 *
 	 * @return array
 	 */
-	private function parse_stack_trace_frames( array $lines ): array {
+	protected function parse_stack_trace_frames( array $lines ): array {
 		$frames = [];
 
 		foreach ( $lines as $index => $line ) {
@@ -450,7 +451,7 @@ class WPLogReaderService implements ServiceInterface {
 	 *
 	 * @return string
 	 */
-	private function parse_timestamp( string $timestamp ): string {
+	protected function parse_timestamp( string $timestamp ): string {
 		// Convert WordPress format to standard format
 		// From: 19-Jun-2025 01:30:45 UTC
 		// To: 2025-06-19 01:30:45
@@ -470,7 +471,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * @param array $options Filter options.
 	 * @return array
 	 */
-	private function filter_entries( array $entries, array $options ): array {
+	protected function filter_entries( array $entries, array $options ): array {
 		$filtered = $entries;
 
 		// Filter by level
@@ -562,7 +563,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * @param string $field Field to sort by.
 	 * @return mixed
 	 */
-	private function get_sort_value( array $entry, string $field ) {
+	protected function get_sort_value( array $entry, string $field ) {
 		switch ( $field ) {
 			case 'timestamp':
 				return strtotime( $entry['timestamp'] );
@@ -583,7 +584,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * @param string $date Date string.
 	 * @return string
 	 */
-	private function validate_date( string $date ): string {
+	protected function validate_date( string $date ): string {
 		$timestamp = strtotime( $date );
 		return $timestamp ? gmdate( 'Y-m-d', $timestamp ) : '1970-01-01';
 	}
@@ -595,7 +596,7 @@ class WPLogReaderService implements ServiceInterface {
 	 * @param array $options Pagination options.
 	 * @return array
 	 */
-	private function paginate_entries( array $entries, array $options ): array {
+	protected function paginate_entries( array $entries, array $options ): array {
 		$limit = max( 1, min( (int) ( $options['limit'] ?? 100 ), 1000 ) );
 		$offset = max( 0, (int) ( $options['offset'] ?? 0 ) );
 
@@ -715,23 +716,6 @@ class WPLogReaderService implements ServiceInterface {
 	 */
 	public function get_log_file_stats( ?string $log_file = null ): ServiceResponse {
 		return $this->get_log_statistics( $log_file );
-	}
-
-	/**
-	 * Format bytes into human-readable format.
-	 * Fallback for when WordPress size_format() is not available.
-	 *
-	 * @param int $bytes File size in bytes.
-	 * @return string
-	 */
-	private function format_bytes( int $bytes ): string {
-		$units = [ 'B', 'KB', 'MB', 'GB', 'TB' ];
-		$bytes = max( $bytes, 0 );
-		$pow = floor( ( $bytes ? log( $bytes ) : 0 ) / log( 1024 ) );
-		$pow = min( $pow, count( $units ) - 1 );
-		$bytes /= pow( 1024, $pow );
-
-		return round( $bytes, 2 ) . ' ' . $units[ $pow ];
 	}
 
 	/**

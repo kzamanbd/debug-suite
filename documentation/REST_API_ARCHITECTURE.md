@@ -4,7 +4,6 @@
 
 - **Base Controller**: `DebugSuite\API\RestController` - Provides common functionality and implements `Hookable`
 - **Settings Controller**: `DebugSuite\API\SettingsController` - Delegates to `SettingsService` for wp-config.php management
-- **File Manager Controller**: `DebugSuite\API\FileManagerController` - Delegates to `FileManagerService` for file operations
 - **File Logs Controller**: `DebugSuite\API\FileLogsController` - Delegates to `FileLogsService` for debug.log processing
 
 ## Controller Lifecycle
@@ -188,25 +187,36 @@ class ExampleController extends RestController {
 }
 ```
 
-**Example Controller Registration**:
+**Example Service and Controller Registration**:
 
 ```php
-// In AppServiceProvider
+// In AppServiceProvider - for business services
 protected array $provides = [
     // ...existing services
     ExampleService::class,
-    ExampleController::class,
 ];
 
 public function register(Container $container): void {
     // ...existing registrations
     
     // Register service
-    $container->singleton(ExampleService::class, fn() => new ExampleService());
+    $container->add([
+        ExampleService::class => $container->object(ExampleService::class),
+    ]);
+}
+
+// In RestControllerProvider - for REST controllers
+protected array $provides = [
+    // ...existing controllers
+    ExampleController::class,
+];
+
+public function register(Container $container): void {
+    // ...existing registrations
     
     // Register controller with dependency injection
-    $container->singleton(ExampleController::class, fn($c) => 
-        new ExampleController($c->get(ExampleService::class))
-    );
+    $container->add([
+        ExampleController::class => $container->autowire(ExampleController::class),
+    ]);
 }
 ```
