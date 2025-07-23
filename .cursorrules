@@ -128,7 +128,7 @@ $myVariableName = 'value';        // Wrong
 - **Clean Structure**: Maintain minimal boilerplate with focused registration
 - **Service Dependencies**: Services with constructor dependencies are automatically resolved
 - **Business Services**: Register in `AppServiceProvider` for business logic services
-- **REST Controllers**: Register in `ApiServiceProvider` for REST API controllers
+- **REST Controllers**: Register in `RestControllerProvider` for REST API controllers
 
 ### WordPress Hooks with Hookable Interface
 
@@ -248,8 +248,7 @@ includes/
 │   └── OverviewController.php  # Dashboard endpoints
 ├── Providers/                  # Service providers
 │   ├── AppServiceProvider.php  # Business service registration
-│   ├── ApiServiceProvider.php  # REST controller registration
-│   ├── CoreServiceProvider.php # Core WordPress services
+│   ├── RestControllerProvider.php  # REST controller registration
 │   ├── AdminServiceProvider.php # Admin-specific services
 │   └── FrontendServiceProvider.php # Frontend services
 ├── Admin/                      # WordPress admin integration

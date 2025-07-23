@@ -206,7 +206,7 @@ public function register(Container $container): void {
     ]);
 }
 
-// In ApiServiceProvider - for REST controllers
+// In RestControllerProvider - for REST controllers
 protected array $provides = [
     // ...existing controllers
     ExampleController::class,

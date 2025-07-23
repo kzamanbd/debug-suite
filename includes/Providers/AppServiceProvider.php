@@ -4,7 +4,7 @@
  *
  * Registers business logic services, core WordPress integration services,
  * and admin interface components. REST API controllers are registered
- * separately in ApiServiceProvider.
+ * separately in RestControllerProvider.
  *
  * @package DebugSuite
  */

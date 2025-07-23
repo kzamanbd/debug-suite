@@ -44,9 +44,8 @@ use DebugSuite\Internal\Activator;
 use DebugSuite\Internal\Deactivator;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
-use DebugSuite\Providers\AdminServiceProvider;
-use DebugSuite\Providers\ApiServiceProvider;
 use DebugSuite\Providers\AppServiceProvider;
+use DebugSuite\Providers\RestControllerProvider;
 
 /**
  * Main plugin bootstrap and orchestration class for Debug Suite.
@@ -160,8 +159,8 @@ final class DebugSuite {
 	 */
 	private function register_providers(): void {
 		$providers = [
-			ApiServiceProvider::class,
 			AppServiceProvider::class,
+			RestControllerProvider::class,
 		];
 
 		$this->service_manager->register_providers( $providers );

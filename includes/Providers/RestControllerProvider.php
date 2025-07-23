@@ -1,6 +1,6 @@
 <?php
 /**
- * API service provider for Debug Suite.
+ * REST Controller provider for Debug Suite.
  *
  * Registers REST API controllers with automatic dependency injection.
  * Business logic services are registered separately in AppServiceProvider.
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * API service provider that registers REST API controllers.
+ * REST controller provider that registers API controllers with dependency injection.
  *
  * This provider handles:
  * - REST API controllers (API namespace)
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class ApiServiceProvider extends AbstractServiceProvider {
+class RestControllerProvider extends AbstractServiceProvider {
 
 	protected array $provides = [
 		LogsController::class,
