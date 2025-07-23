@@ -4,7 +4,6 @@
 
 - **Base Controller**: `DebugSuite\API\RestController` - Provides common functionality and implements `Hookable`
 - **Settings Controller**: `DebugSuite\API\SettingsController` - Delegates to `SettingsService` for wp-config.php management
-- **File Manager Controller**: `DebugSuite\API\FileManagerController` - Delegates to `FileManagerService` for file operations
 - **File Logs Controller**: `DebugSuite\API\FileLogsController` - Delegates to `FileLogsService` for debug.log processing
 
 ## Controller Lifecycle

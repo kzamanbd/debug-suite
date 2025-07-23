@@ -17,7 +17,6 @@ import {
     Bug,
     CheckCircle,
     Clock,
-    Database,
     ExternalLink,
     FileText,
     HardDrive,
@@ -497,10 +496,6 @@ const Overview = () => {
                     <Button as={Link} to="/settings">
                         <Settings className="h-5 w-5" />
                         <span>{__('Debug Settings', 'debug-suite')}</span>
-                    </Button>
-                    <Button as={Link} to="/file-manager">
-                        <Database className="h-5 w-5" />
-                        <span>{__('File Manager', 'debug-suite')}</span>
                     </Button>
                 </div>
             </Card>
