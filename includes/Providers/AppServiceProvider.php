@@ -53,7 +53,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 		// Simple service registration - merged from ServicesServiceProvider
 		$container->add(
 			[
-				Admin::class               => $container->object( Admin::class ),
+				Admin::class               	 => $container->object( Admin::class ),
 				Assets::class                => $container->object( Assets::class ),
 				HookManager::class           => $container->object( HookManager::class ),
 				// Core services as singletons
