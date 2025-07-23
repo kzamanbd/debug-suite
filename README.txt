@@ -121,9 +121,8 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 
 1. Main Dashboard - Overview of debugging tools and recent logs
 2. Log Viewer - Real-time log monitoring with filtering
-3. File Manager - Built-in code editor with syntax highlighting
-4. Settings Panel - Comprehensive configuration options
-5. Error Tracking - Detailed error reports and analysis
+3. Settings Panel - Comprehensive configuration options
+4. Error Tracking - Detailed error reports and analysis
 
 == Changelog ==
 

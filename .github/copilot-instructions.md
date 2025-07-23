@@ -8,7 +8,12 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 
 **Current Version**: 1.0.0  
 **PHP Requirements**: PHP 8.2+  
-**Node/NPM**: Uses pnpm for package management
+**Node/NPM**: Uses pnpm for pac OverviewService::class => $container->autowire(OverviewService::class),
+
+            // Controllers with dependency injection
+            FileLogsController::class    => $container->autowire(FileLogsController::class),
+            SettingsController::class   => $container->autowire(SettingsController::class),
+            OverviewController::class   => $container->autowire(OverviewController::class),agement
 
 ### Core Architecture
 
@@ -197,7 +202,8 @@ $container->add([
 
 **✅ Current Service Registration Pattern:**
 
-- All business services registered in `AppServiceProvider` using `add()`
+- Business services registered in `AppServiceProvider` using `add()`
+- REST API controllers registered in `RestControllerProvider` using `add()`
 - Services use `object()` for simple singletons
 - Controllers use `autowire()` for dependency injection
 - Service classes implement `ServiceInterface` marker interface
@@ -212,7 +218,7 @@ $container->add([
     - **Object Registration**: Use `$container->object(Class::class)` for simple service registration
     - **Autowired Registration**: Use `$container->autowire(Class::class)` for services with dependencies
     - **Clean Structure**: Use minimal boilerplate with focused, readable code
-    - **Single Provider**: Register all business services in `AppServiceProvider` only
+    - **Separated Providers**: Register business services in `AppServiceProvider`, REST controllers in `RestControllerProvider`
 
 3. **Service Provider System**:
     - **Base Class**: Extend `DebugSuite\Core\Container\AbstractServiceProvider` for new service providers
@@ -268,10 +274,10 @@ $container->add([
     - **Dependency Injection**: Services are registered as singletons in the container via `AppServiceProvider`
     - **Error Handling**: Use `ServiceResponse::success($data)` and `ServiceResponse::failure($message, $code)` for consistent responses
     - **Service Registration**: Add new services to `AppServiceProvider::$provides` array and register in `register()` method
+    - **Controller Registration**: Add new REST controllers to `RestControllerProvider::$provides` array and register in `register()` method
     - **Implemented Services**:
         - `FileLogsService` (debug log operations)
         - `SettingsService` (wp-config.php management)
-        - `FileManagerService` (file system operations)
         - `OnboardingService` (onboarding flow)
         - `OverviewService` (dashboard overview)
         - `WPLogReaderService` (WordPress log file reading)
@@ -387,23 +393,30 @@ class ExampleService implements ServiceInterface {
 **Step 2: Register Service with DI Container**
 
 ```php
-// In AppServiceProvider::register()
+// In AppServiceProvider::register() - for business services
 $container->add([
     ExampleService::class => $container->object( ExampleService::class ),
+]);
+
+// In RestControllerProvider::register() - for REST controllers
+$container->add([
     ExampleController::class => $container->autowire( ExampleController::class ),
 ]);
 
-// Add to $provides array (follow existing pattern)
+// Add to respective $provides arrays
+// AppServiceProvider::$provides
 protected array $provides = [
 	WPLogReaderService::class,
 	FileLogsService::class,
-	FileManagerService::class,
 	SettingsService::class,
 	OnboardingService::class,
 	OverviewService::class,
 	ExampleService::class,      // Add new service here
+];
+
+// RestControllerProvider::$provides
+protected array $provides = [
 	FileLogsController::class,
-	FileManagerController::class,
 	SettingsController::class,
 	OverviewController::class,
 	ExampleController::class,   // Add new controller here
@@ -527,7 +540,6 @@ class ExampleController extends RestController {
 - **Single Responsibility**: Each service handles one domain of business logic
     - `FileLogsService`: Debug log operations only
     - `SettingsService`: wp-config.php management only
-    - `FileManagerService`: File system operations only
 
 - **Return ServiceResponse**: Always return `ServiceResponse` objects, never throw exceptions to controllers
 
@@ -571,10 +583,7 @@ class ExampleController extends RestController {
 - **Configuration**: Accept dependencies through constructor for testability
 
     ```php
-    // From FileManagerService - accepts custom base path
-    public function __construct( ?string $base_path = null ) {
-        $this->base_path = $base_path ?? ABSPATH;
-    }
+
     ```
 
 - **Documentation**: Fully document all public methods with PHPDoc
@@ -662,30 +671,35 @@ class AppServiceProvider extends AbstractServiceProvider {
     protected array $provides = [
         WPLogReaderService::class,
         FileLogsService::class,
-        FileManagerService::class,
         SettingsService::class,
         OnboardingService::class,
         OverviewService::class,
+    ];
+
+    public function register(Container $container): void {
+        // Modern definition array approach - Business Services Only
+        $container->add([
+            // Services with simple autowiring
+            WPLogReaderService::class    => $container->object(WPLogReaderService::class),
+            FileLogsService::class       => $container->object(FileLogsService::class),
+            SettingsService::class       => $container->object(SettingsService::class),
+            OnboardingService::class     => $container->object(OnboardingService::class),
+            OverviewService::class       => $container->autowire(OverviewService::class),
+        ]);
+    }
+}
+
+class RestControllerProvider extends AbstractServiceProvider {
+    protected array $provides = [
         FileLogsController::class,
-        FileManagerController::class,
         SettingsController::class,
         OverviewController::class,
     ];
 
     public function register(Container $container): void {
-        // Modern definition array approach
+        // REST API Controllers with dependency injection
         $container->add([
-            // Services with simple autowiring
-            WPLogReaderService::class    => $container->object(WPLogReaderService::class),
-            FileLogsService::class       => $container->object(FileLogsService::class),
-            FileManagerService::class    => $container->object(FileManagerService::class),
-            SettingsService::class       => $container->object(SettingsService::class),
-            OnboardingService::class     => $container->object(OnboardingService::class),
-            OverviewService::class       => $container->autowire(OverviewService::class),
-
-            // Controllers with dependency injection
             FileLogsController::class    => $container->autowire(FileLogsController::class),
-            FileManagerController::class => $container->autowire(FileManagerController::class),
             SettingsController::class   => $container->autowire(SettingsController::class),
             OverviewController::class   => $container->autowire(OverviewController::class),
         ]);
@@ -931,8 +945,8 @@ const options = [
 
 The project follows a clean service provider architecture:
 
-- **CoreServiceProvider**: Registers core services (`Assets`, `I18n`, `Plugin`)
-- **AppServiceProvider**: Registers business logic services and REST controllers
+- **AppServiceProvider**: Registers business logic services only
+- **RestControllerProvider**: Registers REST API controllers only
 - **AdminServiceProvider**: Registers admin-specific services (`Admin`)
 - **FrontendServiceProvider**: Registers frontend services (`Frontend`)
 
@@ -944,7 +958,6 @@ All business logic is implemented in the `includes/Services/` directory:
     - `FileLogsService` - Debug log operations
     - `WPLogReaderService` - WordPress log file reading
     - `LogFileDiscoveryService` - Log file discovery
-- **FileManagerService** - File system operations
 - **SettingsService** - wp-config.php management
 - **OnboardingService** - Onboarding flow management
 - **OverviewService** - Dashboard overview functionality
@@ -954,7 +967,6 @@ All business logic is implemented in the `includes/Services/` directory:
 All API endpoints are handled by controllers in `includes/API/`:
 
 - `FileLogsController` - Debug log API endpoints
-- `FileManagerController` - File management API endpoints
 - `SettingsController` - Settings management API endpoints
 - `OverviewController` - Dashboard overview API endpoints
 

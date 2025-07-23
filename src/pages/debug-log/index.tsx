@@ -86,7 +86,7 @@ const FileLogs = () => {
     };
 
     // Show skeleton while initial data loads
-    if (logsLoading) {
+    if (logsLoading && !logs.length) {
         return <FileLogsSkeleton />;
     }
 
@@ -98,7 +98,7 @@ const FileLogs = () => {
                 selectedFile={selectedFile}
                 clearing={clearing}
                 rawContent={rawContent}
-                loading={rawLoading}
+                loading={rawLoading || logsLoading}
                 onFileChange={onFileChange}
                 onViewModeChange={handleViewModeChange}
                 onFiltersChange={handleFilterChange}
