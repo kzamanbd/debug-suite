@@ -239,7 +239,7 @@ const Overview = () => {
                                 {__('Total Log Entries', 'debug-suite')}
                             </p>
                             <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                                {stats.logs.total_entries.toLocaleString()}
+                                {stats.logs.total_entries}
                             </p>
                         </div>
                         <FileText className="h-8 w-8 text-blue-500" />
