@@ -131,8 +131,7 @@ const FileEditor = ({ open, toggle, fileName, filePath, onSaveSuccess }: FileEdi
             open={open}
             title={fileName}
             onClose={handleClose}
-            className="mx-auto max-h-[calc(100svh_-_20px)] max-w-full"
-        >
+            className="mx-auto max-h-[calc(100svh_-_20px)] max-w-full">
             <Modal.Title>{fileName}</Modal.Title>
             <div className="mt-2">
                 <Editor
@@ -154,8 +153,7 @@ const FileEditor = ({ open, toggle, fileName, filePath, onSaveSuccess }: FileEdi
                             (saving || !hasChanges) && 'cursor-not-allowed opacity-60'
                         )}
                         disabled={saving || !hasChanges}
-                        onClick={handleSave}
-                    >
+                        onClick={handleSave}>
                         {saving ? __('Saving...', 'debug-suite') : __('Save', 'debug-suite')}
                     </button>
                     <button
@@ -164,8 +162,7 @@ const FileEditor = ({ open, toggle, fileName, filePath, onSaveSuccess }: FileEdi
                             'focus:ring-primary-400 hover:bg-gray-100 focus:ring-2 focus:outline-none',
                             'dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
                         )}
-                        onClick={handleClose}
-                    >
+                        onClick={handleClose}>
                         {__('Cancel', 'debug-suite')}
                     </button>
                 </div>
@@ -176,8 +173,7 @@ const FileEditor = ({ open, toggle, fileName, filePath, onSaveSuccess }: FileEdi
                                 className="h-5 w-5 text-red-400"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
-                                aria-hidden="true"
-                            >
+                                aria-hidden="true">
                                 <path
                                     fillRule="evenodd"
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"

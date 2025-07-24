@@ -18,8 +18,10 @@ import { __ } from '@wordpress/i18n';
 const FileDetailSkeleton = ({ className = '' }: { className?: string }): JSX.Element => {
     return (
         <div
-            className={classNames('w-full animate-pulse rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800', className)}
-        >
+            className={classNames(
+                'w-full animate-pulse rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800',
+                className
+            )}>
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead>

@@ -163,8 +163,7 @@ const FileManager = () => {
                         <button
                             type="button"
                             className="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-hidden dark:text-neutral-500 dark:hover:text-blue-500 dark:focus:text-blue-500"
-                            onClick={() => breadcrumbClickHandler()}
-                        >
+                            onClick={() => breadcrumbClickHandler()}>
                             <HardDrive size={16} className="mr-2" />
                             {__('root', 'debug-suite')}
                         </button>
@@ -176,8 +175,7 @@ const FileManager = () => {
                                 viewBox="0 0 16 16"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true"
-                            >
+                                aria-hidden="true">
                                 <path d="M6 13L10 3" stroke="currentColor" strokeLinecap="round"></path>
                             </svg>
                         )}
@@ -187,8 +185,7 @@ const FileManager = () => {
                             <button
                                 type="button"
                                 className="flex items-center text-sm text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-hidden dark:text-neutral-500 dark:hover:text-blue-500 dark:focus:text-blue-500"
-                                onClick={() => breadcrumbClickHandler(index)}
-                            >
+                                onClick={() => breadcrumbClickHandler(index)}>
                                 {item}
                                 {index < breadcrumb.length - 1 && (
                                     <svg
@@ -198,8 +195,7 @@ const FileManager = () => {
                                         viewBox="0 0 16 16"
                                         fill="none"
                                         xmlns="http://www.w3.org/2000/svg"
-                                        aria-hidden="true"
-                                    >
+                                        aria-hidden="true">
                                         <path d="M6 13L10 3" stroke="currentColor" strokeLinecap="round"></path>
                                     </svg>
                                 )}
@@ -260,16 +256,14 @@ const FileManager = () => {
                                         <tr className="on-parent-hover-show bg-primary-50/40 dark:bg-primary-900/10">
                                             <td
                                                 colSpan={5}
-                                                className="rounded-lg border-b border-gray-200 px-4 py-3 text-center dark:border-gray-700"
-                                            >
+                                                className="rounded-lg border-b border-gray-200 px-4 py-3 text-center dark:border-gray-700">
                                                 {__('You have selected', 'debug-suite')}{' '}
                                                 <strong>{checkedItems.length}</strong> {__('users.', 'debug-suite')}
                                                 <button
                                                     className="mx-1 text-red-500 hover:text-red-700"
                                                     onClick={() =>
                                                         confirm('Are you sure you want to delete all selected files?')
-                                                    }
-                                                >
+                                                    }>
                                                     {__('Delete', 'debug-suite')}
                                                 </button>
                                                 {__('them?', 'debug-suite')}
@@ -285,8 +279,7 @@ const FileManager = () => {
                                                 file.checked
                                                     ? 'bg-primary-50 dark:bg-primary-900/10'
                                                     : 'hover:bg-gray-50 dark:hover:bg-gray-800/40'
-                                            )}
-                                        >
+                                            )}>
                                             <td className="w-10 border-b border-gray-200 px-4 py-3 align-middle dark:border-gray-700">
                                                 <CustomCheckbox
                                                     onChange={checkedItem.bind(null, file)}
@@ -296,8 +289,7 @@ const FileManager = () => {
                                             <td className="border-b border-gray-200 px-4 py-3 align-middle dark:border-gray-700">
                                                 <div
                                                     onClick={fetchNestedFiles.bind(null, file)}
-                                                    className="flex cursor-pointer items-center gap-2"
-                                                >
+                                                    className="flex cursor-pointer items-center gap-2">
                                                     <FileIcon type={file.type} />
                                                     <span className="ml-2 truncate font-medium text-gray-900 dark:text-white">
                                                         {file.name}
