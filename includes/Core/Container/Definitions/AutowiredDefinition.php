@@ -10,8 +10,6 @@ namespace DebugSuite\Core\Container\Definitions;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
-use ReflectionType;
-use ReflectionNamedType;
 use DebugSuite\Core\Container\Exceptions\ContainerException;
 
 /**
@@ -364,8 +362,9 @@ class AutowiredDefinition implements DefinitionInterface {
 
 		// Strategy 4: Type-based dependency injection
 		$type = $parameter->getType();
-		if ( $type && ! $this->is_builtin_type( $type ) ) {
-			$dependency_class = $this->get_type_name( $type );
+		if ( $type && ! $type->isBuiltin() ) {
+			// @phpstan-ignore-next-line
+			$dependency_class = $type->getName();
 			return $resolver( $dependency_class );
 		}
 
@@ -455,63 +454,5 @@ class AutowiredDefinition implements DefinitionInterface {
 		$suggestions[] = 'Add a default value to the parameter in the constructor';
 
 		return 'Suggestions: ' . implode( ', ', $suggestions ) . '.';
-	}
-
-	/**
-	 * Check if a reflection type is a builtin type (PHP 8.1 compatible).
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param ReflectionType $type The reflection type to check.
-	 * @return bool True if builtin type, false otherwise.
-	 */
-	private function is_builtin_type( ReflectionType $type ): bool {
-		if ( method_exists( $type, 'isBuiltin' ) ) {
-			return $type->isBuiltin();
-		}
-
-		// Fallback for older PHP versions
-		if ( $type instanceof ReflectionNamedType ) {
-			$type_name = $type->getName();
-			return in_array(
-				$type_name,
-				[
-					'string',
-					'int',
-					'float',
-					'bool',
-					'array',
-					'object',
-					'callable',
-					'resource',
-					'null',
-					'mixed',
-				],
-				true
-			);
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get the name of a reflection type (PHP 8.1 compatible).
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param ReflectionType $type The reflection type.
-	 * @return string The type name.
-	 */
-	private function get_type_name( ReflectionType $type ): string {
-		if ( method_exists( $type, 'getName' ) ) {
-			return $type->getName();
-		}
-
-		// Fallback for older PHP versions
-		if ( $type instanceof ReflectionNamedType ) {
-			return $type->getName();
-		}
-
-		return 'mixed';
 	}
 }
