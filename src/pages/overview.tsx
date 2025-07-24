@@ -103,65 +103,58 @@ const Overview = () => {
     const navigate = useNavigate();
     const toast = useToast();
 
-    const fetchDashboardData = useCallback(
-        async (showRefreshToast = false) => {
-            try {
-                setRefreshing(true);
+    const fetchDashboardData = useCallback(async () => {
+        try {
+            setRefreshing(true);
 
-                // Fetch dashboard stats
-                const dashboardStats = await apiFetch<DashboardStats>({
-                    path: '/debug-suite/v1/overview/stats'
-                });
+            // Fetch dashboard stats
+            const dashboardStats = await apiFetch<DashboardStats>({
+                path: '/debug-suite/v1/overview/stats'
+            });
 
-                // Fetch recent log entries to analyze top errors
-                const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
-                    per_page: 10,
-                    level_filter: 'error'
-                });
+            // Fetch recent log entries to analyze top errors
+            const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
+                per_page: 10,
+                level_filter: 'error'
+            });
 
-                const recentLogs = await apiFetch<{
-                    entries: Array<{ message: string; level: string; timestamp: string }>;
-                }>({
-                    path: recentLogsPath
-                });
+            const recentLogs = await apiFetch<{
+                entries: Array<{ message: string; level: string; timestamp: string }>;
+            }>({
+                path: recentLogsPath
+            });
 
-                // Process top errors
-                const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
-                recentLogs.entries.forEach((entry) => {
-                    const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
-                    if (typeof errorCounts[message] === 'undefined') {
-                        errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
-                    }
-                    errorCounts[message].count++;
-                    if (entry.timestamp > errorCounts[message].last_seen) {
-                        errorCounts[message].last_seen = entry.timestamp;
-                    }
-                });
-
-                const topErrorsList = Object.keys(errorCounts)
-                    .map((message) => ({ message, ...errorCounts[message] }))
-                    .sort((a, b) => b.count - a.count)
-                    .slice(0, 5);
-
-                setStats(dashboardStats);
-
-                setTopErrors(topErrorsList);
-                setSlowQueries(mockSlowQueries);
-
-                if (showRefreshToast) {
-                    toast.success(__('Dashboard data refreshed', 'debug-suite'));
+            // Process top errors
+            const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
+            recentLogs.entries.forEach((entry) => {
+                const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
+                if (typeof errorCounts[message] === 'undefined') {
+                    errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
                 }
-            } catch (error) {
-                void navigate('/config');
-                console.error('Error fetching dashboard data:', error);
-                toast.error(__('Failed to load dashboard data', 'debug-suite'));
-            } finally {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        },
-        [navigate, toast]
-    );
+                errorCounts[message].count++;
+                if (entry.timestamp > errorCounts[message].last_seen) {
+                    errorCounts[message].last_seen = entry.timestamp;
+                }
+            });
+
+            const topErrorsList = Object.keys(errorCounts)
+                .map((message) => ({ message, ...errorCounts[message] }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+
+            setStats(dashboardStats);
+
+            setTopErrors(topErrorsList);
+            setSlowQueries(mockSlowQueries);
+        } catch (error) {
+            void navigate('/config');
+            console.error('Error fetching dashboard data:', error);
+            toast.error(__('Failed to load dashboard data', 'debug-suite'));
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, [navigate, toast]);
 
     useEffect(() => {
         void fetchDashboardData();
@@ -230,11 +223,7 @@ const Overview = () => {
         <div className="space-y-6">
             {/* Header */}
             <Fill name="debug-suite-layout-header-right">
-                <Button
-                    onClick={() => fetchDashboardData(true)}
-                    className="flex items-center gap-2"
-                    disabled={refreshing}
-                >
+                <Button onClick={fetchDashboardData} className="flex items-center gap-2" disabled={refreshing}>
                     <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
                     {__('Refresh', 'debug-suite')}
                 </Button>
