@@ -17,7 +17,7 @@ interface ToastOptions {
     variant?: 'default' | 'success' | 'error';
 }
 
-interface ToastContextValue {
+interface ToastContext {
     toast: (options: ToastOptions) => string;
     dismiss: (toastId: string) => void;
     toasts: Toast[];
@@ -29,9 +29,9 @@ interface ToastProviderProps {
     children: ReactNode;
 }
 
-const ToastContext = createContext<ToastContextValue | undefined>(undefined);
+const ToastContext = createContext<ToastContext | undefined>(undefined);
 
-export function useToast(): ToastContextValue {
+export function useToast(): ToastContext {
     const context = useContext(ToastContext);
     if (!context) {
         throw new Error('useToast must be used within a ToastProvider');
@@ -83,8 +83,10 @@ export function ToastProvider({ children }: ToastProviderProps) {
         setToasts((prev) => prev.filter((toast) => toast.id !== toastId));
     }, []);
 
+    const value = { toast, dismiss, toasts, success, error };
+
     return (
-        <ToastContext.Provider value={{ toast, dismiss, toasts, success, error }}>
+        <ToastContext.Provider value={value}>
             {children}
             <div className="fixed right-0 bottom-0 z-50 flex w-full max-w-md flex-col items-end space-y-2 p-4">
                 {toasts.map(({ id, title, icon, variant }) => (
