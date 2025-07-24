@@ -54,14 +54,9 @@ const DebugConfig = () => {
         void fetchSettings();
     }, []);
 
-    const updateSetting = async (key: keyof DebugSettings, value: boolean) => {
+    const updateSetting = async (values: Partial<DebugSettings>) => {
         setSaving(true);
-
-        const updatedSettings = {
-            ...settings,
-            [key]: value
-        };
-
+        const updatedSettings = { ...settings, ...values };
         try {
             const response = await apiFetch<SettingsResponse>({
                 path: '/debug-suite/v1/settings',
@@ -83,6 +78,24 @@ const DebugConfig = () => {
         }
     };
 
+    const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const key = event.target.name as keyof DebugSettings;
+        const value = event.target.checked;
+        setSettings((prev) => ({
+            ...prev,
+            [key]: value
+        }));
+        void updateSetting({ [key]: value });
+    };
+
+    const updateEnv = (mode: boolean) => {
+        void updateSetting({
+            ...settings,
+            debug: mode,
+            debug_log: mode
+        });
+    };
+
     if (loading) {
         return (
             <div className="flex min-h-96 items-center justify-center">
@@ -97,15 +110,14 @@ const DebugConfig = () => {
     return (
         <div className="space-y-4">
             {/* Compact Configuration Cards */}
-            <div className="space-y-3">
+            <div className="grid gap-4 md:grid-cols-3">
                 {/* Debug Mode Card */}
                 <div
                     className={`rounded-lg border transition-all duration-200 ${
                         settings.debug
                             ? 'border-primary/40 bg-primary/5 shadow-primary/5 shadow-md'
                             : 'hover:border-primary/30 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'
-                    }`}
-                >
+                    }`}>
                     <div className="p-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -114,8 +126,7 @@ const DebugConfig = () => {
                                         settings.debug
                                             ? 'bg-primary/20 text-primary'
                                             : 'bg-gray-100 text-gray-400 dark:bg-gray-700'
-                                    }`}
-                                >
+                                    }`}>
                                     <Bug className="h-4 w-4" />
                                 </div>
                                 <div>
@@ -133,11 +144,9 @@ const DebugConfig = () => {
                                 </div>
                             </div>
                             <CustomSwitch
+                                name="debug"
                                 checked={Boolean(settings.debug)}
-                                onChange={(event) => {
-                                    const target = event.target as HTMLInputElement;
-                                    void updateSetting('debug', target.checked);
-                                }}
+                                onChange={changeHandler}
                                 disabled={saving}
                             />
                         </div>
@@ -150,8 +159,7 @@ const DebugConfig = () => {
                         settings.debug_log
                             ? 'border-primary/40 bg-primary/5 shadow-primary/5 shadow-md'
                             : 'hover:border-primary/30 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'
-                    }`}
-                >
+                    }`}>
                     <div className="p-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -160,8 +168,7 @@ const DebugConfig = () => {
                                         settings.debug_log
                                             ? 'bg-primary/20 text-primary'
                                             : 'bg-gray-100 text-gray-400 dark:bg-gray-700'
-                                    }`}
-                                >
+                                    }`}>
                                     <FileText className="h-4 w-4" />
                                 </div>
                                 <div>
@@ -179,11 +186,9 @@ const DebugConfig = () => {
                                 </div>
                             </div>
                             <CustomSwitch
+                                name="debug_log"
                                 checked={settings.debug_log}
-                                onChange={(event) => {
-                                    const target = event.target as HTMLInputElement;
-                                    void updateSetting('debug_log', target.checked);
-                                }}
+                                onChange={changeHandler}
                                 disabled={saving}
                             />
                         </div>
@@ -196,8 +201,7 @@ const DebugConfig = () => {
                         settings.debug_display
                             ? 'border-amber-400/40 bg-amber-50/50 shadow-md shadow-amber-500/5 dark:bg-amber-900/10'
                             : 'border-gray-200 bg-white hover:border-amber-400/30 dark:border-gray-700 dark:bg-gray-800'
-                    }`}
-                >
+                    }`}>
                     <div className="p-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -206,8 +210,7 @@ const DebugConfig = () => {
                                         settings.debug_display
                                             ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
                                             : 'bg-gray-100 text-gray-400 dark:bg-gray-700'
-                                    }`}
-                                >
+                                    }`}>
                                     {settings.debug_display ? (
                                         <Eye className="h-4 w-4" />
                                     ) : (
@@ -229,11 +232,9 @@ const DebugConfig = () => {
                                 </div>
                             </div>
                             <CustomSwitch
+                                name="debug_display"
                                 checked={Boolean(settings.debug_display)}
-                                onChange={(event) => {
-                                    const target = event.target as HTMLInputElement;
-                                    void updateSetting('debug_display', target.checked);
-                                }}
+                                onChange={changeHandler}
                                 disabled={saving}
                             />
                         </div>
@@ -250,13 +251,9 @@ const DebugConfig = () => {
 
                 <div className="grid grid-cols-2 gap-2">
                     <button
-                        onClick={() => {
-                            void updateSetting('debug', true);
-                            void updateSetting('debug_log', true);
-                        }}
+                        onClick={() => updateEnv(true)}
                         disabled={saving}
-                        className="border-primary/20 bg-primary/5 hover:bg-primary/10 flex items-center gap-2 rounded-md border p-2 text-left text-sm transition-colors duration-200 disabled:opacity-50"
-                    >
+                        className="border-primary/20 bg-primary/5 hover:bg-primary/10 flex items-center gap-2 rounded-md border p-2 text-left text-sm transition-colors duration-200 disabled:opacity-50">
                         <CheckCircle2 className="text-primary h-3 w-3 flex-shrink-0" />
                         <div>
                             <div className="text-xs font-medium text-gray-900 dark:text-white">
@@ -269,14 +266,9 @@ const DebugConfig = () => {
                     </button>
 
                     <button
-                        onClick={() => {
-                            void updateSetting('debug', false);
-                            void updateSetting('debug_log', false);
-                            void updateSetting('debug_display', false);
-                        }}
+                        onClick={() => updateEnv(false)}
                         disabled={saving}
-                        className="flex items-center gap-2 rounded-md border border-gray-200 p-2 text-left text-sm transition-colors duration-200 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:hover:bg-gray-700"
-                    >
+                        className="flex items-center gap-2 rounded-md border border-gray-200 p-2 text-left text-sm transition-colors duration-200 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:hover:bg-gray-700">
                         <Shield className="h-3 w-3 flex-shrink-0 text-gray-500" />
                         <div>
                             <div className="text-xs font-medium text-gray-900 dark:text-white">

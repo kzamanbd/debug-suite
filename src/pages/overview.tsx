@@ -61,6 +61,10 @@ interface SlowQuery {
     source: string;
 }
 
+interface RecentLogs {
+    entries: Array<{ message: string; level: string; timestamp: string }>;
+}
+
 // Mock slow queries data (replace with real API later)
 const mockSlowQueries: SlowQuery[] = [
     {
@@ -104,65 +108,57 @@ const Overview = () => {
     const navigate = useNavigate();
     const toast = useToast();
 
-    const fetchDashboardData = useCallback(
-        async (showRefreshToast = false) => {
-            try {
-                setRefreshing(true);
+    const fetchDashboardData = useCallback(async () => {
+        try {
+            setRefreshing(true);
 
-                // Fetch dashboard stats
-                const dashboardStats = await apiFetch<DashboardStats>({
+            // Prepare the recent logs path for parallel execution
+            const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
+                per_page: 10,
+                level_filter: 'error'
+            });
+
+            // Execute both API calls in parallel
+            const [dashboardStats, recentLogs] = await Promise.all([
+                apiFetch<DashboardStats>({
                     path: '/debug-suite/v1/overview/stats'
-                });
-
-                // Fetch recent log entries to analyze top errors
-                const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
-                    per_page: 10,
-                    level_filter: 'error'
-                });
-
-                const recentLogs = await apiFetch<{
-                    entries: Array<{ message: string; level: string; timestamp: string }>;
-                }>({
+                }),
+                apiFetch<RecentLogs>({
                     path: recentLogsPath
-                });
+                })
+            ]);
 
-                // Process top errors
-                const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
-                recentLogs.entries.forEach((entry) => {
-                    const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
-                    if (typeof errorCounts[message] === 'undefined') {
-                        errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
-                    }
-                    errorCounts[message].count++;
-                    if (entry.timestamp > errorCounts[message].last_seen) {
-                        errorCounts[message].last_seen = entry.timestamp;
-                    }
-                });
-
-                const topErrorsList = Object.keys(errorCounts)
-                    .map((message) => ({ message, ...errorCounts[message] }))
-                    .sort((a, b) => b.count - a.count)
-                    .slice(0, 5);
-
-                setStats(dashboardStats);
-
-                setTopErrors(topErrorsList);
-                setSlowQueries(mockSlowQueries);
-
-                if (showRefreshToast) {
-                    toast.success(__('Dashboard data refreshed', 'debug-suite'));
+            // Process top errors
+            const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
+            recentLogs.entries.forEach((entry) => {
+                const message = entry.message.substring(0, 100) + (entry.message.length > 100 ? '...' : '');
+                if (typeof errorCounts[message] === 'undefined') {
+                    errorCounts[message] = { count: 0, level: entry.level, last_seen: entry.timestamp };
                 }
-            } catch (error) {
-                void navigate('/config');
-                console.error('Error fetching dashboard data:', error);
-                toast.error(__('Failed to load dashboard data', 'debug-suite'));
-            } finally {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        },
-        [navigate, toast]
-    );
+                errorCounts[message].count++;
+                if (entry.timestamp > errorCounts[message].last_seen) {
+                    errorCounts[message].last_seen = entry.timestamp;
+                }
+            });
+
+            const topErrorsList = Object.keys(errorCounts)
+                .map((message) => ({ message, ...errorCounts[message] }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+
+            setStats(dashboardStats);
+
+            setTopErrors(topErrorsList);
+            setSlowQueries(mockSlowQueries);
+        } catch (error) {
+            void navigate('/config');
+            console.error('Error fetching dashboard data:', error);
+            toast.error(__('Failed to load dashboard data', 'debug-suite'));
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, [navigate, toast]);
 
     useEffect(() => {
         void fetchDashboardData();
@@ -231,11 +227,7 @@ const Overview = () => {
         <div className="space-y-6">
             {/* Header */}
             <Fill name="debug-suite-layout-header-right">
-                <Button
-                    onClick={() => fetchDashboardData(true)}
-                    className="flex items-center gap-2"
-                    disabled={refreshing}
-                >
+                <Button onClick={fetchDashboardData} className="flex items-center gap-2" disabled={refreshing}>
                     <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
                     {__('Refresh', 'debug-suite')}
                 </Button>
@@ -251,7 +243,7 @@ const Overview = () => {
                                 {__('Total Log Entries', 'debug-suite')}
                             </p>
                             <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                                {stats.logs.total_entries.toLocaleString()}
+                                {stats.logs.total_entries}
                             </p>
                         </div>
                         <FileText className="h-8 w-8 text-blue-500" />
@@ -441,8 +433,7 @@ const Overview = () => {
                                                           ? 'warning'
                                                           : 'success'
                                                 }
-                                                className="text-xs"
-                                            >
+                                                className="text-xs">
                                                 {query.execution_time.toFixed(2)}s
                                             </Badge>
                                             <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -517,8 +508,7 @@ const Overview = () => {
                     <div className="space-y-3">
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
                                     <BookOpen className="h-4 w-4" />
@@ -537,8 +527,7 @@ const Overview = () => {
 
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400">
                                     <CheckCircle className="h-4 w-4" />
@@ -557,8 +546,7 @@ const Overview = () => {
 
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400">
                                     <Zap className="h-4 w-4" />
@@ -587,8 +575,7 @@ const Overview = () => {
                     <div className="space-y-3">
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400">
                                     <MessageSquare className="h-4 w-4" />
@@ -607,8 +594,7 @@ const Overview = () => {
 
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400">
                                     <AlertTriangle className="h-4 w-4" />
@@ -627,8 +613,7 @@ const Overview = () => {
 
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400">
                                     <Zap className="h-4 w-4" />

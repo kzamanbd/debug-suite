@@ -29,15 +29,15 @@ class OverviewService implements ServiceInterface {
 	 *
 	 * @var LogsService
 	 */
-	private LogsService $file_logs_service;
+	private LogsService $logs_service;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param LogsService $file_logs_service File logs service.
+	 * @param LogsService $logs_service Logs service.
 	 */
-	public function __construct( LogsService $file_logs_service ) {
-		$this->file_logs_service = $file_logs_service;
+	public function __construct( LogsService $logs_service ) {
+		$this->logs_service = $logs_service;
 	}
 
 	/**
@@ -49,7 +49,7 @@ class OverviewService implements ServiceInterface {
 	 */
 	public function get_dashboard_stats(): ServiceResponse {
 		// Get log statistics
-		$log_stats_result = $this->file_logs_service->get_log_file_stats();
+		$log_stats_result = $this->logs_service->get_log_file_stats();
 
 		if ( $log_stats_result->is_failure() ) {
 			return ServiceResponse::failure(

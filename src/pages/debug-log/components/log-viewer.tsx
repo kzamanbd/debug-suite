@@ -124,8 +124,7 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                 className={classNames(
                                                     'transition-colors hover:bg-gray-50',
                                                     open && 'bg-gray-50'
-                                                )}
-                                            >
+                                                )}>
                                                 <td className="p-2 text-sm whitespace-nowrap text-gray-900">
                                                     <DateTimeHtml date={log.timestamp} />
                                                 </td>
@@ -134,8 +133,7 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                         className={classNames(
                                                             'inline-flex items-center rounded-full border px-2 py-px text-xs font-medium',
                                                             levelColors[log.level] || levelColors.debug
-                                                        )}
-                                                    >
+                                                        )}>
                                                         <span className="mr-1">
                                                             {levelIcons[log.level] || <Bug className="size-3" />}
                                                         </span>
@@ -176,8 +174,7 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                                     void handleCopy(log.message, index);
                                                                 }}
                                                                 className="hover:text-primary-600 text-gray-400 focus:outline-none"
-                                                                title={__('Copy message', 'debug-suite')}
-                                                            >
+                                                                title={__('Copy message', 'debug-suite')}>
                                                                 {copiedId === index ? (
                                                                     <CheckIcon className="h-4 w-4 text-green-500" />
                                                                 ) : (
