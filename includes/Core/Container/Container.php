@@ -18,6 +18,8 @@ use DebugSuite\Core\Container\Definitions\DecoratorDefinition;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
+use ReflectionType;
+use ReflectionNamedType;
 use Throwable;
 
 /**
@@ -1290,7 +1292,7 @@ class Container implements ContainerInterface {
 					"Cannot resolve parameter [{$parameter->getName()}]",
 					[
 						'parameter_name' => $parameter->getName(),
-						'parameter_type' => $type ? $type->getName() : 'mixed',
+						'parameter_type' => $type ? $this->get_reflection_type_name( $type ) : 'mixed',
 						'has_default'    => $parameter->isDefaultValueAvailable(),
 						'is_optional'    => $parameter->isOptional(),
 						'resolution_stack' => $this->resolving_stack,
@@ -1301,5 +1303,26 @@ class Container implements ContainerInterface {
 		}
 
 		return $dependencies;
+	}
+
+	/**
+	 * Get the name of a reflection type (PHP 8.1 compatible).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param ReflectionType $type The reflection type.
+	 * @return string The type name.
+	 */
+	private function get_reflection_type_name( ReflectionType $type ): string {
+		if ( method_exists( $type, 'getName' ) ) {
+			return $type->getName();
+		}
+
+		// Fallback for older PHP versions
+		if ( $type instanceof ReflectionNamedType ) {
+			return $type->getName();
+		}
+
+		return 'mixed';
 	}
 }

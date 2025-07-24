@@ -137,7 +137,7 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of Debug Suite - Requires PHP 8.2 or higher.
+Initial release of Debug Suite - Requires PHP 8.1 or higher.
 
 == Development ==
 
