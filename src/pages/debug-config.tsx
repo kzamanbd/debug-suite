@@ -54,14 +54,9 @@ const DebugConfig = () => {
         void fetchSettings();
     }, []);
 
-    const updateSetting = async (key: keyof DebugSettings, value: boolean) => {
+    const updateSetting = async (values: Partial<DebugSettings>) => {
         setSaving(true);
-
-        const updatedSettings = {
-            ...settings,
-            [key]: value
-        };
-
+        const updatedSettings = { ...settings, ...values };
         try {
             const response = await apiFetch<SettingsResponse>({
                 path: '/debug-suite/v1/settings',
@@ -83,6 +78,24 @@ const DebugConfig = () => {
         }
     };
 
+    const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const key = event.target.name as keyof DebugSettings;
+        const value = event.target.checked;
+        setSettings((prev) => ({
+            ...prev,
+            [key]: value
+        }));
+        void updateSetting({ [key]: value });
+    };
+
+    const updateEnv = (mode: boolean) => {
+        void updateSetting({
+            ...settings,
+            debug: mode,
+            debug_log: mode
+        });
+    };
+
     if (loading) {
         return (
             <div className="flex min-h-96 items-center justify-center">
@@ -97,7 +110,7 @@ const DebugConfig = () => {
     return (
         <div className="space-y-4">
             {/* Compact Configuration Cards */}
-            <div className="space-y-3">
+            <div className="grid gap-4 md:grid-cols-3">
                 {/* Debug Mode Card */}
                 <div
                     className={`rounded-lg border transition-all duration-200 ${
@@ -133,11 +146,9 @@ const DebugConfig = () => {
                                 </div>
                             </div>
                             <CustomSwitch
+                                name="debug"
                                 checked={Boolean(settings.debug)}
-                                onChange={(event) => {
-                                    const target = event.target as HTMLInputElement;
-                                    void updateSetting('debug', target.checked);
-                                }}
+                                onChange={changeHandler}
                                 disabled={saving}
                             />
                         </div>
@@ -179,11 +190,9 @@ const DebugConfig = () => {
                                 </div>
                             </div>
                             <CustomSwitch
+                                name="debug_log"
                                 checked={settings.debug_log}
-                                onChange={(event) => {
-                                    const target = event.target as HTMLInputElement;
-                                    void updateSetting('debug_log', target.checked);
-                                }}
+                                onChange={changeHandler}
                                 disabled={saving}
                             />
                         </div>
@@ -229,11 +238,9 @@ const DebugConfig = () => {
                                 </div>
                             </div>
                             <CustomSwitch
+                                name="debug_display"
                                 checked={Boolean(settings.debug_display)}
-                                onChange={(event) => {
-                                    const target = event.target as HTMLInputElement;
-                                    void updateSetting('debug_display', target.checked);
-                                }}
+                                onChange={changeHandler}
                                 disabled={saving}
                             />
                         </div>
@@ -250,10 +257,7 @@ const DebugConfig = () => {
 
                 <div className="grid grid-cols-2 gap-2">
                     <button
-                        onClick={() => {
-                            void updateSetting('debug', true);
-                            void updateSetting('debug_log', true);
-                        }}
+                        onClick={() => updateEnv(true)}
                         disabled={saving}
                         className="border-primary/20 bg-primary/5 hover:bg-primary/10 flex items-center gap-2 rounded-md border p-2 text-left text-sm transition-colors duration-200 disabled:opacity-50"
                     >
@@ -269,11 +273,7 @@ const DebugConfig = () => {
                     </button>
 
                     <button
-                        onClick={() => {
-                            void updateSetting('debug', false);
-                            void updateSetting('debug_log', false);
-                            void updateSetting('debug_display', false);
-                        }}
+                        onClick={() => updateEnv(false)}
                         disabled={saving}
                         className="flex items-center gap-2 rounded-md border border-gray-200 p-2 text-left text-sm transition-colors duration-200 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:hover:bg-gray-700"
                     >
