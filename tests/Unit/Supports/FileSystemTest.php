@@ -300,7 +300,7 @@ class FileSystemTest extends TestCase {
 		$reflection = new ReflectionClass( FileSystem::class );
 		$filesystem_property = $reflection->getProperty( 'filesystem' );
 		$original_filesystem = $filesystem_property->getValue();
-		$filesystem_property->setValue( null );
+		$filesystem_property->setValue( null, null );
 		
 		// Test fallback methods
 		$this->assertTrue( FileSystem::exists( $this->test_file ), 'exists() should fallback to file_exists()' );
@@ -308,6 +308,6 @@ class FileSystemTest extends TestCase {
 		$this->assertEquals( $test_content, FileSystem::get_contents( $this->test_file ), 'get_contents() should fallback to file_get_contents()' );
 		
 		// Restore original filesystem
-		$filesystem_property->setValue( $original_filesystem );
+		$filesystem_property->setValue( null, $original_filesystem );
 	}
 }

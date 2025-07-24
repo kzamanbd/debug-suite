@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.1"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
@@ -85,8 +85,8 @@
     "extra": {
         "wordpress-plugin": {
             "plugin_slug": "debug-suite",
-            "requires_php": "7.4",
-            "requires_wp": "5.7"
+            "requires_php": "8.1",
+            "requires_wp": "6.0"
         }
     }
 }
