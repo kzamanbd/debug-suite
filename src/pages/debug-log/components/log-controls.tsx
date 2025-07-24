@@ -219,11 +219,11 @@ const LogControls = ({
                         className="group relative rounded-none rounded-r-md border-0"
                         title="Clear all logs"
                     >
-                        <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[90px]">
+                        <div className="flex w-full min-w-6 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[90px]">
                             <div className="flex items-center">
                                 <Trash2 className="size-4 shrink-0" />
                                 <span className="text-destructive max-w-0 overflow-hidden text-sm whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[80px] group-hover:opacity-100">
-                                    Clear Logs
+                                    Clear
                                 </span>
                             </div>
                             <kbd className="ml-1.5 rounded px-1.5 py-0.5 text-[10px] opacity-100 transition-all duration-300 ease-in-out group-hover:opacity-50">
