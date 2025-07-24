@@ -9,13 +9,13 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 - **Dependency injection container** system with singleton pattern and autowired service registration
 - **Service Layer Pattern** architecture for business logic separation
 - **React/TypeScript frontend** with Tailwind CSS v4, WordPress Element, and React Router DOM v7
-- **Modern PHP 8.2** features with strict typing and enterprise patterns
+- **Modern PHP 8.1+** features with strict typing and enterprise patterns
 - **Comprehensive testing** with PHPUnit, WordPress test framework, and custom test helpers
 - **Monaco Editor** integration for advanced code editing capabilities
 
 ### Core Technologies Stack
 
-**Backend (PHP 8.2+):**
+**Backend (PHP 8.1+):**
 
 - PSR-4 autoloading with Composer
 - Dependency injection container with service providers
@@ -65,23 +65,32 @@ Debug Suite is a WordPress plugin providing advanced debugging tools with:
 
 ## PHP Backend Standards
 
-### PHP 8.2 Features & Type Safety
+### PHP 8.1+ Features & Type Safety
 
 ```php
-// ✅ Use PHP 8.2 features
+// ✅ Use PHP 8.1+ features
 - Union types: `string|null`, `array|false`
 - Named arguments in function calls
 - Constructor property promotion with private/readonly properties
 - Match expressions over switch statements
-- Readonly properties where appropriate
+- Nullable types: `?string` or `string|null`
 - First-class callable syntax: `$callback = strlen(...)`
-- DNF (Disjunctive Normal Form) types
+- Mixed type for flexible parameters
 
 // ✅ Strict typing requirements
 - Return type declarations for ALL methods and functions
 - Parameter type hints for ALL method and function parameters
 - Use nullable types: `?string` or `string|null`
 - Array type hints with specific structures where possible
+
+// ✅ PHP 8.1+ Compatible Features
+- Union types (available since PHP 8.0)
+- Named arguments (available since PHP 8.0)
+- Constructor property promotion (available since PHP 8.0)
+- Match expressions (available since PHP 8.0)
+- Nullable types (available since PHP 7.1)
+- First-class callable syntax (available since PHP 8.1)
+- Mixed type (available since PHP 8.0)
 ```
 
 ### Naming Conventions (WordPress Standard)
@@ -514,21 +523,22 @@ export function useLogEntries(initialFilters: LogFilters = {}) {
 
 ## Key Reminders
 
-1. **Service Layer First**: All business logic goes in services, controllers are thin HTTP layers
-2. **Return ServiceResponse**: Services always return ServiceResponse, never throw exceptions to controllers
-3. **Use Container**: Register services in providers, resolve via container and helper functions
-4. **snake_case PHP**: Functions, methods, variables use snake_case (WordPress standard)
-5. **camelCase Frontend**: JavaScript/TypeScript uses camelCase for variables and functions
-6. **Consolidate Components**: Prefer substantial components over micro-components
-7. **Headless UI**: Use Headless UI components for accessibility and consistency
-8. **Lucide Icons**: Only use Lucide React icons for all UI icons
-9. **Primary Color**: Always use 'primary' as brand color in Tailwind CSS
-10. **Toast Notifications**: Use `toast.success()` and `toast.error()` for user feedback
-11. **Type Everything**: Full TypeScript coverage, PHP 8.2 type hints everywhere
-12. **WordPress Standards**: Follow WordPress coding standards and use WordPress utilities
-13. **Monaco Editor**: Use Monaco Editor for all code editing interfaces
-14. **React Router v7**: Use React Router DOM v7 for all navigation
-15. **Testing**: Write comprehensive unit and integration tests for all functionality
+1. **PHP 8.1 Minimum**: Use PHP 8.1+ compatible features only, avoid PHP 8.2+ exclusive features
+2. **Service Layer First**: All business logic goes in services, controllers are thin HTTP layers
+3. **Return ServiceResponse**: Services always return ServiceResponse, never throw exceptions to controllers
+4. **Use Container**: Register services in providers, resolve via container and helper functions
+5. **snake_case PHP**: Functions, methods, variables use snake_case (WordPress standard)
+6. **camelCase Frontend**: JavaScript/TypeScript uses camelCase for variables and functions
+7. **Consolidate Components**: Prefer substantial components over micro-components
+8. **Headless UI**: Use Headless UI components for accessibility and consistency
+9. **Lucide Icons**: Only use Lucide React icons for all UI icons
+10. **Primary Color**: Always use 'primary' as brand color in Tailwind CSS
+11. **Toast Notifications**: Use `toast.success()` and `toast.error()` for user feedback
+12. **Type Everything**: Full TypeScript coverage, PHP 8.1+ type hints everywhere
+13. **WordPress Standards**: Follow WordPress coding standards and use WordPress utilities
+14. **Monaco Editor**: Use Monaco Editor for all code editing interfaces
+15. **React Router v7**: Use React Router DOM v7 for all navigation
+16. **Testing**: Write comprehensive unit and integration tests for all functionality
 
 Follow these rules consistently to maintain the enterprise-grade architecture and coding standards of the Debug Suite plugin.
 
