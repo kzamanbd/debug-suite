@@ -635,7 +635,7 @@ class WPLogReaderService implements ServiceInterface {
 			'file_path'        => $log_file,
 			'file_size'        => $file_size,
 			'file_size_human'  => FileSystem::format_size( $file_size ),
-			'total_entries'    => count( $entries ),
+			'total_entries'    => $data['total'],
 			'entries_with_stack_traces' => 0,
 			'levels'           => [],
 			'recent_errors'    => 0,
