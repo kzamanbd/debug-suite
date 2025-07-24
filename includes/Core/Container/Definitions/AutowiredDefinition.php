@@ -40,7 +40,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	 *
 	 * @var string
 	 */
-	private string $class_name;
+	private readonly string $class_name;
 
 	/**
 	 * Whether this definition should be cached as singleton.
@@ -49,7 +49,7 @@ class AutowiredDefinition implements DefinitionInterface {
 	 *
 	 * @var bool
 	 */
-	private bool $singleton;
+	private readonly bool $singleton;
 
 	/**
 	 * Static parameter value overrides by parameter name.
