@@ -11,11 +11,6 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 **Compatibility**: Compatible with PHP 8.1, 8.2, and 8.3
 **Node/NPM**: Uses pnpm for package management
 
-            // Controllers with dependency injection
-            FileLogsController::class    => $container->autowire(FileLogsController::class),
-            SettingsController::class   => $container->autowire(SettingsController::class),
-            OverviewController::class   => $container->autowire(OverviewController::class),agement
-
 ### Core Architecture
 
 - **Dependency Injection Container**: Service container for managing dependencies in `DebugSuite\Core\Container` namespace

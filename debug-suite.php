@@ -32,24 +32,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Check PHP version compatibility
-if ( version_compare( PHP_VERSION, '8.1.0', '<' ) ) {
-	/**
-	 * Display admin notice for PHP version incompatibility.
-	 */
-	function debug_suite_php_version_notice() {
-		$message = sprintf(
-			/* translators: 1: Current PHP version, 2: Required PHP version */
-			esc_html__( 'Debug Suite requires PHP version 8.1.0 or higher. You are running PHP version %1$s. Please upgrade your PHP version to use this plugin.', 'debug-suite' ),
-			PHP_VERSION,
-			'8.1.0'
-		);
-		printf( '<div class="notice notice-error"><p>%s</p></div>', wp_kses_post( $message ) );
-	}
-	add_action( 'admin_notices', 'debug_suite_php_version_notice' );
-	return;
-}
-
 
 // Include Composer autoloader
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
