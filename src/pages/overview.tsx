@@ -60,6 +60,10 @@ interface SlowQuery {
     source: string;
 }
 
+interface RecentLogs {
+    entries: Array<{ message: string; level: string; timestamp: string }>;
+}
+
 // Mock slow queries data (replace with real API later)
 const mockSlowQueries: SlowQuery[] = [
     {
@@ -107,22 +111,21 @@ const Overview = () => {
         try {
             setRefreshing(true);
 
-            // Fetch dashboard stats
-            const dashboardStats = await apiFetch<DashboardStats>({
-                path: '/debug-suite/v1/overview/stats'
-            });
-
-            // Fetch recent log entries to analyze top errors
+            // Prepare the recent logs path for parallel execution
             const recentLogsPath = addQueryArgs('/debug-suite/v1/logs', {
                 per_page: 10,
                 level_filter: 'error'
             });
 
-            const recentLogs = await apiFetch<{
-                entries: Array<{ message: string; level: string; timestamp: string }>;
-            }>({
-                path: recentLogsPath
-            });
+            // Execute both API calls in parallel
+            const [dashboardStats, recentLogs] = await Promise.all([
+                apiFetch<DashboardStats>({
+                    path: '/debug-suite/v1/overview/stats'
+                }),
+                apiFetch<RecentLogs>({
+                    path: recentLogsPath
+                })
+            ]);
 
             // Process top errors
             const errorCounts: Record<string, { count: number; level: string; last_seen: string }> = {};
