@@ -67,8 +67,8 @@ class OverviewControllerTest extends DebugSuiteTestCase {
 		if ( class_exists( 'DebugSuite\Services\DebugLog\LogsService' ) &&
 		     class_exists( 'DebugSuite\Services\OverviewService' ) ) {
 			
-			$file_logs_service = new LogsService();
-			$this->service = new OverviewService( $file_logs_service );
+			$logs_service = new LogsService();
+			$this->service = new OverviewService( $logs_service );
 		}
 		
 		// Create controller

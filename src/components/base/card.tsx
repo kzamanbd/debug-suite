@@ -18,8 +18,7 @@ const Card = ({ className, children, clickable, onClick, ...rest }: CardProps) =
                 className
             )}
             onClick={() => clickable && onClick?.()}
-            {...rest}
-        >
+            {...rest}>
             {children}
         </div>
     );

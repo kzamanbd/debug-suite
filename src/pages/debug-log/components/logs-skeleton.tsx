@@ -30,7 +30,7 @@ const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Elemen
                 </div>
             </div>
             {/* Table skeleton */}
-            <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-800">
+            <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                     <thead className="bg-gray-50 dark:bg-gray-900">
                         <tr>

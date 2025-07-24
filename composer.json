@@ -17,13 +17,12 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
-        "nikic/php-parser": "^5.5",
-        "symfony/finder": "^7.3"
+        "php": ">=8.1"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "friendsofphp/php-cs-fixer": "^3.75",
+        "php-stubs/wordpress-stubs": "^6.8",
         "phpcompatibility/php-compatibility": "^9.3",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.5",
@@ -86,8 +85,8 @@
     "extra": {
         "wordpress-plugin": {
             "plugin_slug": "debug-suite",
-            "requires_php": "7.4",
-            "requires_wp": "5.7"
+            "requires_php": "8.1",
+            "requires_wp": "6.0"
         }
     }
 }

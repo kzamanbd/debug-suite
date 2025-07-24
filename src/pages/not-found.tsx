@@ -13,8 +13,7 @@ const NotFound = (): JSX.Element => {
             className={classNames(
                 'flex h-screen flex-col items-center justify-center py-12',
                 'mx-auto max-w-lg rounded-lg bg-white text-center dark:bg-gray-900'
-            )}
-        >
+            )}>
             <div className="mb-6">
                 <span className="inline-flex items-center justify-center rounded-full bg-red-100 p-4 dark:bg-red-900">
                     <TriangleAlert className="h-10 w-10 text-red-500" />
@@ -28,8 +27,7 @@ const NotFound = (): JSX.Element => {
             </p>
             <a
                 href="/wp-admin/admin.php?page=debug-suite"
-                className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-400 dark:bg-primary-500 dark:hover:bg-primary-400 inline-block rounded-lg px-6 py-2 text-base font-semibold text-white shadow transition focus:ring-2 focus:outline-none"
-            >
+                className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-400 dark:bg-primary-500 dark:hover:bg-primary-400 inline-block rounded-lg px-6 py-2 text-base font-semibold text-white shadow transition focus:ring-2 focus:outline-none">
                 {__('Go to Dashboard', 'debug-suite')}
             </a>
         </div>

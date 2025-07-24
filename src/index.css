@@ -102,7 +102,7 @@ div[data-headlessui-state='open'][role='dialog'] {
     scrollbar-width: none; /* Firefox */
 }
 .debug-suite-layout {
-    @apply mt-5 min-h-screen rounded-lg bg-white p-5;
+    @apply mt-5 flex min-h-screen flex-col gap-4 rounded-lg bg-white p-5;
 }
 
 /* Monaco Editor Error Highlighting */
@@ -136,7 +136,8 @@ body.debug-suite-full-view {
 html.root-debug-suite-full-view,
 body.debug-suite-full-view .debug-suite-layout,
 body.debug-suite-full-view.admin-bar {
-    @apply mt-0 rounded-none;
+    margin-top: 0 !important;
+    border-radius: 0 !important;
 }
 
 body.debug-suite-full-view #adminmenumain,
