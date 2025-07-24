@@ -1,7 +1,7 @@
 # Debug Suite - WordPress Developer Toolkit
 
 [![WordPress Plugin Version](https://img.shields.io/badge/WordPress-6.0%2B-blue.svg)](https://wordpress.org/)
-[![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-purple.svg)](https://www.php.net/)
+[![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-purple.svg)](https://www.php.net/)
 [![License](https://img.shields.io/badge/License-GPL%20v2%2B-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue.svg)](https://www.typescriptlang.org/)
 
@@ -121,7 +121,7 @@ Debug Suite is a comprehensive, all-in-one WordPress development toolkit designe
 
 ### Prerequisites
 
-- PHP 8.2 or higher
+- PHP 8.1 or higher
 - Node.js (v18+ recommended)
 - Composer
 - pnpm (preferred) or npm

@@ -7,8 +7,9 @@ This document provides comprehensive guidelines for GitHub Copilot to assist wit
 Debug Suite is a WordPress plugin that provides advanced debugging tools for WordPress developers. It features a modern architecture with a **dependency injection container** system, PSR-4 autoloading, and a React/TypeScript frontend with Tailwind CSS v4 styling.
 
 **Current Version**: 1.0.0  
-**PHP Requirements**: PHP 8.2+  
-**Node/NPM**: Uses pnpm for pac OverviewService::class => $container->autowire(OverviewService::class),
+**PHP Requirements**: PHP 8.1+  
+**Compatibility**: Compatible with PHP 8.1, 8.2, and 8.3
+**Node/NPM**: Uses pnpm for package management
 
             // Controllers with dependency injection
             FileLogsController::class    => $container->autowire(FileLogsController::class),
@@ -28,22 +29,28 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 
 ### PHP Backend
 
-1. **PHP Version**: Use PHP 8.2 features including:
-    - Union types
-    - Named arguments
-    - Constructor property promotion
-    - Match expressions
-    - Readonly properties
-    - First-class callable syntax
-    - DNF (Disjunctive Normal Form) types
+1. **PHP Version**: Use PHP 8.1+ features including:
+    - Union types (`string|null`, `array|false`)
+    - Named arguments in function calls
+    - Constructor property promotion with typed properties
+    - Match expressions over switch statements
+    - Nullable types (`?string`)
+    - First-class callable syntax (`strlen(...)`)
+    - Mixed type for flexible parameters
 
-2. **Type Hinting**:
+2. **PHP 8.1 Compatibility**:
+    - Avoid PHP 8.2+ exclusive features (readonly classes, DNF types)
+    - Use runtime version checks when needed
+    - Include proper fallbacks for reflection API differences
+    - Test on multiple PHP versions (8.1, 8.2, 8.3) in CI/CD
+
+3. **Type Hinting**:
     - Use return type declarations for all methods and functions
     - Use parameter type hints for all method and function parameters
     - Use union types where appropriate (`string|null`, etc.)
     - Use nullable types when applicable
 
-3. **Coding Standards**:
+4. **Coding Standards**:
     - Follow PSR-12 coding standard
     - Follow WordPress coding standards (where not in conflict with PSR-12)
     - **Use snake_case for all method and function names** (WordPress standard)
@@ -52,7 +59,7 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     - Use full DocBlocks for all classes, methods, and properties
     - Use PHP_CodeSniffer rules defined in `phpcs.xml`
 
-4. **Autoloading**:
+5. **Autoloading**:
     - Follow PSR-4 autoloading standards
     - Namespace all classes appropriately under the `DebugSuite` namespace
 

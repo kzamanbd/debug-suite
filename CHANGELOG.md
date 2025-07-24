@@ -161,7 +161,7 @@ Debug Suite v1.0.0 is the first stable release of this comprehensive WordPress d
 
 #### Minimum Requirements
 
-- **PHP**: 8.2 or higher
+- **PHP**: 8.1 or higher
 - **WordPress**: 6.0 or higher (tested up to 6.8)
 - **Memory**: 128MB+ recommended
 - **Disk Space**: 10MB for plugin files

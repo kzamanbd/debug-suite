@@ -4,7 +4,7 @@ Donate link: https://kzaman.me/plugins/debug-suite/
 Tags: debug, development, debugging, error-log, developer-tools
 Requires at least: 5.7
 Tested up to: 6.8
-Requires PHP: 8.2
+Requires PHP: 8.1
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -58,7 +58,7 @@ Debug Suite is a comprehensive WordPress development toolkit that transforms how
 = 🔧 Technical Requirements =
 
 * WordPress 5.7 or higher
-* PHP 8.2 or higher
+* PHP 8.1 or higher
 * Modern browser with JavaScript enabled
 * Write permissions for log directories
 
