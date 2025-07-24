@@ -56,11 +56,7 @@ class SettingsService implements ServiceInterface {
 	public function update_settings( array $settings ): ServiceResponse {
 		// Validate input
 		if ( empty( $settings ) ) {
-			return ServiceResponse::failure( __( 'No settings provided.', 'debug-suite' ), 'empty_settings' );
-		}
-
-		if ( ! FileSystem::exists( $this->config_file_path ) ) {
-			return ServiceResponse::failure( __( 'wp-config.php file not found.', 'debug-suite' ), 'config_file_not_found' );
+			return ServiceResponse::failure( __( 'No settings provided to update.', 'debug-suite' ), 'empty_settings' );
 		}
 
 		if ( ! FileSystem::is_writable( $this->config_file_path ) ) {

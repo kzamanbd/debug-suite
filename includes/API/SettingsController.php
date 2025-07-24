@@ -118,9 +118,9 @@ class SettingsController extends RestController {
 		$settings = [];
 		// Map request parameters to settings
 		$values = [
-			'debug' => 'WP_DEBUG',
-			'debug_log' => 'WP_DEBUG_LOG',
-			'debug_display' => 'WP_DEBUG_DISPLAY',
+			'debug'          => 'WP_DEBUG',
+			'debug_log'      => 'WP_DEBUG_LOG',
+			'debug_display'  => 'WP_DEBUG_DISPLAY',
 		];
 
 		foreach ( $values as $key => $value ) {
@@ -129,13 +129,22 @@ class SettingsController extends RestController {
 			}
 		}
 
-		$result = $this->service->update_settings( $settings );
-
-		if ( $result->is_failure() ) {
-			return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] );
+		// Only proceed if we have debug settings to update
+		if ( empty( $settings ) && ! isset( $params['onboarding_completed'] ) ) {
+			return new WP_Error( 'no_settings', __( 'No valid settings provided to update.', 'debug-suite' ), [ 'status' => 400 ] );
 		}
 
-		if ( $params['onboarding_completed'] ) {
+		// Update debug settings if any were provided
+		if ( ! empty( $settings ) ) {
+			$result = $this->service->update_settings( $settings );
+
+			if ( $result->is_failure() ) {
+				return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] );
+			}
+		}
+
+		// Handle onboarding completion separately
+		if ( isset( $params['onboarding_completed'] ) ) {
 			update_option( 'debug_suite_onboarding_completed', true );
 		}
 
