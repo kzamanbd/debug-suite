@@ -9,6 +9,7 @@
 namespace DebugSuite;
 
 use DebugSuite\Interfaces\Hookable;
+use Exception;
 
 /**
  * Admin functionality for the Debug Suite plugin.
@@ -33,9 +34,11 @@ class Admin implements Hookable {
 	 * @return void
 	 */
 	public function register_hooks(): void {
+		add_action( 'admin_init', [ $this, 'handle_activation_redirect' ] );
 		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
-		add_action( 'admin_init', [ $this, 'handle_activation_redirect' ] );
+		add_action( 'admin_print_scripts', [ $this, 'hide_unrelated_notices' ] );
+		add_filter( 'admin_footer_text', [ $this, 'admin_footer' ], 1, 2 );
 		add_filter( 'admin_body_class', [ $this, 'add_admin_body_class' ] );
 	}
 
@@ -46,21 +49,24 @@ class Admin implements Hookable {
 	 *
 	 * @return array The menu items.
 	 */
-	public function get_menu_items(): array {
-		return [
+	private function get_menu_items(): array {
+		return apply_filters(
+			'debug_suite_menu_items',
 			[
-				'title' => __( 'Overview', 'debug-suite' ),
-				'path' => '/',
-			],
-			[
-				'title' => __( 'Debug Log', 'debug-suite' ),
-				'path' => 'debug-log',
-			],
-			[
-				'title' => __( 'Configuration', 'debug-suite' ),
-				'path' => 'config',
-			],
-		];
+				[
+					'title' => __( 'Overview', 'debug-suite' ),
+					'path' => '/',
+				],
+				[
+					'title' => __( 'Debug Log', 'debug-suite' ),
+					'path' => 'debug-log',
+				],
+				[
+					'title' => __( 'Configuration', 'debug-suite' ),
+					'path' => 'config',
+				],
+			]
+		);
 	}
 
 	/**
@@ -111,13 +117,14 @@ class Admin implements Hookable {
 	 */
 	public function add_admin_menu(): void {
 		global $submenu;
+		global $debug_suite_page;
 
 		$capability = 'manage_options';
 		$slug       = 'debug-suite';
 		$position   = apply_filters( 'debug_suite_menu_position', '50' );
 		$menu_icon  = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJsb2dvLTE3IiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSI+IDxwYXRoIGQ9Ik0xOS41IDJDMTcuMjAxOSAyIDE0LjkyNjIgMi40NTI3IDEyLjgwMyAzLjMzMjFDMTAuNjc5OCA0LjIxMTYgOC43NTA3IDUuNTAwNiA3LjEyNTYgNy4xMjU2QzUuNTAwNiA4Ljc1MDcgNC4yMTE2IDEwLjY3OTggMy4zMzIxIDEyLjgwM0MyLjQ1MjcgMTQuOTI2MiAyIDE3LjIwMTkgMiAxOS41QzIgMjEuNzk4MSAyLjQ1MjcgMjQuMDczOCAzLjMzMjEgMjYuMTk3QzQuMjExNiAyOC4zMjAyIDUuNTAwNiAzMC4yNDkzIDcuMTI1NiAzMS44NzQ0QzguNzUwNyAzMy40OTk0IDEwLjY3OTggMzQuNzg4NCAxMi44MDMgMzUuNjY3OUMxNC45MjYyIDM2LjU0NzMgMTcuMjAxOSAzNyAxOS41IDM3VjI4LjI1QzE4LjM1MDkgMjguMjUgMTcuMjEzMSAyOC4wMjM3IDE2LjE1MTUgMjcuNTgzOUMxNS4wODk5IDI3LjE0NDIgMTQuMTI1MyAyNi40OTk3IDEzLjMxMjggMjUuNjg3MkMxMi41MDAzIDI0Ljg3NDcgMTEuODU1OCAyMy45MTAxIDExLjQxNjEgMjIuODQ4NUMxMC45NzYzIDIxLjc4NjkgMTAuNzUgMjAuNjQ5MSAxMC43NSAxOS41QzEwLjc1IDE4LjM1MDkgMTAuOTc2MyAxNy4yMTMxIDExLjQxNjEgMTYuMTUxNUMxMS44NTU4IDE1LjA4OTkgMTIuNTAwMyAxNC4xMjUzIDEzLjMxMjggMTMuMzEyOEMxNC4xMjUzIDEyLjUwMDMgMTUuMDg5OSAxMS44NTU4IDE2LjE1MTUgMTEuNDE2MUMxNy4yMTMxIDEwLjk3NjMgMTguMzUwOSAxMC43NSAxOS41IDEwLjc1VjJaIiBjbGFzcz0iY2N1c3RvbSIgZmlsbD0iIzBGNTJGRiIvPiA8cGF0aCBkPSJNMTkuNTAwMSAyNS4zMzMzQzIyLjcyMTggMjUuMzMzMyAyNS4zMzM0IDIyLjcyMTcgMjUuMzMzNCAxOS41QzI1LjMzMzQgMTYuMjc4MyAyMi43MjE4IDEzLjY2NjcgMTkuNTAwMSAxMy42NjY3QzE2LjI3ODQgMTMuNjY2NyAxMy42NjY4IDE2LjI3ODMgMTMuNjY2OCAxOS41QzEzLjY2NjggMjIuNzIxNyAxNi4yNzg0IDI1LjMzMzMgMTkuNTAwMSAyNS4zMzMzWiIgY2xhc3M9ImNjdXN0b20iIGZpbGw9IiMwRjUyRkYiLz4gPHBhdGggZD0iTTIgMTkuNUMyIDIxLjc5ODEgMi40NTI3IDI0LjA3MzggMy4zMzIxIDI2LjE5N0M0LjIxMTYgMjguMzIwMiA1LjUwMDYgMzAuMjQ5MyA3LjEyNTYgMzEuODc0NEM4Ljc1MDcgMzMuNDk5NCAxMC42Nzk4IDM0Ljc4ODQgMTIuODAzIDM1LjY2NzlDMTQuOTI2MiAzNi41NDczIDE3LjIwMTkgMzcgMTkuNSAzN0MyMS43OTgxIDM3IDI0LjA3MzggMzYuNTQ3MyAyNi4xOTcgMzUuNjY3OUMyOC4zMjAyIDM0Ljc4ODQgMzAuMjQ5MyAzMy40OTk0IDMxLjg3NDQgMzEuODc0NEMzMy40OTk0IDMwLjI0OTMgMzQuNzg4NCAyOC4zMjAyIDM1LjY2NzkgMjYuMTk3QzM2LjU0NzMgMjQuMDczOCAzNyAyMS43OTgxIDM3IDE5LjVIMjguMjVDMjguMjUgMjAuNjQ5MSAyOC4wMjM3IDIxLjc4NjkgMjcuNTgzOSAyMi44NDg1QzI3LjE0NDIgMjMuOTEwMSAyNi40OTk3IDI0Ljg3NDcgMjUuNjg3MiAyNS42ODcyQzI0Ljg3NDcgMjYuNDk5NyAyMy45MTAxIDI3LjE0NDIgMjIuODQ4NSAyNy41ODM5QzIxLjc4NjkgMjguMDIzNyAyMC42NDkxIDI4LjI1IDE5LjUgMjguMjVDMTguMzUwOSAyOC4yNSAxNy4yMTMxIDI4LjAyMzcgMTYuMTUxNSAyNy41ODM5QzE1LjA4OTkgMjcuMTQ0MiAxNC4xMjUzIDI2LjQ5OTcgMTMuMzEyOCAyNS42ODcyQzEyLjUwMDMgMjQuODc0NyAxMS44NTU4IDIzLjkxMDEgMTEuNDE2MSAyMi44NDg1QzEwLjk3NjMgMjEuNzg2OSAxMC43NSAyMC42NDkxIDEwLjc1IDE5LjVIMloiIGNsYXNzPSJjY29tcGxpMSIgZmlsbD0iIzVCRDBGNCIvPiA8cGF0aCBkPSJNMjUuMzMzNCAxOS41QzI1LjMzMzQgMTcuOTUyOSAyNC43MTg4IDE2LjQ2OTIgMjMuNjI0OSAxNS4zNzUyQzIyLjUzMDkgMTQuMjgxMiAyMS4wNDcyIDEzLjY2NjYgMTkuNTAwMSAxMy42NjY2QzE3Ljk1MyAxMy42NjY2IDE2LjQ2OTMgMTQuMjgxMiAxNS4zNzUzIDE1LjM3NTJDMTQuMjgxMyAxNi40NjkyIDEzLjY2NjcgMTcuOTUyOSAxMy42NjY3IDE5LjVIMTkuNTAwMUgyNS4zMzM0WiIgY2xhc3M9ImNjb21wbGkxIiBmaWxsPSIjNUJEMEY0Ii8+ICAgICAgICAgIDwvc3ZnPg==';
 
-		add_menu_page(
+		$debug_suite_page = add_menu_page(
 			__( 'Debug Suite', 'debug-suite' ),
 			__( 'Debug Suite', 'debug-suite' ),
 			$capability,
@@ -128,7 +135,7 @@ class Admin implements Hookable {
 		);
 
 		foreach ( $this->get_menu_items() as $menu ) {
-			$path = str_replace( '#/', '#', 'admin.php?page=' . $slug . '#' . $menu['path'], );
+			$path = str_replace( '#/', '#', 'admin.php?page=' . $slug . '#' . $menu['path'] );
 			$submenu[ $slug ][] = [
 				$menu['title'],
 				$capability,
@@ -146,6 +153,7 @@ class Admin implements Hookable {
 	 * @since 1.0.0
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function admin_page(): void {
 		// Check user capabilities
@@ -154,7 +162,7 @@ class Admin implements Hookable {
 		}
 
 		ob_start();
-		echo '<div class="wrap"><div id="debug-suite-root-app" class="debug-suite-root-app"></div></div>';
+		echo '<div id="debug-suite-root-app" class="wrap debug-suite-root-app"></div>';
 		echo ob_get_clean(); // phpcs:ignore
 	}
 
@@ -187,13 +195,11 @@ class Admin implements Hookable {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $hook_suffix The current admin page hook suffix.
-	 *
 	 * @return void
 	 */
-	public function admin_enqueue_scripts( $hook_suffix ): void {
+	public function admin_enqueue_scripts(): void {
 		// Only enqueue on our plugin's admin page
-		if ( 'toplevel_page_debug-suite' !== $hook_suffix ) {
+		if ( ! is_debug_suite_page() ) {
 			return;
 		}
 
@@ -205,5 +211,113 @@ class Admin implements Hookable {
 			'debugSuite',
 			Assets::get_localized_data()
 		);
+	}
+
+	/**
+	 * Remove all non-Debug Suite Logging plugin notices from our plugin pages.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 */
+	public function hide_unrelated_notices(): void {
+
+		if ( ! is_debug_suite_page() ) {
+			return;
+		}
+
+		$this->remove_unrelated_actions( 'user_admin_notices' );
+		$this->remove_unrelated_actions( 'admin_notices' );
+		$this->remove_unrelated_actions( 'all_admin_notices' );
+		$this->remove_unrelated_actions( 'network_admin_notices' );
+	}
+
+	/**
+	 * Remove all non-Debug Suite Logging notices from the our plugin pages based on the provided action hook.
+	 *
+	 * @param string $action The name of the action.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return void
+	 */
+	private function remove_unrelated_actions( string $action ): void {
+
+		global $wp_filter;
+
+		if ( empty( $wp_filter[ $action ]->callbacks ) || ! is_array( $wp_filter[ $action ]->callbacks ) ) {
+			return;
+		}
+
+		foreach ( $wp_filter[ $action ]->callbacks as $priority => $hooks ) {
+			foreach ( $hooks as $name => $arr ) {
+
+				if ( str_contains( strtolower( $name ), 'no3x\wpml' ) ) {
+					continue;
+				}
+
+				// Handle the case when the callback is an array.
+				if (
+					is_array( $arr ) && ! empty( $arr['function'] ) && is_array( $arr['function'] )
+					&& ! empty( $arr['function'][0] ) && is_object( $arr['function'][0] )
+					&& ( str_contains( strtolower( get_class( $arr['function'][0] ) ), 'no3x\wpml' ) )
+				) {
+					continue;
+				}
+
+				unset( $wp_filter[ $action ]->callbacks[ $priority ][ $name ] );
+			}
+		}
+	}
+
+	/**
+	 * When user is on a Debug Suite Logging related admin page, display footer text
+	 * that graciously asks them to rate us.
+	 *
+	 * @param string $text Footer text.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return string
+	 */
+	public function admin_footer( string $text ): string {
+
+		if ( ! is_debug_suite_page() ) {
+			return $text;
+		}
+
+		$url_review = 'https://wordpress.org/support/plugin/debug-suite/reviews/?filter=5#new-post';
+		$url_github = 'https://github.com/kzamanbd/debug-suite'; // Replace with actual GitHub repo
+		$url_donate = 'https://coff.ee/kzamanbd';   // Replace with your actual Buy Me a Coffee profile
+
+		$content = sprintf(
+			wp_kses( /* translators: 1. Debug Suite plugin name; 2. WP.org review link; 3. - WP.org review link. */
+				__( 'Please rate %1$s <a href="%2$s" target="_blank" rel="noopener noreferrer">&#9733;&#9733;&#9733;&#9733;&#9733;</a> on <a href="%3$s" target="_blank" rel="noopener">WordPress.org</a> to help us spread the word.', 'debug-suite' ),
+				[
+					'a' => [
+						'href'   => [],
+						'target' => [],
+						'rel'    => [],
+					],
+				]
+			),
+			'<strong>Debug Suite</strong>',
+			$url_review,
+			$url_review
+		);
+
+		$extra_links = sprintf(
+			wp_kses( /* translators: 1: GitHub URL, 2: Buy Me a Coffee URL */
+				__( '<a href="%1$s" target="_blank" rel="noopener noreferrer">View on GitHub</a> &nbsp;|&nbsp; <a href="%2$s" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a>', 'debug-suite' ),
+				[
+					'a' => [
+						'href'   => [],
+						'target' => [],
+						'rel'    => [],
+					],
+				]
+			),
+			$url_github,
+			$url_donate
+		);
+		return $content . ' ' . $extra_links;
 	}
 }
