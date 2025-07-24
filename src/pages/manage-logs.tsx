@@ -117,36 +117,31 @@ const ManageLogs = () => {
                     <button
                         className="bg-primary-600 hover:bg-primary-700 rounded-md px-4 py-2 font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                         onClick={handleClearLogs}
-                        disabled={isProcessing || selectedFiles.length === 0}
-                    >
+                        disabled={isProcessing || selectedFiles.length === 0}>
                         {isProcessing ? __('Processing...', 'debug-suite') : __('Clear Selected', 'debug-suite')}
                     </button>
                     <button
                         className="rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
                         onClick={handleDownloadLogs}
-                        disabled={isProcessing || selectedFiles.length === 0}
-                    >
+                        disabled={isProcessing || selectedFiles.length === 0}>
                         {__('Download Selected', 'debug-suite')}
                     </button>
                     <button
                         className="rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
                         onClick={handleArchiveLogs}
-                        disabled={isProcessing || selectedFiles.length === 0}
-                    >
+                        disabled={isProcessing || selectedFiles.length === 0}>
                         {__('Archive Selected', 'debug-suite')}
                     </button>
                 </div>
                 <div className="flex gap-3">
                     <Link
                         to="/"
-                        className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-800 transition-colors hover:bg-gray-200"
-                    >
+                        className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-800 transition-colors hover:bg-gray-200">
                         {'\u2190'} {__('Back to Overview', 'debug-suite')}
                     </Link>
                     <Link
                         to="/file-logs"
-                        className="bg-primary-50 text-primary-700 hover:bg-primary-100 inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors"
-                    >
+                        className="bg-primary-50 text-primary-700 hover:bg-primary-100 inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors">
                         {'\ud83d\udcc4'} {__('View Logs', 'debug-suite')}
                     </Link>
                 </div>
@@ -210,14 +205,12 @@ const ManageLogs = () => {
                                     <div className="flex gap-2">
                                         <button
                                             className="rounded bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200"
-                                            onClick={() => alert(`Viewing ${file.name}...`)}
-                                        >
+                                            onClick={() => alert(`Viewing ${file.name}...`)}>
                                             {__('View', 'debug-suite')}
                                         </button>
                                         <button
                                             className="rounded bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200"
-                                            onClick={() => alert(`Downloading ${file.name}...`)}
-                                        >
+                                            onClick={() => alert(`Downloading ${file.name}...`)}>
                                             {__('Download', 'debug-suite')}
                                         </button>
                                     </div>
@@ -283,8 +276,7 @@ const ManageLogs = () => {
                     <div className="mt-6">
                         <button
                             type="submit"
-                            className="bg-primary-600 hover:bg-primary-700 rounded-lg px-6 py-2 font-medium text-white transition-colors"
-                        >
+                            className="bg-primary-600 hover:bg-primary-700 rounded-lg px-6 py-2 font-medium text-white transition-colors">
                             {__('Save Settings', 'debug-suite')}
                         </button>
                     </div>

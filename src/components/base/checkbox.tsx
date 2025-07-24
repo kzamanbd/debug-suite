@@ -30,8 +30,7 @@ const CustomCheckbox = ({ className = '', label, ...props }: CustomCheckboxProps
                         props.disabled
                             ? 'cursor-not-allowed opacity-50'
                             : 'hover:border-gray-400 dark:hover:border-gray-500'
-                    )}
-                >
+                    )}>
                     <Check size={12} className="text-white transition-opacity duration-200" />
                 </span>
             </label>
@@ -40,8 +39,7 @@ const CustomCheckbox = ({ className = '', label, ...props }: CustomCheckboxProps
                     className={classNames(
                         'ml-2 text-sm font-medium text-gray-700 select-none dark:text-gray-300',
                         props.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-                    )}
-                >
+                    )}>
                     {label}
                 </div>
             )}
