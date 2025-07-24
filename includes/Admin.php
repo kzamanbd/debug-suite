@@ -199,7 +199,7 @@ class Admin implements Hookable {
 	 */
 	public function admin_enqueue_scripts(): void {
 		// Only enqueue on our plugin's admin page
-		if ( ! is_debug_suite_page() ) {
+		if ( ! debug_suite_current_page() ) {
 			return;
 		}
 
@@ -220,7 +220,7 @@ class Admin implements Hookable {
 	 */
 	public function hide_unrelated_notices(): void {
 
-		if ( ! is_debug_suite_page() ) {
+		if ( ! debug_suite_current_page() ) {
 			return;
 		}
 
@@ -280,7 +280,7 @@ class Admin implements Hookable {
 	 */
 	public function admin_footer( string $text ): string {
 
-		if ( ! is_debug_suite_page() ) {
+		if ( ! debug_suite_current_page() ) {
 			return $text;
 		}
 

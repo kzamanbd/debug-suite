@@ -60,7 +60,7 @@ if ( ! function_exists( 'debug_suite_date' ) ) {
 	}
 }
 
-if ( ! function_exists( 'is_debug_suite_page' ) ) {
+if ( ! function_exists( 'debug_suite_current_page' ) ) {
 	/**
 	 * Check if the current admin page is a Debug Suite page.
 	 *
@@ -68,7 +68,7 @@ if ( ! function_exists( 'is_debug_suite_page' ) ) {
 	 *
 	 * @return bool True if it's a Debug Suite page, false otherwise.
 	 */
-	function is_debug_suite_page(): bool {
+	function debug_suite_current_page(): bool {
 		$current_screen = get_current_screen();
 		return $current_screen && strpos( $current_screen->id, 'debug-suite' ) !== false;
 	}
