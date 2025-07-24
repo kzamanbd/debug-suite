@@ -88,48 +88,50 @@ export function ToastProvider({ children }: ToastProviderProps) {
     return (
         <ToastContext.Provider value={value}>
             {children}
-            <div className="fixed right-0 bottom-0 z-50 flex w-full max-w-md flex-col items-end space-y-2 p-4">
-                {toasts.map(({ id, title, icon, variant }) => (
-                    <div
-                        key={id}
-                        className={classNames(
-                            'bg-background relative flex items-center gap-2 rounded-lg border p-4 pr-8 shadow-lg',
-                            'animate-in slide-in-from-bottom-5 fade-in duration-300',
-                            'data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right-5 data-[state=closed]:fade-out',
-                            variant === 'success' && 'border-green-200 bg-green-50',
-                            variant === 'error' && 'border-red-200 bg-red-50'
-                        )}
-                    >
-                        {icon && (
-                            <div
-                                className={classNames(
-                                    variant === 'success' && 'text-green-600',
-                                    variant === 'error' && 'text-red-600',
-                                    variant === 'default' && 'text-primary'
-                                )}
-                            >
-                                {icon}
-                            </div>
-                        )}
-                        <p
+            {toasts.length > 0 && (
+                <div className="fixed right-0 bottom-0 z-50 flex w-full max-w-md flex-col items-end space-y-2 p-4">
+                    {toasts.map(({ id, title, icon, variant }) => (
+                        <div
+                            key={id}
                             className={classNames(
-                                'text-sm',
-                                variant === 'success' && 'text-green-800',
-                                variant === 'error' && 'text-red-800',
-                                variant === 'default' && 'text-foreground'
+                                'relative flex items-center gap-2 rounded-md border p-4 pr-8 shadow-lg',
+                                'animate-in slide-in-from-bottom-5 fade-in duration-300',
+                                'data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right-5 data-[state=closed]:fade-out',
+                                variant === 'success' && 'border-green-200 bg-green-50',
+                                variant === 'error' && 'border-red-200 bg-red-50'
                             )}
                         >
-                            {title}
-                        </p>
-                        <button
-                            onClick={() => dismiss(id)}
-                            className="absolute top-2 right-2 opacity-70 transition-opacity hover:opacity-100"
-                        >
-                            <X className="size-4" />
-                        </button>
-                    </div>
-                ))}
-            </div>
+                            {icon && (
+                                <div
+                                    className={classNames(
+                                        variant === 'success' && 'text-green-600',
+                                        variant === 'error' && 'text-red-600',
+                                        variant === 'default' && 'text-primary'
+                                    )}
+                                >
+                                    {icon}
+                                </div>
+                            )}
+                            <p
+                                className={classNames(
+                                    'text-sm',
+                                    variant === 'success' && 'text-green-800',
+                                    variant === 'error' && 'text-red-800',
+                                    variant === 'default' && 'text-foreground'
+                                )}
+                            >
+                                {title}
+                            </p>
+                            <button
+                                onClick={() => dismiss(id)}
+                                className="absolute top-2 right-2 opacity-70 transition-opacity hover:opacity-100"
+                            >
+                                <X className="size-4" />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
         </ToastContext.Provider>
     );
 }
