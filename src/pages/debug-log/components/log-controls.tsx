@@ -120,8 +120,7 @@ const LogControls = ({
                             viewMode === 'parsed'
                                 ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
                                 : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
-                        )}
-                    >
+                        )}>
                         <EyeIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
                         <span className="hidden sm:inline">{__('Parsed', 'debug-suite')}</span>
                     </button>
@@ -133,8 +132,7 @@ const LogControls = ({
                             viewMode === 'raw'
                                 ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
                                 : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
-                        )}
-                    >
+                        )}>
                         <FileTextIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
                         <span className="hidden sm:inline">{__('Raw File', 'debug-suite')}</span>
                     </button>
@@ -145,8 +143,7 @@ const LogControls = ({
                         onClick={onRefresh}
                         disabled={loading}
                         className="group relative rounded-none rounded-l-md border-0 border-r"
-                        title="Refresh"
-                    >
+                        title="Refresh">
                         <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[90px]">
                             <div className="flex items-center">
                                 <RefreshCw className={classNames('size-4 shrink-0', loading && 'animate-spin')} />
@@ -166,8 +163,7 @@ const LogControls = ({
                             'group relative rounded-none border-0 border-r',
                             showFilters && 'bg-gray-100'
                         )}
-                        title="Show/hide filters panel"
-                    >
+                        title="Show/hide filters panel">
                         <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[60px]">
                             <div className="flex items-center">
                                 <Filter className="size-4 shrink-0" />
@@ -198,8 +194,7 @@ const LogControls = ({
                         <Button
                             onClick={handleDownload}
                             className="group relative rounded-none border-0 border-r"
-                            title="Download logs"
-                        >
+                            title="Download logs">
                             <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[110px]">
                                 <div className="flex items-center">
                                     <Download className="size-4 shrink-0" />
@@ -217,8 +212,7 @@ const LogControls = ({
                         onClick={handleClear}
                         disabled={clearing}
                         className="group relative rounded-none rounded-r-md border-0"
-                        title="Clear all logs"
-                    >
+                        title="Clear all logs">
                         <div className="flex w-full min-w-6 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[90px]">
                             <div className="flex items-center">
                                 <Trash2 className="size-4 shrink-0" />
@@ -300,8 +294,7 @@ const LogControls = ({
                                     <button
                                         onClick={clearSearch}
                                         className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
-                                        title={__('Clear search', 'debug-suite')}
-                                    >
+                                        title={__('Clear search', 'debug-suite')}>
                                         <XIcon className="size-4" />
                                     </button>
                                 )}

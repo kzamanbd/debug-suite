@@ -24,8 +24,7 @@ const Modal = ({ children, showXButton = true, className, open, fullScreen = fal
                     enterTo="opacity-100"
                     leave="ease-in duration-200"
                     leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
+                    leaveTo="opacity-0">
                     <DialogBackdrop className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
                 </TransitionChild>
 
@@ -34,8 +33,7 @@ const Modal = ({ children, showXButton = true, className, open, fullScreen = fal
                     className={classNames(
                         'fixed inset-0 flex w-screen',
                         fullScreen ? '' : 'items-center justify-center p-4'
-                    )}
-                >
+                    )}>
                     {/* Panel with scale and fade transition */}
                     <TransitionChild
                         as={Fragment}
@@ -44,23 +42,20 @@ const Modal = ({ children, showXButton = true, className, open, fullScreen = fal
                         enterTo="opacity-100 scale-100"
                         leave="ease-in duration-200"
                         leaveFrom="opacity-100 scale-100"
-                        leaveTo="opacity-0 scale-95"
-                    >
+                        leaveTo="opacity-0 scale-95">
                         <DialogPanel
                             className={classNames(
                                 fullScreen
                                     ? 'h-full w-full bg-white'
                                     : 'relative w-full max-w-md transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all',
                                 className
-                            )}
-                        >
+                            )}>
                             {children}
                             {showXButton && (
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="absolute top-2 right-2 rounded-lg p-1.5 text-sm text-gray-500 transition-colors duration-150 outline-none hover:text-gray-700 focus:outline-none"
-                                >
+                                    className="absolute top-2 right-2 rounded-lg p-1.5 text-sm text-gray-500 transition-colors duration-150 outline-none hover:text-gray-700 focus:outline-none">
                                     &#10005;
                                 </button>
                             )}

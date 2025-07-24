@@ -50,8 +50,7 @@ const LayoutFooter = () => {
                     href="https://github.com/kzamanbd/debug-suite"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 transition-colors"
-                >
+                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 transition-colors">
                     <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
                         <g fill="#181616">
                             <path
@@ -70,8 +69,7 @@ const LayoutFooter = () => {
                     href="https://coff.ee/kzamanbd"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 transition-colors"
-                >
+                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 transition-colors">
                     <Coffee className="h-4 w-4" />
                     Buy me a coffee
                     <ExternalLink className="h-3 w-3" />

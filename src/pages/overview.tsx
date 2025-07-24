@@ -429,8 +429,7 @@ const Overview = () => {
                                                           ? 'warning'
                                                           : 'success'
                                                 }
-                                                className="text-xs"
-                                            >
+                                                className="text-xs">
                                                 {query.execution_time.toFixed(2)}s
                                             </Badge>
                                             <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -501,8 +500,7 @@ const Overview = () => {
                     <div className="space-y-3">
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
                                     <BookOpen className="h-4 w-4" />
@@ -521,8 +519,7 @@ const Overview = () => {
 
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400">
                                     <CheckCircle className="h-4 w-4" />
@@ -541,8 +538,7 @@ const Overview = () => {
 
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400">
                                     <Zap className="h-4 w-4" />
@@ -571,8 +567,7 @@ const Overview = () => {
                     <div className="space-y-3">
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400">
                                     <MessageSquare className="h-4 w-4" />
@@ -591,8 +586,7 @@ const Overview = () => {
 
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400">
                                     <AlertTriangle className="h-4 w-4" />
@@ -611,8 +605,7 @@ const Overview = () => {
 
                         <a
                             href="#"
-                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
+                            className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400">
                                     <Zap className="h-4 w-4" />

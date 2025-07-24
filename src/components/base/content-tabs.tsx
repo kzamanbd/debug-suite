@@ -29,8 +29,7 @@ const ContentTabs = ({ tabs, className = '' }: ContentTabsProps): JSX.Element =>
                                         ? 'border-primary-600 text-primary-700 dark:text-primary-300 border-b-2'
                                         : 'hover:text-primary-600 dark:hover:text-primary-300 text-gray-500 dark:text-gray-400'
                                 )
-                            }
-                        >
+                            }>
                             {tab.label}
                         </Tab>
                     ))}

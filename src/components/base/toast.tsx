@@ -99,16 +99,14 @@ export function ToastProvider({ children }: ToastProviderProps) {
                                 'data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right-5 data-[state=closed]:fade-out',
                                 variant === 'success' && 'border-green-200 bg-green-50',
                                 variant === 'error' && 'border-red-200 bg-red-50'
-                            )}
-                        >
+                            )}>
                             {icon && (
                                 <div
                                     className={classNames(
                                         variant === 'success' && 'text-green-600',
                                         variant === 'error' && 'text-red-600',
                                         variant === 'default' && 'text-primary'
-                                    )}
-                                >
+                                    )}>
                                     {icon}
                                 </div>
                             )}
@@ -118,14 +116,12 @@ export function ToastProvider({ children }: ToastProviderProps) {
                                     variant === 'success' && 'text-green-800',
                                     variant === 'error' && 'text-red-800',
                                     variant === 'default' && 'text-foreground'
-                                )}
-                            >
+                                )}>
                                 {title}
                             </p>
                             <button
                                 onClick={() => dismiss(id)}
-                                className="absolute top-2 right-2 opacity-70 transition-opacity hover:opacity-100"
-                            >
+                                className="absolute top-2 right-2 opacity-70 transition-opacity hover:opacity-100">
                                 <X className="size-4" />
                             </button>
                         </div>

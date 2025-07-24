@@ -37,8 +37,7 @@ const Alert = ({ children, variant = 'primary', className = '', dismissible = fa
                 'relative flex items-start gap-2 rounded-lg border px-4 py-3',
                 variantClasses[variant],
                 className
-            )}
-        >
+            )}>
             <div className="flex-1">{children}</div>
             {dismissible && (
                 <button
@@ -48,8 +47,7 @@ const Alert = ({ children, variant = 'primary', className = '', dismissible = fa
                     onClick={() => {
                         setVisible(false);
                         onClose?.();
-                    }}
-                >
+                    }}>
                     &times;
                 </button>
             )}
