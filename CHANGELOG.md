@@ -46,7 +46,7 @@ Debug Suite v1.0.0 is the first stable release of this comprehensive WordPress d
 
 #### Modern PHP Architecture
 
-- **PHP 8.2+ Support**: Built with modern PHP features including typed properties, union types, and constructor property promotion
+- **PHP 8.1+ Support**: Built with modern PHP features including typed properties, union types, and constructor property promotion
 - **PSR-4 Autoloading**: Comprehensive PSR-4 autoloading with `DebugSuite` namespace
 - **PSR-12 Coding Standards**: Adherence to PSR-12 and WordPress coding standards
 - **Dependency Injection Container**: Enterprise-grade DI container system for service management
@@ -161,7 +161,7 @@ Debug Suite v1.0.0 is the first stable release of this comprehensive WordPress d
 
 #### Minimum Requirements
 
-- **PHP**: 8.2 or higher
+- **PHP**: 8.1 or higher
 - **WordPress**: 6.0 or higher (tested up to 6.8)
 - **Memory**: 128MB+ recommended
 - **Disk Space**: 10MB for plugin files

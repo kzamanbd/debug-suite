@@ -31,8 +31,7 @@ const Badge = ({ children, variant = 'default', className = '' }: BadgeProps) =>
             'inline-block rounded px-2 py-0.5 text-xs font-semibold',
             variantClasses[variant],
             className
-        )}
-    >
+        )}>
         {children}
     </span>
 );

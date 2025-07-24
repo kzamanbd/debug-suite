@@ -68,8 +68,7 @@ const Button = <T extends ElementType = 'button'>({
             )}
             disabled={isButton ? loading || disabled : undefined}
             aria-disabled={loading || disabled}
-            {...props}
-        >
+            {...props}>
             {loading && <Spinner className={spinnerClassName} />}
             {children}
         </Component>

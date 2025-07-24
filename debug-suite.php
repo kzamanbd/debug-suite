@@ -23,7 +23,7 @@
  * Text Domain:       debug-suite
  * Domain Path:       /languages
  *
- * Requires PHP: 8.2
+ * Requires PHP: 8.1
  * Tested up to: 6.8
  */
 

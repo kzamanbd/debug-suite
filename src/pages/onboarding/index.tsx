@@ -154,11 +154,9 @@ const Onboarding = () => {
                                             'flex flex-col items-center',
                                             step.id === 1 && 'items-start',
                                             step.id === 3 && 'items-end'
-                                        )}
-                                    >
+                                        )}>
                                         <div
-                                            className={`relative flex h-12 w-12 transform items-center justify-center rounded-full border-2 transition-all duration-300 ease-out ${isActive ? 'border-primary bg-primary shadow-primary/25 scale-110 text-white shadow-lg' : ''} ${isCompleted ? 'border-primary bg-primary text-white' : ''} ${isPending ? 'border-gray-300 bg-white text-gray-400' : ''} `}
-                                        >
+                                            className={`relative flex h-12 w-12 transform items-center justify-center rounded-full border-2 transition-all duration-300 ease-out ${isActive ? 'border-primary bg-primary shadow-primary/25 scale-110 text-white shadow-lg' : ''} ${isCompleted ? 'border-primary bg-primary text-white' : ''} ${isPending ? 'border-gray-300 bg-white text-gray-400' : ''} `}>
                                             {isCompleted ? (
                                                 <CheckCircle2 className="h-6 w-6" />
                                             ) : (
@@ -175,15 +173,13 @@ const Onboarding = () => {
                                             <div
                                                 className={`text-sm font-semibold transition-colors duration-200 ${
                                                     isActive || isCompleted ? 'text-primary' : 'text-gray-500'
-                                                }`}
-                                            >
+                                                }`}>
                                                 {step.title}
                                             </div>
                                             <div
                                                 className={`text-xs transition-colors duration-200 ${
                                                     isActive ? 'text-gray-600' : 'text-gray-400'
-                                                }`}
-                                            >
+                                                }`}>
                                                 {step.subtitle}
                                             </div>
                                         </div>
@@ -466,8 +462,7 @@ const Onboarding = () => {
                                     <Button
                                         onClick={prevStep}
                                         disabled={currentStep === 1}
-                                        className={`flex items-center space-x-2 ${currentStep === 1 ? 'invisible' : ''}`}
-                                    >
+                                        className={`flex items-center space-x-2 ${currentStep === 1 ? 'invisible' : ''}`}>
                                         <span>{__('Previous', 'debug-suite')}</span>
                                     </Button>
 
@@ -479,8 +474,7 @@ const Onboarding = () => {
                                     <Button
                                         onClick={nextStep}
                                         disabled={saving}
-                                        className="flex items-center space-x-2"
-                                    >
+                                        className="flex items-center space-x-2">
                                         {saving ? (
                                             <>
                                                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
