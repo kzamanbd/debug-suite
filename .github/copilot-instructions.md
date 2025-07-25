@@ -6,7 +6,7 @@ This document provides comprehensive guidelines for GitHub Copilot to assist wit
 
 Debug Suite is a WordPress plugin that provides advanced debugging tools for WordPress developers. It features a modern architecture with a **dependency injection container** system, PSR-4 autoloading, and a React/TypeScript frontend with Tailwind CSS v4 styling.
 
-**Current Version**: 1.0.0  
+**Current Version**: DEBUG_SUITE_SINCE  
 **PHP Requirements**: PHP 8.1+  
 **Compatibility**: Compatible with PHP 8.1, 8.2, and 8.3
 **Node/NPM**: Uses pnpm for package management
