@@ -141,29 +141,34 @@ abstract class BaseModel {
 	}
 
 	/**
+	 * Build LIMIT and OFFSET clause.
+	 *
+	 * @param array $options Query options with limit and offset.
+	 * @return string
+	 */
+	protected static function build_limit_clause( array $options ): string {
+		if ( ! $options['limit'] ) {
+			return '';
+		}
+
+		$wpdb = static::get_wpdb();
+		return $wpdb->prepare( ' LIMIT %d OFFSET %d', $options['limit'], $options['offset'] );
+	}
+
+	/**
 	 * Get all records.
 	 *
 	 * @param array $options Query options.
 	 * @return array
 	 */
 	public static function all( array $options = [] ): array {
-		$defaults = [
-			'limit'      => null,
-			'offset'     => 0,
-			'order_by'   => static::$primary_key,
-			'order'      => 'ASC',
-		];
-
-		$options = wp_parse_args( $options, $defaults );
+		$options = wp_parse_args( $options, static::get_default_query_options() );
 
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
 		$query = "SELECT * FROM {$table_name} ORDER BY {$options['order_by']} {$options['order']}";
-
-		if ( $options['limit'] ) {
-			$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d', $options['limit'], $options['offset'] );
-		}
+		$query .= static::build_limit_clause( $options );
 
 		$results = $wpdb->get_results( $query, ARRAY_A );
 
@@ -171,25 +176,16 @@ abstract class BaseModel {
 	}
 
 	/**
-	 * Build a query with WHERE conditions.
+	 * Build WHERE clause and values from conditions.
 	 *
 	 * @param array $conditions WHERE conditions.
-	 * @param array $options Query options.
-	 * @return array
+	 * @return array {
+	 *     WHERE clause data.
+	 *     @type string $clause WHERE clause string.
+	 *     @type array  $values Prepared statement values.
+	 * }
 	 */
-	public static function where( array $conditions, array $options = [] ): array {
-		$defaults = [
-			'limit'      => null,
-			'offset'     => 0,
-			'order_by'   => static::$primary_key,
-			'order'      => 'ASC',
-		];
-
-		$options = wp_parse_args( $options, $defaults );
-
-		$wpdb = static::get_wpdb();
-		$table_name = static::get_table_name();
-
+	protected static function build_where_clause( array $conditions ): array {
 		$where_conditions = [];
 		$where_values = [];
 
@@ -205,14 +201,45 @@ abstract class BaseModel {
 			}
 		}
 
-		$where_clause = implode( ' AND ', $where_conditions );
-		$query = "SELECT * FROM {$table_name} WHERE {$where_clause} ORDER BY {$options['order_by']} {$options['order']}";
+		return [
+			'clause' => implode( ' AND ', $where_conditions ),
+			'values' => $where_values,
+		];
+	}
 
-		if ( $options['limit'] ) {
-			$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d', $options['limit'], $options['offset'] );
-		}
+	/**
+	 * Get default query options.
+	 *
+	 * @return array
+	 */
+	protected static function get_default_query_options(): array {
+		return [
+			'limit'      => null,
+			'offset'     => 0,
+			'order_by'   => static::$primary_key,
+			'order'      => 'ASC',
+		];
+	}
 
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $where_values ), ARRAY_A );
+	/**
+	 * Build a query with WHERE conditions.
+	 *
+	 * @param array $conditions WHERE conditions.
+	 * @param array $options Query options.
+	 * @return array
+	 */
+	public static function where( array $conditions, array $options = [] ): array {
+		$options = wp_parse_args( $options, static::get_default_query_options() );
+
+		$wpdb = static::get_wpdb();
+		$table_name = static::get_table_name();
+
+		$where_data = static::build_where_clause( $conditions );
+
+		$query = "SELECT * FROM {$table_name} WHERE {$where_data['clause']} ORDER BY {$options['order_by']} {$options['order']}";
+		$query .= static::build_limit_clause( $options );
+
+		$results = $wpdb->get_results( $wpdb->prepare( $query, $where_data['values'] ), ARRAY_A );
 
 		return array_map( [ static::class, 'from_array' ], $results );
 	}
@@ -231,24 +258,10 @@ abstract class BaseModel {
 			return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" );
 		}
 
-		$where_conditions = [];
-		$where_values = [];
+		$where_data = static::build_where_clause( $conditions );
+		$query = "SELECT COUNT(*) FROM {$table_name} WHERE {$where_data['clause']}";
 
-		foreach ( $conditions as $column => $value ) {
-			if ( is_array( $value ) ) {
-				$placeholders = implode( ',', array_fill( 0, count( $value ), '%s' ) );
-				$where_conditions[] = "{$column} IN ({$placeholders})";
-				$where_values = array_merge( $where_values, $value );
-			} else {
-				$where_conditions[] = "{$column} = %s";
-				$where_values[] = $value;
-			}
-		}
-
-		$where_clause = implode( ' AND ', $where_conditions );
-		$query = "SELECT COUNT(*) FROM {$table_name} WHERE {$where_clause}";
-
-		return (int) $wpdb->get_var( $wpdb->prepare( $query, $where_values ) );
+		return (int) $wpdb->get_var( $wpdb->prepare( $query, $where_data['values'] ) );
 	}
 
 	/**
@@ -265,24 +278,10 @@ abstract class BaseModel {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
-		$where_conditions = [];
-		$where_values = [];
+		$where_data = static::build_where_clause( $conditions );
+		$query = "DELETE FROM {$table_name} WHERE {$where_data['clause']}";
 
-		foreach ( $conditions as $column => $value ) {
-			if ( is_array( $value ) ) {
-				$placeholders = implode( ',', array_fill( 0, count( $value ), '%s' ) );
-				$where_conditions[] = "{$column} IN ({$placeholders})";
-				$where_values = array_merge( $where_values, $value );
-			} else {
-				$where_conditions[] = "{$column} = %s";
-				$where_values[] = $value;
-			}
-		}
-
-		$where_clause = implode( ' AND ', $where_conditions );
-		$query = "DELETE FROM {$table_name} WHERE {$where_clause}";
-
-		return (int) $wpdb->query( $wpdb->prepare( $query, $where_values ) );
+		return (int) $wpdb->query( $wpdb->prepare( $query, $where_data['values'] ) );
 	}
 
 	/**
@@ -322,6 +321,16 @@ abstract class BaseModel {
 	}
 
 	/**
+	 * Check if an attribute is fillable.
+	 *
+	 * @param string $key Attribute key.
+	 * @return bool
+	 */
+	protected static function is_fillable( string $key ): bool {
+		return empty( static::$fillable ) || in_array( $key, static::$fillable, true );
+	}
+
+	/**
 	 * Fill the model with attributes.
 	 *
 	 * @param array $attributes Attributes to fill.
@@ -329,11 +338,60 @@ abstract class BaseModel {
 	 */
 	public function fill( array $attributes ): static {
 		foreach ( $attributes as $key => $value ) {
-			if ( empty( static::$fillable ) || in_array( $key, static::$fillable, true ) ) {
+			if ( static::is_fillable( $key ) ) {
 				$this->attributes[ $key ] = $value;
 			}
 		}
 		return $this;
+	}
+
+	/**
+	 * Update timestamps before saving.
+	 *
+	 * @return void
+	 */
+	protected function touch_timestamps(): void {
+		$current_time = current_time( 'mysql' );
+
+		if ( in_array( 'updated_at', static::$timestamps, true ) ) {
+			$this->attributes['updated_at'] = $current_time;
+		}
+
+		if ( ! $this->exists && in_array( 'created_at', static::$timestamps, true ) ) {
+			$this->attributes['created_at'] = $current_time;
+		}
+	}
+
+	/**
+	 * Perform database update operation.
+	 *
+	 * @param \wpdb $wpdb WordPress database instance.
+	 * @param string $table_name Table name.
+	 * @return mixed
+	 */
+	protected function perform_update( \wpdb $wpdb, string $table_name ): mixed {
+		$primary_key_value = $this->get_primary_key_value();
+		if ( ! $primary_key_value ) {
+			return false;
+		}
+
+		return $wpdb->update( $table_name, $this->attributes, [ static::$primary_key => $primary_key_value ] );
+	}
+
+	/**
+	 * Perform database insert operation.
+	 *
+	 * @param \wpdb $wpdb WordPress database instance.
+	 * @param string $table_name Table name.
+	 * @return mixed
+	 */
+	protected function perform_insert( \wpdb $wpdb, string $table_name ): mixed {
+		$result = $wpdb->insert( $table_name, $this->attributes );
+		if ( $result && $wpdb->insert_id ) {
+			$this->attributes[ static::$primary_key ] = $wpdb->insert_id;
+			$this->exists = true;
+		}
+		return $result;
 	}
 
 	/**
@@ -345,31 +403,11 @@ abstract class BaseModel {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
-		// Add timestamps
-		if ( in_array( 'updated_at', static::$timestamps, true ) ) {
-			$this->attributes['updated_at'] = current_time( 'mysql' );
-		}
+		$this->touch_timestamps();
 
-		if ( ! $this->exists && in_array( 'created_at', static::$timestamps, true ) ) {
-			$this->attributes['created_at'] = current_time( 'mysql' );
-		}
-
-		if ( $this->exists ) {
-			// Update existing record
-			$primary_key_value = $this->attributes[ static::$primary_key ] ?? null;
-			if ( ! $primary_key_value ) {
-				return false;
-			}
-
-			$result = $wpdb->update( $table_name, $this->attributes, [ static::$primary_key => $primary_key_value ] );
-		} else {
-			// Insert new record
-			$result = $wpdb->insert( $table_name, $this->attributes );
-			if ( $result && $wpdb->insert_id ) {
-				$this->attributes[ static::$primary_key ] = $wpdb->insert_id;
-				$this->exists = true;
-			}
-		}
+		$result = $this->exists 
+			? $this->perform_update( $wpdb, $table_name )
+			: $this->perform_insert( $wpdb, $table_name );
 
 		if ( $result !== false ) {
 			$this->original = $this->attributes;
@@ -377,6 +415,15 @@ abstract class BaseModel {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get primary key value for the model.
+	 *
+	 * @return mixed
+	 */
+	protected function get_primary_key_value(): mixed {
+		return $this->attributes[ static::$primary_key ] ?? null;
 	}
 
 	/**
@@ -389,13 +436,13 @@ abstract class BaseModel {
 			return false;
 		}
 
-		$wpdb = static::get_wpdb();
-		$table_name = static::get_table_name();
-		$primary_key_value = $this->attributes[ static::$primary_key ] ?? null;
-
+		$primary_key_value = $this->get_primary_key_value();
 		if ( ! $primary_key_value ) {
 			return false;
 		}
+
+		$wpdb = static::get_wpdb();
+		$table_name = static::get_table_name();
 
 		$result = $wpdb->delete( $table_name, [ static::$primary_key => $primary_key_value ] );
 
@@ -425,7 +472,7 @@ abstract class BaseModel {
 	 * @return $this
 	 */
 	public function set_attribute( string $key, mixed $value ): static {
-		if ( empty( static::$fillable ) || in_array( $key, static::$fillable, true ) ) {
+		if ( static::is_fillable( $key ) ) {
 			$this->attributes[ $key ] = $value;
 		}
 		return $this;

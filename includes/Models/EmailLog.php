@@ -10,6 +10,8 @@
 
 namespace DebugSuite\Models;
 
+use AllowDynamicProperties;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -19,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
+#[AllowDynamicProperties]
 class EmailLog extends BaseModel {
 
 	/**
@@ -66,6 +69,78 @@ class EmailLog extends BaseModel {
 	const STATUS_FAILED = 'failed';
 
 	/**
+	 * Build WHERE clause and values for filtering.
+	 *
+	 * @param array $options Filter options.
+	 * @return array {
+	 *     WHERE clause data.
+	 *     @type string $clause WHERE clause string.
+	 *     @type array  $values Prepared statement values.
+	 * }
+	 */
+	protected static function build_where_clause( array $options ): array {
+		$wpdb = static::get_wpdb();
+		$where_conditions = [ '1=1' ];
+		$where_values = [];
+
+		// Filter by receiver
+		if ( ! empty( $options['receiver'] ) ) {
+			$where_conditions[] = 'to_email LIKE %s';
+			$where_values[] = '%' . $wpdb->esc_like( $options['receiver'] ) . '%';
+		}
+
+		// Filter by status
+		if ( $options['status'] !== 'all' ) {
+			$where_conditions[] = 'status = %s';
+			$where_values[] = $options['status'];
+		}
+
+		// Search functionality
+		if ( ! empty( $options['search'] ) ) {
+			$search_term = '%' . $wpdb->esc_like( $options['search'] ) . '%';
+			$where_conditions[] = '(to_email LIKE %s OR subject LIKE %s OR message LIKE %s)';
+			$where_values[] = $search_term;
+			$where_values[] = $search_term;
+			$where_values[] = $search_term;
+		}
+
+		// Date range filtering
+		if ( ! empty( $options['date_from'] ) ) {
+			$where_conditions[] = 'sent_date >= %s';
+			$where_values[] = $options['date_from'] . ' 00:00:00';
+		}
+
+		if ( ! empty( $options['date_to'] ) ) {
+			$where_conditions[] = 'sent_date <= %s';
+			$where_values[] = $options['date_to'] . ' 23:59:59';
+		}
+
+		return [
+			'clause' => implode( ' AND ', $where_conditions ),
+			'values' => $where_values,
+		];
+	}
+
+	/**
+	 * Get default filter options.
+	 *
+	 * @return array
+	 */
+	private static function get_default_filter_options(): array {
+		return [
+			'receiver'   => '',
+			'status'     => 'all',
+			'search'     => '',
+			'sort_by'    => 'sent_date',
+			'sort_order' => 'desc',
+			'limit'      => 100,
+			'offset'     => 0,
+			'date_from'  => '',
+			'date_to'    => '',
+		];
+	}
+
+	/**
 	 * Get email logs with advanced filtering and pagination.
 	 *
 	 * @param array $options {
@@ -83,60 +158,13 @@ class EmailLog extends BaseModel {
 	 * @return array
 	 */
 	public static function get_filtered_entries( array $options = [] ): array {
-		$defaults = [
-			'receiver'   => '',
-			'status'     => 'all',
-			'search'     => '',
-			'sort_by'    => 'sent_date',
-			'sort_order' => 'desc',
-			'limit'      => 100,
-			'offset'     => 0,
-			'date_from'  => '',
-			'date_to'    => '',
-		];
-
-		$options = wp_parse_args( $options, $defaults );
+		$options = wp_parse_args( $options, static::get_default_filter_options() );
 
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
 		// Build WHERE clause
-		$where_conditions = [ '1=1' ];
-		$where_values = [];
-
-		// Filter by receiver
-		if ( ! empty( $options['receiver'] ) ) {
-			$where_conditions[] = 'to_email LIKE %s';
-			$where_values[] = '%' . $wpdb->esc_like( $options['receiver'] ) . '%';
-		}
-
-		// Filter by status
-		if ( $options['status'] !== 'all' ) {
-			$where_conditions[] = 'status = %s';
-			$where_values[] = $options['status'];
-		}
-
-		// Search functionality
-		if ( ! empty( $options['search'] ) ) {
-			$search_term = '%' . $wpdb->esc_like( $options['search'] ) . '%';
-			$where_conditions[] = '(to_email LIKE %s OR subject LIKE %s OR message LIKE %s)';
-			$where_values[] = $search_term;
-			$where_values[] = $search_term;
-			$where_values[] = $search_term;
-		}
-
-		// Date range filtering
-		if ( ! empty( $options['date_from'] ) ) {
-			$where_conditions[] = 'sent_date >= %s';
-			$where_values[] = $options['date_from'] . ' 00:00:00';
-		}
-
-		if ( ! empty( $options['date_to'] ) ) {
-			$where_conditions[] = 'sent_date <= %s';
-			$where_values[] = $options['date_to'] . ' 23:59:59';
-		}
-
-		$where_clause = implode( ' AND ', $where_conditions );
+		$where_data = static::build_where_clause( $options );
 
 		// Build ORDER BY clause
 		$allowed_sort_fields = [ 'sent_date', 'to_email', 'subject', 'status' ];
@@ -144,8 +172,8 @@ class EmailLog extends BaseModel {
 		$sort_order = strtoupper( $options['sort_order'] ) === 'ASC' ? 'ASC' : 'DESC';
 
 		// Get entries
-		$query = "SELECT * FROM {$table_name} WHERE {$where_clause} ORDER BY {$sort_by} {$sort_order} LIMIT %d OFFSET %d";
-		$query_values = array_merge( $where_values, [ $options['limit'], $options['offset'] ] );
+		$query = "SELECT * FROM {$table_name} WHERE {$where_data['clause']} ORDER BY {$sort_by} {$sort_order} LIMIT %d OFFSET %d";
+		$query_values = array_merge( $where_data['values'], [ $options['limit'], $options['offset'] ] );
 
 		$results = $wpdb->get_results( $wpdb->prepare( $query, $query_values ), ARRAY_A );
 
@@ -159,7 +187,7 @@ class EmailLog extends BaseModel {
 	 * @return int
 	 */
 	public static function count_filtered_entries( array $options = [] ): int {
-		$defaults = [
+		$count_defaults = [
 			'receiver'   => '',
 			'status'     => 'all',
 			'search'     => '',
@@ -167,54 +195,19 @@ class EmailLog extends BaseModel {
 			'date_to'    => '',
 		];
 
-		$options = wp_parse_args( $options, $defaults );
+		$options = wp_parse_args( $options, $count_defaults );
 
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
-		// Build WHERE clause
-		$where_conditions = [ '1=1' ];
-		$where_values = [];
-
-		// Filter by receiver
-		if ( ! empty( $options['receiver'] ) ) {
-			$where_conditions[] = 'to_email LIKE %s';
-			$where_values[] = '%' . $wpdb->esc_like( $options['receiver'] ) . '%';
-		}
-
-		// Filter by status
-		if ( $options['status'] !== 'all' ) {
-			$where_conditions[] = 'status = %s';
-			$where_values[] = $options['status'];
-		}
-
-		// Search functionality
-		if ( ! empty( $options['search'] ) ) {
-			$search_term = '%' . $wpdb->esc_like( $options['search'] ) . '%';
-			$where_conditions[] = '(to_email LIKE %s OR subject LIKE %s OR message LIKE %s)';
-			$where_values[] = $search_term;
-			$where_values[] = $search_term;
-			$where_values[] = $search_term;
-		}
-
-		// Date range filtering
-		if ( ! empty( $options['date_from'] ) ) {
-			$where_conditions[] = 'sent_date >= %s';
-			$where_values[] = $options['date_from'] . ' 00:00:00';
-		}
-
-		if ( ! empty( $options['date_to'] ) ) {
-			$where_conditions[] = 'sent_date <= %s';
-			$where_values[] = $options['date_to'] . ' 23:59:59';
-		}
-
-		$where_clause = implode( ' AND ', $where_conditions );
+		// Build WHERE clause using shared method
+		$where_data = static::build_where_clause( $options );
 
 		// Get count
-		$count_query = "SELECT COUNT(*) FROM {$table_name} WHERE {$where_clause}";
+		$count_query = "SELECT COUNT(*) FROM {$table_name} WHERE {$where_data['clause']}";
 
-		if ( ! empty( $where_values ) ) {
-			return (int) $wpdb->get_var( $wpdb->prepare( $count_query, $where_values ) );
+		if ( ! empty( $where_data['values'] ) ) {
+			return (int) $wpdb->get_var( $wpdb->prepare( $count_query, $where_data['values'] ) );
 		}
 
 		return (int) $wpdb->get_var( $count_query );
@@ -275,11 +268,11 @@ class EmailLog extends BaseModel {
 	 */
 	public static function create_from_mail_data( array $mail_data, string $status, string $error_message = '' ): ?static {
 		$attributes = [
-			'to_email'      => is_array( $mail_data['to'] ?? '' ) ? implode( ', ', $mail_data['to'] ) : ( $mail_data['to'] ?? '' ),
+			'to_email'      => static::format_mail_recipients( $mail_data['to'] ?? '' ),
 			'subject'       => $mail_data['subject'] ?? '',
 			'message'       => $mail_data['message'] ?? '',
-			'headers'       => is_array( $mail_data['headers'] ?? '' ) ? implode( "\n", $mail_data['headers'] ) : ( $mail_data['headers'] ?? '' ),
-			'attachments'   => is_array( $mail_data['attachments'] ?? '' ) ? wp_json_encode( $mail_data['attachments'] ) : '',
+			'headers'       => static::format_mail_headers( $mail_data['headers'] ?? '' ),
+			'attachments'   => static::format_mail_attachments( $mail_data['attachments'] ?? '' ),
 			'status'        => $status,
 			'error_message' => $error_message,
 			'sent_date'     => current_time( 'mysql' ),
@@ -289,25 +282,50 @@ class EmailLog extends BaseModel {
 	}
 
 	/**
+	 * Format mail recipients for storage.
+	 *
+	 * @param mixed $recipients Recipients data.
+	 * @return string
+	 */
+	private static function format_mail_recipients( mixed $recipients ): string {
+		return is_array( $recipients ) ? implode( ', ', $recipients ) : (string) $recipients;
+	}
+
+	/**
+	 * Format mail headers for storage.
+	 *
+	 * @param mixed $headers Headers data.
+	 * @return string
+	 */
+	private static function format_mail_headers( mixed $headers ): string {
+		return is_array( $headers ) ? implode( "\n", $headers ) : (string) $headers;
+	}
+
+	/**
+	 * Format mail attachments for storage.
+	 *
+	 * @param mixed $attachments Attachments data.
+	 * @return string
+	 */
+	private static function format_mail_attachments( mixed $attachments ): string {
+		return is_array( $attachments ) ? wp_json_encode( $attachments ) : '';
+	}
+
+	/**
 	 * Delete multiple email logs by IDs.
 	 *
 	 * @param array $ids Array of email log IDs.
 	 * @return int Number of deleted rows.
 	 */
 	public static function delete_by_ids( array $ids ): int {
-		if ( empty( $ids ) ) {
+		// Sanitize and filter IDs
+		$sanitized_ids = array_filter( array_map( 'absint', $ids ) );
+
+		if ( empty( $sanitized_ids ) ) {
 			return 0;
 		}
 
-		// Sanitize IDs
-		$ids = array_map( 'absint', $ids );
-		$ids = array_filter( $ids );
-
-		if ( empty( $ids ) ) {
-			return 0;
-		}
-
-		return static::delete_where( [ static::$primary_key => $ids ] );
+		return static::delete_where( [ static::$primary_key => $sanitized_ids ] );
 	}
 
 	/**
@@ -389,7 +407,7 @@ class EmailLog extends BaseModel {
 	 *
 	 * @return array
 	 */
-	public function to_api_array(): array {
+	public function to_array(): array {
 		return [
 			'id'         => (int) $this->id,
 			'time'       => $this->sent_date,
@@ -424,11 +442,7 @@ class EmailLog extends BaseModel {
 	 * @return array
 	 */
 	public function get_headers(): array {
-		if ( empty( $this->headers ) ) {
-			return [];
-		}
-
-		return explode( "\n", $this->headers );
+		return empty( $this->headers ) ? [] : explode( "\n", $this->headers );
 	}
 
 	/**
@@ -459,14 +473,25 @@ class EmailLog extends BaseModel {
 	}
 
 	/**
+	 * Update email status and error message.
+	 *
+	 * @param string $status New status.
+	 * @param string $error_message Error message (optional).
+	 * @return bool
+	 */
+	private function update_status( string $status, string $error_message = '' ): bool {
+		$this->status = $status;
+		$this->error_message = $error_message;
+		return $this->save();
+	}
+
+	/**
 	 * Mark email as successful.
 	 *
 	 * @return bool
 	 */
 	public function mark_as_successful(): bool {
-		$this->status = self::STATUS_SUCCESS;
-		$this->error_message = '';
-		return $this->save();
+		return $this->update_status( self::STATUS_SUCCESS );
 	}
 
 	/**
@@ -476,8 +501,6 @@ class EmailLog extends BaseModel {
 	 * @return bool
 	 */
 	public function mark_as_failed( string $error_message = '' ): bool {
-		$this->status = self::STATUS_FAILED;
-		$this->error_message = $error_message;
-		return $this->save();
+		return $this->update_status( self::STATUS_FAILED, $error_message );
 	}
 }

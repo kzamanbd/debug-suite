@@ -143,7 +143,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 			// Convert to API format
 			$formatted_entries = array_map(
 				static function ( EmailLog $entry ) {
-					return $entry->to_api_array();
+					return $entry->to_array();
 				},
 				$entries
 			);
@@ -288,7 +288,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 				);
 			}
 
-			return ServiceResponse::success( $email->to_api_array() );
+			return ServiceResponse::success( $email->to_array() );
 
 		} catch ( Exception $e ) {
 			return ServiceResponse::failure(
