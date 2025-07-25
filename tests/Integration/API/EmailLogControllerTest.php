@@ -8,6 +8,7 @@
 namespace DebugSuite\Tests\Integration\API;
 
 use DebugSuite\API\EmailLogController;
+use DebugSuite\Install;
 use DebugSuite\Services\EmailLog\EmailLogService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use WP_REST_Request;
@@ -73,7 +74,7 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 		$this->controller->register_routes();
 
 		// Create table
-		$this->service->create_table();
+		Install::create_email_logs_table();
 
 		// Create admin user
 		$this->create_admin_user();

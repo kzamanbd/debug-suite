@@ -10,6 +10,7 @@ namespace DebugSuite\Tests\Unit\Services\EmailLog;
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Services\EmailLog\EmailLogService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
+use DebugSuite\Install;
 
 /**
  * Test EmailLogService functionality.
@@ -32,7 +33,22 @@ class EmailLogServiceTest extends DebugSuiteTestCase {
      */
     public function set_up() {
         parent::set_up();
+        
+        // Create the email logs table for testing
+        Install::create_email_logs_table();
+        
         $this->service = new EmailLogService();
+    }
+
+    /**
+     * Clean up test environment.
+     */
+    public function tear_down(): void {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'debug_suite_email_logs';
+        $wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
+        
+        parent::tear_down();
     }
 
     /**
@@ -41,9 +57,9 @@ class EmailLogServiceTest extends DebugSuiteTestCase {
     public function test_register_hooks(): void {
         $this->service->register_hooks();
 
-        $this->assertTrue( has_action( 'wp_mail', [ $this->service, 'capture_email_data' ] ) );
-        $this->assertTrue( has_action( 'wp_mail_succeeded', [ $this->service, 'log_email_success' ] ) );
-        $this->assertTrue( has_action( 'wp_mail_failed', [ $this->service, 'log_email_failure' ] ) );
+        $this->assertNotFalse( has_action( 'wp_mail', [ $this->service, 'capture_email_data' ] ) );
+        $this->assertNotFalse( has_action( 'wp_mail_succeeded', [ $this->service, 'log_email_success' ] ) );
+        $this->assertNotFalse( has_action( 'wp_mail_failed', [ $this->service, 'log_email_failure' ] ) );
     }
 
     /**
