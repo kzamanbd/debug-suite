@@ -56,14 +56,22 @@ class Admin implements Hookable {
 				[
 					'title' => __( 'Overview', 'debug-suite' ),
 					'path' => '/',
+					'order' => 1,
 				],
 				[
 					'title' => __( 'Debug Log', 'debug-suite' ),
 					'path' => 'debug-log',
+					'order' => 2,
+				],
+				[
+					'title' => __( 'Email Log', 'debug-suite' ),
+					'path' => 'email-log',
+					'order' => 3,
 				],
 				[
 					'title' => __( 'Configuration', 'debug-suite' ),
 					'path' => 'config',
+					'order' => 4,
 				],
 			]
 		);
