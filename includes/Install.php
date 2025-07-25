@@ -81,6 +81,7 @@ class Install {
 		$result = dbDelta( $sql );
 
 		// Check if table was created successfully
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) === $table_name;
 	}
 
@@ -125,6 +126,7 @@ class Install {
 		];
 
 		foreach ( $tables as $table ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 		}
 
@@ -140,6 +142,7 @@ class Install {
 	public static function email_logs_table_exists(): bool {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'debug_suite_email_logs';
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) === $table_name;
 	}
 
@@ -154,11 +157,14 @@ class Install {
 
 		$full_table_name = $wpdb->prefix . 'debug_suite_' . $table_name;
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$full_table_name}'" ) !== $full_table_name ) {
 			return null;
 		}
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$columns = $wpdb->get_results( "DESCRIBE {$full_table_name}", ARRAY_A );
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$indexes = $wpdb->get_results( "SHOW INDEX FROM {$full_table_name}", ARRAY_A );
 
 		return [
@@ -183,7 +189,9 @@ class Install {
 		$results = [];
 
 		foreach ( $tables as $table ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table ) {
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$result = $wpdb->get_row( "REPAIR TABLE {$table}", ARRAY_A );
 				$results[ $table ] = $result;
 			}
@@ -207,7 +215,9 @@ class Install {
 		$results = [];
 
 		foreach ( $tables as $table ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table ) {
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$result = $wpdb->get_row( "OPTIMIZE TABLE {$table}", ARRAY_A );
 				$results[ $table ] = $result;
 			}
@@ -232,6 +242,7 @@ class Install {
 		$table_info = [];
 
 		foreach ( $tables as $table ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table ) {
 				$size_result = $wpdb->get_row(
 					$wpdb->prepare(

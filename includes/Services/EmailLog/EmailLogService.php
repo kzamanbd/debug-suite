@@ -14,6 +14,7 @@ use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\Hookable;
 use DebugSuite\Interfaces\ServiceInterface;
 use DebugSuite\Models\EmailLog;
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -39,9 +40,9 @@ class EmailLogService implements ServiceInterface, Hookable {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'wp_mail', [ $this, 'capture_email_data' ], 10, 1 );
-		add_action( 'wp_mail_succeeded', [ $this, 'log_email_success' ], 10, 1 );
-		add_action( 'wp_mail_failed', [ $this, 'log_email_failure' ], 10, 1 );
+		add_action( 'wp_mail', [ $this, 'capture_email_data' ] );
+		add_action( 'wp_mail_succeeded', [ $this, 'log_email_success' ] );
+		add_action( 'wp_mail_failed', [ $this, 'log_email_failure' ] );
 	}
 
 	/**
@@ -93,6 +94,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 		if ( is_wp_error( $wp_error ) ) {
 			$error_message = $wp_error->get_error_message();
 		} elseif ( property_exists( $wp_error, 'ErrorInfo' ) ) {
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			$error_message = $wp_error->ErrorInfo;
 		}
 
@@ -150,7 +152,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 				[
 					'entries'     => $formatted_entries,
 					'total_count' => $total_count,
-					'has_more'    => ( $options['offset'] + $options['limit'] ) < $total_count,
+					'has_more'    => (int) ( $options['offset'] + $options['limit'] ) < $total_count,
 					'pagination'  => [
 						'limit'  => $options['limit'],
 						'offset' => $options['offset'],
@@ -159,7 +161,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 				]
 			);
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			return ServiceResponse::failure(
 				__( 'Failed to retrieve email logs.', 'debug-suite' ),
 				'database_error',
@@ -179,7 +181,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 
 			return ServiceResponse::success( $stats );
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			return ServiceResponse::failure(
 				__( 'Failed to retrieve email statistics.', 'debug-suite' ),
 				'database_error',
@@ -228,7 +230,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 				]
 			);
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			return ServiceResponse::failure(
 				__( 'Failed to delete email logs.', 'debug-suite' ),
 				'database_error',
@@ -253,7 +255,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 				]
 			);
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			return ServiceResponse::failure(
 				__( 'Failed to clear email logs.', 'debug-suite' ),
 				'database_error',
@@ -288,7 +290,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 
 			return ServiceResponse::success( $email->to_api_array() );
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			return ServiceResponse::failure(
 				__( 'Failed to retrieve email log.', 'debug-suite' ),
 				'database_error',
@@ -344,7 +346,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 					'send_failed'
 				);
 			}
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			return ServiceResponse::failure(
 				__( 'Failed to resend email.', 'debug-suite' ),
 				'send_error',
@@ -374,11 +376,13 @@ class EmailLogService implements ServiceInterface, Hookable {
 
 			// Get subject if available
 			if ( property_exists( $mail_info, 'Subject' ) ) {
+				// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 				$enhanced_data['subject'] = $mail_info->Subject;
 			}
 
 			// Get body if available
 			if ( property_exists( $mail_info, 'Body' ) ) {
+				// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 				$enhanced_data['message'] = $mail_info->Body;
 			}
 		}
@@ -401,6 +405,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 			],
 			'sort_by' => [
 				'values' => [ 'sent_date', 'to_email', 'subject', 'status' ],
+				/* translators: %s: comma-separated list of allowed sort fields */
 				'message' => __( 'Invalid sort field. Allowed: %s', 'debug-suite' ),
 				'code' => 'invalid_sort_field',
 			],
@@ -424,7 +429,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 			}
 
 			if ( ! in_array( $value, $rule['values'], true ) ) {
-				$message = strpos( $rule['message'], '%s' ) !== false
+				$message = str_contains( $rule['message'], '%s' )
 					? sprintf( $rule['message'], implode( ', ', $rule['values'] ) )
 					: $rule['message'];
 
@@ -454,6 +459,7 @@ class EmailLogService implements ServiceInterface, Hookable {
 		foreach ( [ 'date_from', 'date_to' ] as $date_field ) {
 			if ( ! empty( $options[ $date_field ] ) && ! $this->is_valid_date( $options[ $date_field ] ) ) {
 				return ServiceResponse::failure(
+					/* translators: %s: the date field name */
 					sprintf( __( 'Invalid %s format. Use Y-m-d format.', 'debug-suite' ), $date_field ),
 					'invalid_' . $date_field
 				);

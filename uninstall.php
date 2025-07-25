@@ -22,12 +22,13 @@
  */
 
 // If uninstall not called from WordPress, then exit.
+use DebugSuite\Install;
+
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-// Load the Install class for database cleanup
-require_once plugin_dir_path( __FILE__ ) . 'includes/Install.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Delete options
 delete_option( 'debug_suite_version' );
@@ -35,9 +36,4 @@ delete_option( 'debug_suite_needs_onboarding' );
 delete_transient( 'debug_suite_activation_redirect' );
 
 // Drop database tables
-\DebugSuite\Install::drop_tables();
-
-// Clean up email logs table
-global $wpdb;
-$table_name = $wpdb->prefix . 'debug_suite_email_logs';
-$wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
+Install::drop_tables();
