@@ -18,6 +18,7 @@ use DebugSuite\Core\Container\Container;
 use DebugSuite\Internal\HookManager;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
+use DebugSuite\Services\EmailLog\EmailLogService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;
 
@@ -45,6 +46,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 		LogsService::class,
 		SettingsService::class,
 		OverviewService::class,
+		\DebugSuite\Services\EmailLog\EmailLogService::class,
 	];
 
 	public function register( Container $container ): void {
@@ -59,6 +61,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 				LogsService::class          => $container->object( LogsService::class ),
 				SettingsService::class      => $container->object( SettingsService::class ),
 				OverviewService::class      => $container->autowire( OverviewService::class ),
+				EmailLogService::class      => $container->object( EmailLogService::class ),
 			]
 		);
 	}
