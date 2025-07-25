@@ -69,15 +69,14 @@
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant hover (&:hover);
 
-.debug-suite-root-app p,
-.debug-suite-root-app h1,
-.debug-suite-root-app h2,
-.debug-suite-root-app h3,
-.debug-suite-root-app h4,
-.debug-suite-root-app h5,
-.debug-suite-root-app h6 {
-    margin: 0 !important;
-    padding: 0 !important;
+@layer components {
+    .debug-suite-layout {
+        @apply flex min-h-screen flex-col gap-4 bg-white p-4;
+    }
+}
+
+#wpcontent:has(.debug-suite-root-app) {
+    padding-left: 0 !important;
 }
 .debug-suite-root-app input {
     height: auto !important;
@@ -101,9 +100,6 @@ div[data-headlessui-state='open'][role='dialog'] {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
 }
-.debug-suite-layout {
-    @apply mt-5 flex min-h-screen flex-col gap-4 rounded-lg bg-white p-5;
-}
 
 /* Monaco Editor Error Highlighting */
 .error-line-highlight {
@@ -126,43 +122,50 @@ div[data-headlessui-state='open'][role='dialog'] {
     background-color: rgba(255, 0, 0, 0.2);
 }
 /* Core body reset for frontend */
-body.debug-suite-full-view {
+.debug-suite-full-view {
     margin: 0 !important;
     padding: 0 !important;
     background: #f0f0f1 !important;
     overflow-x: hidden;
 }
 
-html.root-debug-suite-full-view,
-body.debug-suite-full-view .debug-suite-layout,
-body.debug-suite-full-view.admin-bar {
+.root-debug-suite-full-view,
+.debug-suite-full-view .debug-suite-layout,
+.debug-suite-full-view.admin-bar {
     margin-top: 0 !important;
     border-radius: 0 !important;
 }
 
-body.debug-suite-full-view #adminmenumain,
-body.debug-suite-full-view #wpadminbar,
-body.debug-suite-full-view #adminmenuwrap,
-body.debug-suite-full-view #screen-meta,
-body.debug-suite-full-view #screen-meta-links,
-body.debug-suite-full-view #footer,
-body.debug-suite-full-view #wpfooter,
-body.debug-suite-full-view .update-nag {
+.debug-suite-full-view #adminmenumain,
+.debug-suite-full-view #wpadminbar,
+.debug-suite-full-view #adminmenuwrap,
+.debug-suite-full-view #screen-meta,
+.debug-suite-full-view #screen-meta-links,
+.debug-suite-full-view #footer,
+.debug-suite-full-view #wpfooter,
+.debug-suite-full-view .update-nag {
     display: none !important;
 }
-body.debug-suite-full-view #wpcontent,
-body.debug-suite-full-view .notice,
-body.debug-suite-full-view #wpbody,
-body.debug-suite-full-view #wpwrap,
-body.debug-suite-full-view #wpbody-content,
-body.debug-suite-full-view .wrap,
-html.wp-toolbar:has(.debug-suite-full-view),
-body.debug-suite-full-view > .container:not(#debug-suite-root-app),
-body.debug-suite-full-view > .wrapper:not(#debug-suite-root-app),
-body.debug-suite-full-view > .site:not(#debug-suite-root-app),
-body.debug-suite-full-view > .site-content:not(#debug-suite-root-app),
-body.debug-suite-full-view > .content-area:not(#debug-suite-root-app),
-body.debug-suite-full-view > .main:not(#debug-suite-root-app) {
+.debug-suite-root-app,
+.debug-suite-root-app p,
+.debug-suite-root-app h1,
+.debug-suite-root-app h2,
+.debug-suite-root-app h3,
+.debug-suite-root-app h4,
+.debug-suite-root-app h5,
+.debug-suite-root-app h6,
+.debug-suite-full-view .wrap,
+.debug-suite-full-view #wpbody,
+.debug-suite-full-view #wpwrap,
+.debug-suite-full-view #wpcontent,
+.debug-suite-full-view #wpbody-content,
+.wp-toolbar:has(.debug-suite-full-view),
+.debug-suite-full-view > .container:not(#debug-suite-root-app),
+.debug-suite-full-view > .wrapper:not(#debug-suite-root-app),
+.debug-suite-full-view > .site:not(#debug-suite-root-app),
+.debug-suite-full-view > .site-content:not(#debug-suite-root-app),
+.debug-suite-full-view > .content-area:not(#debug-suite-root-app),
+.debug-suite-full-view > .main:not(#debug-suite-root-app) {
     margin: 0 !important;
     padding: 0 !important;
 }
