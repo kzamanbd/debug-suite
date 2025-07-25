@@ -13,6 +13,7 @@ interface ButtonOwnProps<T extends ElementType> {
     className?: string;
     size?: keyof typeof sizeClasses;
     disabled?: boolean;
+    icon?: ReactNode;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -49,6 +50,7 @@ const Button = <T extends ElementType = 'button'>({
     loading = false,
     spinnerClassName = '',
     className = '',
+    icon,
     disabled,
     ...props
 }: PolymorphicComponentProps<T>) => {
@@ -70,6 +72,7 @@ const Button = <T extends ElementType = 'button'>({
             aria-disabled={loading || disabled}
             {...props}>
             {loading && <Spinner className={spinnerClassName} />}
+            {icon && !loading && icon}
             {children}
         </Component>
     );
