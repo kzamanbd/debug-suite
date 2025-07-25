@@ -14,7 +14,6 @@
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
-use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
 
 if ( ! function_exists( 'debug_suite' ) ) {
@@ -58,5 +57,19 @@ if ( ! function_exists( 'debug_suite_date' ) ) {
 		$date_format = get_option( 'date_format' );
 		// Convert the timestamp to formatted date
 		return date_i18n( $date_format, $timestamp );
+	}
+}
+
+if ( ! function_exists( 'debug_suite_current_page' ) ) {
+	/**
+	 * Check if the current admin page is a Debug Suite page.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return bool True if it's a Debug Suite page, false otherwise.
+	 */
+	function debug_suite_current_page(): bool {
+		$current_screen = get_current_screen();
+		return $current_screen && strpos( $current_screen->id, 'debug-suite' ) !== false;
 	}
 }

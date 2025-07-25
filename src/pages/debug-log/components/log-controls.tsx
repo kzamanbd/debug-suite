@@ -86,7 +86,7 @@ const LogControls = ({
     };
 
     const handleDownload = () => {
-        if (!rawContent) return;
+        if (!(viewMode === 'raw' && rawContent?.content)) return;
 
         const blob = new Blob([rawContent.content], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
@@ -190,24 +190,22 @@ const LogControls = ({
                             </kbd>
                         </div>
                     </Button>
-                    {viewMode === 'raw' && rawContent && (
-                        <Button
-                            onClick={handleDownload}
-                            className="group relative rounded-none border-0 border-r"
-                            title="Download logs">
-                            <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[110px]">
-                                <div className="flex items-center">
-                                    <Download className="size-4 shrink-0" />
-                                    <span className="max-w-0 overflow-hidden text-sm whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[100px] group-hover:opacity-100">
-                                        Download Logs
-                                    </span>
-                                </div>
-                                <kbd className="ml-1.5 rounded px-1.5 py-0.5 text-[10px] opacity-100 transition-all duration-300 ease-in-out group-hover:opacity-50">
-                                    D
-                                </kbd>
+                    <Button
+                        onClick={handleDownload}
+                        className="group relative rounded-none border-0 border-r"
+                        title="Download logs">
+                        <div className="flex w-full min-w-8 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[110px]">
+                            <div className="flex items-center">
+                                <Download className="size-4 shrink-0" />
+                                <span className="max-w-0 overflow-hidden text-sm whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[100px] group-hover:opacity-100">
+                                    Download
+                                </span>
                             </div>
-                        </Button>
-                    )}
+                            <kbd className="ml-1.5 rounded px-1.5 py-0.5 text-[10px] opacity-100 transition-all duration-300 ease-in-out group-hover:opacity-50">
+                                D
+                            </kbd>
+                        </div>
+                    </Button>
                     <Button
                         onClick={handleClear}
                         disabled={clearing}
