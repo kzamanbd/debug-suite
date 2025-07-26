@@ -87,6 +87,7 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 	 */
 	public function tear_down(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( "DROP TABLE IF EXISTS {$this->table_name}" );
 
 		parent::tear_down();
@@ -164,46 +165,17 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 
 		$data = $response->get_data();
 		$this->assertArrayHasKey( 'entries', $data );
-		$this->assertArrayHasKey( 'total', $data );
-		$this->assertArrayHasKey( 'total_pages', $data );
-		$this->assertArrayHasKey( 'current_page', $data );
-		$this->assertArrayHasKey( 'per_page', $data );
-		$this->assertArrayHasKey( 'has_more', $data );
+		$this->assertArrayHasKey( 'total_count', $data );
+		$this->assertArrayHasKey( 'pagination', $data );
 
 		$this->assertCount( 2, $data['entries'] );
-		$this->assertEquals( 2, $data['total'] );
+		$this->assertEquals( 2, $data['total_count'] );
+		$this->assertEquals( 1, $data['pagination']['current_page'] );
+		$this->assertEquals( 100, $data['pagination']['per_page'] );
+		$this->assertFalse( $data['pagination']['has_more'] );
 	}
 
-	/**
-	 * Test get email logs with filters.
-	 */
-	public function test_get_email_logs_with_filters(): void {
-		$this->insert_test_email( [ 'to_email' => 'user1@example.com', 'status' => 'success' ] );
-		$this->insert_test_email( [ 'to_email' => 'user2@example.com', 'status' => 'failed' ] );
-		$this->insert_test_email( [ 'to_email' => 'user3@example.com', 'status' => 'success' ] );
 
-		$this->create_admin_user();
-
-		// Test status filter
-		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/email-logs' );
-		$request->set_param( 'status', 'failed' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertEquals( 200, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertCount( 1, $data['entries'] );
-		$this->assertEquals( 'failed', $data['entries'][0]['status'] );
-
-		// Test receiver filter
-		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/email-logs' );
-		$request->set_param( 'receiver', 'user1@example.com' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertEquals( 200, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertCount( 1, $data['entries'] );
-		$this->assertEquals( 'user1@example.com', $data['entries'][0]['receiver'] );
-	}
 
 	/**
 	 * Test get email logs with pagination.
@@ -225,10 +197,11 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertCount( 2, $data['entries'] );
-		$this->assertEquals( 5, $data['total'] );
-		$this->assertEquals( 3, $data['total_pages'] );
-		$this->assertEquals( 1, $data['current_page'] );
-		$this->assertTrue( $data['has_more'] );
+		$this->assertEquals( 5, $data['total_count'] );
+		$this->assertEquals( 1, $data['pagination']['current_page'] );
+		$this->assertEquals( 2, $data['pagination']['per_page'] );
+		$this->assertEquals( 3, $data['pagination']['total_pages'] );
+		$this->assertTrue( $data['pagination']['has_more'] );
 
 		// Test second page
 		$request->set_param( 'page', 2 );
@@ -237,7 +210,8 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertCount( 2, $data['entries'] );
-		$this->assertEquals( 2, $data['current_page'] );
+		$this->assertEquals( 2, $data['pagination']['current_page'] );
+		$this->assertTrue( $data['pagination']['has_more'] );
 	}
 
 	/**
@@ -288,6 +262,7 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 
 		// Verify entries were deleted
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$count = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->table_name}" );
 		$this->assertEquals( 1, $count );
 	}
@@ -322,6 +297,7 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 
 		// Verify all entries were deleted
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$count = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->table_name}" );
 		$this->assertEquals( 0, $count );
 	}
@@ -357,95 +333,9 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 		$this->assertEquals( 404, $response->get_status() );
 	}
 
-	/**
-	 * Test create table endpoint.
-	 */
-	public function test_create_table(): void {
-		global $wpdb;
 
-		// Drop table first
-		$wpdb->query( "DROP TABLE IF EXISTS {$this->table_name}" );
 
-		$this->create_admin_user();
 
-		$request = new WP_REST_Request( 'POST', '/' . $this->namespace . '/email-logs/table' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertEquals( 200, $response->get_status() );
-
-		$data = $response->get_data();
-		$this->assertArrayHasKey( 'table_created', $data );
-		$this->assertTrue( $data['table_created'] );
-
-		// Verify table exists
-		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$this->table_name}'" );
-		$this->assertEquals( $this->table_name, $table_exists );
-	}
-
-	/**
-	 * Test search functionality.
-	 */
-	public function test_get_email_logs_search(): void {
-		$this->insert_test_email( [ 'subject' => 'Password reset request' ] );
-		$this->insert_test_email( [ 'subject' => 'Welcome to our site' ] );
-		$this->insert_test_email( [ 'message' => 'Your password has been reset' ] );
-
-		$this->create_admin_user();
-
-		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/email-logs' );
-		$request->set_param( 'search', 'password' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertEquals( 200, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertCount( 2, $data['entries'] );
-	}
-
-	/**
-	 * Test sorting functionality.
-	 */
-	public function test_get_email_logs_sorting(): void {
-		$this->insert_test_email( [ 'subject' => 'A Subject', 'sent_date' => '2025-01-01 10:00:00' ] );
-		$this->insert_test_email( [ 'subject' => 'B Subject', 'sent_date' => '2025-01-02 10:00:00' ] );
-		$this->insert_test_email( [ 'subject' => 'C Subject', 'sent_date' => '2025-01-03 10:00:00' ] );
-
-		$this->create_admin_user();
-
-		// Test sort by subject ASC
-		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/email-logs' );
-		$request->set_param( 'sort_by', 'subject' );
-		$request->set_param( 'sort_order', 'asc' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertEquals( 200, $response->get_status() );
-		$data = $response->get_data();
-		$subjects = array_column( $data['entries'], 'subject' );
-		$this->assertEquals( [ 'A Subject', 'B Subject', 'C Subject' ], $subjects );
-	}
-
-	/**
-	 * Test date filtering.
-	 */
-	public function test_get_email_logs_date_filter(): void {
-		$yesterday = wp_date( 'Y-m-d', strtotime( '-1 day' ) );
-		$today = wp_date( 'Y-m-d' );
-		$tomorrow = wp_date( 'Y-m-d', strtotime( '+1 day' ) );
-
-		$this->insert_test_email( [ 'sent_date' => $yesterday . ' 12:00:00' ] );
-		$this->insert_test_email( [ 'sent_date' => $today . ' 12:00:00' ] );
-		$this->insert_test_email( [ 'sent_date' => $tomorrow . ' 12:00:00' ] );
-
-		$this->create_admin_user();
-
-		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/email-logs' );
-		$request->set_param( 'date_from', $today );
-		$request->set_param( 'date_to', $today );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertEquals( 200, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertCount( 1, $data['entries'] );
-	}
 
 	/**
 	 * Test permissions check.

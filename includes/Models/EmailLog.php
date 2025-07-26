@@ -10,8 +10,6 @@
 
 namespace DebugSuite\Models;
 
-use AllowDynamicProperties;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -21,7 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-#[AllowDynamicProperties]
 class EmailLog extends BaseModel {
 
 	/**
@@ -68,151 +65,7 @@ class EmailLog extends BaseModel {
 	const STATUS_SUCCESS = 'success';
 	const STATUS_FAILED = 'failed';
 
-	/**
-	 * Build WHERE clause and values for filtering.
-	 *
-	 * @param array $conditions Filter options.
-	 *
-	 * @return array {
-	 *     WHERE clause data.
-	 *     @type string $clause WHERE clause string.
-	 *     @type array  $values Prepared statement values.
-	 * }
-	 */
-	protected static function build_where_clause( array $conditions ): array {
-		$wpdb = static::get_wpdb();
-		$where_conditions = [ '1=1' ];
-		$where_values = [];
 
-		// Filter by receiver
-		if ( ! empty( $conditions['receiver'] ) ) {
-			$where_conditions[] = 'to_email LIKE %s';
-			$where_values[] = '%' . $wpdb->esc_like( $conditions['receiver'] ) . '%';
-		}
-
-		// Filter by status
-		if ( $conditions['status'] !== 'all' ) {
-			$where_conditions[] = 'status = %s';
-			$where_values[]     = $conditions['status'];
-		}
-
-		// Search functionality
-		if ( ! empty( $conditions['search'] ) ) {
-			$search_term = '%' . $wpdb->esc_like( $conditions['search'] ) . '%';
-			$where_conditions[] = '(to_email LIKE %s OR subject LIKE %s OR message LIKE %s)';
-			$where_values[] = $search_term;
-			$where_values[] = $search_term;
-			$where_values[] = $search_term;
-		}
-
-		// Date range filtering
-		if ( ! empty( $conditions['date_from'] ) ) {
-			$where_conditions[] = 'sent_date >= %s';
-			$where_values[]     = $conditions['date_from'] . ' 00:00:00';
-		}
-
-		if ( ! empty( $conditions['date_to'] ) ) {
-			$where_conditions[] = 'sent_date <= %s';
-			$where_values[]     = $conditions['date_to'] . ' 23:59:59';
-		}
-
-		return [
-			'clause' => implode( ' AND ', $where_conditions ),
-			'values' => $where_values,
-		];
-	}
-
-	/**
-	 * Get default filter options.
-	 *
-	 * @return array
-	 */
-	private static function get_default_filter_options(): array {
-		return [
-			'receiver'   => '',
-			'status'     => 'all',
-			'search'     => '',
-			'sort_by'    => 'sent_date',
-			'sort_order' => 'desc',
-			'limit'      => 100,
-			'offset'     => 0,
-			'date_from'  => '',
-			'date_to'    => '',
-		];
-	}
-
-	/**
-	 * Get email logs with advanced filtering and pagination.
-	 *
-	 * @param array $options {
-	 *     Optional filtering and pagination options.
-	 *     @type string $receiver   Filter by receiver email.
-	 *     @type string $status     Filter by status (success, failed, all).
-	 *     @type string $search     Search term.
-	 *     @type string $sort_by    Sort field.
-	 *     @type string $sort_order Sort order (asc, desc).
-	 *     @type int    $limit      Number of entries to return.
-	 *     @type int    $offset     Offset for pagination.
-	 *     @type string $date_from  Start date filter.
-	 *     @type string $date_to    End date filter.
-	 * }
-	 * @return array
-	 */
-	public static function get_filtered_entries( array $options = [] ): array {
-		$options = wp_parse_args( $options, static::get_default_filter_options() );
-
-		$wpdb = static::get_wpdb();
-		$table_name = static::get_table_name();
-
-		// Build WHERE clause
-		$where_data = static::build_where_clause( $options );
-
-		// Build ORDER BY clause
-		$allowed_sort_fields = [ 'sent_date', 'to_email', 'subject', 'status' ];
-		$sort_by = in_array( $options['sort_by'], $allowed_sort_fields, true ) ? $options['sort_by'] : 'sent_date';
-		$sort_order = strtoupper( $options['sort_order'] ) === 'ASC' ? 'ASC' : 'DESC';
-
-		// Get entries
-		$query = "SELECT * FROM {$table_name} WHERE {$where_data['clause']} ORDER BY {$sort_by} {$sort_order} LIMIT %d OFFSET %d";
-		$query_values = array_merge( $where_data['values'], [ $options['limit'], $options['offset'] ] );
-
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $query_values ), ARRAY_A );
-
-		return array_map( [ static::class, 'from_array' ], $results );
-	}
-
-	/**
-	 * Count filtered entries.
-	 *
-	 * @param array $options Filter options.
-	 * @return int
-	 */
-	public static function count_filtered_entries( array $options = [] ): int {
-		$count_defaults = [
-			'receiver'   => '',
-			'status'     => 'all',
-			'search'     => '',
-			'date_from'  => '',
-			'date_to'    => '',
-		];
-
-		$options = wp_parse_args( $options, $count_defaults );
-
-		$wpdb = static::get_wpdb();
-		$table_name = static::get_table_name();
-
-		// Build WHERE clause using shared method
-		$where_data = static::build_where_clause( $options );
-
-		// Get count
-		$count_query = "SELECT COUNT(*) FROM {$table_name} WHERE {$where_data['clause']}";
-
-		if ( ! empty( $where_data['values'] ) ) {
-			return (int) $wpdb->get_var( $wpdb->prepare( $count_query, $where_data['values'] ) );
-		}
-
-		return (int) $wpdb->get_var( $count_query );
-	}
 
 	/**
 	 * Get email statistics.
@@ -232,6 +85,7 @@ class EmailLog extends BaseModel {
 		";
 
 		$stats = $wpdb->get_row(
+			// phpcs:ignore
 			$wpdb->prepare( $stats_query, self::STATUS_SUCCESS, self::STATUS_FAILED ),
 			ARRAY_A
 		);
@@ -329,79 +183,7 @@ class EmailLog extends BaseModel {
 		return static::delete_where( [ static::$primary_key => $sanitized_ids ] );
 	}
 
-	/**
-	 * Get emails by status.
-	 *
-	 * @param string $status Email status.
-	 * @param array  $options Query options.
-	 * @return array
-	 */
-	public static function get_by_status( string $status, array $options = [] ): array {
-		$conditions = [ 'status' => $status ];
-		return static::where( $conditions, $options );
-	}
 
-	/**
-	 * Get recent emails.
-	 *
-	 * @param int $limit Number of emails to retrieve.
-	 * @return array
-	 */
-	public static function get_recent( int $limit = 10 ): array {
-		return static::all(
-			[
-				'limit'    => $limit,
-				'order_by' => 'sent_date',
-				'order'    => 'DESC',
-			]
-		);
-	}
-
-	/**
-	 * Search emails by term.
-	 *
-	 * @param string $search_term Search term.
-	 * @param array  $options Query options.
-	 * @return array
-	 */
-	public static function search( string $search_term, array $options = [] ): array {
-		if ( empty( $search_term ) ) {
-			return [];
-		}
-
-		return static::get_filtered_entries( array_merge( $options, [ 'search' => $search_term ] ) );
-	}
-
-	/**
-	 * Get emails sent to specific recipient.
-	 *
-	 * @param string $email Email address.
-	 * @param array  $options Query options.
-	 * @return array
-	 */
-	public static function get_by_recipient( string $email, array $options = [] ): array {
-		return static::get_filtered_entries( array_merge( $options, [ 'receiver' => $email ] ) );
-	}
-
-	/**
-	 * Get emails within date range.
-	 *
-	 * @param string $date_from Start date (Y-m-d format).
-	 * @param string $date_to End date (Y-m-d format).
-	 * @param array  $options Query options.
-	 * @return array
-	 */
-	public static function get_by_date_range( string $date_from, string $date_to, array $options = [] ): array {
-		return static::get_filtered_entries(
-			array_merge(
-				$options,
-				[
-					'date_from' => $date_from,
-					'date_to'   => $date_to,
-				]
-			)
-		);
-	}
 
 	/**
 	 * Format email entry for API response.
@@ -444,64 +226,5 @@ class EmailLog extends BaseModel {
 	 */
 	public function get_headers(): array {
 		return empty( $this->headers ) ? [] : explode( "\n", $this->headers );
-	}
-
-	/**
-	 * Check if email was successful.
-	 *
-	 * @return bool
-	 */
-	public function is_successful(): bool {
-		return $this->status === self::STATUS_SUCCESS;
-	}
-
-	/**
-	 * Check if email failed.
-	 *
-	 * @return bool
-	 */
-	public function is_failed(): bool {
-		return $this->status === self::STATUS_FAILED;
-	}
-
-	/**
-	 * Check if email is pending.
-	 *
-	 * @return bool
-	 */
-	public function is_pending(): bool {
-		return $this->status === self::STATUS_PENDING;
-	}
-
-	/**
-	 * Update email status and error message.
-	 *
-	 * @param string $status New status.
-	 * @param string $error_message Error message (optional).
-	 * @return bool
-	 */
-	private function update_status( string $status, string $error_message = '' ): bool {
-		$this->status = $status;
-		$this->error_message = $error_message;
-		return $this->save();
-	}
-
-	/**
-	 * Mark email as successful.
-	 *
-	 * @return bool
-	 */
-	public function mark_as_successful(): bool {
-		return $this->update_status( self::STATUS_SUCCESS );
-	}
-
-	/**
-	 * Mark email as failed.
-	 *
-	 * @param string $error_message Error message.
-	 * @return bool
-	 */
-	public function mark_as_failed( string $error_message = '' ): bool {
-		return $this->update_status( self::STATUS_FAILED, $error_message );
 	}
 }

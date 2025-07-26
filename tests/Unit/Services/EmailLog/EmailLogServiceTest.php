@@ -46,6 +46,7 @@ class EmailLogServiceTest extends DebugSuiteTestCase {
     public function tear_down(): void {
         global $wpdb;
         $table_name = $wpdb->prefix . 'debug_suite_email_logs';
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
         
         parent::tear_down();
@@ -86,13 +87,15 @@ class EmailLogServiceTest extends DebugSuiteTestCase {
     }
 
     /**
-     * Test validation.
+     * Test basic functionality.
      */
-    public function test_validation(): void {
-        $result = $this->service->get_email_log_entries( [ 'status' => 'invalid' ] );
+    public function test_basic_get_entries(): void {
+        $result = $this->service->get_email_log_entries( [ 'limit' => 50 ] );
 
-        $this->assert_service_result_failure( $result );
-        $this->assertEquals( 'invalid_status', $result->get_error_code() );
+        $this->assert_service_result_success( $result );
+        $this->assertArrayHasKey( 'entries', $result->get_data() );
+        $this->assertArrayHasKey( 'total_count', $result->get_data() );
+        $this->assertArrayHasKey( 'pagination', $result->get_data() );
     }
 
     /**
