@@ -143,12 +143,10 @@ class EmailLogService implements ServiceInterface, Hookable {
 			[
 				'entries'     => $formatted_entries,
 				'total_count' => $total_count,
-				'pagination'  => [
-					'current_page' => floor( $options['offset'] / $options['limit'] ) + 1,
-					'per_page'     => $options['limit'],
-					'total_pages'  => ceil( $total_count / $options['limit'] ),
-					'has_more'     => (int) ( $options['offset'] + $options['limit'] ) < $total_count,
-				],
+				'current_page' => floor( $options['offset'] / $options['limit'] ) + 1,
+				'per_page'     => $options['limit'],
+				'total_pages'  => ceil( $total_count / $options['limit'] ),
+				'has_more'     => (int) ( $options['offset'] + $options['limit'] ) < $total_count,
 			]
 		);
 	}
