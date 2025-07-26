@@ -9,6 +9,8 @@
 
 namespace DebugSuite\Models;
 
+use wpdb;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -91,9 +93,9 @@ abstract class BaseModel {
 	/**
 	 * Get WPDB instance.
 	 *
-	 * @return \wpdb
+	 * @return wpdb
 	 */
-	protected static function get_wpdb(): \wpdb {
+	protected static function get_wpdb(): wpdb {
 		global $wpdb;
 		return $wpdb;
 	}
@@ -110,7 +112,7 @@ abstract class BaseModel {
 		$primary_key = static::$primary_key;
 
 		$result = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$table_name} WHERE {$primary_key} = %s", $id ),
+			$wpdb->prepare( "SELECT * FROM $table_name WHERE $primary_key = %s", $id ), // phpcs:ignore
 			ARRAY_A
 		);
 
@@ -133,9 +135,9 @@ abstract class BaseModel {
 		$primary_key = static::$primary_key;
 
 		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%s' ) );
-		$query = "SELECT * FROM {$table_name} WHERE {$primary_key} IN ({$placeholders})";
+		$query = "SELECT * FROM $table_name WHERE $primary_key IN ($placeholders)";
 
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $ids ), ARRAY_A );
+		$results = $wpdb->get_results( $wpdb->prepare( $query, $ids ), ARRAY_A ); // phpcs:ignore
 
 		return array_map( [ static::class, 'from_array' ], $results );
 	}
@@ -156,8 +158,8 @@ abstract class BaseModel {
 		$limit = isset( $options['limit'] ) ? (int) $options['limit'] : 100;
 		$offset = isset( $options['offset'] ) ? (int) $options['offset'] : 0;
 
-		$query = "SELECT * FROM {$table_name} ORDER BY {$primary_key} DESC LIMIT %d OFFSET %d";
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $limit, $offset ), ARRAY_A );
+		$query = "SELECT * FROM $table_name ORDER BY $primary_key DESC LIMIT %d OFFSET %d";
+		$results = $wpdb->get_results( $wpdb->prepare( $query, $limit, $offset ), ARRAY_A ); // phpcs:ignore
 
 		return array_map( [ static::class, 'from_array' ], $results );
 	}
@@ -185,17 +187,17 @@ abstract class BaseModel {
 		$where_parts = [];
 		$values = [];
 		foreach ( $conditions as $column => $value ) {
-			$where_parts[] = "{$column} = %s";
+			$where_parts[] = "$column = %s";
 			$values[] = $value;
 		}
 
 		$where_clause = implode( ' AND ', $where_parts );
-		$query = "SELECT * FROM {$table_name} WHERE {$where_clause} ORDER BY {$primary_key} DESC LIMIT %d OFFSET %d";
+		$query = "SELECT * FROM $table_name WHERE $where_clause ORDER BY $primary_key DESC LIMIT %d OFFSET %d";
 
 		$values[] = $limit;
 		$values[] = $offset;
 
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $values ), ARRAY_A );
+		$results = $wpdb->get_results( $wpdb->prepare( $query, $values ), ARRAY_A ); // phpcs:ignore
 
 		return array_map( [ static::class, 'from_array' ], $results );
 	}
@@ -212,21 +214,21 @@ abstract class BaseModel {
 
 		if ( empty( $conditions ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" );
+			return (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table_name" ); // phpcs:ignore
 		}
 
 		// Build simple WHERE clause
 		$where_parts = [];
 		$values = [];
 		foreach ( $conditions as $column => $value ) {
-			$where_parts[] = "{$column} = %s";
+			$where_parts[] = "$column = %s";
 			$values[] = $value;
 		}
 
 		$where_clause = implode( ' AND ', $where_parts );
-		$query = "SELECT COUNT(*) FROM {$table_name} WHERE {$where_clause}";
+		$query = "SELECT COUNT(*) FROM $table_name WHERE $where_clause";
 
-		return (int) $wpdb->get_var( $wpdb->prepare( $query, $values ) );
+		return (int) $wpdb->get_var( $wpdb->prepare( $query, $values ) ); // phpcs:ignore
 	}
 
 	/**
@@ -249,18 +251,18 @@ abstract class BaseModel {
 		foreach ( $conditions as $column => $value ) {
 			if ( is_array( $value ) ) {
 				$placeholders = implode( ',', array_fill( 0, count( $value ), '%s' ) );
-				$where_parts[] = "{$column} IN ({$placeholders})";
+				$where_parts[] = "$column IN ($placeholders)";
 				$values = array_merge( $values, $value );
 			} else {
-				$where_parts[] = "{$column} = %s";
+				$where_parts[] = "$column = %s";
 				$values[] = $value;
 			}
 		}
 
 		$where_clause = implode( ' AND ', $where_parts );
-		$query = "DELETE FROM {$table_name} WHERE {$where_clause}";
+		$query = "DELETE FROM $table_name WHERE $where_clause";
 
-		return (int) $wpdb->query( $wpdb->prepare( $query, $values ) );
+		return (int) $wpdb->query( $wpdb->prepare( $query, $values ) ); // phpcs:ignore
 	}
 
 	/**
@@ -272,12 +274,11 @@ abstract class BaseModel {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return false !== $wpdb->query( "TRUNCATE TABLE {$table_name}" );
+		return false !== $wpdb->query( "TRUNCATE TABLE $table_name" ); // phpcs:ignore
 	}
 
 	/**
-	 * Create a new model instance from array.
+	 * Create a new model instance from an array.
 	 *
 	 * @param array $attributes Attributes array.
 	 * @return static
