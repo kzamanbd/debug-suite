@@ -71,33 +71,34 @@ class EmailLog extends BaseModel {
 	/**
 	 * Build WHERE clause and values for filtering.
 	 *
-	 * @param array $options Filter options.
+	 * @param array $conditions Filter options.
+	 *
 	 * @return array {
 	 *     WHERE clause data.
 	 *     @type string $clause WHERE clause string.
 	 *     @type array  $values Prepared statement values.
 	 * }
 	 */
-	protected static function build_where_clause( array $options ): array {
+	protected static function build_where_clause( array $conditions ): array {
 		$wpdb = static::get_wpdb();
 		$where_conditions = [ '1=1' ];
 		$where_values = [];
 
 		// Filter by receiver
-		if ( ! empty( $options['receiver'] ) ) {
+		if ( ! empty( $conditions['receiver'] ) ) {
 			$where_conditions[] = 'to_email LIKE %s';
-			$where_values[] = '%' . $wpdb->esc_like( $options['receiver'] ) . '%';
+			$where_values[] = '%' . $wpdb->esc_like( $conditions['receiver'] ) . '%';
 		}
 
 		// Filter by status
-		if ( $options['status'] !== 'all' ) {
+		if ( $conditions['status'] !== 'all' ) {
 			$where_conditions[] = 'status = %s';
-			$where_values[] = $options['status'];
+			$where_values[]     = $conditions['status'];
 		}
 
 		// Search functionality
-		if ( ! empty( $options['search'] ) ) {
-			$search_term = '%' . $wpdb->esc_like( $options['search'] ) . '%';
+		if ( ! empty( $conditions['search'] ) ) {
+			$search_term = '%' . $wpdb->esc_like( $conditions['search'] ) . '%';
 			$where_conditions[] = '(to_email LIKE %s OR subject LIKE %s OR message LIKE %s)';
 			$where_values[] = $search_term;
 			$where_values[] = $search_term;
@@ -105,14 +106,14 @@ class EmailLog extends BaseModel {
 		}
 
 		// Date range filtering
-		if ( ! empty( $options['date_from'] ) ) {
+		if ( ! empty( $conditions['date_from'] ) ) {
 			$where_conditions[] = 'sent_date >= %s';
-			$where_values[] = $options['date_from'] . ' 00:00:00';
+			$where_values[]     = $conditions['date_from'] . ' 00:00:00';
 		}
 
-		if ( ! empty( $options['date_to'] ) ) {
+		if ( ! empty( $conditions['date_to'] ) ) {
 			$where_conditions[] = 'sent_date <= %s';
-			$where_values[] = $options['date_to'] . ' 23:59:59';
+			$where_values[]     = $conditions['date_to'] . ' 23:59:59';
 		}
 
 		return [
