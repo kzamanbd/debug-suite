@@ -105,16 +105,14 @@ class FrontendRouterService implements ServiceInterface, Hookable {
 	 * Resolve template path with in-memory cache.
 	 */
 	private function resolve_template_path( string $template ): string|false {
-		static $template_cache = [];
-
-		if ( isset( $template_cache[ $template ] ) ) {
-			return $template_cache[ $template ];
+		if ( isset( $this->template_cache[ $template ] ) ) {
+			return $this->template_cache[ $template ];
 		}
 
 		$path = DEBUG_SUITE_PLUGIN_DIR . "templates/{$template}.php";
-		$template_cache[ $template ] = file_exists( $path ) ? $path : false;
+		$this->template_cache[ $template ] = file_exists( $path ) ? $path : false;
 
-		return $template_cache[ $template ];
+		return $this->template_cache[ $template ];
 	}
 
 	/**
