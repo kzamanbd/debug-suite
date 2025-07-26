@@ -14,7 +14,7 @@ include DEBUG_SUITE_PLUGIN_DIR . 'templates/header-debug-suite.php';
 <div class="flex items-center justify-center min-h-screen text-center bg-gray-50">
 	<div class="max-w-lg p-12 mx-5 bg-white rounded-2xl shadow-xl">
 		<div class="text-center mb-8">
-			<img src="<?php echo esc_url( DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.svg' ); ?>" 
+			<img src="<?php echo esc_url( DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png' ); ?>" 
 				 alt="Debug Suite" 
 				 class="h-12 mx-auto mb-5">
 		</div>
