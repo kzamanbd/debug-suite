@@ -33,7 +33,7 @@ class Install {
 	 *
 	 * @return void
 	 */
-	public static function install(): void {
+	public static function do_install(): void {
 		self::create_tables();
 		self::update_db_version();
 	}
@@ -59,7 +59,7 @@ class Install {
 		$table_name = $wpdb->prefix . 'debug_suite_email_logs';
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
 			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			to_email varchar(200) NOT NULL,
 			subject text NOT NULL,
@@ -75,14 +75,14 @@ class Install {
 			KEY idx_status (status),
 			KEY idx_sent_date (sent_date),
 			KEY idx_to_email (to_email)
-		) {$charset_collate};";
+		) $charset_collate;";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		$result = dbDelta( $sql );
+		dbDelta( $sql );
 
 		// Check if table was created successfully
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) === $table_name;
+		return $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) === $table_name;
 	}
 
 	/**
@@ -104,7 +104,7 @@ class Install {
 	}
 
 	/**
-	 * Check if database needs upgrade.
+	 * Check if the database needs upgrade.
 	 *
 	 * @return bool
 	 */
@@ -113,7 +113,7 @@ class Install {
 	}
 
 	/**
-	 * Drop all plugin tables (used during uninstall).
+	 * Drop all plugin tables (used during uninstallation).
 	 *
 	 * @return void
 	 */
@@ -127,147 +127,10 @@ class Install {
 
 		foreach ( $tables as $table ) {
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+			$wpdb->query( "DROP TABLE IF EXISTS $table" );
 		}
 
-		// Remove database version option
+		// Remove a database version option
 		delete_option( 'debug_suite_db_version' );
-	}
-
-	/**
-	 * Check if email logs table exists.
-	 *
-	 * @return bool
-	 */
-	public static function email_logs_table_exists(): bool {
-		global $wpdb;
-		$table_name = $wpdb->prefix . 'debug_suite_email_logs';
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) === $table_name;
-	}
-
-	/**
-	 * Get table schema information.
-	 *
-	 * @param string $table_name Table name without prefix.
-	 * @return array|null
-	 */
-	public static function get_table_schema( string $table_name ): ?array {
-		global $wpdb;
-
-		$full_table_name = $wpdb->prefix . 'debug_suite_' . $table_name;
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$full_table_name}'" ) !== $full_table_name ) {
-			return null;
-		}
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$columns = $wpdb->get_results( "DESCRIBE {$full_table_name}", ARRAY_A );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$indexes = $wpdb->get_results( "SHOW INDEX FROM {$full_table_name}", ARRAY_A );
-
-		return [
-			'table_name' => $full_table_name,
-			'columns'    => $columns,
-			'indexes'    => $indexes,
-		];
-	}
-
-	/**
-	 * Repair tables if corrupted.
-	 *
-	 * @return array Results of repair operations.
-	 */
-	public static function repair_tables(): array {
-		global $wpdb;
-
-		$tables = [
-			$wpdb->prefix . 'debug_suite_email_logs',
-		];
-
-		$results = [];
-
-		foreach ( $tables as $table ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table ) {
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$result = $wpdb->get_row( "REPAIR TABLE {$table}", ARRAY_A );
-				$results[ $table ] = $result;
-			}
-		}
-
-		return $results;
-	}
-
-	/**
-	 * Optimize tables for better performance.
-	 *
-	 * @return array Results of optimization operations.
-	 */
-	public static function optimize_tables(): array {
-		global $wpdb;
-
-		$tables = [
-			$wpdb->prefix . 'debug_suite_email_logs',
-		];
-
-		$results = [];
-
-		foreach ( $tables as $table ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table ) {
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$result = $wpdb->get_row( "OPTIMIZE TABLE {$table}", ARRAY_A );
-				$results[ $table ] = $result;
-			}
-		}
-
-		return $results;
-	}
-
-	/**
-	 * Get database size information.
-	 *
-	 * @return array Database size information.
-	 */
-	public static function get_database_info(): array {
-		global $wpdb;
-
-		$tables = [
-			$wpdb->prefix . 'debug_suite_email_logs',
-		];
-
-		$total_size = 0;
-		$table_info = [];
-
-		foreach ( $tables as $table ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) === $table ) {
-				$size_result = $wpdb->get_row(
-					$wpdb->prepare(
-						"SELECT 
-							table_name as 'table_name',
-							round(((data_length + index_length) / 1024 / 1024), 2) as 'size_mb',
-							table_rows as 'rows'
-						FROM information_schema.TABLES 
-						WHERE table_schema = %s AND table_name = %s",
-						DB_NAME,
-						$table
-					),
-					ARRAY_A
-				);
-
-				if ( $size_result ) {
-					$table_info[ $table ] = $size_result;
-					$total_size += (float) $size_result['size_mb'];
-				}
-			}
-		}
-
-		return [
-			'total_size_mb' => round( $total_size, 2 ),
-			'tables'        => $table_info,
-		];
 	}
 }

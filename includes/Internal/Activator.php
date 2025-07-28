@@ -36,6 +36,6 @@ class Activator {
 		set_transient( 'debug_suite_activation_redirect', true, 30 );
 
 		// Install database tables
-		Install::install();
+		Install::do_install();
 	}
 }
