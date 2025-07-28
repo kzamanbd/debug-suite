@@ -66,11 +66,10 @@ const FileLogs = () => {
     // Handle view mode change
     const handleViewModeChange = (mode: ViewMode) => {
         setViewMode(mode);
-        if (mode !== 'parsed') {
-            // If switching to raw view, fetch the raw content for the selected file
-            if (!rawContent) {
-                void refetchRawContent();
-            }
+        if (mode === 'parsed') {
+            refetchLogs();
+        } else {
+            void refetchRawContent();
         }
     };
 
