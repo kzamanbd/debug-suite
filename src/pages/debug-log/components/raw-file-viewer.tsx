@@ -34,7 +34,7 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
                 <div className="text-center">
                     <p className="text-sm text-gray-500">{__('No file content available.', 'debug-suite')}</p>
                     <Button onClick={onRefresh} className="mt-4">
-                        <RefreshCwIcon className="mr-2 h-4 w-4" />
+                        <RefreshCwIcon className="mr-2 size-4" />
                         {__('Retry', 'debug-suite')}
                     </Button>
                 </div>

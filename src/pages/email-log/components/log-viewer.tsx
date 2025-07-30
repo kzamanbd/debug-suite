@@ -172,19 +172,19 @@ const EmailLogViewer = ({
                                             onClick={() => onItemAction('view', entry)}
                                             className="hover:text-primary-600 p-1 text-gray-400"
                                             title={__('View', 'debug-suite')}>
-                                            <Eye className="h-4 w-4" />
+                                            <Eye className="size-4" />
                                         </button>
                                         <button
                                             onClick={() => onItemAction('resend', entry)}
                                             className="p-1 text-gray-400 hover:text-blue-600"
                                             title={__('Resend', 'debug-suite')}>
-                                            <RotateCcw className="h-4 w-4" />
+                                            <RotateCcw className="size-4" />
                                         </button>
                                         <button
                                             onClick={() => onItemAction('delete', entry)}
                                             className="p-1 text-gray-400 hover:text-red-600"
                                             title={__('Delete', 'debug-suite')}>
-                                            <Trash2 className="h-4 w-4" />
+                                            <Trash2 className="size-4" />
                                         </button>
                                     </div>
                                 </td>

@@ -121,7 +121,7 @@ const LogControls = ({
                                 ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
                                 : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
                         )}>
-                        <EyeIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
+                        <EyeIcon className="mr-1 size-4 sm:mr-1.5" />
                         <span className="hidden sm:inline">{__('Parsed', 'debug-suite')}</span>
                     </button>
                     <button
@@ -133,7 +133,7 @@ const LogControls = ({
                                 ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
                                 : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
                         )}>
-                        <FileTextIcon className="mr-1 h-3.5 w-3.5 sm:mr-1.5" />
+                        <FileTextIcon className="mr-1 size-4 sm:mr-1.5" />
                         <span className="hidden sm:inline">{__('Raw File', 'debug-suite')}</span>
                     </button>
                 </nav>

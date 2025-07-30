@@ -482,13 +482,13 @@ const Onboarding = () => {
                                             </>
                                         ) : currentStep === steps.length ? (
                                             <>
-                                                <CheckCircle2 className="h-4 w-4" />
+                                                <CheckCircle2 className="size-4" />
                                                 <span>{__('Finish Setup', 'debug-suite')}</span>
                                             </>
                                         ) : (
                                             <>
                                                 <span>{__('Next', 'debug-suite')}</span>
-                                                <ArrowRight className="h-4 w-4" />
+                                                <ArrowRight className="size-4" />
                                             </>
                                         )}
                                     </Button>
