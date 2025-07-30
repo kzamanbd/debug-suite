@@ -172,7 +172,7 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 		$this->assertCount( 2, $data['entries'] );
 		$this->assertEquals( 2, $data['total_count'] );
 		$this->assertEquals( 1, $data['pagination']['current_page'] );
-		$this->assertEquals( 100, $data['pagination']['per_page'] );
+		$this->assertEquals( 20, $data['pagination']['per_page'] );
 		$this->assertFalse( $data['pagination']['has_more'] );
 	}
 

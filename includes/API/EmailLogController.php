@@ -290,6 +290,21 @@ class EmailLogController extends RestController {
 	public function resend_email( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$email_id = (int) $request->get_param( 'id' );
 		$result = $this->service->resend_email( $email_id );
+
+		if ( $result->is_failure() ) {
+			$status_code = match ( $result->get_error_code() ) {
+				'email_not_found'   => 404,
+				'send_failed'       => 500,
+				default             => 500
+			};
+
+			return new WP_Error(
+				$result->get_error_code(),
+				$result->get_error_message(),
+				[ 'status' => $status_code ]
+			);
+		}
+
 		return rest_ensure_response( $result->get_data() );
 	}
 
