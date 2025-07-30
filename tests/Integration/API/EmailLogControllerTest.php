@@ -172,11 +172,9 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 		$this->assertCount( 2, $data['entries'] );
 		$this->assertEquals( 2, $data['total_count'] );
 		$this->assertEquals( 1, $data['pagination']['current_page'] );
-		$this->assertEquals( 20, $data['pagination']['per_page'] );
+		$this->assertEquals( 20, $data['pagination']['per_page'] ); // Fixed: API default is 20, not 100
 		$this->assertFalse( $data['pagination']['has_more'] );
 	}
-
-
 
 	/**
 	 * Test get email logs with pagination.
