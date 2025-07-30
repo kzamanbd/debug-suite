@@ -226,8 +226,7 @@ const Overview = () => {
         <div className="space-y-6">
             {/* Header */}
             <Fill name="debug-suite-layout-header-right">
-                <Button onClick={fetchDashboardData} className="flex items-center gap-2" disabled={refreshing}>
-                    <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                <Button onClick={fetchDashboardData} icon={<RefreshCw className="size-4" />} loading={refreshing}>
                     {__('Refresh', 'debug-suite')}
                 </Button>
             </Fill>
@@ -363,7 +362,7 @@ const Overview = () => {
                             </h3>
                         </div>
                         <Button as={Link} to="/debug-log" size="sm" className="flex items-center gap-1">
-                            <ExternalLink className="h-3 w-3" />
+                            <ExternalLink className="size-4" />
                             {__('View All', 'debug-suite')}
                         </Button>
                     </div>
@@ -410,7 +409,7 @@ const Overview = () => {
                         </h3>
                     </div>
                     <Button className="flex items-center gap-1 text-sm">
-                        <ExternalLink className="h-3 w-3" />
+                        <ExternalLink className="size-4" />
                         {__('View All', 'debug-suite')}
                     </Button>
                 </div>

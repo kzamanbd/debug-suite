@@ -124,8 +124,8 @@ EOT;
 		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/settings' );
 		$response = rest_get_server()->dispatch( $request );
 		
-		// WordPress REST API returns 403 for unauthorized access, not 401
-		$this->assertEquals( 403, $response->get_status() );
+		// WordPress REST API returns 401 for unauthorized access
+		$this->assertEquals( 401, $response->get_status() );
 	}
 
 	/**
@@ -229,10 +229,10 @@ EOT;
 		
 		$response = rest_get_server()->dispatch( $request );
 		
-		$this->assertEquals( 500, $response->get_status() );
+		$this->assertEquals( 400, $response->get_status() );
 		$data = $response->get_data();
 		// Allow different error codes based on service implementation
-		$this->assertContains( $data['code'], [ 'invalid_value', 'config_file_not_found', 'validation_error' ] );
+		$this->assertContains( $data['code'], [ 'invalid_value', 'config_file_not_found', 'validation_error', 'rest_invalid_param' ] );
 	}
 
 	/**

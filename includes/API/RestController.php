@@ -37,6 +37,10 @@ class RestController extends WP_REST_Controller implements Hookable {
 	}
 
 	public function permissions_check( $request ): bool|WP_Error {
+		if ( ! is_user_logged_in() ) {
+			return new WP_Error( 'rest_not_logged_in', __( 'You are not currently logged in.', 'debug-suite' ), [ 'status' => 401 ] );
+		}
+
 		return current_user_can( 'manage_options' )
 			? true
 			: new WP_Error( 'rest_forbidden', __( 'You do not have permission to access this endpoint.', 'debug-suite' ), [ 'status' => 403 ] );

@@ -484,6 +484,8 @@ private array $file_cache = [];
 
 ### PHPDoc Standards
 
+**Version Documentation**: Always use `@since DEBUG_SUITE_SINCE` constant for version tags instead of hardcoded version numbers.
+
 ```php
 /**
  * Get log entries with advanced filtering and pagination.
@@ -498,7 +500,7 @@ private array $file_cache = [];
  * }
  * @return ServiceResponse Success with log entries or failure with error.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 public function get_log_entries(array $options = []): ServiceResponse {
     // Implementation
@@ -514,7 +516,7 @@ public function get_log_entries(array $options = []): ServiceResponse {
  * @param initialFilters - Initial filter state
  * @returns Object containing logs, filters, and filter management functions
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 export function useLogEntries(initialFilters: LogFilters = {}) {
     // Implementation
@@ -621,9 +623,262 @@ export function useLogEntries(initialFilters: LogFilters = {}) {
 }
 ```
 
+### Established Architecture Patterns SOPs
+
+#### SOP 6: Service Layer Architecture
+
+**Mandatory Pattern**: All business logic implemented using Service Layer Pattern with ServiceResponse objects.
+
+```php
+// Service Implementation Standard
+class ExampleService implements ServiceInterface {
+    public function process_data(array $input): ServiceResponse {
+        // Validate input
+        if (empty($input['required_field'])) {
+            return ServiceResponse::failure(
+                __('Required field missing', 'debug-suite'),
+                'validation_error',
+                ['field' => 'required_field']
+            );
+        }
+        
+        // Process business logic
+        $result = $this->do_processing($input);
+        
+        return ServiceResponse::success([
+            'data' => $result,
+            'timestamp' => current_time('mysql')
+        ]);
+    }
+}
+```
+
+**Established Services:**
+
+- `DebugLog/LogsService` - Debug log operations with service delegation
+- `DebugLog/WPLogReaderService` - Advanced log parsing with stack traces
+- `DebugLog/LogDiscoveryService` - Log file discovery across multiple paths
+- `EmailLog/EmailLogService` - Email logging with wp_mail hooks integration
+- `SettingsService` - wp-config.php management with validation
+- `OverviewService` - Dashboard data aggregation from multiple services
+
+#### SOP 7: Dependency Injection Container Registration
+
+**Established Registration Pattern:**
+
+```php
+// AppServiceProvider - Business Services
+$container->add([
+    ServiceName::class => $container->object(ServiceName::class),     // Simple singletons
+    ComplexService::class => $container->autowire(ComplexService::class), // With dependencies
+]);
+
+// RestControllerProvider - REST Controllers 
+$container->add([
+    ControllerName::class => $container->autowire(ControllerName::class), // Always autowire
+]);
+```
+
+**Service Provider Organization:**
+
+- **AppServiceProvider**: Business services, WordPress integration (Admin, Assets, HookManager)
+- **RestControllerProvider**: REST API controllers with dependency injection
+
+#### SOP 8: REST API Controller Implementation
+
+**Established Controller Pattern:**
+
+```php
+class ExampleController extends RestController {
+    private ExampleService $service;
+    protected $rest_base = 'example';
+    
+    public function __construct(ExampleService $service) {
+        $this->service = $service;
+    }
+    
+    public function handle_request(WP_REST_Request $request): WP_REST_Response|WP_Error {
+        $input = [
+            'field' => $request->get_param('field'),
+        ];
+        
+        $result = $this->service->process_data($input);
+        
+        if ($result->is_failure()) {
+            $status_code = match($result->get_error_code()) {
+                'validation_error' => 400,
+                'not_found' => 404,
+                default => 500
+            };
+            
+            return new WP_Error(
+                $result->get_error_code(),
+                $result->get_error_message(),
+                ['status' => $status_code]
+            );
+        }
+        
+        return rest_ensure_response($result->to_array());
+    }
+}
+```
+
+**Current Controllers:**
+
+- `LogsController` - Debug log endpoints (`/debug-suite/v1/logs/*`)
+- `EmailLogController` - Email log management (`/debug-suite/v1/email-logs/*`)
+- `SettingsController` - Configuration endpoints (`/debug-suite/v1/settings`)
+- `OverviewController` - Dashboard data (`/debug-suite/v1/overview`)
+
+#### SOP 9: WordPress Hooks Integration with Hookable Interface
+
+**Automatic Hook Registration Pattern:**
+
+```php
+class EmailLogService implements ServiceInterface, Hookable {
+    public function register_hooks(): void {
+        add_action('wp_mail', [$this, 'capture_email_data']);
+        add_action('wp_mail_succeeded', [$this, 'log_email_success']);
+        add_action('wp_mail_failed', [$this, 'log_email_failure']);
+    }
+}
+```
+
+**ServiceManager handles automatic registration** - no manual hook registration needed.
+
+#### SOP 10: Model-Based Database Operations
+
+**ActiveRecord Pattern Implementation:**
+
+```php
+class EmailLog extends BaseModel {
+    protected static string $table = 'email_logs';
+    protected static string $primary_key = 'id';
+    protected static array $fillable = ['to_email', 'subject', 'message', 'status'];
+    
+    public static function get_filtered(array $filters): array {
+        // Database query implementation
+    }
+    
+    public static function get_statistics(): array {
+        // Statistics calculation
+    }
+}
+```
+
+**Current Models:**
+
+- `EmailLog` - Email logging with filtering, bulk operations, statistics
+- `BaseModel` - Abstract base with common CRUD operations
+
+### Frontend Component Architecture SOPs
+
+#### SOP 11: Component Consolidation Standard
+
+**Mandatory Pattern**: 2-3 substantial components per feature (100-300 lines each).
+
+```typescript
+// Feature Structure
+src/pages/[feature-name]/
+├── index.tsx                 // Main page component
+├── types.ts                  // TypeScript interfaces  
+├── hooks.ts                  // Custom hooks
+├── constants.ts              // Feature constants
+└── components/
+    ├── index.ts              // Barrel exports
+    ├── feature-viewer.tsx    // Display component (tables, details)
+    ├── feature-controls.tsx  // Controls component (filters, actions)
+    └── feature-skeleton.tsx  // Loading states
+```
+
+**Current Feature Implementations:**
+
+- `debug-log/` - Log viewer with infinite scroll and filtering
+- `email-log/` - Email log management with pagination and bulk actions
+- `overview/` - Dashboard with multiple data sources and statistics
+
+#### SOP 12: Reusable Component Standards
+
+**Base Component Library (`src/components/base/`):**
+
+```typescript
+// SearchableSelect - Always use for dropdowns
+import SearchableSelect from '@/components/base/select';
+
+<SearchableSelect
+    options={options}
+    value={selectedOption}
+    onChange={handleChange}
+    placeholder="Select option..."
+/>
+
+// Toast System - User feedback
+import { useToast } from '@/components/base/toast';
+
+const { toast } = useToast();
+toast.success('Operation successful');
+toast.error('Operation failed');
+
+// Modal System - Consistent dialogs
+import { Modal } from '@/components/base';
+
+<Modal isOpen={isOpen} onClose={onClose}>
+    <Modal.Content>Content here</Modal.Content>
+</Modal>
+```
+
+**Established Base Components:**
+
+- `SearchableSelect` - React-select wrapper with accessibility
+- `Toast` - Success/error notifications with animations
+- `Modal` - Consistent dialog system
+- `Button` - Variant-based button component
+- `Pagination` - WordPress-style pagination
+- `DateTimeHtml` - Consistent date formatting
+
+#### SOP 13: Data Management Hook Pattern
+
+**Custom Hook Implementation Standard:**
+
+```typescript
+// Example: useEmailLogEntries
+export function useEmailLogEntries() {
+    const [entries, setEntries] = useState<EmailLogEntry[]>([]);
+    const [filters, setFilters] = useState<EmailLogFilters>({});
+    const [selectedItems, setSelectedItems] = useState<number[]>([]);
+    const [loading, setLoading] = useState(false);
+    
+    // Client-side filtering with debounce
+    const debouncedSearch = useDebounce(filters.search, 300);
+    
+    const filteredEntries = useMemo(() => {
+        return entries.filter(/* filtering logic */);
+    }, [entries, filters, debouncedSearch]);
+    
+    return {
+        entries: filteredEntries,
+        filters,
+        updateFilters,
+        selectedItems,
+        onSelectAll,
+        onSelectItem,
+        loading,
+        refetch,
+        paginationInfo
+    };
+}
+```
+
+**Current Hook Implementations:**
+
+- `useEmailLogEntries` - Email log data with filtering and pagination
+- `useEmailLogActions` - Bulk actions and individual operations
+- `useLogEntries` - Debug log data with infinite scroll
+- `useDebounce` - 300ms debounced search implementation
+
 ### URL Parameter Handling SOPs
 
-#### SOP 6: WordPress URL Standards
+#### SOP 14: WordPress URL Standards
 
 **Use `@wordpress/url` `addQueryArgs` for all API endpoint construction:**
 
@@ -632,7 +887,7 @@ export function useLogEntries(initialFilters: LogFilters = {}) {
 - **WordPress Compliance**: Follows WordPress coding standards
 - **Security**: Prevents URL injection vulnerabilities
 
-#### SOP 7: Performance Optimization
+#### SOP 15: Performance Optimization
 
 **Use precise dependency arrays for memoization:**
 
@@ -642,7 +897,7 @@ export function useLogEntries(initialFilters: LogFilters = {}) {
 
 ### Testing SOPs
 
-#### SOP 8: Test Organization
+#### SOP 16: Test Organization
 
 **Separate unit and integration tests:**
 
@@ -651,7 +906,7 @@ export function useLogEntries(initialFilters: LogFilters = {}) {
 - **API Tests**: Test REST endpoints with proper authentication and permissions
 - **Service Tests**: Test business logic with mocked dependencies
 
-#### SOP 9: Test Helper Usage
+#### SOP 17: Test Helper Usage
 
 **Use custom test helpers for consistency:**
 
@@ -661,9 +916,39 @@ $this->assert_service_result_success($result);
 $this->assert_service_result_failure($result);
 $this->assert_service_result_error_code($result, 'expected_code');
 
-// Use factory methods
-$mockService = $this->mock_factory->create_file_logs_service();
-$testFile = $this->create_test_file('content', '.log');
+// Use factory methods for test data
+$this->create_test_file('content', '.log');
+$this->create_admin_user();
+```
+
+**Current Test Infrastructure:**
+
+- `TestCase` - Base unit test class with service assertion helpers
+- `DebugSuiteTestCase` - Integration test base with WordPress setup
+- `MockFactory` - Test fixture creation utilities
+- Custom assertion methods for ServiceResponse validation
+
+### Container Helper Function SOPs
+
+#### SOP 18: Service Resolution Standards
+
+**Use established helper functions:**
+
+```php
+// Service Resolution
+$service = debug_suite()->resolve(ServiceName::class);
+
+// Container Access  
+$container = debug_suite()->container();
+
+// Service Manager Access
+$service_manager = debug_suite_service_manager();
+
+// Main Plugin Instance
+$plugin = debug_suite();
+
+// Date Formatting Utility
+$formatted_date = debug_suite_date($timestamp);
 ```
 
 These SOPs ensure consistent, performant, and WordPress-compliant implementation across all Debug Suite components.
@@ -672,6 +957,7 @@ These SOPs ensure consistent, performant, and WordPress-compliant implementation
 
 - Use comprehensive DocBlocks for all PHP classes and methods
 - Include JSDoc comments for TypeScript functions and components
+- **Always use `@since DEBUG_SUITE_SINCE` constant instead of hardcoded version numbers**
 - Maintain README files for major components and testing
 - Document API endpoints and their usage patterns
 - Follow WordPress documentation standards for hooks and filters

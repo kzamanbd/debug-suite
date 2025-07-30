@@ -1,5 +1,6 @@
 import DebugConfig from '@/pages/debug-config';
 import DebugLog from '@/pages/debug-log';
+import EmailLog from '@/pages/email-log';
 import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
 import Onboarding from '@/pages/onboarding';
@@ -45,6 +46,13 @@ const routes: DebugSuiteRoute[] = [
         description: __('View and manage your debug logs.', 'debug-suite'),
         path: '/debug-log',
         element: <DebugLog />
+    },
+    {
+        id: 'email-log',
+        title: __('Email Log', 'debug-suite'),
+        description: __('View and manage your email logs.', 'debug-suite'),
+        path: '/email-log',
+        element: <EmailLog />
     },
     {
         id: 'file-logs-manage',

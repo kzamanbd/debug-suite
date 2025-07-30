@@ -10,6 +10,7 @@
 
 namespace DebugSuite\Providers;
 
+use DebugSuite\API\EmailLogController;
 use DebugSuite\API\LogsController;
 use DebugSuite\API\OverviewController;
 use DebugSuite\API\SettingsController;
@@ -36,6 +37,7 @@ class RestControllerProvider extends AbstractServiceProvider {
 		LogsController::class,
 		SettingsController::class,
 		OverviewController::class,
+		EmailLogController::class,
 	];
 
 	public function register( Container $container ): void {
@@ -45,6 +47,7 @@ class RestControllerProvider extends AbstractServiceProvider {
 				LogsController::class        => $container->autowire( LogsController::class ),
 				SettingsController::class    => $container->autowire( SettingsController::class ),
 				OverviewController::class    => $container->autowire( OverviewController::class ),
+				EmailLogController::class    => $container->autowire( EmailLogController::class ),
 			]
 		);
 	}

@@ -93,8 +93,8 @@ class OverviewControllerTest extends DebugSuiteTestCase {
 		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/overview/stats' );
 		$response = rest_get_server()->dispatch( $request );
 		
-		// WordPress REST API returns 403 for unauthorized access
-		$this->assertEquals( 403, $response->get_status() );
+		// WordPress REST API returns 401 for unauthorized access
+		$this->assertEquals( 401, $response->get_status() );
 	}
 
 	/**

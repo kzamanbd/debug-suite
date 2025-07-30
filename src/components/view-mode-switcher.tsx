@@ -29,14 +29,14 @@ const ViewModeSwitcher = () => {
     };
 
     return (
-        <Button loading={isLoading} onClick={toggleFullScreen} className="p-2">
+        <Button loading={isLoading} onClick={toggleFullScreen} className="p-2.5">
             {isMaximize ? (
                 <div title={__('Minimize', 'debug-suite')}>
-                    <Minimize className="size-5" />
+                    <Minimize className="size-4" />
                 </div>
             ) : (
                 <div title={__('Maximize', 'debug-suite')}>
-                    <Maximize className="size-5" />
+                    <Maximize className="size-4" />
                 </div>
             )}
         </Button>

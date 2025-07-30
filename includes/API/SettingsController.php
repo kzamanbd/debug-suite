@@ -125,6 +125,11 @@ class SettingsController extends RestController {
 
 		foreach ( $values as $key => $value ) {
 			if ( isset( $params[ $key ] ) ) {
+				// Validate boolean values - reject non-boolean strings
+				if ( is_string( $params[ $key ] ) && ! in_array( strtolower( $params[ $key ] ), [ 'true', 'false', '1', '0' ], true ) ) {
+					// translators: %s is the setting name, e.g. 'debug'
+					return new WP_Error( 'invalid_value', sprintf( __( 'Invalid value for %s. Expected boolean.', 'debug-suite' ), $key ), [ 'status' => 500 ] );
+				}
 				$settings[ $value ] = $params[ $key ] ? 'true' : 'false';
 			}
 		}
