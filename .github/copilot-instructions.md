@@ -52,6 +52,7 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
     - **Use snake_case for all variable names** (WordPress standard)
     - **Use PascalCase for class names only** (WordPress standard)
     - Use full DocBlocks for all classes, methods, and properties
+    - **Version Documentation**: Always use `@since DEBUG_SUITE_SINCE` constant for version tags instead of hardcoded version numbers
     - Use PHP_CodeSniffer rules defined in `phpcs.xml`
 
 5. **Autoloading**:
@@ -941,40 +942,344 @@ const options = [
 - Keep messages concise and actionable
 - Use consistent duration (2000ms default, 3000ms for important messages)
 
+## Development Standard Operating Procedures (SOPs)
+
+### SOP 1: Service Layer Architecture Pattern
+
+**Established Pattern**: All business logic must be implemented using the Service Layer Pattern with ServiceResponse objects.
+
+#### Service Implementation Standards
+
+- **Service Location**: All services in `includes/Services/` namespace
+- **Service Interface**: Implement `ServiceInterface` marker interface
+- **Return Pattern**: Always return `ServiceResponse::success($data)` or `ServiceResponse::failure($message, $code, $context)`
+- **Error Handling**: Never throw exceptions to controllers, always return ServiceResponse
+- **Validation**: Perform all input validation in service methods
+- **Dependencies**: Accept dependencies through constructor (constructor injection)
+
+#### Current Service Classes
+
+- **Core Debug Services**: `DebugLog/LogsService`, `DebugLog/WPLogReaderService`, `DebugLog/LogDiscoveryService`
+- **Email Logging**: `EmailLog/EmailLogService` with wp_mail hooks integration
+- **Configuration**: `SettingsService` for wp-config.php management
+- **Dashboard**: `OverviewService` with service aggregation pattern
+
+### SOP 2: Dependency Injection Container System
+
+**Container Registration Pattern**: Use established container definition methods with service providers.
+
+#### Service Registration Standards
+
+```php
+// Business Services (AppServiceProvider)
+$container->add([
+    ServiceName::class => $container->object(ServiceName::class),     // For simple singletons
+    ComplexService::class => $container->autowire(ComplexService::class), // For dependency injection
+]);
+
+// REST Controllers (RestControllerProvider)
+$container->add([
+    ControllerName::class => $container->autowire(ControllerName::class), // Always autowire controllers
+]);
+```
+
+#### Service Provider Organization
+
+- **AppServiceProvider**: Business logic services, WordPress integration (Admin, Assets, HookManager)
+- **RestControllerProvider**: REST API controllers with dependency injection
+- **Separation**: Keep business services and controllers in separate providers
+
+### SOP 3: REST API Controller Pattern
+
+**Controller Implementation Standards**: Controllers handle only HTTP requests/responses, delegate business logic to services.
+
+#### Controller Structure
+
+```php
+class ExampleController extends RestController {
+    private ExampleService $service;
+    protected $rest_base = 'example';
+
+    public function __construct(ExampleService $service) {
+        $this->service = $service;
+    }
+
+    public function register_routes(): void {
+        // Route registration with validation
+    }
+
+    public function handle_request(WP_REST_Request $request): WP_REST_Response|WP_Error {
+        $result = $this->service->process_data($input);
+
+        // Transform ServiceResponse to HTTP response
+        if ($result->is_failure()) {
+            return new WP_Error($result->get_error_code(), $result->get_error_message());
+        }
+
+        return rest_ensure_response($result->to_array());
+    }
+}
+```
+
+#### Current Controller Classes
+
+- **LogsController**: Debug log operations (`/debug-suite/v1/logs/*`)
+- **EmailLogController**: Email log management (`/debug-suite/v1/email-logs/*`)
+- **SettingsController**: WordPress configuration (`/debug-suite/v1/settings`)
+- **OverviewController**: Dashboard data aggregation (`/debug-suite/v1/overview`)
+
+### SOP 4: WordPress Hooks Integration Pattern
+
+**Hookable Interface Pattern**: Services implementing `Hookable` get automatic hook registration.
+
+#### Hook Registration Standards
+
+```php
+class EmailLogService implements ServiceInterface, Hookable {
+    public function register_hooks(): void {
+        add_action('wp_mail', [$this, 'capture_email_data']);
+        add_action('wp_mail_succeeded', [$this, 'log_email_success']);
+        add_action('wp_mail_failed', [$this, 'log_email_failure']);
+    }
+}
+```
+
+#### Automatic Hook Registration
+
+- **ServiceManager**: Automatically calls `register_hooks()` after provider booting
+- **No Manual Registration**: Avoid manual hook registration in constructors
+- **Separation**: Keep hook logic separate from business logic
+
+### SOP 5: Frontend React/TypeScript Architecture
+
+**Component Consolidation Pattern**: Prefer substantial components over micro-components following the 2-3 component rule.
+
+#### Component Organization Standards
+
+```typescript
+// Feature Structure (e.g., debug-log/, email-log/)
+src/pages/[feature-name]/
+├── index.tsx                 // Main page component (100-300 lines)
+├── types.ts                  // TypeScript interfaces
+├── hooks.ts                  // Custom hooks (useEmailLogEntries, useLogFiltering)
+├── constants.ts              // Feature constants
+└── components/
+    ├── index.ts              // Barrel exports
+    ├── feature-viewer.tsx    // Display component (table, details, formatting)
+    ├── feature-controls.tsx  // Controls component (filters, search, actions)
+    └── feature-skeleton.tsx  // Loading states
+```
+
+#### Reusable Component Standards
+
+- **Base Components**: `src/components/base/` for reusable UI (Button, SearchableSelect, Toast, Modal)
+- **SearchableSelect**: Always use for dropdowns (react-select wrapper with accessibility)
+- **Toast System**: Use `toast.success()`, `toast.error()` for user feedback
+- **Lucide Icons**: Only icon library allowed (`import { Icon } from 'lucide-react'`)
+- **Tailwind Primary**: Always use `primary` color as brand color
+
+### SOP 6: Model-Based Database Operations
+
+**ActiveRecord Pattern**: Use model classes for database operations with WordPress wpdb integration.
+
+#### Model Implementation Standards
+
+```php
+class EmailLog extends BaseModel {
+    protected static string $table = 'email_logs';
+    protected static string $primary_key = 'id';
+    protected static array $fillable = ['to_email', 'subject', 'message', 'status'];
+
+    // Static methods for queries
+    public static function get_filtered(array $filters): array
+    public static function count_filtered(array $filters): int
+    public static function get_statistics(): array
+}
+```
+
+#### Current Models
+
+- **EmailLog**: Email logging with filtering, statistics, bulk operations
+- **BaseModel**: Abstract base with common CRUD operations
+
+### SOP 7: Client-Side Data Management
+
+**Custom Hooks Pattern**: Implement data management with custom hooks for consistent state handling.
+
+#### Data Hook Standards
+
+```typescript
+// Example: useEmailLogEntries hook
+export function useEmailLogEntries() {
+    const [entries, setEntries] = useState<EmailLogEntry[]>([]);
+    const [filters, setFilters] = useState<EmailLogFilters>({});
+    const [loading, setLoading] = useState(false);
+
+    // Client-side filtering with debounced search
+    const filteredEntries = useMemo(() => {
+        return entries.filter(/* filtering logic */);
+    }, [entries, filters]);
+
+    return {
+        entries: filteredEntries,
+        filters,
+        updateFilters,
+        loading,
+        refetch,
+        selectedItems,
+        onSelectAll,
+        onSelectItem,
+        paginationInfo
+    };
+}
+```
+
+#### Current Hook Implementations
+
+- **useEmailLogEntries**: Email log data management with filtering and pagination
+- **useEmailLogActions**: Bulk actions and individual item operations
+- **useLogEntries**: Debug log data management with infinite scroll
+- **useDebounce**: 300ms debounced search for real-time filtering
+
+### SOP 8: Testing Architecture Standards
+
+**Comprehensive Testing Strategy**: Separate unit and integration tests with proper WordPress integration.
+
+#### Test Organization
+
+```php
+// Unit Tests (tests/Unit/) - No WordPress dependencies
+class ServiceTest extends TestCase {
+    public function test_service_success(): void {
+        $result = $this->service->process_data($input);
+        $this->assert_service_result_success($result);
+    }
+}
+
+// Integration Tests (tests/Integration/) - With WordPress
+class ControllerTest extends DebugSuiteTestCase {
+    public function test_api_endpoint(): void {
+        $request = new WP_REST_Request('GET', '/debug-suite/v1/endpoint');
+        $response = rest_get_server()->dispatch($request);
+        $this->assertEquals(200, $response->get_status());
+    }
+}
+```
+
+#### Test Helpers and Utilities
+
+- **TestCase**: Base unit test class with assertion helpers
+- **DebugSuiteTestCase**: Integration test base with WordPress setup
+- **MockFactory**: Test fixture creation utilities
+- **Custom Assertions**: `assert_service_result_success()`, `assert_service_result_failure()`
+
+### SOP 9: CSS and Styling Standards
+
+**Tailwind CSS v4 with Primary Color System**: Consistent design system using utility-first approach.
+
+#### Styling Standards
+
+```css
+/* Primary Color System (src/index.css) */
+@theme {
+    --color-primary: #6366f1; /* Indigo-500 base */
+    --color-primary-50: #eef2ff;
+    /* ... full indigo scale ... */
+}
+
+/* Component Classes */
+.debug-suite-root-app {
+    @import 'tailwindcss/preflight.css' layer(base) important;
+    @import 'tailwindcss/utilities.css' layer(utilities) important;
+}
+```
+
+#### Design System Guidelines
+
+- **Primary Color**: Always use `primary` for brand elements (buttons, links, highlights)
+- **Conditional Classes**: Use `classNames` utility from `@/utils` for conditional styling
+- **Responsive Design**: Apply breakpoint utilities (sm:, md:, lg:, xl:)
+- **Component Consistency**: Follow established patterns in base components
+
+### SOP 10: Container Helper Functions Usage
+
+**Global Access Pattern**: Use established helper functions for service resolution and container access.
+
+#### Helper Function Standards
+
+```php
+// Service Resolution
+$service = debug_suite()->resolve(ServiceName::class);
+
+// Container Access
+$container = debug_suite()->container();
+
+// Service Manager Access
+$service_manager = debug_suite_service_manager();
+
+// Main Plugin Instance
+$plugin = debug_suite();
+
+// Date Formatting Utility
+$formatted_date = debug_suite_date($timestamp);
+```
+
+#### Helper Function Implementation
+
+- **debug_suite()**: Main plugin instance with container access
+- **Service Resolution**: Direct service retrieval with type safety
+- **Container Operations**: Full container functionality through helpers
+
 ## Current Project Organization
 
 ### Core Service Providers
 
 The project follows a clean service provider architecture:
 
-- **AppServiceProvider**: Registers business logic services only
-- **RestControllerProvider**: Registers REST API controllers only
-- **AdminServiceProvider**: Registers admin-specific services (`Admin`)
-- **FrontendServiceProvider**: Registers frontend services (`Frontend`)
+- **AppServiceProvider**: Registers business logic services, WordPress integration (Admin, Assets, HookManager)
+- **RestControllerProvider**: Registers REST API controllers with dependency injection
 
 ### Service Layer Implementation
 
 All business logic is implemented in the `includes/Services/` directory:
 
 - **DebugLog/** - Debug log related services
-    - `FileLogsService` - Debug log operations
-    - `WPLogReaderService` - WordPress log file reading
-    - `LogFileDiscoveryService` - Log file discovery
-- **SettingsService** - wp-config.php management
-- **OnboardingService** - Onboarding flow management
-- **OverviewService** - Dashboard overview functionality
+    - `LogsService` - Debug log operations with service delegation pattern
+    - `WPLogReaderService` - Advanced log parsing with stack trace detection
+    - `LogDiscoveryService` - Log file discovery across multiple locations
+- **EmailLog/** - Email logging services
+    - `EmailLogService` - wp_mail integration with Hookable interface
+- **SettingsService** - wp-config.php management with validation
+- **OverviewService** - Dashboard overview with service aggregation
 
 ### REST API Controllers
 
 All API endpoints are handled by controllers in `includes/API/`:
 
-- `FileLogsController` - Debug log API endpoints
-- `SettingsController` - Settings management API endpoints
-- `OverviewController` - Dashboard overview API endpoints
+- `LogsController` - Debug log API endpoints (`/debug-suite/v1/logs/*`)
+- `EmailLogController` - Email log management (`/debug-suite/v1/email-logs/*`)
+- `SettingsController` - Settings management API endpoints (`/debug-suite/v1/settings`)
+- `OverviewController` - Dashboard overview API endpoints (`/debug-suite/v1/overview`)
+
+### Model Layer
+
+Database operations handled by model classes in `includes/Models/`:
+
+- **EmailLog** - Email log database operations with filtering and statistics
+- **BaseModel** - Abstract base model with common CRUD operations
+
+### Frontend Architecture
+
+React/TypeScript components following consolidation pattern:
+
+- **Pages**: Feature-specific pages (`debug-log/`, `email-log/`, `overview/`)
+- **Components**: Reusable UI components (`base/`, `editor/`)
+- **Hooks**: Custom data management hooks (`use-entries.ts`, `use-actions.ts`)
+- **Utils**: Utility functions and helpers
 
 ### Testing Infrastructure
 
-- **Unit Tests**: `tests/Unit/` - Isolated component testing
-- **Integration Tests**: `tests/Integration/` - Service integration testing
-- **Test Helpers**: `tests/Helpers/DebugSuiteTestCase.php` - Base test case
+- **Unit Tests**: `tests/Unit/` - Isolated component testing without WordPress
+- **Integration Tests**: `tests/Integration/` - Full WordPress integration testing
+- **Test Helpers**: `tests/Helpers/` with base classes and utilities
 - **Coverage Reports**: `tests/coverage/` - Code coverage analysis
