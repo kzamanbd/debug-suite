@@ -7,7 +7,7 @@
 
 namespace DebugSuite;
 
-use DebugSuite\Internal\DatabaseTables;
+use DebugSuite\Internal\DatabaseManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -29,6 +29,6 @@ class Install {
 	 * @return void
 	 */
 	public static function do_install(): void {
-		DatabaseTables::create_tables();
+		DatabaseManager::create_tables();
 	}
 }
