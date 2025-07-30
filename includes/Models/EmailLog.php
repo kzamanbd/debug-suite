@@ -41,6 +41,7 @@ class EmailLog extends BaseModel {
 	 * @var array
 	 */
 	protected static array $fillable = [
+		'id',
 		'to_email',
 		'subject',
 		'message',
@@ -49,6 +50,8 @@ class EmailLog extends BaseModel {
 		'status',
 		'error_message',
 		'sent_date',
+		'created_at',
+		'updated_at',
 	];
 
 	/**
