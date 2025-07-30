@@ -7,7 +7,6 @@
 
 namespace DebugSuite\API;
 
-use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Services\EmailLog\EmailLogService;
 use WP_Error;
 use WP_REST_Request;

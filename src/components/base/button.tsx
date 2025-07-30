@@ -36,7 +36,7 @@ const sizeClasses = {
 };
 
 const Spinner = ({ className = '' }: { className?: string }) => (
-    <LoaderCircle className={classNames('h-5 w-5 animate-spin', className)} />
+    <LoaderCircle className={classNames('size-4 animate-spin', className)} />
 );
 
 type PolymorphicComponentProps<T extends ElementType> = ButtonOwnProps<T> &

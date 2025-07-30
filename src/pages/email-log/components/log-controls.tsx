@@ -1,5 +1,7 @@
 /**
- * Email Log Controls - Filter and action controls component.
+ * Email Limport { RefreshCw, Search } from 'lucide-react';
+import { useEmailLogAPI } from '../hooks';
+import type { BulkAction, EmailEntry, EmailFilters } from '../types';ontrols - Filter and action controls component.
  *
  * @since 1.0.0
  */
@@ -40,7 +42,7 @@ const EmailLogControls = ({
     const confirm = useConfirm({
         okText: __('Continue', 'debug-suite')
     });
-    const { fetchFilterOptions } = useEmailLogAPI();
+    const { fetchFilterOptions, clearAllEmails } = useEmailLogAPI();
     const [filterOptions, setFilterOptions] = useState<{
         receivers: Array<{ value: string; label: string }>;
         statuses: Array<{ value: string; label: string }>;
@@ -99,6 +101,22 @@ const EmailLogControls = ({
                 action: selectedBulkAction.value as BulkAction['action'],
                 selected_ids: selectedItems
             });
+        }
+    };
+
+    const clearEmail = async () => {
+        if (
+            !(await confirm(
+                __('Are you sure you want to clear all email logs? This action cannot be undone.', 'debug-suite')
+            ))
+        ) {
+            return;
+        }
+        try {
+            await clearAllEmails();
+            onRefresh();
+        } catch (error) {
+            console.error('Failed to clear all emails:', error);
         }
     };
 
@@ -212,13 +230,18 @@ const EmailLogControls = ({
 
                 {/* Refresh Button */}
                 <Fill name="debug-suite-layout-header-right">
-                    <Button
-                        variant="default"
-                        loading={loading}
-                        onClick={onRefresh}
-                        icon={<RefreshCw className="h-4 w-4" />}>
-                        {__('Refresh', 'debug-suite')}
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                        <Button size="md" onClick={clearEmail}>
+                            {__('Clear All', 'debug-suite')}
+                        </Button>
+                        <Button
+                            variant="default"
+                            loading={loading}
+                            onClick={onRefresh}
+                            icon={<RefreshCw className="h-4 w-4" />}>
+                            {__('Refresh', 'debug-suite')}
+                        </Button>
+                    </div>
                 </Fill>
             </div>
         </div>
