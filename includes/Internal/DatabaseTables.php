@@ -84,6 +84,11 @@ class DatabaseTables {
 			KEY created_at (created_at)
 		) $charset_collate;";
 
+		// Include WordPress upgrade functions if not available
+		if ( ! function_exists( 'dbDelta' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		}
+
 		dbDelta( $sql );
 	}
 
