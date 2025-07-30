@@ -17,7 +17,6 @@ interface UseEmailLogAPIResult {
     deleteEmails: (ids: number[]) => Promise<{ deleted_count: number; message: string }>;
     clearAllEmails: () => Promise<{ message: string }>;
     resendEmail: (id: number) => Promise<{ message: string }>;
-    getEmail: (id: number) => Promise<EmailLogEntry>;
 }
 
 const useEmailLogAPI = (): UseEmailLogAPIResult => {
@@ -95,20 +94,13 @@ const useEmailLogAPI = (): UseEmailLogAPIResult => {
         });
     }, []);
 
-    const getEmail = useCallback(async (id: number): Promise<EmailLogEntry> => {
-        return await apiFetch<EmailLogEntry>({
-            path: `/debug-suite/v1/email-logs/${id}`
-        });
-    }, []);
-
     return {
         fetchEmailLogs,
         fetchEmailStats,
         fetchFilterOptions,
         deleteEmails,
         clearAllEmails,
-        resendEmail,
-        getEmail
+        resendEmail
     };
 };
 

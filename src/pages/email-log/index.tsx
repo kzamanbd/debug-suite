@@ -4,7 +4,7 @@
  * @since 1.0.0
  */
 import { useCallback, useState } from '@wordpress/element';
-import { EmailLogControls, EmailLogSkeleton, EmailLogViewer } from './components';
+import { EmailDetail, EmailLogControls, EmailLogSkeleton, EmailLogViewer } from './components';
 import { useEmailLogActions, useEmailLogEntries } from './hooks';
 import type { BulkAction, EmailLogEntry } from './types';
 
@@ -23,13 +23,24 @@ const EmailLog = () => {
     } = useEmailLogEntries();
 
     const [currentSelections, setCurrentSelections] = useState<number[]>([]);
+    const [modalState, setModalState] = useState<{
+        isOpen: boolean;
+        entry: EmailLogEntry | null;
+    }>({
+        isOpen: false,
+        entry: null
+    });
 
     // Update selections when they change
     const handleSelectionsChange = useCallback((selections: number[]) => {
         setCurrentSelections(selections);
     }, []);
 
-    const { processing, handleBulkAction, handleItemAction } = useEmailLogActions(refetch, handleSelectionsChange);
+    const { processing, handleBulkAction, handleItemAction } = useEmailLogActions(
+        refetch,
+        handleSelectionsChange,
+        setModalState
+    );
 
     // Handle filter changes
     const handleFilterChange = (newFilters: Partial<typeof filters>) => {
@@ -54,6 +65,11 @@ const EmailLog = () => {
     // Handle refresh
     const handleRefresh = () => {
         refetch();
+    };
+
+    // Handle modal close
+    const handleModalClose = () => {
+        setModalState({ isOpen: false, entry: null });
     };
 
     // Calculate total items for display
@@ -89,6 +105,8 @@ const EmailLog = () => {
                 paginationInfo={paginationInfo}
                 onPageChange={handlePageChange}
             />
+
+            <EmailDetail isOpen={modalState.isOpen} onClose={handleModalClose} entry={modalState.entry} />
         </div>
     );
 };

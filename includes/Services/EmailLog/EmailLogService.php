@@ -277,25 +277,6 @@ class EmailLogService implements ServiceInterface, Hookable {
 	}
 
 	/**
-	 * Get specific email log by ID.
-	 *
-	 * @param int $email_id Email log ID.
-	 * @return ServiceResponse
-	 */
-	public function get_email_by_id( int $email_id ): ServiceResponse {
-		$email = EmailLog::find( $email_id );
-
-		if ( ! $email ) {
-			return ServiceResponse::failure(
-				__( 'Email not found.', 'debug-suite' ),
-				'not_found'
-			);
-		}
-
-		return ServiceResponse::success( $email->to_array() );
-	}
-
-	/**
 	 * Resend email by ID.
 	 *
 	 * @param int $email_id Email log ID.

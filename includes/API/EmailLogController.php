@@ -88,25 +88,6 @@ class EmailLogController extends RestController {
 			]
 		);
 
-		// Get single email
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>\d+)',
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_email' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
-				'args'                => [
-					'id' => [
-						'required'          => true,
-						'type'              => 'integer',
-						'minimum'           => 1,
-						'sanitize_callback' => 'absint',
-					],
-				],
-			]
-		);
-
 		// Bulk delete emails
 		register_rest_route(
 			$this->namespace,
@@ -206,28 +187,6 @@ class EmailLogController extends RestController {
 
 		if ( $result->is_failure() ) {
 			return new WP_Error( 'error', $result->get_error_message(), [ 'status' => 500 ] );
-		}
-
-		return rest_ensure_response( $result->get_data() );
-	}
-
-	/**
-	 * Get single email.
-	 *
-	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response|WP_Error
-	 */
-	public function get_email( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$email_id = (int) $request->get_param( 'id' );
-		$result = $this->service->get_email_by_id( $email_id );
-
-		if ( $result->is_failure() ) {
-			$status_code = $result->get_error_code() === 'not_found' ? 404 : 500;
-			return new WP_Error(
-				$result->get_error_code(),
-				$result->get_error_message(),
-				[ 'status' => $status_code ]
-			);
 		}
 
 		return rest_ensure_response( $result->get_data() );
