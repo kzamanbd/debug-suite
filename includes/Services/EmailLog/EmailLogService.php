@@ -305,8 +305,8 @@ class EmailLogService implements ServiceInterface, Hookable {
 		$email = EmailLog::find( $email_id );
 
 		if ( ! $email ) {
-			return ServiceResponse::failure( 
-				__( 'Email not found.', 'debug-suite' ), 
+			return ServiceResponse::failure(
+				__( 'Email not found.', 'debug-suite' ),
 				'email_not_found'
 			);
 		}
@@ -323,8 +323,8 @@ class EmailLogService implements ServiceInterface, Hookable {
 			return ServiceResponse::success( [ 'message' => __( 'Email resent.', 'debug-suite' ) ] );
 		}
 
-		return ServiceResponse::failure( 
-			__( 'Failed to resend email.', 'debug-suite' ), 
+		return ServiceResponse::failure(
+			__( 'Failed to resend email.', 'debug-suite' ),
 			'send_failed'
 		);
 	}
