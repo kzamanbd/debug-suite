@@ -8,6 +8,7 @@
 namespace DebugSuite\Tests\Unit\Services\EmailLog;
 
 use DebugSuite\Core\ServiceResponse;
+use DebugSuite\Internal\DatabaseTables;
 use DebugSuite\Services\EmailLog\EmailLogService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\Install;
@@ -35,7 +36,7 @@ class EmailLogServiceTest extends DebugSuiteTestCase {
         parent::set_up();
         
         // Create the email logs table for testing
-        Install::create_email_logs_table();
+        DatabaseTables::create_email_logs_table();
         
         $this->service = new EmailLogService();
     }

@@ -62,6 +62,18 @@ class EmailLogController extends RestController {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => [ $this, 'get_email_logs' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
+				'args'                => $this->get_collection_params(),
+			]
+		);
+
+		// Get filter options
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/filters',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_filter_options' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
 			]
 		);
 
@@ -76,6 +88,25 @@ class EmailLogController extends RestController {
 			]
 		);
 
+		// Get single email
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)',
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'get_email' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+				'args'                => [
+					'id' => [
+						'required'          => true,
+						'type'              => 'integer',
+						'minimum'           => 1,
+						'sanitize_callback' => 'absint',
+					],
+				],
+			]
+		);
+
 		// Bulk delete emails
 		register_rest_route(
 			$this->namespace,
@@ -84,6 +115,16 @@ class EmailLogController extends RestController {
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => [ $this, 'bulk_delete_emails' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
+				'args'                => [
+					'ids' => [
+						'required' => true,
+						'type'     => 'array',
+						'items'    => [
+							'type'    => 'integer',
+							'minimum' => 1,
+						],
+					],
+				],
 			]
 		);
 
@@ -106,6 +147,14 @@ class EmailLogController extends RestController {
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => [ $this, 'resend_email' ],
 				'permission_callback' => [ $this, 'permissions_check' ],
+				'args'                => [
+					'id' => [
+						'required'          => true,
+						'type'              => 'integer',
+						'minimum'           => 1,
+						'sanitize_callback' => 'absint',
+					],
+				],
 			]
 		);
 	}
@@ -118,14 +167,67 @@ class EmailLogController extends RestController {
 	 */
 	public function get_email_logs( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$options = [
-			'limit'  => $request->get_param( 'per_page' ) ?? 100,
-			'offset' => ( ( $request->get_param( 'page' ) ?? 1 ) - 1 ) * ( $request->get_param( 'per_page' ) ?? 100 ),
+			'search'     => $request->get_param( 'search' ) ?? '',
+			'status'     => $request->get_param( 'status' ) ?? 'all',
+			'receiver'   => $request->get_param( 'receiver' ) ?? '',
+			'sort_by'    => $request->get_param( 'sort_by' ) ?? 'sent_date',
+			'sort_order' => $request->get_param( 'sort_order' ) ?? 'desc',
+			'per_page'   => $request->get_param( 'per_page' ) ?? 20,
+			'page'       => $request->get_param( 'page' ) ?? 1,
 		];
 
 		$result = $this->service->get_email_log_entries( $options );
 
 		if ( $result->is_failure() ) {
+			$status_code = match ( $result->get_error_code() ) {
+				'database_error'    => 500,
+				'validation_error'  => 400,
+				default             => 500
+			};
+
+			return new WP_Error(
+				$result->get_error_code(),
+				$result->get_error_message(),
+				[ 'status' => $status_code ]
+			);
+		}
+
+		return rest_ensure_response( $result->get_data() );
+	}
+
+	/**
+	 * Get filter options.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_filter_options( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$result = $this->service->get_filter_options();
+
+		if ( $result->is_failure() ) {
 			return new WP_Error( 'error', $result->get_error_message(), [ 'status' => 500 ] );
+		}
+
+		return rest_ensure_response( $result->get_data() );
+	}
+
+	/**
+	 * Get single email.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_email( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$email_id = (int) $request->get_param( 'id' );
+		$result = $this->service->get_email_by_id( $email_id );
+
+		if ( $result->is_failure() ) {
+			$status_code = $result->get_error_code() === 'not_found' ? 404 : 500;
+			return new WP_Error(
+				$result->get_error_code(),
+				$result->get_error_message(),
+				[ 'status' => $status_code ]
+			);
 		}
 
 		return rest_ensure_response( $result->get_data() );
@@ -150,7 +252,21 @@ class EmailLogController extends RestController {
 	 */
 	public function bulk_delete_emails( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$ids = $request->get_param( 'ids' );
+
+		if ( empty( $ids ) || ! is_array( $ids ) ) {
+			return new WP_Error(
+				'invalid_ids',
+				__( 'Invalid or missing email IDs.', 'debug-suite' ),
+				[ 'status' => 400 ]
+			);
+		}
+
 		$result = $this->service->bulk_delete_emails( $ids );
+
+		if ( $result->is_failure() ) {
+			return new WP_Error( 'error', $result->get_error_message(), [ 'status' => 500 ] );
+		}
+
 		return rest_ensure_response( $result->get_data() );
 	}
 
@@ -184,13 +300,49 @@ class EmailLogController extends RestController {
 	 */
 	public function get_collection_params(): array {
 		return [
-			'page' => [
-				'type'    => 'integer',
-				'default' => 1,
+			'page'       => [
+				'description'       => __( 'Current page of the collection.', 'debug-suite' ),
+				'type'              => 'integer',
+				'default'           => 1,
+				'minimum'           => 1,
+				'sanitize_callback' => 'absint',
 			],
-			'per_page' => [
-				'type'    => 'integer',
-				'default' => 100,
+			'per_page'   => [
+				'description'       => __( 'Maximum number of items to be returned in result set.', 'debug-suite' ),
+				'type'              => 'integer',
+				'default'           => 20,
+				'minimum'           => 1,
+				'maximum'           => 100,
+				'sanitize_callback' => 'absint',
+			],
+			'search'     => [
+				'description'       => __( 'Limit results to those matching a string.', 'debug-suite' ),
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+			'status'     => [
+				'description' => __( 'Limit results to emails with a specific status.', 'debug-suite' ),
+				'type'        => 'string',
+				'default'     => 'all',
+				'enum'        => [ 'all', 'success', 'failed' ],
+			],
+			'receiver'   => [
+				'description'       => __( 'Limit results to a specific receiver email.', 'debug-suite' ),
+				'type'              => 'string',
+				'format'            => 'email',
+				'sanitize_callback' => 'sanitize_email',
+			],
+			'sort_by'    => [
+				'description' => __( 'Sort collection by email attribute.', 'debug-suite' ),
+				'type'        => 'string',
+				'default'     => 'sent_date',
+				'enum'        => [ 'sent_date', 'subject', 'to_email', 'status' ],
+			],
+			'sort_order' => [
+				'description' => __( 'Order sort attribute ascending or descending.', 'debug-suite' ),
+				'type'        => 'string',
+				'default'     => 'desc',
+				'enum'        => [ 'asc', 'desc' ],
 			],
 		];
 	}

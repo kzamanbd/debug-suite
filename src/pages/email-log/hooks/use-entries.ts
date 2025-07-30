@@ -4,83 +4,9 @@
  * @since 1.0.0
  */
 import { useCallback, useEffect, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import type { EmailLogEntry, EmailLogFilters, PaginationInfo } from '../types';
-
-// Mock data for demonstration - matches the image content
-const mockEmailLogEntries: EmailLogEntry[] = [
-    {
-        id: 1,
-        time: '2025-07-25 22:35:30',
-        receiver: 'kzamanbn@gmail.com',
-        subject: '[My Dokan] Payment gateway "Direct bank transfer" enabled',
-        status: 'success',
-        created_at: '2025-07-25 22:35:30'
-    },
-    {
-        id: 2,
-        time: '2025-07-25 14:52:27',
-        receiver: 'dummy_store3@dokan.com',
-        subject: '[My Dokan] Your customer order is now complete (1140) - July 25, 2025',
-        status: 'success',
-        created_at: '2025-07-25 14:52:27'
-    },
-    {
-        id: 3,
-        time: '2025-07-25 14:52:27',
-        receiver: 'dummy_store1@dokan.com',
-        subject: 'Your order from My Dokan is on its way!',
-        status: 'success',
-        created_at: '2025-07-25 14:52:27'
-    },
-    {
-        id: 4,
-        time: '2025-07-25 14:52:27',
-        receiver: 'dummy_store3@dokan.com',
-        subject: '[My Dokan] New customer order (1140) - July 25, 2025',
-        status: 'success',
-        created_at: '2025-07-25 14:52:27'
-    },
-    {
-        id: 5,
-        time: '2025-07-25 14:52:27',
-        receiver: 'dummy_store2@dokan.com',
-        subject: '[My Dokan] New customer order (1139) - July 25, 2025',
-        status: 'success',
-        created_at: '2025-07-25 14:52:27'
-    },
-    {
-        id: 6,
-        time: '2025-07-25 14:52:27',
-        receiver: 'dummy_store1@dokan.com',
-        subject: 'Your My Dokan order has been received!',
-        status: 'success',
-        created_at: '2025-07-25 14:52:27'
-    },
-    {
-        id: 7,
-        time: '2025-07-25 14:52:27',
-        receiver: 'kzamanbn@gmail.com',
-        subject: "[My Dokan]: You've got a new order: #1138",
-        status: 'success',
-        created_at: '2025-07-25 14:52:27'
-    },
-    {
-        id: 8,
-        time: '2025-07-25 14:47:30',
-        receiver: 'kzamanbn@gmail.com',
-        subject: '[My Dokan] Payment gateway "Dokan Paystack" enabled',
-        status: 'success',
-        created_at: '2025-07-25 14:47:30'
-    },
-    {
-        id: 9,
-        time: '2025-07-25 14:46:40',
-        receiver: 'kzamanbn@gmail.com',
-        subject: '[My Dokan] Payment gateway "Dokan Paystack" enabled',
-        status: 'success',
-        created_at: '2025-07-25 14:46:40'
-    }
-];
+import useEmailLogAPI from './use-api';
 
 interface UseEmailLogEntriesResult {
     entries: EmailLogEntry[];
@@ -105,115 +31,53 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         receiver: '',
         status: 'all',
         search: '',
-        sortBy: 'time',
+        sortBy: 'sent_date',
         sortOrder: 'desc',
         perPage: 20
     });
     const [currentPage, setCurrentPage] = useState(1);
+    const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
+        current_page: 1,
+        total_pages: 1,
+        total_items: 0,
+        per_page: 20,
+        from: 0,
+        to: 0
+    });
 
-    // Simulate data fetching
-    const fetchEmailLogs = useCallback(async () => {
+    const { fetchEmailLogs } = useEmailLogAPI();
+
+    // Fetch email logs from API
+    const fetchEmailData = useCallback(async () => {
         setLoading(true);
         setError(null);
 
         try {
-            // Simulate API delay
-            await new Promise((resolve) => setTimeout(resolve, 500));
-
-            // Filter and sort mock data
-            let filteredEntries = [...mockEmailLogEntries];
-
-            // Apply receiver filter
-            if (filters.receiver) {
-                filteredEntries = filteredEntries.filter((entry) =>
-                    entry.receiver.toLowerCase().includes(filters.receiver.toLowerCase())
-                );
-            }
-
-            // Apply status filter
-            if (filters.status !== 'all') {
-                filteredEntries = filteredEntries.filter((entry) => entry.status === filters.status);
-            }
-
-            // Apply search filter
-            if (filters.search) {
-                filteredEntries = filteredEntries.filter(
-                    (entry) =>
-                        entry.subject.toLowerCase().includes(filters.search.toLowerCase()) ||
-                        entry.receiver.toLowerCase().includes(filters.search.toLowerCase())
-                );
-            }
-
-            // Apply sorting
-            filteredEntries.sort((a, b) => {
-                let aValue: string | number = a[filters.sortBy as keyof EmailLogEntry] as string;
-                let bValue: string | number = b[filters.sortBy as keyof EmailLogEntry] as string;
-
-                // Convert to comparable values
-                if (filters.sortBy === 'time') {
-                    aValue = new Date(a.time).getTime();
-                    bValue = new Date(b.time).getTime();
-                } else {
-                    aValue = String(aValue).toLowerCase();
-                    bValue = String(bValue).toLowerCase();
-                }
-
-                if (filters.sortOrder === 'asc') {
-                    return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-                } else {
-                    return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-                }
+            const response = await fetchEmailLogs(filters, currentPage);
+            
+            setEntries(response.entries);
+            setPaginationInfo({
+                current_page: response.current_page,
+                total_pages: response.total_pages,
+                total_items: response.total,
+                per_page: response.per_page,
+                from: Math.min((response.current_page - 1) * response.per_page + 1, response.total),
+                to: Math.min(response.current_page * response.per_page, response.total)
             });
 
-            // Apply pagination
-            const _total = filteredEntries.length;
-            const startIndex = (currentPage - 1) * filters.perPage;
-            const endIndex = startIndex + filters.perPage;
-            const paginatedEntries = filteredEntries.slice(startIndex, endIndex);
-
-            setEntries(paginatedEntries);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred');
+            console.error('Failed to fetch email logs:', err);
+            setError(__('Failed to load email logs.', 'debug-suite'));
+            setEntries([]);
         } finally {
             setLoading(false);
         }
-    }, [filters, currentPage]);
+    }, [fetchEmailLogs, filters, currentPage]);
 
     // Effect to fetch data when filters or page change
     useEffect(() => {
-        void fetchEmailLogs();
-    }, [fetchEmailLogs]);
-
-    // Calculate pagination info
-    const totalFiltered = mockEmailLogEntries.filter((entry) => {
-        let matches = true;
-
-        if (filters.receiver) {
-            matches = entry.receiver.toLowerCase().includes(filters.receiver.toLowerCase());
-        }
-
-        if (filters.status !== 'all') {
-            matches = matches && entry.status === filters.status;
-        }
-
-        if (filters.search) {
-            matches =
-                matches &&
-                (entry.subject.toLowerCase().includes(filters.search.toLowerCase()) ||
-                    entry.receiver.toLowerCase().includes(filters.search.toLowerCase()));
-        }
-
-        return matches;
-    }).length;
-
-    const paginationInfo: PaginationInfo = {
-        current_page: currentPage,
-        total_pages: Math.ceil(totalFiltered / filters.perPage),
-        total_items: totalFiltered,
-        per_page: filters.perPage,
-        from: Math.min((currentPage - 1) * filters.perPage + 1, totalFiltered),
-        to: Math.min(currentPage * filters.perPage, totalFiltered)
-    };
+        void fetchEmailData();
+    }, [fetchEmailData]);
 
     const updateFilters = useCallback((newFilters: Partial<EmailLogFilters>) => {
         setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -222,8 +86,8 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
     }, []);
 
     const refetch = useCallback(() => {
-        void fetchEmailLogs();
-    }, [fetchEmailLogs]);
+        void fetchEmailData();
+    }, [fetchEmailData]);
 
     const onSelectAll = useCallback(
         (selected: boolean) => {
@@ -237,13 +101,9 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
     );
 
     const onSelectItem = useCallback((id: number, selected: boolean) => {
-        setSelectedItems((prev) => {
-            if (selected) {
-                return prev.indexOf(id) === -1 ? [...prev, id] : prev;
-            } else {
-                return prev.filter((itemId) => itemId !== id);
-            }
-        });
+        setSelectedItems((prev) =>
+            selected ? [...prev, id] : prev.filter((itemId) => itemId !== id)
+        );
     }, []);
 
     // Handle page change
@@ -255,11 +115,7 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
     // Add page change to filters update
     const updateFiltersWithPage = useCallback(
         (newFilters: Partial<EmailLogFilters>) => {
-            if ('perPage' in newFilters) {
-                updateFilters(newFilters);
-            } else {
-                setFilters((prev) => ({ ...prev, ...newFilters }));
-            }
+            updateFilters(newFilters);
         },
         [updateFilters]
     );
@@ -270,11 +126,7 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         error,
         filters,
         updateFilters: updateFiltersWithPage,
-        paginationInfo: {
-            ...paginationInfo,
-            current_page: currentPage,
-            total_pages: Math.ceil(totalFiltered / filters.perPage)
-        },
+        paginationInfo,
         refetch,
         selectedItems,
         onSelectAll,

@@ -1,16 +1,15 @@
 /**
  * useEmailLogActions - Hook for managing email log actions.
  *
- * @since 1.0.0
  */
 import { useCallback, useState } from '@wordpress/element';
 import type { BulkAction, EmailLogEntry } from '../types';
+import useEmailLogAPI from './use-api';
 
 interface UseEmailLogActionsResult {
     processing: boolean;
     handleBulkAction: (action: BulkAction) => Promise<void>;
     handleItemAction: (action: 'view' | 'resend' | 'delete', entry: EmailLogEntry) => Promise<void>;
-    handlePageChange: (page: number) => void;
 }
 
 const useEmailLogActions = (
@@ -18,24 +17,27 @@ const useEmailLogActions = (
     onSelectionsChange: (selections: number[]) => void
 ): UseEmailLogActionsResult => {
     const [processing, setProcessing] = useState(false);
+    const { deleteEmails, resendEmail, getEmail } = useEmailLogAPI();
 
     const handleBulkAction = useCallback(
         async (action: BulkAction) => {
             setProcessing(true);
 
             try {
-                // Simulate API call
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-
                 switch (action.action) {
                     case 'delete':
-                        // In real implementation, make API call to delete emails
+                        await deleteEmails(action.selected_ids);
                         break;
                     case 'resend':
-                        // In real implementation, make API call to resend emails
+                        // For bulk resend, we'd need to implement a bulk resend endpoint
+                        // For now, resend emails one by one
+                        for (const id of action.selected_ids) {
+                            await resendEmail(id);
+                        }
                         break;
                     case 'mark_read':
-                        // In real implementation, make API call to mark as read
+                        // This would need to be implemented in the API
+                        console.warn('Mark as read not implemented yet');
                         break;
                 }
 
@@ -45,30 +47,32 @@ const useEmailLogActions = (
             } catch (error) {
                 console.error('Bulk action failed:', error);
                 // Handle error (show toast, etc.)
+                throw error;
             } finally {
                 setProcessing(false);
             }
         },
-        [onRefresh, onSelectionsChange]
+        [deleteEmails, resendEmail, onRefresh, onSelectionsChange]
     );
 
     const handleItemAction = useCallback(
-        async (action: 'view' | 'resend' | 'delete', _entry: EmailLogEntry) => {
+        async (action: 'view' | 'resend' | 'delete', entry: EmailLogEntry) => {
             setProcessing(true);
 
             try {
-                // Simulate API call
-                await new Promise((resolve) => setTimeout(resolve, 500));
-
                 switch (action) {
-                    case 'view':
-                        // In real implementation, open email details modal
+                    case 'view': {
+                        // Get full email details and open modal
+                        const emailDetails = await getEmail(entry.id);
+                        console.warn('Email details:', emailDetails);
+                        // In real implementation, this would open a modal
                         break;
+                    }
                     case 'resend':
-                        // In real implementation, make API call to resend email
+                        await resendEmail(entry.id);
                         break;
                     case 'delete':
-                        // In real implementation, make API call to delete email
+                        await deleteEmails([entry.id]);
                         break;
                 }
 
@@ -78,22 +82,18 @@ const useEmailLogActions = (
             } catch (error) {
                 console.error('Item action failed:', error);
                 // Handle error (show toast, etc.)
+                throw error;
             } finally {
                 setProcessing(false);
             }
         },
-        [onRefresh]
+        [deleteEmails, resendEmail, getEmail, onRefresh]
     );
-
-    const handlePageChange = useCallback((_page: number) => {
-        // Page change logic is handled by the parent component
-    }, []);
 
     return {
         processing,
         handleBulkAction,
-        handleItemAction,
-        handlePageChange
+        handleItemAction
     };
 };
 

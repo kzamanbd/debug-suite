@@ -61,7 +61,6 @@ class EmailLog extends BaseModel {
 	/**
 	 * Email status constants.
 	 */
-	const STATUS_PENDING = 'pending';
 	const STATUS_SUCCESS = 'success';
 	const STATUS_FAILED = 'failed';
 
@@ -167,6 +166,93 @@ class EmailLog extends BaseModel {
 	}
 
 	/**
+	 * Get filtered email logs with search and pagination.
+	 *
+	 * @param array $filters Filter options.
+	 * @return array
+	 */
+	public static function get_filtered( array $filters = [] ): array {
+		$wpdb = static::get_wpdb();
+		$table_name = static::get_table_name();
+
+		$defaults = [
+			'search'     => '',
+			'status'     => 'all',
+			'receiver'   => '',
+			'sort_by'    => 'sent_date',
+			'sort_order' => 'DESC',
+			'limit'      => 20,
+			'offset'     => 0,
+		];
+
+		$filters = wp_parse_args( $filters, $defaults );
+
+		// Build WHERE clause using helper method
+		$where_data = self::build_where_clause( $filters );
+		$where_clause = $where_data['where_clause'];
+		$prepare_values = $where_data['prepare_values'];
+
+		$sort_by = sanitize_sql_orderby( $filters['sort_by'] );
+		$sort_order = strtoupper( $filters['sort_order'] ) === 'ASC' ? 'ASC' : 'DESC';
+
+		$query = "SELECT * FROM $table_name $where_clause ORDER BY $sort_by $sort_order LIMIT %d OFFSET %d";
+
+		$prepare_values[] = (int) $filters['limit'];
+		$prepare_values[] = (int) $filters['offset'];
+
+		$results = $wpdb->get_results(
+			// phpcs:ignore
+			empty( $prepare_values ) ? $query : $wpdb->prepare( $query, $prepare_values ),
+			ARRAY_A
+		);
+
+		return array_map( [ static::class, 'from_array' ], $results ?? [] );
+	}
+
+	/**
+	 * Count filtered email logs.
+	 *
+	 * @param array $filters Filter options.
+	 * @return int
+	 */
+	public static function count_filtered( array $filters = [] ): int {
+		$wpdb = static::get_wpdb();
+		$table_name = static::get_table_name();
+
+		$defaults = [
+			'search'   => '',
+			'status'   => 'all',
+			'receiver' => '',
+		];
+
+		$filters = wp_parse_args( $filters, $defaults );
+
+		// Build WHERE clause using helper method
+		$where_data = self::build_where_clause( $filters );
+		$where_clause = $where_data['where_clause'];
+		$prepare_values = $where_data['prepare_values'];
+
+		$query = "SELECT COUNT(*) FROM $table_name $where_clause";
+
+		return (int) $wpdb->get_var(
+			// phpcs:ignore
+			empty( $prepare_values ) ? $query : $wpdb->prepare( $query, $prepare_values )
+		);
+	}
+
+	/**
+	 * Get unique receivers for filter dropdown.
+	 *
+	 * @return array
+	 */
+	public static function get_unique_receivers(): array {
+		$wpdb = static::get_wpdb();
+		$table_name = static::get_table_name();
+		// phpcs:ignore
+		return $wpdb->get_col( "SELECT DISTINCT to_email FROM $table_name WHERE to_email != '' ORDER BY to_email ASC" );
+	}
+
+	/**
 	 * Delete multiple email logs by IDs.
 	 *
 	 * @param array $ids Array of email log IDs.
@@ -226,5 +312,45 @@ class EmailLog extends BaseModel {
 	 */
 	public function get_headers(): array {
 		return empty( $this->headers ) ? [] : explode( "\n", $this->headers );
+	}
+
+	/**
+	 * Build WHERE clause conditions for filters.
+	 *
+	 * @param array $filters Validated filter options.
+	 * @return array Array containing where_clause string and prepare_values array.
+	 */
+	private static function build_where_clause( array $filters ): array {
+		$wpdb = static::get_wpdb();
+		$where_conditions = [];
+		$prepare_values = [];
+
+		// Search filter
+		if ( ! empty( $filters['search'] ) ) {
+			$search_term = '%' . $wpdb->esc_like( $filters['search'] ) . '%';
+			$where_conditions[] = '(subject LIKE %s OR to_email LIKE %s OR message LIKE %s)';
+			$prepare_values[] = $search_term;
+			$prepare_values[] = $search_term;
+			$prepare_values[] = $search_term;
+		}
+
+		// Status filter
+		if ( $filters['status'] !== 'all' ) {
+			$where_conditions[] = 'status = %s';
+			$prepare_values[] = $filters['status'];
+		}
+
+		// Receiver filter
+		if ( ! empty( $filters['receiver'] ) ) {
+			$where_conditions[] = 'to_email LIKE %s';
+			$prepare_values[] = '%' . $wpdb->esc_like( $filters['receiver'] ) . '%';
+		}
+
+		$where_clause = empty( $where_conditions ) ? '' : 'WHERE ' . implode( ' AND ', $where_conditions );
+
+		return [
+			'where_clause'    => $where_clause,
+			'prepare_values'  => $prepare_values,
+		];
 	}
 }

@@ -14,6 +14,7 @@ use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\Hookable;
 use DebugSuite\Interfaces\ServiceInterface;
 use DebugSuite\Models\EmailLog;
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -108,47 +109,129 @@ class EmailLogService implements ServiceInterface, Hookable {
 	}
 
 	/**
-	 * Get email log entries with basic filtering.
+	 * Get email log entries with filtering and pagination.
 	 *
 	 * @param array $options Query options.
 	 * @return ServiceResponse
 	 */
 	public function get_email_log_entries( array $options = [] ): ServiceResponse {
 		$defaults = [
-			'limit'  => 100,
-			'offset' => 0,
+			'search'     => '',
+			'status'     => 'all',
+			'receiver'   => '',
+			'sort_by'    => 'sent_date',
+			'sort_order' => 'desc',
+			'per_page'   => 20,
+			'page'       => 1,
 		];
 
 		$options = wp_parse_args( $options, $defaults );
 
-		// Basic validation
-		if ( $options['limit'] > 1000 ) {
-			$options['limit'] = 1000;
+		// Sanitize and validate options
+		$options['per_page'] = max( 1, min( 100, (int) $options['per_page'] ) );
+		$options['page'] = max( 1, (int) $options['page'] );
+		$options['sort_order'] = strtolower( $options['sort_order'] ) === 'asc' ? 'asc' : 'desc';
+
+		// Calculate offset
+		$offset = ( $options['page'] - 1 ) * $options['per_page'];
+
+		// Prepare filters for model
+		$filters = [
+			'search'     => sanitize_text_field( $options['search'] ),
+			'status'     => in_array( $options['status'], [ 'all', 'success', 'failed' ], true ) ? $options['status'] : 'all',
+			'receiver'   => sanitize_email( $options['receiver'] ),
+			'sort_by'    => in_array( $options['sort_by'], [ 'sent_date', 'subject', 'to_email', 'status' ], true ) ? $options['sort_by'] : 'sent_date',
+			'sort_order' => strtoupper( $options['sort_order'] ),
+			'limit'      => $options['per_page'],
+			'offset'     => $offset,
+		];
+
+		try {
+			// Get filtered entries
+			$entries = EmailLog::get_filtered( $filters );
+			$total_count = EmailLog::count_filtered( $filters );
+
+			// Format entries for API response
+			$formatted_entries = array_map(
+				static function ( EmailLog $entry ) {
+					return $entry->to_array();
+				},
+				$entries
+			);
+
+			// Calculate pagination info
+			$total_pages = ceil( $total_count / $options['per_page'] );
+			$current_page = $options['page'];
+
+			return ServiceResponse::success(
+				[
+					'entries'      => $formatted_entries,
+					'pagination'   => [
+						'current_page' => $current_page,
+						'total_pages'  => $total_pages,
+						'total_items'  => $total_count,
+						'per_page'     => $options['per_page'],
+						'from'         => $total_count > 0 ? $offset + 1 : 0,
+						'to'           => min( $offset + $options['per_page'], $total_count ),
+						'has_more'     => $current_page < $total_pages,
+					],
+					'total_count'  => $total_count,
+				]
+			);
+
+		} catch ( Exception $e ) {
+			return ServiceResponse::failure(
+				__( 'Failed to retrieve email logs.', 'debug-suite' ),
+				'database_error',
+				[ 'error' => $e->getMessage() ]
+			);
 		}
-		if ( $options['offset'] < 0 ) {
-			$options['offset'] = 0;
+	}
+
+	/**
+	 * Get filter options for dropdowns.
+	 *
+	 * @return ServiceResponse
+	 */
+	public function get_filter_options(): ServiceResponse {
+		try {
+			$receivers = EmailLog::get_unique_receivers();
+
+			return ServiceResponse::success(
+				[
+					'receivers' => array_map(
+						static function ( $receiver ) {
+							return [
+								'value' => $receiver,
+								'label' => $receiver,
+							];
+						},
+						$receivers
+					),
+					'statuses'  => [
+						[
+							'value' => 'all',
+							'label' => __( 'All Statuses', 'debug-suite' ),
+						],
+						[
+							'value' => 'success',
+							'label' => __( 'Successful', 'debug-suite' ),
+						],
+						[
+							'value' => 'failed',
+							'label' => __( 'Failed', 'debug-suite' ),
+						],
+					],
+				]
+			);
+
+		} catch ( Exception $e ) {
+			return ServiceResponse::failure(
+				__( 'Failed to retrieve filter options.', 'debug-suite' ),
+				'database_error',
+				[ 'error' => $e->getMessage() ]
+			);
 		}
-
-		$entries = EmailLog::all( $options );
-		$total_count = EmailLog::count();
-
-		$formatted_entries = array_map(
-			static function ( EmailLog $entry ) {
-				return $entry->to_array();
-			},
-			$entries
-		);
-
-		return ServiceResponse::success(
-			[
-				'entries'     => $formatted_entries,
-				'total_count' => $total_count,
-				'current_page' => floor( $options['offset'] / $options['limit'] ) + 1,
-				'per_page'     => $options['limit'],
-				'total_pages'  => ceil( $total_count / $options['limit'] ),
-				'has_more'     => (int) ( $options['offset'] + $options['limit'] ) < $total_count,
-			]
-		);
 	}
 
 	/**
@@ -203,7 +286,10 @@ class EmailLogService implements ServiceInterface, Hookable {
 		$email = EmailLog::find( $email_id );
 
 		if ( ! $email ) {
-			return ServiceResponse::failure( __( 'Email not found.', 'debug-suite' ) );
+			return ServiceResponse::failure(
+				__( 'Email not found.', 'debug-suite' ),
+				'not_found'
+			);
 		}
 
 		return ServiceResponse::success( $email->to_array() );

@@ -9,7 +9,10 @@ export interface EmailLogEntry {
     time: string;
     receiver: string;
     subject: string;
-    error?: string;
+    message?: string;
+    headers?: string;
+    attachments?: string;
+    error?: string | null;
     status: 'success' | 'failed';
     created_at: string;
 }

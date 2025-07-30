@@ -22,7 +22,7 @@
  */
 
 // If uninstall not called from WordPress, then exit.
-use DebugSuite\Install;
+use DebugSuite\Internal\DatabaseTables;
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
@@ -36,4 +36,4 @@ delete_option( 'debug_suite_needs_onboarding' );
 delete_transient( 'debug_suite_activation_redirect' );
 
 // Drop database tables
-Install::drop_tables();
+DatabaseTables::drop_tables();
