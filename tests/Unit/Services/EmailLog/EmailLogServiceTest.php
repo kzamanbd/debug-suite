@@ -96,8 +96,7 @@ class EmailLogServiceTest extends DebugSuiteTestCase {
         $this->assert_service_result_success( $result );
         $this->assertArrayHasKey( 'entries', $result->get_data() );
         $this->assertArrayHasKey( 'total_count', $result->get_data() );
-        $this->assertArrayHasKey( 'current_page', $result->get_data() );
-        $this->assertArrayHasKey( 'total_pages', $result->get_data() );
+        $this->assertArrayHasKey( 'pagination', $result->get_data() );
     }
 
     /**
