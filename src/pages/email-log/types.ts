@@ -6,7 +6,7 @@
 
 export interface EmailLogEntry {
     id: number;
-    time: string;
+    sent_date: string;
     receiver: string;
     subject: string;
     message?: string;

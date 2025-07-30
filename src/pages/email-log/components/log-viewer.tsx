@@ -4,7 +4,7 @@
  * @since 1.0.0
  */
 import type { PaginationInfo } from '@/components/base';
-import { Pagination } from '@/components/base';
+import { DateTimeHtml, Pagination } from '@/components/base';
 import Checkbox from '@/components/base/checkbox';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -39,7 +39,7 @@ const EmailLogViewer = ({
         key: keyof EmailLogEntry;
         direction: 'asc' | 'desc';
     }>({
-        key: 'time',
+        key: 'sent_date',
         direction: 'desc'
     });
 
@@ -56,22 +56,6 @@ const EmailLogViewer = ({
 
     const handleSelectAll = () => {
         onSelectAll(!isAllSelected);
-    };
-
-    const formatTime = (timeString: string) => {
-        try {
-            const date = new Date(timeString);
-            return date.toLocaleString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        } catch {
-            return timeString;
-        }
     };
 
     if (loading && entries.length === 0) {
@@ -107,10 +91,10 @@ const EmailLogViewer = ({
                         </th>
                         <th
                             className="w-36 cursor-pointer px-2 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase hover:bg-gray-100"
-                            onClick={() => handleSort('time')}>
+                            onClick={() => handleSort('sent_date')}>
                             <div className="flex items-center space-x-1">
-                                <span>{__('Time', 'debug-suite')}</span>
-                                {sortConfig.key === 'time' && (
+                                <span>{__('Sent Date', 'debug-suite')}</span>
+                                {sortConfig.key === 'sent_date' && (
                                     <span className="text-primary">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                                 )}
                             </div>
@@ -159,7 +143,7 @@ const EmailLogViewer = ({
                                     />
                                 </td>
                                 <td className="px-2 py-3 text-sm whitespace-nowrap text-gray-900">
-                                    {formatTime(entry.time)}
+                                    <DateTimeHtml date={entry.sent_date} />
                                 </td>
                                 <td className="px-2 py-3 text-sm text-gray-900">
                                     <div className="truncate" title={entry.receiver}>

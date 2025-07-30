@@ -3,7 +3,7 @@
  *
  * @since 1.0.0
  */
-import { Modal } from '@/components/base';
+import { DateTimeHtml, Modal } from '@/components/base';
 import { __ } from '@wordpress/i18n';
 import { AlertCircle, Calendar, CheckCircle, FileText, Mail, MessageSquare, Paperclip } from 'lucide-react';
 import type { EmailLogEntry } from '../types';
@@ -27,23 +27,6 @@ const EmailDetail = ({ isOpen, onClose, entry, loading = false }: EmailDetailPro
         return null;
     }
 
-    // Format date time function
-    const formatDateTime = (timeString: string): string => {
-        try {
-            const date = new Date(timeString);
-            return date.toLocaleString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        } catch {
-            return timeString;
-        }
-    };
-
     // Parse attachments if they exist
     let attachments: Attachment[] = [];
     try {
@@ -61,7 +44,7 @@ const EmailDetail = ({ isOpen, onClose, entry, loading = false }: EmailDetailPro
     }
 
     return (
-        <Modal open={isOpen} onClose={onClose} className="max-w-4xl" showXButton={true}>
+        <Modal open={isOpen} onClose={onClose} className="max-w-2xl" showXButton={true}>
             <Modal.Title className="flex items-center gap-2">
                 <Mail className="text-primary h-5 w-5" />
                 {__('Email Details', 'debug-suite')}
@@ -83,7 +66,9 @@ const EmailDetail = ({ isOpen, onClose, entry, loading = false }: EmailDetailPro
                                     <span className="text-sm font-medium text-gray-700">
                                         {__('Sent:', 'debug-suite')}
                                     </span>
-                                    <span className="text-sm text-gray-900">{formatDateTime(entry.time)}</span>
+                                    <span className="text-sm text-gray-900">
+                                        <DateTimeHtml date={entry.sent_date} />
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {entry.error ? (

@@ -281,16 +281,16 @@ class EmailLog extends BaseModel {
 	 */
 	public function to_array(): array {
 		return [
-			'id'         => (int) $this->id,
-			'time'       => $this->sent_date,
-			'receiver'   => $this->to_email,
-			'subject'    => $this->subject,
-			'message'    => $this->message,
-			'headers'    => $this->headers,
-			'attachments' => $this->attachments,
-			'status'     => $this->status,
-			'error'      => $this->error_message,
-			'created_at' => $this->created_at,
+			'id' 			=> (int) $this->id,
+			'sent_date'		=> $this->sent_date,
+			'receiver'		=> $this->to_email,
+			'subject'		=> $this->subject,
+			'message'		=> $this->message,
+			'headers'		=> $this->headers,
+			'attachments' 	=> $this->attachments,
+			'status'		=> $this->status,
+			'error'			=> $this->error_message,
+			'created_at'	=> $this->created_at,
 		];
 	}
 

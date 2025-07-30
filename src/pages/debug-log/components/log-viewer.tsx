@@ -4,7 +4,7 @@
  * @since 1.0.0
  */
 import Button from '@/components/base/button';
-import DateTimeHtml from '@/components/date-time';
+import DateTimeHtml from '@/components/base/date-time';
 import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { useRef, useState } from '@wordpress/element';
