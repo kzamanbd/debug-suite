@@ -54,18 +54,18 @@ class Admin implements Hookable {
 			'debug_suite_menu_items',
 			[
 				[
-					'title' => __( 'Overview', 'debug-suite' ),
-					'path' => '/',
-					'order' => 1,
-				],
-				[
 					'title' => __( 'Debug Log', 'debug-suite' ),
 					'path' => 'debug-log',
-					'order' => 2,
+					'order' => 1,
 				],
 				[
 					'title' => __( 'Email Log', 'debug-suite' ),
 					'path' => 'email-log',
+					'order' => 2,
+				],
+				[
+					'title' => __( 'Overview', 'debug-suite' ),
+					'path' => '/',
 					'order' => 3,
 				],
 				[
