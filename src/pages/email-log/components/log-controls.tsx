@@ -3,6 +3,7 @@
  *
  * @since 1.0.0
  */
+import type { PaginationInfo } from '@/components/base';
 import Button from '@/components/base/button';
 import SearchableSelect from '@/components/base/select';
 import TextInput from '@/components/base/text-input';
@@ -19,14 +20,7 @@ interface EmailLogControlsProps {
     loading?: boolean;
     selectedItems: number[];
     totalItems: number;
-    paginationInfo: {
-        current_page: number;
-        total_pages: number;
-        total_items: number;
-        per_page: number;
-        from: number;
-        to: number;
-    };
+    paginationInfo: PaginationInfo;
 }
 
 const EmailLogControls = ({

@@ -3,12 +3,13 @@
  *
  * @since 1.0.0
  */
+import type { PaginationInfo } from '@/components/base';
+import { Pagination } from '@/components/base';
 import Checkbox from '@/components/base/checkbox';
-import { classNames } from '@/utils';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Eye, RotateCcw, Trash2 } from 'lucide-react';
-import type { EmailLogEntry, EmailLogFilters, PaginationInfo } from '../types';
+import type { EmailLogEntry, EmailLogFilters } from '../types';
 
 interface EmailLogViewerProps {
     entries: EmailLogEntry[];
@@ -73,153 +74,6 @@ const EmailLogViewer = ({
         }
     };
 
-    const renderPagination = () => {
-        const { current_page, total_pages, from, to, total_items } = paginationInfo;
-
-        if (total_pages <= 1) return null;
-
-        const pages = [];
-        const showPages = 5;
-        let startPage = Math.max(1, current_page - Math.floor(showPages / 2));
-        const endPage = Math.min(total_pages, startPage + showPages - 1);
-
-        if (endPage - startPage + 1 < showPages) {
-            startPage = Math.max(1, endPage - showPages + 1);
-        }
-
-        // First page and ellipsis
-        if (startPage > 1) {
-            pages.push(
-                <button
-                    key={1}
-                    onClick={() => onPageChange(1)}
-                    className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50">
-                    1
-                </button>
-            );
-            if (startPage > 2) {
-                pages.push(
-                    <span
-                        key="ellipsis-start"
-                        className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
-                        ...
-                    </span>
-                );
-            }
-        }
-
-        // Page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(
-                <button
-                    key={i}
-                    onClick={() => onPageChange(i)}
-                    className={classNames(
-                        'relative inline-flex items-center border px-4 py-2 text-sm font-medium',
-                        current_page === i
-                            ? 'bg-primary border-primary z-10 text-white'
-                            : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50'
-                    )}>
-                    {i}
-                </button>
-            );
-        }
-
-        // Last page and ellipsis
-        if (endPage < total_pages) {
-            if (endPage < total_pages - 1) {
-                pages.push(
-                    <span
-                        key="ellipsis-end"
-                        className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
-                        ...
-                    </span>
-                );
-            }
-            pages.push(
-                <button
-                    key={total_pages}
-                    onClick={() => onPageChange(total_pages)}
-                    className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50">
-                    {total_pages}
-                </button>
-            );
-        }
-
-        return (
-            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-                <div className="flex flex-1 justify-between sm:hidden">
-                    <button
-                        onClick={() => current_page > 1 && onPageChange(current_page - 1)}
-                        disabled={current_page <= 1}
-                        className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
-                        {__('Previous', 'debug-suite')}
-                    </button>
-                    <button
-                        onClick={() => current_page < total_pages && onPageChange(current_page + 1)}
-                        disabled={current_page >= total_pages}
-                        className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
-                        {__('Next', 'debug-suite')}
-                    </button>
-                </div>
-                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                    <div>
-                        <p className="text-sm text-gray-700">
-                            {__('Showing', 'debug-suite')} <span className="font-medium">{from}</span>{' '}
-                            {__('to', 'debug-suite')} <span className="font-medium">{to}</span>{' '}
-                            {__('of', 'debug-suite')}{' '}
-                            <span className="font-medium">{total_items.toLocaleString()}</span>{' '}
-                            {__('results', 'debug-suite')}
-                        </p>
-                    </div>
-                    <div>
-                        <nav
-                            className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
-                            aria-label="Pagination">
-                            <button
-                                onClick={() => current_page > 1 && onPageChange(current_page - 1)}
-                                disabled={current_page <= 1}
-                                className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
-                                <span className="sr-only">{__('Previous', 'debug-suite')}</span>
-                                <svg
-                                    className="h-5 w-5"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    aria-hidden="true">
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
-                            </button>
-                            {pages}
-                            <button
-                                onClick={() => current_page < total_pages && onPageChange(current_page + 1)}
-                                disabled={current_page >= total_pages}
-                                className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
-                                <span className="sr-only">{__('Next', 'debug-suite')}</span>
-                                <svg
-                                    className="h-5 w-5"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    aria-hidden="true">
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
-                            </button>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
     if (loading && entries.length === 0) {
         return (
             <div className="flex-1 rounded-lg border border-gray-200 bg-white">
@@ -228,7 +82,7 @@ const EmailLogViewer = ({
                         <div className="h-4 w-1/4 rounded bg-gray-200"></div>
                     </div>
                     {Array.from({ length: 10 }, (_, i) => (
-                        <div key={i} className="border-b border-gray-100 px-6 py-4">
+                        <div key={`skeleton-${i}`} className="border-b border-gray-100 px-6 py-4">
                             <div className="flex items-center space-x-4">
                                 <div className="h-4 w-4 rounded bg-gray-200"></div>
                                 <div className="h-4 w-32 rounded bg-gray-200"></div>
@@ -357,7 +211,7 @@ const EmailLogViewer = ({
             </table>
 
             {/* Pagination */}
-            {renderPagination()}
+            <Pagination paginationInfo={paginationInfo} onPageChange={onPageChange} />
         </div>
     );
 };

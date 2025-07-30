@@ -3,9 +3,10 @@
  *
  * @since 1.0.0
  */
+import type { PaginationInfo } from '@/components/base';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import type { EmailLogEntry, EmailLogFilters, PaginationInfo } from '../types';
+import type { EmailLogEntry, EmailLogFilters } from '../types';
 import useEmailLogAPI from './use-api';
 
 interface UseEmailLogEntriesResult {
@@ -54,7 +55,7 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
 
         try {
             const response = await fetchEmailLogs(filters, currentPage);
-            
+
             setEntries(response.entries);
             setPaginationInfo({
                 current_page: response.current_page,
@@ -64,7 +65,6 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
                 from: Math.min((response.current_page - 1) * response.per_page + 1, response.total),
                 to: Math.min(response.current_page * response.per_page, response.total)
             });
-
         } catch (err) {
             console.error('Failed to fetch email logs:', err);
             setError(__('Failed to load email logs.', 'debug-suite'));
@@ -101,9 +101,7 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
     );
 
     const onSelectItem = useCallback((id: number, selected: boolean) => {
-        setSelectedItems((prev) =>
-            selected ? [...prev, id] : prev.filter((itemId) => itemId !== id)
-        );
+        setSelectedItems((prev) => (selected ? [...prev, id] : prev.filter((itemId) => itemId !== id)));
     }, []);
 
     // Handle page change

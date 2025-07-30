@@ -42,15 +42,6 @@ export interface EmailLogStats {
     success_rate: string;
 }
 
-export interface PaginationInfo {
-    current_page: number;
-    total_pages: number;
-    total_items: number;
-    per_page: number;
-    from: number;
-    to: number;
-}
-
 export interface BulkAction {
     action: 'delete' | 'resend' | 'mark_read';
     selected_ids: number[];
