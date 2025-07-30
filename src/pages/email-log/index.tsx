@@ -19,7 +19,8 @@ const EmailLog = () => {
         selectedItems,
         onSelectAll,
         onSelectItem,
-        onPageChange
+        onPageChange,
+        emailStats
     } = useEmailLogEntries();
 
     const [currentSelections, setCurrentSelections] = useState<number[]>([]);
@@ -72,9 +73,6 @@ const EmailLog = () => {
         setModalState({ isOpen: false, entry: null });
     };
 
-    // Calculate total items for display
-    const totalItems = paginationInfo.total_items;
-
     // Show skeleton while initial data loads
     if (loading && entries.length === 0) {
         return <EmailLogSkeleton />;
@@ -89,8 +87,8 @@ const EmailLog = () => {
                 onBulkAction={handleBulkActionSubmit}
                 loading={loading || processing}
                 selectedItems={currentSelections.length > 0 ? currentSelections : selectedItems}
-                totalItems={totalItems}
                 paginationInfo={paginationInfo}
+                emailStats={emailStats}
             />
 
             <EmailLogViewer

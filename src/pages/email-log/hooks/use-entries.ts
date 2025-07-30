@@ -6,7 +6,7 @@
 import type { PaginationInfo } from '@/components/base';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import type { EmailLogEntry, EmailLogFilters } from '../types';
+import type { EmailLogEntry, EmailLogFilters, EmailLogStats } from '../types';
 import useEmailLogAPI from './use-api';
 
 interface UseEmailLogEntriesResult {
@@ -21,6 +21,7 @@ interface UseEmailLogEntriesResult {
     onSelectAll: (selected: boolean) => void;
     onSelectItem: (id: number, selected: boolean) => void;
     onPageChange: (page: number) => void;
+    emailStats: EmailLogStats;
 }
 
 const useEmailLogEntries = (): UseEmailLogEntriesResult => {
@@ -28,6 +29,12 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
+    const [emailStats, setEmailStats] = useState<EmailLogStats>({
+        total_emails: 0,
+        successful: 0,
+        failed: 0,
+        success_rate: '0%'
+    });
     const [filters, setFilters] = useState<EmailLogFilters>({
         receiver: '',
         status: 'all',
@@ -46,7 +53,7 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         to: 0
     });
 
-    const { fetchEmailLogs } = useEmailLogAPI();
+    const { fetchEmailLogs, fetchEmailStats } = useEmailLogAPI();
 
     // Fetch email logs from API
     const fetchEmailData = useCallback(async () => {
@@ -54,9 +61,10 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         setError(null);
 
         try {
-            const response = await fetchEmailLogs(filters, currentPage);
+            const [response, stats] = await Promise.all([fetchEmailLogs(filters, currentPage), fetchEmailStats()]);
 
             setEntries(response.entries);
+            setEmailStats(stats);
             setPaginationInfo({
                 current_page: response.current_page,
                 total_pages: response.total_pages,
@@ -72,7 +80,7 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         } finally {
             setLoading(false);
         }
-    }, [fetchEmailLogs, filters, currentPage]);
+    }, [fetchEmailLogs, fetchEmailStats, filters, currentPage]);
 
     // Effect to fetch data when filters or page change
     useEffect(() => {
@@ -129,7 +137,8 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         selectedItems,
         onSelectAll,
         onSelectItem,
-        onPageChange
+        onPageChange,
+        emailStats
     };
 };
 
