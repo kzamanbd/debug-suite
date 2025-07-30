@@ -46,7 +46,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 		LogsService::class,
 		SettingsService::class,
 		OverviewService::class,
-		\DebugSuite\Services\EmailLog\EmailLogService::class,
+		EmailLogService::class,
 	];
 
 	public function register( Container $container ): void {
