@@ -160,7 +160,7 @@ const Pagination = ({
                     </div>
                 )}
                 <div>
-                    <nav className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                    <nav className="relative z-0 inline-flex -space-x-px rounded-md" aria-label="Pagination">
                         {/* Previous button */}
                         <button
                             onClick={() => current_page > 1 && onPageChange(current_page - 1)}
