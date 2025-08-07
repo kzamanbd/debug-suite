@@ -224,7 +224,7 @@ class Admin implements Hookable {
 	/**
 	 * Remove all non-Debug Suite Logging plugin notices from our plugin pages.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 */
 	public function hide_unrelated_notices(): void {
 
@@ -243,7 +243,7 @@ class Admin implements Hookable {
 	 *
 	 * @param string $action The name of the action.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
@@ -282,7 +282,7 @@ class Admin implements Hookable {
 	 *
 	 * @param string $text Footer text.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return string
 	 */

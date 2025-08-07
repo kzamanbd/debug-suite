@@ -64,7 +64,7 @@ if ( ! function_exists( 'debug_suite_current_page' ) ) {
 	/**
 	 * Check if the current admin page is a Debug Suite page.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.0.0
 	 *
 	 * @return bool True if it's a Debug Suite page, false otherwise.
 	 */
