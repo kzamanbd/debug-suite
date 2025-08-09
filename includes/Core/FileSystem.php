@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Provides a consistent interface for file operations using WordPress
  * Filesystem API instead of direct PHP file functions.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 class FileSystem {
 
@@ -111,7 +111,8 @@ class FileSystem {
 		$filesystem = self::get_instance();
 
 		if ( ! $filesystem ) {
-			return is_writable( $file_path );
+			// Use WordPress helper instead of direct PHP is_writable for compatibility with various FS methods.
+			return function_exists( 'wp_is_writable' ) ? wp_is_writable( $file_path ) : false;
 		}
 
 		return $filesystem->is_writable( $file_path );
@@ -243,22 +244,8 @@ class FileSystem {
 	 * @return string|false File contents on success, false on failure.
 	 */
 	public static function read_tail( string $file_path, int $bytes ): string|false {
-		$filesystem = self::get_instance();
-
-		if ( ! $filesystem ) {
-			$handle = fopen( $file_path, 'rb' );
-			if ( ! $handle ) {
-				return false;
-			}
-
-			fseek( $handle, -$bytes, SEEK_END );
-			$content = fread( $handle, $bytes );
-			fclose( $handle );
-
-			return $content;
-		}
-
-		$content = $filesystem->get_contents( $file_path );
+		// Read file contents via WP_Filesystem when available, otherwise via our wrapper fallback.
+		$content = self::get_contents( $file_path );
 
 		if ( $content === false ) {
 			return false;
