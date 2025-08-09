@@ -8,7 +8,7 @@ import type { BulkAction, EmailEntry, EmailFilters } from '../types';ontrols - F
 import type { PaginationInfo } from '@/components/base';
 import Button from '@/components/base/button';
 import type { Option } from '@/components/base/select';
-import SearchableSelect from '@/components/base/select';
+import SimpleSelect from '@/components/base/select';
 import TextInput from '@/components/base/text-input';
 import { useConfirm } from '@/hooks/use-confirm';
 import { Fill } from '@wordpress/components';
@@ -183,7 +183,7 @@ const EmailLogControls = ({
             <div className="flex flex-wrap items-center gap-4">
                 {/* Bulk Actions */}
                 <div className="flex items-center space-x-2">
-                    <SearchableSelect
+                    <SimpleSelect
                         options={bulkActionOptions}
                         value={selectedBulkAction}
                         onChange={handleBulkActionChange}
@@ -197,7 +197,8 @@ const EmailLogControls = ({
                 </div>
 
                 {/* Receiver Filter */}
-                <SearchableSelect
+                <SimpleSelect
+                    searchable
                     options={receiverOptions}
                     value={receiverOptions.find((opt) => opt.value === filters.receiver) || null}
                     onChange={handleReceiverChange}
@@ -206,7 +207,7 @@ const EmailLogControls = ({
                 />
 
                 {/* Status Filter */}
-                <SearchableSelect
+                <SimpleSelect
                     options={statusOptions}
                     value={statusOptions.find((opt) => opt.value === filters.status) || null}
                     onChange={handleStatusChange}

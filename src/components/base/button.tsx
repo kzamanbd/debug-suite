@@ -31,8 +31,8 @@ const variantClasses: Record<ButtonVariant, string> = {
 
 const sizeClasses = {
     sm: 'px-2 py-1 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
+    md: 'px-2 py-1.5 text-sm',
+    lg: 'px-4 py-3 text-base'
 };
 
 const Spinner = ({ className = '' }: { className?: string }) => (
@@ -62,7 +62,7 @@ const Button = <T extends ElementType = 'button'>({
             data-size={size}
             data-variant={variant}
             className={classNames(
-                'flex cursor-pointer items-center justify-center gap-1 rounded-md border border-gray-200 px-2.5 py-1.5 text-sm font-medium dark:border-gray-700',
+                'flex cursor-pointer items-center justify-center gap-1 rounded-md border border-gray-200 text-sm font-medium dark:border-gray-700',
                 variantClasses[variant],
                 sizeClasses[size],
                 className,

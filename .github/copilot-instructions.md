@@ -101,16 +101,16 @@ Debug Suite is a WordPress plugin that provides advanced debugging tools for Wor
 
 7. **UI Components**:
     - **Use Headless UI for interactive components**: Prefer `@headlessui/react` components for dropdowns, modals, dialogs, and other interactive elements
-    - **Combobox for Dropdowns**: Use the custom `SearchableSelect` component (built on react-select) for all dropdown selections instead of native selects
+    - **Combobox for Dropdowns**: Use the custom `SimpleSelect` component (built on react-select) for all dropdown selections instead of native selects
     - **Toast Notifications**: Use the custom `Toast` component with variation methods for user feedback
     - **Accessibility First**: Always use Headless UI components which provide built-in accessibility features
     - **Custom Components**: Build custom UI components in `src/components/base/` following the established patterns
     - **Component Examples**:
 
         ```typescript
-        // ✅ Good - Use react-select based SearchableSelect
-        import SearchableSelect from '@/components/base/select';
-        <SearchableSelect options={options} value={selected} onChange={setSelected} />
+        // ✅ Good - Use react-select based SimpleSelect
+        import SimpleSelect from '@/components/base/select';
+        <SimpleSelect options={options} value={selected} onChange={setSelected} />
 
         // ✅ Good - Use Toast variations
         import { useToast } from '@/components/base/toast';
@@ -882,7 +882,7 @@ src/pages/[feature-name]/
 
 #### Dropdown/Select Components
 
-**Always use the custom SearchableSelect component** built on react-select for all dropdown selections.
+**Always use the custom SimpleSelect component** built on react-select for all dropdown selections.
 
 **Features:**
 
@@ -904,14 +904,14 @@ src/pages/[feature-name]/
 **Usage Example:**
 
 ```typescript
-import SearchableSelect from '@/components/base/select';
+import SimpleSelect from '@/components/base/select';
 
 const options = [
     { value: 'option1', label: 'Option 1' },
     { value: 'option2', label: 'Option 2' },
 ];
 
-<SearchableSelect
+<SimpleSelect
     options={options}
     value={selectedOption}
     onChange={(option) => setSelectedOption(option)}
@@ -1072,8 +1072,8 @@ src/pages/[feature-name]/
 
 #### Reusable Component Standards
 
-- **Base Components**: `src/components/base/` for reusable UI (Button, SearchableSelect, Toast, Modal)
-- **SearchableSelect**: Always use for dropdowns (react-select wrapper with accessibility)
+- **Base Components**: `src/components/base/` for reusable UI (Button, SimpleSelect, Toast, Modal)
+- **SimpleSelect**: Always use for dropdowns (react-select wrapper with accessibility)
 - **Toast System**: Use `toast.success()`, `toast.error()` for user feedback
 - **Lucide Icons**: Only icon library allowed (`import { Icon } from 'lucide-react'`)
 - **Tailwind Primary**: Always use `primary` color as brand color

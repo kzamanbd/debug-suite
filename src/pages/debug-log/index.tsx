@@ -31,13 +31,13 @@ const FileLogs = () => {
     } = useRawFileContent(selectedFile?.value);
 
     // Local state for view mode only
-    const [viewMode, setViewMode] = useState<ViewMode>('parsed');
+    const [viewMode, setViewMode] = useState<ViewMode>('raw');
 
     // Handle focus change to refetch logs when tab becomes visible
     useEffect(() => {
         const handleFocus = () => {
             if (viewMode === 'parsed') {
-                refetchLogs();
+                void refetchLogs();
             } else {
                 void refetchRawContent();
             }
@@ -57,7 +57,7 @@ const FileLogs = () => {
     // Handle refresh based on current view mode
     const handleRefresh = () => {
         if (viewMode === 'parsed') {
-            refetchLogs();
+            void refetchLogs();
         } else {
             void refetchRawContent();
         }
@@ -67,7 +67,7 @@ const FileLogs = () => {
     const handleViewModeChange = (mode: ViewMode) => {
         setViewMode(mode);
         if (mode === 'parsed') {
-            refetchLogs();
+            void refetchLogs();
         } else {
             void refetchRawContent();
         }
@@ -85,7 +85,7 @@ const FileLogs = () => {
     };
 
     // Show skeleton while initial data loads
-    if (logsLoading && !logs.length) {
+    if (rawLoading && !rawContent) {
         return <FileLogsSkeleton />;
     }
 

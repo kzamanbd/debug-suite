@@ -802,10 +802,10 @@ src/pages/[feature-name]/
 **Base Component Library (`src/components/base/`):**
 
 ```typescript
-// SearchableSelect - Always use for dropdowns
-import SearchableSelect from '@/components/base/select';
+// SimpleSelect - Always use for dropdowns
+import SimpleSelect from '@/components/base/select';
 
-<SearchableSelect
+<SimpleSelect
     options={options}
     value={selectedOption}
     onChange={handleChange}
@@ -829,7 +829,7 @@ import { Modal } from '@/components/base';
 
 **Established Base Components:**
 
-- `SearchableSelect` - React-select wrapper with accessibility
+- `SimpleSelect` - React-select wrapper with accessibility
 - `Toast` - Success/error notifications with animations
 - `Modal` - Consistent dialog system
 - `Button` - Variant-based button component
