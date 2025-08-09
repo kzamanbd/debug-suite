@@ -43,7 +43,6 @@ const routes: DebugSuiteRoute[] = [
     {
         id: 'debug-log',
         title: __('Debug Log', 'debug-suite'),
-        description: __('View and manage your debug logs.', 'debug-suite'),
         path: '/debug-log',
         element: <DebugLog />
     },

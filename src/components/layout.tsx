@@ -20,7 +20,7 @@ const LayoutHeader = ({ route }: { route: DebugSuiteRoute }) => {
             <div className="flex-1">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     {typeof route.title === 'string' ? (
-                        <div className="text-2xl font-semibold text-gray-900 dark:text-white">{route.title}</div>
+                        <div className="text-xl font-semibold text-gray-900 dark:text-white">{route.title}</div>
                     ) : (
                         route.title
                     )}
@@ -29,13 +29,15 @@ const LayoutHeader = ({ route }: { route: DebugSuiteRoute }) => {
                         <ViewModeSwitcher />
                     </div>
                 </div>
-                <div className="mt-2">
-                    {typeof route.description === 'string' ? (
-                        <div className="text-sm text-gray-600 dark:text-gray-400">{route.description}</div>
-                    ) : (
-                        route.description
-                    )}
-                </div>
+                {route.description && (
+                    <div className="mt-2">
+                        {typeof route.description === 'string' ? (
+                            <div className="text-sm text-gray-600 dark:text-gray-400">{route.description}</div>
+                        ) : (
+                            route.description
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -11,7 +11,7 @@ import { useConfirm } from '@/hooks/use-confirm';
 import { classNames } from '@/utils';
 import { Fill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Copy, Download, EyeIcon, FileTextIcon, Filter, RefreshCw, SearchIcon, Trash2, XIcon } from 'lucide-react';
+import { Download, EyeIcon, FileTextIcon, Filter, RefreshCw, SearchIcon, Trash2, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { levelOptions, perPageOptions, sortOptions } from '../constants';
 import type { LogFilters, RawFileContent, ViewMode } from '../types';
@@ -104,10 +104,11 @@ const LogControls = ({
             {/* Header with file selector */}
             <Fill name="debug-suite-layout-header-right">
                 <SearchableSelect
+                    simpleSelect
                     options={filteredLogFiles}
                     value={selectedFile}
                     onChange={onFileChange}
-                    className="w-56"
+                    className="w-56 py-1.5"
                     placeholder={__('Select a log file', 'debug-suite')}
                 />
                 {/* View Mode Toggle */}
@@ -116,7 +117,7 @@ const LogControls = ({
                         type="button"
                         onClick={() => onViewModeChange('parsed')}
                         className={classNames(
-                            'flex items-center rounded-md border border-transparent px-1.5 py-2 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
+                            'flex items-center rounded-md border border-transparent p-1.5 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
                             viewMode === 'parsed'
                                 ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
                                 : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
@@ -128,13 +129,13 @@ const LogControls = ({
                         type="button"
                         onClick={() => onViewModeChange('raw')}
                         className={classNames(
-                            'flex items-center rounded-md border border-transparent px-1.5 py-2 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
+                            'flex items-center rounded-md border border-transparent p-1.5 text-xs font-medium transition-all duration-200 focus:outline-hidden sm:px-2 md:text-[13px]',
                             viewMode === 'raw'
                                 ? 'bg-white text-gray-800 shadow-sm hover:border-transparent focus:border-transparent'
                                 : 'text-gray-800 hover:border-gray-400 focus:border-gray-400 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:text-white dark:focus:border-neutral-500 dark:focus:text-white'
                         )}>
                         <FileTextIcon className="mr-1 size-4 sm:mr-1.5" />
-                        <span className="hidden sm:inline">{__('Raw File', 'debug-suite')}</span>
+                        <span className="hidden sm:inline">{__('Raw', 'debug-suite')}</span>
                     </button>
                 </nav>
 
@@ -142,7 +143,7 @@ const LogControls = ({
                     <Button
                         onClick={onRefresh}
                         disabled={loading}
-                        className="group relative rounded-none rounded-l-md border-0 border-r"
+                        className="group relative rounded-none rounded-l-md border-0 border-r p-1.5"
                         title="Refresh">
                         <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[90px]">
                             <div className="flex items-center">
@@ -160,7 +161,7 @@ const LogControls = ({
                     <Button
                         onClick={() => setShowFilters(!showFilters)}
                         className={classNames(
-                            'group relative rounded-none border-0 border-r',
+                            'group relative rounded-none border-0 border-r p-1.5',
                             showFilters && 'bg-gray-100'
                         )}
                         title="Show/hide filters panel">
@@ -176,23 +177,9 @@ const LogControls = ({
                             </kbd>
                         </div>
                     </Button>
-
-                    <Button className="group relative rounded-none border-0 border-r" title="Copy logs to clipboard">
-                        <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[50px]">
-                            <div className="flex items-center">
-                                <Copy className="size-4 shrink-0" />
-                                <span className="max-w-0 overflow-hidden text-sm whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[40px] group-hover:opacity-100">
-                                    Copy
-                                </span>
-                            </div>
-                            <kbd className="ml-1.5 rounded px-1.5 py-0.5 text-[10px] opacity-100 transition-all duration-300 ease-in-out group-hover:opacity-50">
-                                C
-                            </kbd>
-                        </div>
-                    </Button>
                     <Button
                         onClick={handleDownload}
-                        className="group relative rounded-none border-0 border-r"
+                        className="group relative rounded-none border-0 border-r p-1.5"
                         title="Download logs">
                         <div className="flex w-full min-w-8 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[110px]">
                             <div className="flex items-center">
@@ -209,7 +196,7 @@ const LogControls = ({
                     <Button
                         onClick={handleClear}
                         disabled={clearing}
-                        className="group relative rounded-none rounded-r-md border-0"
+                        className="group relative rounded-none rounded-r-md border-0 p-1.5"
                         title="Clear all logs">
                         <div className="flex w-full min-w-6 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[90px]">
                             <div className="flex items-center">

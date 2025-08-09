@@ -79,7 +79,7 @@ const defaultLog: Option = {
 export const useLogEntries = () => {
     const [allLogs, setAllLogs] = useState<LogEntry[]>([]);
     const [totalEntries, setTotalEntries] = useState(0);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<Option | null>(defaultLog);
     const [filters, setFilters] = useState<LogFilters>({
         level: '',
@@ -173,17 +173,6 @@ export const useLogEntries = () => {
         }));
     }, []);
 
-    // Refetch logs
-    const refetch = useCallback(() => {
-        void fetchLogs();
-    }, [fetchLogs]);
-
-    // Initial fetch - runs only once on mount
-    useEffect(() => {
-        void fetchLogs(defaultPerPage);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     return {
         logs: filteredLogs,
         loading,
@@ -192,7 +181,7 @@ export const useLogEntries = () => {
         filters,
         updateFilters,
         loadMore,
-        refetch,
+        refetch: fetchLogs,
         selectedFile,
         onFileChange
     };
