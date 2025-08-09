@@ -5,7 +5,7 @@
  */
 import Button from '@/components/base/button';
 import type { Option } from '@/components/base/select';
-import SearchableSelect from '@/components/base/select';
+import SimpleSelect from '@/components/base/select';
 import InputField from '@/components/base/text-input';
 import { useConfirm } from '@/hooks/use-confirm';
 import { classNames } from '@/utils';
@@ -103,12 +103,11 @@ const LogControls = ({
         <>
             {/* Header with file selector */}
             <Fill name="debug-suite-layout-header-right">
-                <SearchableSelect
-                    simpleSelect
+                <SimpleSelect
                     options={filteredLogFiles}
                     value={selectedFile}
                     onChange={onFileChange}
-                    className="w-56 py-1.5"
+                    className="w-56 p-1.5"
                     placeholder={__('Select a log file', 'debug-suite')}
                 />
                 {/* View Mode Toggle */}
@@ -219,19 +218,19 @@ const LogControls = ({
                     <div className="flex flex-col flex-wrap gap-4 md:gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 md:gap-4">
-                                <SearchableSelect
+                                <SimpleSelect
                                     options={levelOptions}
                                     value={levelOptions.find((opt) => opt.value === filters.level) || levelOptions[0]}
                                     onChange={(option) => onFiltersChange({ level: option?.value || '' })}
                                 />
-                                <SearchableSelect
+                                <SimpleSelect
                                     options={sortOptions}
                                     value={sortOptions.find((opt) => opt.value === filters.sortBy) || sortOptions[0]}
                                     onChange={(option) => onFiltersChange({ sortBy: option?.value || '' })}
                                     className="w-[150px]"
                                 />
 
-                                <SearchableSelect
+                                <SimpleSelect
                                     options={perPageOptions}
                                     value={
                                         perPageOptions.find((opt) => opt.value === filters.perPage.toString()) ||

@@ -27,11 +27,11 @@ export interface SelectProps
     error?: string;
     className?: string;
     isDisabled?: boolean;
-    isSearchable?: boolean;
     menuPlacement?: 'auto' | 'bottom' | 'top';
     menuPortalTarget?: HTMLElement;
     formatOptionLabel?: (option: Option) => React.ReactNode;
-    simpleSelect?: boolean;
+    searchable?: boolean;
+    simpleClass?: string;
 }
 
 // Custom dropdown indicator with Lucide icon
@@ -43,7 +43,7 @@ const DropdownIndicator = (props: DropdownIndicatorProps<Option, false, GroupBas
     );
 };
 
-const SearchableSelect = ({
+const SimpleSelect = ({
     value,
     label,
     error,
@@ -52,7 +52,7 @@ const SearchableSelect = ({
     className = '',
     placeholder = 'Select an option...',
     formatOptionLabel,
-    simpleSelect = false,
+    searchable = false,
     ...props
 }: SelectProps) => {
     const renderOptionLabel = (option: Option) => {
@@ -68,9 +68,9 @@ const SearchableSelect = ({
     };
 
     return (
-        <div className={classNames('flex flex-col space-y-1', className)}>
+        <div className={classNames('flex flex-col space-y-1', searchable && className)}>
             {label && <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>}
-            {simpleSelect ? (
+            {!searchable ? (
                 <select
                     className={classNames(
                         'rounded-lg border-gray-200 px-3 py-2 pe-9 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
@@ -128,4 +128,4 @@ const SearchableSelect = ({
     );
 };
 
-export default SearchableSelect;
+export default SimpleSelect;
