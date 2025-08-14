@@ -75,7 +75,7 @@ class DatabaseManager implements Hookable {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE $table_name (
+		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
 			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			to_email varchar(200) NOT NULL DEFAULT '',
 			subject text NOT NULL,
@@ -110,13 +110,7 @@ class DatabaseManager implements Hookable {
 	public static function drop_tables(): void {
 		global $wpdb;
 
-		$tables = [
-			$wpdb->prefix . 'debug_suite_email_logs',
-		];
-
-		foreach ( $tables as $table ) {
-			$wpdb->query( "DROP TABLE IF EXISTS $table" ); // phpcs:ignore
-		}
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}debug_suite_email_logs" );
 
 		// Remove a database version option
 		delete_option( 'debug_suite_db_version' );
