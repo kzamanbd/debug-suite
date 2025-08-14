@@ -7,7 +7,6 @@
 
 namespace DebugSuite\Services\DebugLog;
 
-use Automattic\WooCommerce\Utilities\LoggingUtil;
 use DebugSuite\Core\FileSystem;
 use DebugSuite\Interfaces\ServiceInterface;
 
@@ -29,7 +28,6 @@ class LogDiscoveryService implements ServiceInterface {
 	 */
 	public function get_supported_log_files(): array {
 		$paths = [
-			WP_CONTENT_DIR,         // WordPress content (for debug.log)
 			'/var/log/apache2',     // Apache (Debian/Ubuntu)
 			'/var/log/httpd',       // Apache (CentOS/RedHat)
 			'/var/log/nginx',       // Nginx
@@ -37,9 +35,13 @@ class LogDiscoveryService implements ServiceInterface {
 			'/var/log/redis',       // Redis logs
 		];
 
+		if ( defined( 'WP_CONTENT_DIR' ) ) {
+			$paths[] = WP_CONTENT_DIR;
+		}
+
 		// Add custom paths for WooCommerce logs if available.
 		if ( class_exists( '\Automattic\WooCommerce\Utilities\LoggingUtil' ) ) {
-			$paths[] = LoggingUtil::get_log_directory();
+			$paths[] = \Automattic\WooCommerce\Utilities\LoggingUtil::get_log_directory();
 		}
 
 		$files = [];

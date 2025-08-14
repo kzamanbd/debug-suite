@@ -292,27 +292,7 @@ class Admin implements Hookable {
 			return $text;
 		}
 
-		$url_review = 'https://wordpress.org/support/plugin/debug-suite/reviews/?filter=5#new-post';
-		$url_github = 'https://github.com/kzamanbd/debug-suite'; // Replace with actual GitHub repo
-		$url_donate = 'https://coff.ee/kzamanbd';   // Replace with your actual Buy Me a Coffee profile
-
-		$content = sprintf(
-			wp_kses( /* translators: 1. Debug Suite plugin name; 2. WP.org review link; 3. - WP.org review link. */
-				__( 'Please rate %1$s <a href="%2$s" target="_blank" rel="noopener noreferrer">&#9733;&#9733;&#9733;&#9733;&#9733;</a> on <a href="%3$s" target="_blank" rel="noopener">WordPress.org</a> to help us spread the word.', 'debug-suite' ),
-				[
-					'a' => [
-						'href'   => [],
-						'target' => [],
-						'rel'    => [],
-					],
-				]
-			),
-			'<strong>Debug Suite</strong>',
-			$url_review,
-			$url_review
-		);
-
-		$extra_links = sprintf(
+		return sprintf(
 			wp_kses( /* translators: 1: GitHub URL, 2: Buy Me a Coffee URL */
 				__( '<a href="%1$s" target="_blank" rel="noopener noreferrer">View on GitHub</a> &nbsp;|&nbsp; <a href="%2$s" target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a>', 'debug-suite' ),
 				[
@@ -323,9 +303,8 @@ class Admin implements Hookable {
 					],
 				]
 			),
-			$url_github,
-			$url_donate
+			'https://github.com/kzamanbd/debug-suite',
+			'https://coff.ee/kzamanbd'
 		);
-		return $content . ' ' . $extra_links;
 	}
 }
