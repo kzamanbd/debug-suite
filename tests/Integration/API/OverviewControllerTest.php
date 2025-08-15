@@ -12,8 +12,10 @@ namespace DebugSuite\Tests\Integration\API;
 
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\API\OverviewController;
+use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\DebugLog\LogsService;
+use DebugSuite\Services\DebugLog\WPLogReaderService;
 use WP_REST_Request;
 use WP_REST_Server;
 
@@ -66,8 +68,12 @@ class OverviewControllerTest extends DebugSuiteTestCase {
 		// Create service instances
 		if ( class_exists( 'DebugSuite\Services\DebugLog\LogsService' ) &&
 		     class_exists( 'DebugSuite\Services\OverviewService' ) ) {
+
+			// Create service dependencies and service with dependency injection
+			$log_reader = new WPLogReaderService();
+			$log_discovery = new LogDiscoveryService();
 			
-			$logs_service = new LogsService();
+			$logs_service = new LogsService( $log_reader, $log_discovery );
 			$this->service = new OverviewService( $logs_service );
 		}
 		

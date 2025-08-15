@@ -23,26 +23,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class LogsService implements ServiceInterface {
 
 	/**
-	 * Advanced log reader service.
+	 * Constructor with dependency injection.
 	 *
-	 * @var WPLogReaderService
+	 * @param WPLogReaderService  $log_reader    Advanced log reader service.
+	 * @param LogDiscoveryService $log_discovery Log file discovery service.
 	 */
-	private WPLogReaderService $log_reader;
-
-	/**
-	 * Log file discovery service.
-	 *
-	 * @var LogDiscoveryService
-	 */
-	private LogDiscoveryService $log_discovery;
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->log_reader    = new WPLogReaderService();
-		$this->log_discovery = new LogDiscoveryService();
-	}
+	public function __construct(
+		private WPLogReaderService $log_reader,
+		private LogDiscoveryService $log_discovery
+	) {}
 
 	/**
 	 * Get log entries from the debug log file.
@@ -64,10 +53,12 @@ class LogsService implements ServiceInterface {
 	/**
 	 * Clear the debug log file.
 	 *
+	 * @param string $file_path Path to the log file to clear. If not provided, uses the default debug log.
+	 *
 	 * @return ServiceResponse
 	 */
-	public function clear_log_file(): ServiceResponse {
-		return $this->log_reader->clear_log_file();
+	public function clear_log_file( string $file_path = '' ): ServiceResponse {
+		return $this->log_reader->clear_log_file( $file_path );
 	}
 
 	/**

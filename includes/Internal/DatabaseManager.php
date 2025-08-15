@@ -9,6 +9,8 @@
 
 namespace DebugSuite\Internal;
 
+use DebugSuite\Interfaces\Hookable;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -18,8 +20,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class DatabaseManager {
+class DatabaseManager implements Hookable {
+	public function register_hooks(): void {
+		add_action( 'init', [ $this, 'wpdb_table_shortcuts' ], 1 );
+	}
 
+	public function wpdb_table_shortcuts(): void {
+		global $wpdb;
+		// Define custom table names for the plugin
+		$wpdb->debug_suite_email_logs = $wpdb->prefix . 'debug_suite_email_logs';
+	}
 	/**
 	 * Get the current database version.
 	 *
@@ -65,7 +75,7 @@ class DatabaseManager {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE $table_name (
+		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
 			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			to_email varchar(200) NOT NULL DEFAULT '',
 			subject text NOT NULL,
@@ -100,13 +110,7 @@ class DatabaseManager {
 	public static function drop_tables(): void {
 		global $wpdb;
 
-		$tables = [
-			$wpdb->prefix . 'debug_suite_email_logs',
-		];
-
-		foreach ( $tables as $table ) {
-			$wpdb->query( "DROP TABLE IF EXISTS $table" ); // phpcs:ignore
-		}
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}debug_suite_email_logs" );
 
 		// Remove a database version option
 		delete_option( 'debug_suite_db_version' );
