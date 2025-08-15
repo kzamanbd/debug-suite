@@ -15,6 +15,7 @@ use DebugSuite\Admin;
 use DebugSuite\Assets;
 use DebugSuite\Core\Container\AbstractServiceProvider;
 use DebugSuite\Core\Container\Container;
+use DebugSuite\Internal\DatabaseManager;
 use DebugSuite\Internal\HookManager;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
@@ -43,6 +44,7 @@ class AppServiceProvider extends AbstractServiceProvider {
 		Admin::class,
 		Assets::class,
 		HookManager::class,
+		DatabaseManager::class,
 		WPLogReaderService::class,
 		LogDiscoveryService::class,
 		LogsService::class,
