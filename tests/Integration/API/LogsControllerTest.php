@@ -13,6 +13,8 @@ namespace DebugSuite\Tests\Integration\API;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\API\LogsController;
 use DebugSuite\Services\DebugLog\LogsService;
+use DebugSuite\Services\DebugLog\WPLogReaderService;
+use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use WP_REST_Request;
 use WP_REST_Server;
 
@@ -55,8 +57,10 @@ class LogsControllerTest extends DebugSuiteTestCase {
 		$wp_rest_server = new WP_REST_Server();
 		do_action( 'rest_api_init' );
 
-		// Create service and controller (LogsService has no constructor parameters)
-		$this->service = new LogsService();
+		// Create service dependencies and service with dependency injection
+		$log_reader = new WPLogReaderService();
+		$log_discovery = new LogDiscoveryService();
+		$this->service = new LogsService( $log_reader, $log_discovery );
 		$this->controller = new LogsController( $this->service );
 		
 		// Register routes
