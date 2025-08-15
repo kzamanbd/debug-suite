@@ -156,7 +156,8 @@ class LogsController extends RestController {
 	}
 
 	public function clear_log_file( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$result = $this->service->clear_log_file();
+		$file_path = $request->get_param( 'file' );
+		$result = $this->service->clear_log_file($file_path);
 
 		return $result->is_failure()
 			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )

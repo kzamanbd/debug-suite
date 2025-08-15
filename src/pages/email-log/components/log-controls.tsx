@@ -39,9 +39,7 @@ const EmailLogControls = ({
     paginationInfo,
     emailStats
 }: EmailLogControlsProps) => {
-    const confirm = useConfirm({
-        okText: __('Continue', 'debug-suite')
-    });
+    const confirm = useConfirm();
     const { fetchFilterOptions, clearAllEmails } = useEmailLogAPI();
     const [filterOptions, setFilterOptions] = useState<{
         receivers: Array<{ value: string; label: string }>;
@@ -105,14 +103,14 @@ const EmailLogControls = ({
     };
 
     const clearEmail = async () => {
-        if (
-            !(await confirm(
-                __('Are you sure you want to clear all email logs? This action cannot be undone.', 'debug-suite')
-            ))
-        ) {
-            return;
-        }
         try {
+            if (
+                !(await confirm(
+                    __('Are you sure you want to clear all email logs? This action cannot be undone.', 'debug-suite')
+                ))
+            ) {
+                return;
+            }
             await clearAllEmails();
             onRefresh();
         } catch (error) {

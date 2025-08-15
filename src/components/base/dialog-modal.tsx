@@ -87,7 +87,7 @@ const DialogModal: React.FC<DialogModalProps> = ({ title, message, open, options
 
     const {
         type = 'confirm',
-        okText = __('Ok', 'debug-suite'),
+        okText = __('Continue', 'debug-suite'),
         autoHideDelay = 2000,
         showOk = true,
         showCancel = true,
