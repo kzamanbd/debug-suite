@@ -52,13 +52,13 @@ class LogsService implements ServiceInterface {
 
 	/**
 	 * Clear the debug log file.
-	 * 
+	 *
 	 * @param string $file_path Path to the log file to clear. If not provided, uses the default debug log.
 	 *
 	 * @return ServiceResponse
 	 */
-	public function clear_log_file(string $file_path = ''): ServiceResponse {
-		return $this->log_reader->clear_log_file($file_path);
+	public function clear_log_file( string $file_path = '' ): ServiceResponse {
+		return $this->log_reader->clear_log_file( $file_path );
 	}
 
 	/**
