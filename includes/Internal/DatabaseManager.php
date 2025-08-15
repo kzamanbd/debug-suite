@@ -9,6 +9,8 @@
 
 namespace DebugSuite\Internal;
 
+use DebugSuite\Interfaces\Hookable;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -18,8 +20,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class DatabaseManager {
+class DatabaseManager implements Hookable {
+	public function register_hooks(): void {
+		add_action( 'init', [ $this, 'wpdb_table_shortcuts' ], 1 );
+	}
 
+	public function wpdb_table_shortcuts(): void {
+		global $wpdb;
+		// Define custom table names for the plugin
+		$wpdb->debug_suite_email_logs = $wpdb->prefix . 'debug_suite_email_logs';
+	}
 	/**
 	 * Get the current database version.
 	 *

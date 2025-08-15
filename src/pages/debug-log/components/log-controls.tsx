@@ -60,9 +60,7 @@ const LogControls = ({
     const confirm = useConfirm({
         type: 'confirm',
         showCancel: true,
-        showOk: true,
-        okText: __('Ok, Clear', 'debug-suite'),
-        cancelText: __('Cancel', 'debug-suite')
+        showOk: true
     });
 
     const filteredLogFiles = window.debugSuite.logs.map((file) => ({

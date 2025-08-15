@@ -190,12 +190,13 @@ export const useLogEntries = () => {
 export const useLogActions = () => {
     const [clearing, setClearing] = useState(false);
 
-    const clearLogs = async () => {
+    const clearLogs = async (filePath?: string) => {
         try {
             setClearing(true);
             await apiFetch({
                 path: '/debug-suite/v1/logs/clear',
-                method: 'DELETE'
+                method: 'DELETE',
+                data: { file: filePath }
             });
         } catch (error) {
             console.error('Error clearing logs:', error);

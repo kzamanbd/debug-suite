@@ -76,7 +76,7 @@ const FileLogs = () => {
     // Handle clearing logs with automatic refresh
     const handleClearLogs = async () => {
         try {
-            await clearLogs();
+            await clearLogs(selectedFile?.value);
             // Refresh logs after clearing
             handleRefresh();
         } catch (error) {

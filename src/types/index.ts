@@ -21,7 +21,7 @@ export interface DialogState {
     cancelText?: string;
     options: DialogOptions;
     resolve?: (value: boolean) => void;
-    reject?: () => void;
+    reject?: (value: string) => void;
 }
 
 export interface DialogModalProps {

@@ -18,6 +18,7 @@ parameters:
         # Ignore missing array typehints 
         - identifier: missingType.iterableValue
         - identifier: class.notFound
+        - identifier: property.notFound
         
     # Bootstrap files
     bootstrapFiles:
