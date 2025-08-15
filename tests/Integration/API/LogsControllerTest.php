@@ -145,6 +145,7 @@ class LogsControllerTest extends DebugSuiteTestCase {
 		file_put_contents( $log_file, $test_content );
 		
 		$request = new WP_REST_Request( 'DELETE', '/' . $this->namespace . '/logs/clear' );
+		$request->set_param( 'file', $log_file );
 		$response = rest_get_server()->dispatch( $request );
 		
 		$this->assertEquals( 200, $response->get_status() );
