@@ -108,7 +108,6 @@ class Assets implements Hookable {
 			'debug'         => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
 			'debug_log'     => defined( 'WP_DEBUG_LOG' ) ? WP_DEBUG_LOG : false,
 			'debug_display' => defined( 'WP_DEBUG_DISPLAY' ) ? WP_DEBUG_DISPLAY : false,
-			'root_path'     => defined( 'ABSPATH' ) ? ABSPATH : '',
 			'content_url'   => content_url(),
 			'favicon'       => DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png',
 			'wp_version'    => get_bloginfo( 'version' ),
