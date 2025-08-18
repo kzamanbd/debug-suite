@@ -17,6 +17,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * EmailLog model class.
  *
+ * @property int   $id              Unique identifier for the email log.
+ * @property string $to_email       Recipient email address.
+ * @property string $subject        Email subject.
+ * @property string $message        Email message body.
+ * @property string $headers        Email headers.
+ * @property string $attachments    JSON encoded attachments.
+ * @property string $status         Email status (success/failed).
+ * @property string $error_message  Error message if email sending failed.
+ * @property string $sent_date      Date and time when the email was sent.
+ * @property string $created_at     Timestamp when the log was created.
+ * @property string $updated_at     Timestamp when the log was last updated.
+ *
  * @since 1.0.0
  */
 class EmailLog extends BaseModel {
@@ -246,10 +258,12 @@ class EmailLog extends BaseModel {
 	 * @return array
 	 */
 	public static function get_unique_receivers(): array {
-		$wpdb = static::get_wpdb();
-		return $wpdb->get_col(
-			$wpdb->prepare( "SELECT DISTINCT to_email FROM $wpdb->debug_suite_email_logs WHERE to_email != '' ORDER BY to_email ASC" )
-		);
+		$wpdb       = static::get_wpdb();
+		$table_name = static::get_table_name();
+
+		// No dynamic values in query; safe to run directly without prepare().
+		$query = "SELECT DISTINCT to_email FROM $table_name WHERE to_email != '' ORDER BY to_email ASC";
+		return $wpdb->get_col( $query );
 	}
 
 	/**
@@ -278,7 +292,7 @@ class EmailLog extends BaseModel {
 	 */
 	public function to_array(): array {
 		return [
-			'id'            => (int) $this->id,
+			'id'            => $this->id,
 			'sent_date'     => $this->sent_date,
 			'receiver'      => $this->to_email,
 			'subject'       => $this->subject,
