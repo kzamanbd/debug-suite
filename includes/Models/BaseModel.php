@@ -214,7 +214,8 @@ abstract class BaseModel {
 		$table_name = static::get_table_name();
 		$query = "SELECT COUNT(*) FROM $table_name";
 		if ( empty( $conditions ) ) {
-			return (int) $wpdb->get_var( $wpdb->prepare( $query ) );
+			// No dynamic values; run raw query safely (table name already validated via class property).
+			return (int) $wpdb->get_var( $query );
 		}
 
 		// Build simple WHERE clause
@@ -274,7 +275,8 @@ abstract class BaseModel {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 		$query = "TRUNCATE TABLE $table_name";
-		return false !== $wpdb->query( $wpdb->prepare( $query ) );
+		// No placeholders; execute directly.
+		return false !== $wpdb->query( $query );
 	}
 
 	/**
