@@ -20,7 +20,8 @@ const EmailLog = () => {
         onSelectAll,
         onSelectItem,
         onPageChange,
-        emailStats
+        emailStats,
+        filterOptions
     } = useEmailLogEntries();
 
     const [currentSelections, setCurrentSelections] = useState<number[]>([]);
@@ -89,6 +90,7 @@ const EmailLog = () => {
                 selectedItems={currentSelections.length > 0 ? currentSelections : selectedItems}
                 paginationInfo={paginationInfo}
                 emailStats={emailStats}
+                filterOptions={filterOptions}
             />
 
             <EmailLogViewer

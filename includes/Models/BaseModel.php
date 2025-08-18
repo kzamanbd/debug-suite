@@ -111,8 +111,9 @@ abstract class BaseModel {
 		$table_name = static::get_table_name();
 		$primary_key = static::$primary_key;
 
+		$query = "SELECT * FROM $table_name WHERE $primary_key = %s";
 		$result = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM $table_name WHERE $primary_key = %s", $id ), // phpcs:ignore
+			$wpdb->prepare( $query, $id ),
 			ARRAY_A
 		);
 
@@ -137,7 +138,7 @@ abstract class BaseModel {
 		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%s' ) );
 		$query = "SELECT * FROM $table_name WHERE $primary_key IN ($placeholders)";
 
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $ids ), ARRAY_A ); // phpcs:ignore
+		$results = $wpdb->get_results( $wpdb->prepare( $query, $ids ), ARRAY_A );
 
 		return array_map( [ static::class, 'from_array' ], $results );
 	}
@@ -159,7 +160,7 @@ abstract class BaseModel {
 		$offset = isset( $options['offset'] ) ? (int) $options['offset'] : 0;
 
 		$query = "SELECT * FROM $table_name ORDER BY $primary_key DESC LIMIT %d OFFSET %d";
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $limit, $offset ), ARRAY_A ); // phpcs:ignore
+		$results = $wpdb->get_results( $wpdb->prepare( $query, $limit, $offset ), ARRAY_A );
 
 		return array_map( [ static::class, 'from_array' ], $results );
 	}
@@ -197,7 +198,7 @@ abstract class BaseModel {
 		$values[] = $limit;
 		$values[] = $offset;
 
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $values ), ARRAY_A ); // phpcs:ignore
+		$results = $wpdb->get_results( $wpdb->prepare( $query, $values ), ARRAY_A );
 
 		return array_map( [ static::class, 'from_array' ], $results );
 	}
@@ -211,24 +212,35 @@ abstract class BaseModel {
 	public static function count( array $conditions = [] ): int {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
-
+		$query = "SELECT COUNT(*) FROM $table_name";
 		if ( empty( $conditions ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			return (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table_name" ); // phpcs:ignore
+			// No dynamic values; run raw query safely (table name already validated via class property).
+			return (int) $wpdb->get_var( $query );
 		}
+
+		// Validate column names to prevent SQL injection
+		$allowed_columns = array_merge( static::$fillable, [ static::$primary_key ] );
 
 		// Build simple WHERE clause
 		$where_parts = [];
 		$values = [];
 		foreach ( $conditions as $column => $value ) {
-			$where_parts[] = "$column = %s";
+			// Validate column name
+			if ( ! in_array( $column, $allowed_columns, true ) ) {
+				continue; // Skip invalid columns
+			}
+			$where_parts[] = "`$column` = %s";
 			$values[] = $value;
+		}
+
+		if ( empty( $where_parts ) ) {
+			return 0;
 		}
 
 		$where_clause = implode( ' AND ', $where_parts );
 		$query = "SELECT COUNT(*) FROM $table_name WHERE $where_clause";
 
-		return (int) $wpdb->get_var( $wpdb->prepare( $query, $values ) ); // phpcs:ignore
+		return (int) $wpdb->get_var( $wpdb->prepare( $query, $values ) );
 	}
 
 	/**
@@ -245,24 +257,36 @@ abstract class BaseModel {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
+		// Validate column names to prevent SQL injection
+		$allowed_columns = array_merge( static::$fillable, [ static::$primary_key ] );
+
 		// Build simple WHERE clause
 		$where_parts = [];
 		$values = [];
 		foreach ( $conditions as $column => $value ) {
+			// Validate column name
+			if ( ! in_array( $column, $allowed_columns, true ) ) {
+				continue; // Skip invalid columns
+			}
+
 			if ( is_array( $value ) ) {
 				$placeholders = implode( ',', array_fill( 0, count( $value ), '%s' ) );
-				$where_parts[] = "$column IN ($placeholders)";
+				$where_parts[] = "`$column` IN ($placeholders)";
 				$values = array_merge( $values, $value );
 			} else {
-				$where_parts[] = "$column = %s";
+				$where_parts[] = "`$column` = %s";
 				$values[] = $value;
 			}
+		}
+
+		if ( empty( $where_parts ) ) {
+			return 0;
 		}
 
 		$where_clause = implode( ' AND ', $where_parts );
 		$query = "DELETE FROM $table_name WHERE $where_clause";
 
-		return (int) $wpdb->query( $wpdb->prepare( $query, $values ) ); // phpcs:ignore
+		return (int) $wpdb->query( $wpdb->prepare( $query, $values ) );
 	}
 
 	/**
@@ -273,8 +297,9 @@ abstract class BaseModel {
 	public static function truncate(): bool {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
-
-		return false !== $wpdb->query( "TRUNCATE TABLE $table_name" ); // phpcs:ignore
+		$query = "TRUNCATE TABLE $table_name";
+		// No placeholders; execute directly.
+		return false !== $wpdb->query( $query );
 	}
 
 	/**

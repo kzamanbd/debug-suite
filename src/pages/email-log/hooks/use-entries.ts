@@ -22,6 +22,10 @@ interface UseEmailLogEntriesResult {
     onSelectItem: (id: number, selected: boolean) => void;
     onPageChange: (page: number) => void;
     emailStats: EmailLogStats;
+    filterOptions: {
+        receivers: Array<{ value: string; label: string }>;
+        statuses: Array<{ value: string; label: string }>;
+    };
 }
 
 const useEmailLogEntries = (): UseEmailLogEntriesResult => {
@@ -43,6 +47,13 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         sortOrder: 'desc',
         perPage: 20
     });
+    const [filterOptions, setFilterOptions] = useState<{
+        receivers: Array<{ value: string; label: string }>;
+        statuses: Array<{ value: string; label: string }>;
+    }>({
+        receivers: [],
+        statuses: []
+    });
     const [currentPage, setCurrentPage] = useState(1);
     const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
         current_page: 1,
@@ -53,7 +64,7 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         to: 0
     });
 
-    const { fetchEmailLogs, fetchEmailStats } = useEmailLogAPI();
+    const { fetchEmailLogs } = useEmailLogAPI();
 
     // Fetch email logs from API
     const fetchEmailData = useCallback(async () => {
@@ -61,10 +72,10 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         setError(null);
 
         try {
-            const [response, stats] = await Promise.all([fetchEmailLogs(filters, currentPage), fetchEmailStats()]);
+            const response = await fetchEmailLogs(filters, currentPage);
 
             setEntries(response.entries);
-            setEmailStats(stats);
+            setEmailStats(response.stats);
             setPaginationInfo({
                 current_page: response.current_page,
                 total_pages: response.total_pages,
@@ -73,6 +84,7 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
                 from: Math.min((response.current_page - 1) * response.per_page + 1, response.total),
                 to: Math.min(response.current_page * response.per_page, response.total)
             });
+            setFilterOptions(response.filter_options);
         } catch (err) {
             console.error('Failed to fetch email logs:', err);
             setError(__('Failed to load email logs.', 'debug-suite'));
@@ -80,7 +92,7 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         } finally {
             setLoading(false);
         }
-    }, [fetchEmailLogs, fetchEmailStats, filters, currentPage]);
+    }, [fetchEmailLogs, filters, currentPage]);
 
     // Effect to fetch data when filters or page change
     useEffect(() => {
@@ -138,7 +150,8 @@ const useEmailLogEntries = (): UseEmailLogEntriesResult => {
         onSelectAll,
         onSelectItem,
         onPageChange,
-        emailStats
+        emailStats,
+        filterOptions
     };
 };
 

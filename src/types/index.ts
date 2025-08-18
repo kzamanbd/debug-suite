@@ -66,7 +66,6 @@ declare global {
             debug: boolean;
             debug_log: boolean;
             debug_display: boolean;
-            root_path: string;
             content_url: string;
             wp_version: string;
             php_version: string;

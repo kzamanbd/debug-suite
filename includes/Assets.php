@@ -105,10 +105,9 @@ class Assets implements Hookable {
 	public static function get_localized_data(): array {
 		$files = debug_suite()->resolve( LogsService::class )->supported_log_files();
 		$constants = [
-			'debug'         => WP_DEBUG,
-			'debug_log'     => WP_DEBUG_LOG,
-			'debug_display' => WP_DEBUG_DISPLAY,
-			'root_path'     => ABSPATH,
+			'debug'         => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
+			'debug_log'     => defined( 'WP_DEBUG_LOG' ) ? WP_DEBUG_LOG : false,
+			'debug_display' => defined( 'WP_DEBUG_DISPLAY' ) ? WP_DEBUG_DISPLAY : false,
 			'content_url'   => content_url(),
 			'favicon'       => DEBUG_SUITE_PLUGIN_URL . 'assets/images/brand-logo.png',
 			'wp_version'    => get_bloginfo( 'version' ),

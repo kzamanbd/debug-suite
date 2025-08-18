@@ -12,7 +12,7 @@ import SimpleSelect from '@/components/base/select';
 import TextInput from '@/components/base/text-input';
 import { useConfirm } from '@/hooks/use-confirm';
 import { Fill } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { RefreshCw, Search } from 'lucide-react';
 import useEmailLogAPI from '../hooks/use-api';
@@ -27,6 +27,10 @@ interface EmailLogControlsProps {
     selectedItems: number[];
     paginationInfo: PaginationInfo;
     emailStats: EmailLogStats;
+    filterOptions: {
+        receivers: Array<{ value: string; label: string }>;
+        statuses: Array<{ value: string; label: string }>;
+    };
 }
 
 const EmailLogControls = ({
@@ -37,31 +41,12 @@ const EmailLogControls = ({
     loading = false,
     selectedItems,
     paginationInfo,
-    emailStats
+    emailStats,
+    filterOptions
 }: EmailLogControlsProps) => {
     const confirm = useConfirm();
-    const { fetchFilterOptions, clearAllEmails } = useEmailLogAPI();
-    const [filterOptions, setFilterOptions] = useState<{
-        receivers: Array<{ value: string; label: string }>;
-        statuses: Array<{ value: string; label: string }>;
-    }>({
-        receivers: [],
-        statuses: []
-    });
+    const { clearAllEmails } = useEmailLogAPI();
     const [selectedBulkAction, setSelectedBulkAction] = useState<Option | null>(null);
-
-    // Fetch filter options on component mount
-    useEffect(() => {
-        const loadFilterOptions = async () => {
-            try {
-                const options = await fetchFilterOptions();
-                setFilterOptions(options);
-            } catch (error) {
-                console.error('Failed to fetch filter options:', error);
-            }
-        };
-        void loadFilterOptions();
-    }, [fetchFilterOptions]);
 
     // Filter options
     const statusOptions = [

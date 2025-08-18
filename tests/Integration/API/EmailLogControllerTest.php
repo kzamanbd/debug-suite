@@ -168,6 +168,10 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 		$this->assertArrayHasKey( 'entries', $data );
 		$this->assertArrayHasKey( 'total_count', $data );
 		$this->assertArrayHasKey( 'pagination', $data );
+		$this->assertArrayHasKey( 'stats', $data );
+		$this->assertArrayHasKey( 'filter_options', $data );
+		$this->assertArrayHasKey( 'receivers', $data['filter_options'] );
+		$this->assertArrayHasKey( 'statuses', $data['filter_options'] );
 
 		$this->assertCount( 2, $data['entries'] );
 		$this->assertEquals( 2, $data['total_count'] );
@@ -213,31 +217,7 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 		$this->assertTrue( $data['pagination']['has_more'] );
 	}
 
-	/**
-	 * Test get email statistics endpoint.
-	 */
-	public function test_get_email_stats(): void {
-		$this->insert_test_email( [ 'status' => 'success' ] );
-		$this->insert_test_email( [ 'status' => 'success' ] );
-		$this->insert_test_email( [ 'status' => 'failed' ] );
-
-		$this->create_admin_user();
-
-		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/email-logs/stats' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertEquals( 200, $response->get_status() );
-
-		$data = $response->get_data();
-		$this->assertArrayHasKey( 'total_emails', $data );
-		$this->assertArrayHasKey( 'successful', $data );
-		$this->assertArrayHasKey( 'failed', $data );
-		$this->assertArrayHasKey( 'success_rate', $data );
-
-		$this->assertEquals( 3, $data['total_emails'] );
-		$this->assertEquals( 2, $data['successful'] );
-		$this->assertEquals( 1, $data['failed'] );
-	}
+	// Stats now merged into base endpoint; covered in test_get_email_logs_with_admin & pagination tests.
 
 	/**
 	 * Test bulk delete email logs endpoint.

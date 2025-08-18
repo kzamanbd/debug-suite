@@ -17,6 +17,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * EmailLog model class.
  *
+ * @property int   $id              Unique identifier for the email log.
+ * @property string $to_email       Recipient email address.
+ * @property string $subject        Email subject.
+ * @property string $message        Email message body.
+ * @property string $headers        Email headers.
+ * @property string $attachments    JSON encoded attachments.
+ * @property string $status         Email status (success/failed).
+ * @property string $error_message  Error message if email sending failed.
+ * @property string $sent_date      Date and time when the email was sent.
+ * @property string $created_at     Timestamp when the log was created.
+ * @property string $updated_at     Timestamp when the log was last updated.
+ *
  * @since 1.0.0
  */
 class EmailLog extends BaseModel {
@@ -78,7 +90,7 @@ class EmailLog extends BaseModel {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
-		$stats_query = "
+		$query = "
 			SELECT 
 				COUNT(*) as total_emails,
 				SUM(CASE WHEN status = %s THEN 1 ELSE 0 END) as successful,
@@ -87,8 +99,7 @@ class EmailLog extends BaseModel {
 		";
 
 		$stats = $wpdb->get_row(
-			// phpcs:ignore
-			$wpdb->prepare( $stats_query, self::STATUS_SUCCESS, self::STATUS_FAILED ),
+			$wpdb->prepare( $query, self::STATUS_SUCCESS, self::STATUS_FAILED ),
 			ARRAY_A
 		);
 
@@ -125,11 +136,11 @@ class EmailLog extends BaseModel {
 	 */
 	public static function create_from_mail_data( array $mail_data, string $status, string $error_message = '' ): ?static {
 		$attributes = [
-			'to_email'      => static::format_mail_recipients( $mail_data['to'] ?? '' ),
+			'to_email'      => self::format_mail_recipients( $mail_data['to'] ?? '' ),
 			'subject'       => $mail_data['subject'] ?? '',
 			'message'       => $mail_data['message'] ?? '',
-			'headers'       => static::format_mail_headers( $mail_data['headers'] ?? '' ),
-			'attachments'   => static::format_mail_attachments( $mail_data['attachments'] ?? '' ),
+			'headers'       => self::format_mail_headers( $mail_data['headers'] ?? '' ),
+			'attachments'   => self::format_mail_attachments( $mail_data['attachments'] ?? '' ),
 			'status'        => $status,
 			'error_message' => $error_message,
 			'sent_date'     => current_time( 'mysql' ),
@@ -204,8 +215,7 @@ class EmailLog extends BaseModel {
 		$prepare_values[] = (int) $filters['offset'];
 
 		$results = $wpdb->get_results(
-			// phpcs:ignore
-			empty( $prepare_values ) ? $query : $wpdb->prepare( $query, $prepare_values ),
+			$wpdb->prepare( $query, $prepare_values ),
 			ARRAY_A
 		);
 
@@ -238,7 +248,6 @@ class EmailLog extends BaseModel {
 		$query = "SELECT COUNT(*) FROM $table_name $where_clause";
 
 		return (int) $wpdb->get_var(
-			// phpcs:ignore
 			empty( $prepare_values ) ? $query : $wpdb->prepare( $query, $prepare_values )
 		);
 	}
@@ -249,10 +258,12 @@ class EmailLog extends BaseModel {
 	 * @return array
 	 */
 	public static function get_unique_receivers(): array {
-		$wpdb = static::get_wpdb();
+		$wpdb       = static::get_wpdb();
 		$table_name = static::get_table_name();
-		// phpcs:ignore
-		return $wpdb->get_col( "SELECT DISTINCT to_email FROM $table_name WHERE to_email != '' ORDER BY to_email ASC" );
+
+		// No dynamic values in query; safe to run directly without prepare().
+		$query = "SELECT DISTINCT to_email FROM $table_name WHERE to_email != '' ORDER BY to_email ASC";
+		return $wpdb->get_col( $query );
 	}
 
 	/**
@@ -281,7 +292,7 @@ class EmailLog extends BaseModel {
 	 */
 	public function to_array(): array {
 		return [
-			'id'            => (int) $this->id,
+			'id'            => $this->id,
 			'sent_date'     => $this->sent_date,
 			'receiver'      => $this->to_email,
 			'subject'       => $this->subject,
