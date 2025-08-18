@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Provides a consistent interface for file operations using WordPress
  * Filesystem API instead of direct PHP file functions.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class FileSystem {
 

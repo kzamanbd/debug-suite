@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Email log controller for Debug Suite.
  *
- * @since DEBUG_SUITE_SINCE
+ * @since 1.0.0
  */
 class EmailLogController extends RestController {
 
