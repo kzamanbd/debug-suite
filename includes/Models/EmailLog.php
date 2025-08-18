@@ -215,7 +215,7 @@ class EmailLog extends BaseModel {
 		$prepare_values[] = (int) $filters['offset'];
 
 		$results = $wpdb->get_results(
-			empty( $prepare_values ) ? $query : $wpdb->prepare( $query, $prepare_values ),
+			$wpdb->prepare( $query, $prepare_values ),
 			ARRAY_A
 		);
 

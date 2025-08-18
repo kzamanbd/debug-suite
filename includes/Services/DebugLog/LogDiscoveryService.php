@@ -28,16 +28,13 @@ class LogDiscoveryService implements ServiceInterface {
 	 */
 	public function get_supported_log_files(): array {
 		$paths = [
+			WP_CONTENT_DIR,         // WordPress content (for debug.log)
 			'/var/log/apache2',     // Apache (Debian/Ubuntu)
 			'/var/log/httpd',       // Apache (CentOS/RedHat)
 			'/var/log/nginx',       // Nginx
 			'/var/log/php',         // PHP logs
 			'/var/log/redis',       // Redis logs
 		];
-
-		if ( defined( 'WP_CONTENT_DIR' ) ) {
-			$paths[] = WP_CONTENT_DIR;
-		}
 
 		// Add custom paths for WooCommerce logs if available.
 		if ( class_exists( '\Automattic\WooCommerce\Utilities\LoggingUtil' ) ) {

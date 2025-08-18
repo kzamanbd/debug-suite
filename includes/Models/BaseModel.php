@@ -218,12 +218,23 @@ abstract class BaseModel {
 			return (int) $wpdb->get_var( $query );
 		}
 
+		// Validate column names to prevent SQL injection
+		$allowed_columns = array_merge( static::$fillable, [ static::$primary_key ] );
+
 		// Build simple WHERE clause
 		$where_parts = [];
 		$values = [];
 		foreach ( $conditions as $column => $value ) {
-			$where_parts[] = "$column = %s";
+			// Validate column name
+			if ( ! in_array( $column, $allowed_columns, true ) ) {
+				continue; // Skip invalid columns
+			}
+			$where_parts[] = "`$column` = %s";
 			$values[] = $value;
+		}
+
+		if ( empty( $where_parts ) ) {
+			return 0;
 		}
 
 		$where_clause = implode( ' AND ', $where_parts );
@@ -246,18 +257,30 @@ abstract class BaseModel {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
+		// Validate column names to prevent SQL injection
+		$allowed_columns = array_merge( static::$fillable, [ static::$primary_key ] );
+
 		// Build simple WHERE clause
 		$where_parts = [];
 		$values = [];
 		foreach ( $conditions as $column => $value ) {
+			// Validate column name
+			if ( ! in_array( $column, $allowed_columns, true ) ) {
+				continue; // Skip invalid columns
+			}
+
 			if ( is_array( $value ) ) {
 				$placeholders = implode( ',', array_fill( 0, count( $value ), '%s' ) );
-				$where_parts[] = "$column IN ($placeholders)";
+				$where_parts[] = "`$column` IN ($placeholders)";
 				$values = array_merge( $values, $value );
 			} else {
-				$where_parts[] = "$column = %s";
+				$where_parts[] = "`$column` = %s";
 				$values[] = $value;
 			}
+		}
+
+		if ( empty( $where_parts ) ) {
+			return 0;
 		}
 
 		$where_clause = implode( ' AND ', $where_parts );
