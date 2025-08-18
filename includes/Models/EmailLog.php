@@ -78,7 +78,7 @@ class EmailLog extends BaseModel {
 		$wpdb = static::get_wpdb();
 		$table_name = static::get_table_name();
 
-		$stats_query = "
+		$query = "
 			SELECT 
 				COUNT(*) as total_emails,
 				SUM(CASE WHEN status = %s THEN 1 ELSE 0 END) as successful,
@@ -87,8 +87,7 @@ class EmailLog extends BaseModel {
 		";
 
 		$stats = $wpdb->get_row(
-			// phpcs:ignore
-			$wpdb->prepare( $stats_query, self::STATUS_SUCCESS, self::STATUS_FAILED ),
+			$wpdb->prepare( $query, self::STATUS_SUCCESS, self::STATUS_FAILED ),
 			ARRAY_A
 		);
 
@@ -125,11 +124,11 @@ class EmailLog extends BaseModel {
 	 */
 	public static function create_from_mail_data( array $mail_data, string $status, string $error_message = '' ): ?static {
 		$attributes = [
-			'to_email'      => static::format_mail_recipients( $mail_data['to'] ?? '' ),
+			'to_email'      => self::format_mail_recipients( $mail_data['to'] ?? '' ),
 			'subject'       => $mail_data['subject'] ?? '',
 			'message'       => $mail_data['message'] ?? '',
-			'headers'       => static::format_mail_headers( $mail_data['headers'] ?? '' ),
-			'attachments'   => static::format_mail_attachments( $mail_data['attachments'] ?? '' ),
+			'headers'       => self::format_mail_headers( $mail_data['headers'] ?? '' ),
+			'attachments'   => self::format_mail_attachments( $mail_data['attachments'] ?? '' ),
 			'status'        => $status,
 			'error_message' => $error_message,
 			'sent_date'     => current_time( 'mysql' ),
@@ -204,7 +203,6 @@ class EmailLog extends BaseModel {
 		$prepare_values[] = (int) $filters['offset'];
 
 		$results = $wpdb->get_results(
-			// phpcs:ignore
 			empty( $prepare_values ) ? $query : $wpdb->prepare( $query, $prepare_values ),
 			ARRAY_A
 		);
@@ -238,7 +236,6 @@ class EmailLog extends BaseModel {
 		$query = "SELECT COUNT(*) FROM $table_name $where_clause";
 
 		return (int) $wpdb->get_var(
-			// phpcs:ignore
 			empty( $prepare_values ) ? $query : $wpdb->prepare( $query, $prepare_values )
 		);
 	}
@@ -250,9 +247,9 @@ class EmailLog extends BaseModel {
 	 */
 	public static function get_unique_receivers(): array {
 		$wpdb = static::get_wpdb();
-		$table_name = static::get_table_name();
-		// phpcs:ignore
-		return $wpdb->get_col( "SELECT DISTINCT to_email FROM $table_name WHERE to_email != '' ORDER BY to_email ASC" );
+		return $wpdb->get_col(
+			$wpdb->prepare( "SELECT DISTINCT to_email FROM $wpdb->debug_suite_email_logs WHERE to_email != '' ORDER BY to_email ASC" )
+		);
 	}
 
 	/**
