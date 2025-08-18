@@ -159,7 +159,8 @@ const LogControls = ({
                         onClick={() => setShowFilters(!showFilters)}
                         className={classNames(
                             'group relative rounded-none border-0 border-r p-1.5',
-                            showFilters && 'bg-gray-100'
+                            showFilters && 'bg-gray-100',
+                            viewMode === 'raw' && 'hidden'
                         )}
                         title="Show/hide filters panel">
                         <div className="flex w-full min-w-9 items-center justify-between transition-all duration-300 ease-in-out group-hover:min-w-[60px]">

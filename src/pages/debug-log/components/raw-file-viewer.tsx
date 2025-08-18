@@ -59,10 +59,10 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
             <div className="flex-1">
                 <Editor
                     readOnly
+                    height="calc(100vh - 130px)"
                     value={content.content}
                     filename={content.filename}
                     loading={loading}
-                    height={'calc(100vh - 120px)'}
                 />
             </div>
         </div>
