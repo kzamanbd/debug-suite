@@ -8,19 +8,25 @@ import { useCallback } from '@wordpress/element';
 import type { EmailLogEntry, EmailLogFilters, EmailLogResponse, EmailLogStats } from '../types';
 
 interface UseEmailLogAPIResult {
-    fetchEmailLogs: (filters: EmailLogFilters, page?: number) => Promise<EmailLogResponse>;
-    fetchEmailStats: () => Promise<EmailLogStats>;
-    fetchFilterOptions: () => Promise<{
-        receivers: Array<{ value: string; label: string }>;
-        statuses: Array<{ value: string; label: string }>;
-    }>;
+    fetchEmailLogs: (
+        filters: EmailLogFilters,
+        page?: number
+    ) => Promise<
+        EmailLogResponse & {
+            stats: EmailLogStats;
+            filter_options: {
+                receivers: Array<{ value: string; label: string }>;
+                statuses: Array<{ value: string; label: string }>;
+            };
+        }
+    >;
     deleteEmails: (ids: number[]) => Promise<{ deleted_count: number; message: string }>;
     clearAllEmails: () => Promise<{ message: string }>;
     resendEmail: (id: number) => Promise<{ message: string }>;
 }
 
 const useEmailLogAPI = (): UseEmailLogAPIResult => {
-    const fetchEmailLogs = useCallback(async (filters: EmailLogFilters, page = 1): Promise<EmailLogResponse> => {
+    const fetchEmailLogs = useCallback(async (filters: EmailLogFilters, page = 1) => {
         const params = new URLSearchParams({
             page: page.toString(),
             per_page: filters.perPage.toString(),
@@ -43,6 +49,11 @@ const useEmailLogAPI = (): UseEmailLogAPIResult => {
                 has_more: boolean;
             };
             total_count: number;
+            stats: EmailLogStats;
+            filter_options: {
+                receivers: Array<{ value: string; label: string }>;
+                statuses: Array<{ value: string; label: string }>;
+            };
         }>({
             path: `/debug-suite/v1/email-logs?${params.toString()}`
         });
@@ -53,23 +64,10 @@ const useEmailLogAPI = (): UseEmailLogAPIResult => {
             total_pages: response.pagination.total_pages,
             current_page: response.pagination.current_page,
             per_page: response.pagination.per_page,
-            has_more: response.pagination.has_more
+            has_more: response.pagination.has_more,
+            stats: response.stats,
+            filter_options: response.filter_options
         };
-    }, []);
-
-    const fetchEmailStats = useCallback(async (): Promise<EmailLogStats> => {
-        return await apiFetch<EmailLogStats>({
-            path: '/debug-suite/v1/email-logs/stats'
-        });
-    }, []);
-
-    const fetchFilterOptions = useCallback(async () => {
-        return await apiFetch<{
-            receivers: Array<{ value: string; label: string }>;
-            statuses: Array<{ value: string; label: string }>;
-        }>({
-            path: '/debug-suite/v1/email-logs/filters'
-        });
     }, []);
 
     const deleteEmails = useCallback(async (ids: number[]) => {
@@ -96,8 +94,6 @@ const useEmailLogAPI = (): UseEmailLogAPIResult => {
 
     return {
         fetchEmailLogs,
-        fetchEmailStats,
-        fetchFilterOptions,
         deleteEmails,
         clearAllEmails,
         resendEmail

@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Email log controller for Debug Suite.
  *
- * @since 1.0.0
+ * @since DEBUG_SUITE_SINCE
  */
 class EmailLogController extends RestController {
 
@@ -65,27 +65,7 @@ class EmailLogController extends RestController {
 			]
 		);
 
-		// Get filter options
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/filters',
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_filter_options' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
-			]
-		);
-
-		// Get email stats
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/stats',
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [ $this, 'get_email_stats' ],
-				'permission_callback' => [ $this, 'permissions_check' ],
-			]
-		);
+		// Removed dedicated /filters and /stats endpoints. Their data is merged into get_email_logs response.
 
 		// Bulk delete emails
 		register_rest_route(
@@ -156,23 +136,37 @@ class EmailLogController extends RestController {
 			'page'       => $request->get_param( 'page' ) ?? 1,
 		];
 
-		$result = $this->service->get_email_log_entries( $options );
+		$logs_result    = $this->service->get_email_log_entries( $options );
+		$filters_result = $this->service->get_filter_options();
+		$stats_result   = $this->service->get_email_statistics();
 
-		if ( $result->is_failure() ) {
-			$status_code = match ( $result->get_error_code() ) {
+		if ( $logs_result->is_failure() ) {
+			$status_code = match ( $logs_result->get_error_code() ) {
 				'database_error'    => 500,
 				'validation_error'  => 400,
 				default             => 500
 			};
 
 			return new WP_Error(
-				$result->get_error_code(),
-				$result->get_error_message(),
+				$logs_result->get_error_code(),
+				$logs_result->get_error_message(),
 				[ 'status' => $status_code ]
 			);
 		}
 
-		return rest_ensure_response( $result->get_data() );
+		if ( $filters_result->is_failure() ) {
+			return new WP_Error( 'filters_error', $filters_result->get_error_message(), [ 'status' => 500 ] );
+		}
+
+		if ( $stats_result->is_failure() ) {
+			return new WP_Error( 'stats_error', $stats_result->get_error_message(), [ 'status' => 500 ] );
+		}
+
+		$data = $logs_result->get_data();
+		$data['filter_options'] = $filters_result->get_data();
+		$data['stats']          = $stats_result->get_data();
+
+		return rest_ensure_response( $data );
 	}
 
 	/**
@@ -191,16 +185,6 @@ class EmailLogController extends RestController {
 		return rest_ensure_response( $result->get_data() );
 	}
 
-	/**
-	 * Get email statistics.
-	 *
-	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response|WP_Error
-	 */
-	public function get_email_stats( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$result = $this->service->get_email_statistics();
-		return rest_ensure_response( $result->get_data() );
-	}
 
 	/**
 	 * Bulk delete emails.
