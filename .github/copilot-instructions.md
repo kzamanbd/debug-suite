@@ -43,7 +43,7 @@ Unit tests cover service success + at least one failure path (use custom asserti
 
 Pre-PR gate: service/controller registered & in `$provides`; full typing; docs with `@since`; localized strings; lint (PHPCS + ESLint) + static analysis (PHPStan + TS) green; tests pass. Reject: business logic in controllers/views/hooks; throwing for normal validation; untyped params; alternative icon libs; raw inline SVG for standard icons; native `<select>` for feature UI; silent failures (always return structured failure). Keep file concise—expand only if a rule materially changes.
 
-````
+````md
 
 ### 2. **Service Layer Best Practices**
 
@@ -335,7 +335,7 @@ Following WordPress coding standards adapted for React/TypeScript development wi
 
 #### Directory Structure for Components
 
-```
+```md
 src/pages/[feature-name]/
 ├── index.tsx                 # Main page component
 ├── types.ts                  # TypeScript type definitions
@@ -351,8 +351,8 @@ src/pages/[feature-name]/
 
 - **Favor Substantial Components over Micro-Components**: Prefer 2-3 well-structured components over many micro-level components
 - **Logical Grouping**: Group related functionality into cohesive components:
-    - **Viewer Components**: Handle display, tables, content rendering, and detail views
-    - **Controls Components**: Handle filtering, search, pagination, actions, and form controls
+  - **Viewer Components**: Handle display, tables, content rendering, and detail views
+  - **Controls Components**: Handle filtering, search, pagination, actions, and form controls
 - **Clear Separation of Concerns**: Each consolidated component should have a distinct purpose
 - **Single Responsibility per Consolidated Component**: Each component handles one major UI domain
 - **Props Interface**: Every component has a comprehensive typed Props interface
@@ -366,12 +366,12 @@ src/pages/[feature-name]/
 
 #### Consolidated Component Examples
 
-**Good: Two Substantial Components**
+- **Good: Two Substantial Components**
 
 - **Viewer Components**: Handle display, tables, content rendering, and detail views
 - **Controls Components**: Handle filtering, search, pagination, actions, and form controls
 
-**Avoid: Excessive Micro-Components**
+- **Avoid: Excessive Micro-Components**
 
 - ❌ Too granular - creates maintenance overhead
 - ❌ Separate components for entry, table, file selector, filters bar, pagination, stats footer
@@ -751,11 +751,11 @@ The project follows a clean service provider architecture:
 All business logic is implemented in the `includes/Services/` directory:
 
 - **DebugLog/** - Debug log related services
-    - `LogsService` - Debug log operations with service delegation pattern
-    - `WPLogReaderService` - Advanced log parsing with stack trace detection
-    - `LogDiscoveryService` - Log file discovery across multiple locations
+  - `LogsService` - Debug log operations with service delegation pattern
+  - `WPLogReaderService` - Advanced log parsing with stack trace detection
+  - `LogDiscoveryService` - Log file discovery across multiple locations
 - **EmailLog/** - Email logging services
-    - `EmailLogService` - wp_mail integration with Hookable interface
+  - `EmailLogService` - wp_mail integration with Hookable interface
 - **SettingsService** - wp-config.php management with validation
 - **OverviewService** - Dashboard overview with service aggregation
 
