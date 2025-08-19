@@ -4,6 +4,7 @@
  * @since 1.0.0
  */
 import Button from '@/components/base/button';
+import type { Option } from '@/components/base/select';
 import Editor from '@/components/editor';
 import { classNames } from '@/utils';
 import { useRef } from '@wordpress/element';
@@ -13,11 +14,12 @@ import type { RawFileContent } from '../types';
 
 interface RawFileViewerProps {
     content: RawFileContent | null;
+    selectedFile: Option | null;
     loading: boolean;
     onRefresh: () => void;
 }
 
-const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
+const RawFileViewer = ({ content, loading, onRefresh, selectedFile }: RawFileViewerProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     if (loading && !content) {
@@ -33,8 +35,11 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
             <div className="flex flex-1 items-center justify-center bg-white">
                 <div className="text-center">
                     <p className="text-sm text-gray-500">{__('No file content available.', 'debug-suite')}</p>
-                    <Button onClick={onRefresh} className="mt-4">
-                        <RefreshCwIcon className="mr-2 size-4" />
+                    <Button
+                        onClick={onRefresh}
+                        className="mt-4"
+                        loading={loading}
+                        icon={<RefreshCwIcon className="size-4" />}>
                         {__('Retry', 'debug-suite')}
                     </Button>
                 </div>
@@ -48,10 +53,11 @@ const RawFileViewer = ({ content, loading, onRefresh }: RawFileViewerProps) => {
             className={classNames('flex flex-1 flex-col overflow-hidden rounded-lg border bg-white')}>
             {/* Toolbar */}
             <div className="rounded-t-lg border-b border-gray-200 bg-gray-50 px-4 py-3">
-                <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-gray-500">
-                        {content.size} • {__('Modified:', 'debug-suite')} {content.last_modified}
+                <div className="flex items-center justify-between gap-4">
+                    <p className="text-xs font-bold text-nowrap text-gray-500">
+                        {content.size} | {__('Last Modified:', 'debug-suite')} {content.last_modified}
                     </p>
+                    <small className="line-clamp-1 text-xs text-gray-400">{selectedFile?.value}</small>
                 </div>
             </div>
 

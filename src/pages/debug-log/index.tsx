@@ -116,7 +116,12 @@ const FileLogs = () => {
                     onFiltersChange={handleFilterChange}
                 />
             ) : (
-                <RawFileViewer content={rawContent} loading={rawLoading} onRefresh={refetchRawContent} />
+                <RawFileViewer
+                    selectedFile={selectedFile}
+                    content={rawContent}
+                    loading={rawLoading}
+                    onRefresh={refetchRawContent}
+                />
             )}
         </div>
     );
