@@ -54,10 +54,10 @@ const RawFileViewer = ({ content, loading, onRefresh, selectedFile }: RawFileVie
             {/* Toolbar */}
             <div className="rounded-t-lg border-b border-gray-200 bg-gray-50 px-4 py-3">
                 <div className="flex items-center justify-between gap-4">
-                    <p className="text-xs font-bold text-nowrap text-gray-500">
+                    <p className="line-clamp-1 text-xs">{selectedFile?.value}</p>
+                    <p className="text-xs text-nowrap">
                         {content.size} | {__('Last Modified:', 'debug-suite')} {content.last_modified}
                     </p>
-                    <small className="line-clamp-1 text-xs text-gray-400">{selectedFile?.value}</small>
                 </div>
             </div>
 
