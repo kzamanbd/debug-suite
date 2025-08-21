@@ -1,4 +1,8 @@
+import type { editor } from 'monaco-editor';
 import type { ReactNode } from 'react';
+
+export type IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
+export type EditorOptions = editor.IStandaloneEditorConstructionOptions;
 
 export type DialogType = 'success' | 'error' | 'warning' | 'confirm';
 

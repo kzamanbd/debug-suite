@@ -7,7 +7,6 @@ import Button from '@/components/base/button';
 import type { Option } from '@/components/base/select';
 import Editor from '@/components/editor';
 import { classNames } from '@/utils';
-import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { RefreshCwIcon } from 'lucide-react';
 import type { RawFileContent } from '../types';
@@ -20,8 +19,6 @@ interface RawFileViewerProps {
 }
 
 const RawFileViewer = ({ content, loading, onRefresh, selectedFile }: RawFileViewerProps) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-
     if (loading && !content) {
         return (
             <div className="flex flex-1 items-center justify-center bg-white">
@@ -48,9 +45,7 @@ const RawFileViewer = ({ content, loading, onRefresh, selectedFile }: RawFileVie
     }
 
     return (
-        <div
-            ref={containerRef}
-            className={classNames('flex flex-1 flex-col overflow-hidden rounded-lg border bg-white')}>
+        <div className={classNames('flex flex-1 flex-col overflow-hidden rounded-lg border bg-white')}>
             {/* Toolbar */}
             <div className="rounded-t-lg border-b border-gray-200 bg-gray-50 px-4 py-3">
                 <div className="flex items-center justify-between gap-4">
