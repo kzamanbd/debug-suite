@@ -1,9 +1,8 @@
 name: Deploy and Release Plugin to WP.org
 
 on:
-  push:
-    tags:
-      - '*'
+  workflow_dispatch:
+
 jobs:
   releaseToWPOrg:
     name: Release to WordPress.org
