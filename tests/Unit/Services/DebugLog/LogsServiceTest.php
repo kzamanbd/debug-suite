@@ -63,13 +63,8 @@ class LogsServiceTest extends TestCase {
 		$this->log_reader = $this->createMock( WPLogReaderService::class );
 		$this->log_discovery = $this->createMock( LogDiscoveryService::class );
 
-		// Create service instance with mocked dependencies
-		$this->service = new LogsService();
-		$reflection = new ReflectionClass( $this->service );
-		$log_reader_prop = $reflection->getProperty( 'log_reader' );
-		$log_reader_prop->setValue( $this->service, $this->log_reader );
-		$log_discovery_prop = $reflection->getProperty( 'log_discovery' );
-		$log_discovery_prop->setValue( $this->service, $this->log_discovery );
+		// Create service instance with mocked dependencies using constructor injection
+		$this->service = new LogsService( $this->log_reader, $this->log_discovery );
 	}
 
 	/**
@@ -140,19 +135,23 @@ class LogsServiceTest extends TestCase {
 	}
 
 	/**
-	 * Test constructor with default dependencies.
+	 * Test constructor with dependency injection.
 	 */
-	public function test_constructor_with_default_dependencies(): void {
-		$service = new LogsService();
+	public function test_constructor_with_dependency_injection(): void {
+		$log_reader = $this->createMock( WPLogReaderService::class );
+		$log_discovery = $this->createMock( LogDiscoveryService::class );
+
+		$service = new LogsService( $log_reader, $log_discovery );
 		$this->assertInstanceOf( LogsService::class, $service );
 
+		// Use reflection to verify the dependencies were injected correctly
 		$reflection = new ReflectionClass( $service );
 
 		$log_reader_prop = $reflection->getProperty( 'log_reader' );
-		$this->assertInstanceOf( WPLogReaderService::class, $log_reader_prop->getValue( $service ) );
+		$this->assertSame( $log_reader, $log_reader_prop->getValue( $service ) );
 
 		$log_discovery_prop = $reflection->getProperty( 'log_discovery' );
-		$this->assertInstanceOf( LogDiscoveryService::class, $log_discovery_prop->getValue( $service ) );
+		$this->assertSame( $log_discovery, $log_discovery_prop->getValue( $service ) );
 	}
 
 	/**

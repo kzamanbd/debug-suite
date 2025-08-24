@@ -34,7 +34,7 @@ const DialogProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =
             if (confirmed) {
                 prev.resolve?.(true);
             } else {
-                prev.reject?.();
+                prev.reject?.('[Dialog] closed without confirmation');
             }
             return { ...prev, open: false };
         });

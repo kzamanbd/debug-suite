@@ -31,13 +31,13 @@ const FileLogs = () => {
     } = useRawFileContent(selectedFile?.value);
 
     // Local state for view mode only
-    const [viewMode, setViewMode] = useState<ViewMode>('parsed');
+    const [viewMode, setViewMode] = useState<ViewMode>('raw');
 
     // Handle focus change to refetch logs when tab becomes visible
     useEffect(() => {
         const handleFocus = () => {
             if (viewMode === 'parsed') {
-                refetchLogs();
+                void refetchLogs();
             } else {
                 void refetchRawContent();
             }
@@ -57,7 +57,7 @@ const FileLogs = () => {
     // Handle refresh based on current view mode
     const handleRefresh = () => {
         if (viewMode === 'parsed') {
-            refetchLogs();
+            void refetchLogs();
         } else {
             void refetchRawContent();
         }
@@ -66,18 +66,17 @@ const FileLogs = () => {
     // Handle view mode change
     const handleViewModeChange = (mode: ViewMode) => {
         setViewMode(mode);
-        if (mode !== 'parsed') {
-            // If switching to raw view, fetch the raw content for the selected file
-            if (!rawContent) {
-                void refetchRawContent();
-            }
+        if (mode === 'parsed') {
+            void refetchLogs();
+        } else {
+            void refetchRawContent();
         }
     };
 
     // Handle clearing logs with automatic refresh
     const handleClearLogs = async () => {
         try {
-            await clearLogs();
+            await clearLogs(selectedFile?.value);
             // Refresh logs after clearing
             handleRefresh();
         } catch (error) {
@@ -86,7 +85,7 @@ const FileLogs = () => {
     };
 
     // Show skeleton while initial data loads
-    if (logsLoading && !logs.length) {
+    if (rawLoading && !rawContent) {
         return <FileLogsSkeleton />;
     }
 
@@ -117,7 +116,12 @@ const FileLogs = () => {
                     onFiltersChange={handleFilterChange}
                 />
             ) : (
-                <RawFileViewer content={rawContent} loading={rawLoading} onRefresh={refetchRawContent} />
+                <RawFileViewer
+                    selectedFile={selectedFile}
+                    content={rawContent}
+                    loading={rawLoading}
+                    onRefresh={refetchRawContent}
+                />
             )}
         </div>
     );

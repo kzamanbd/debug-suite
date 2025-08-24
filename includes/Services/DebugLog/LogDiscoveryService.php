@@ -7,7 +7,6 @@
 
 namespace DebugSuite\Services\DebugLog;
 
-use Automattic\WooCommerce\Utilities\LoggingUtil;
 use DebugSuite\Core\FileSystem;
 use DebugSuite\Interfaces\ServiceInterface;
 
@@ -39,7 +38,7 @@ class LogDiscoveryService implements ServiceInterface {
 
 		// Add custom paths for WooCommerce logs if available.
 		if ( class_exists( '\Automattic\WooCommerce\Utilities\LoggingUtil' ) ) {
-			$paths[] = LoggingUtil::get_log_directory();
+			$paths[] = \Automattic\WooCommerce\Utilities\LoggingUtil::get_log_directory();
 		}
 
 		$files = [];

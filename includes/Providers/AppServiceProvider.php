@@ -15,9 +15,12 @@ use DebugSuite\Admin;
 use DebugSuite\Assets;
 use DebugSuite\Core\Container\AbstractServiceProvider;
 use DebugSuite\Core\Container\Container;
+use DebugSuite\Internal\DatabaseManager;
 use DebugSuite\Internal\HookManager;
+use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
+use DebugSuite\Services\EmailLog\EmailLogService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;
 
@@ -41,24 +44,22 @@ class AppServiceProvider extends AbstractServiceProvider {
 		Admin::class,
 		Assets::class,
 		HookManager::class,
+		DatabaseManager::class,
 		WPLogReaderService::class,
+		LogDiscoveryService::class,
 		LogsService::class,
 		SettingsService::class,
 		OverviewService::class,
+		EmailLogService::class,
 	];
 
 	public function register( Container $container ): void {
-		// Simple service registration - merged from ServicesServiceProvider
+		// Register debug log services with dependency injection
 		$container->add(
 			[
-				Admin::class                => $container->object( Admin::class ),
-				Assets::class               => $container->object( Assets::class ),
-				HookManager::class          => $container->object( HookManager::class ),
-				// Core services as singletons
-				WPLogReaderService::class   => $container->object( WPLogReaderService::class ),
-				LogsService::class          => $container->object( LogsService::class ),
-				SettingsService::class      => $container->object( SettingsService::class ),
-				OverviewService::class      => $container->autowire( OverviewService::class ),
+				WPLogReaderService::class  => $container->object( WPLogReaderService::class ),
+				LogDiscoveryService::class => $container->object( LogDiscoveryService::class ),
+				LogsService::class         => $container->autowire( LogsService::class ),
 			]
 		);
 	}

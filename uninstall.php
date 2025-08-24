@@ -22,11 +22,18 @@
  */
 
 // If uninstall not called from WordPress, then exit.
+use DebugSuite\Internal\DatabaseManager;
+
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Delete options
 delete_option( 'debug_suite_version' );
 delete_option( 'debug_suite_needs_onboarding' );
 delete_transient( 'debug_suite_activation_redirect' );
+
+// Drop database tables
+DatabaseManager::drop_tables();

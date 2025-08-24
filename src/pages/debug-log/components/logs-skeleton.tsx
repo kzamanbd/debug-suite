@@ -17,18 +17,6 @@ const skeleton = (extra = '') => classNames('bg-gray-200 dark:bg-gray-700 animat
 const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Element => {
     return (
         <div className={classNames('space-y-6', className)}>
-            {/* Filter and controls skeleton */}
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                {/* Action buttons skeleton */}
-                <div className="flex flex-wrap gap-4">
-                    <div className={skeleton('h-10 w-32')}></div>
-                    <div className={skeleton('h-10 w-36')}></div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className={skeleton('h-10 w-32')}></div>
-                    <div className={skeleton('h-10 w-24')}></div>
-                </div>
-            </div>
             {/* Table skeleton */}
             <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
@@ -42,7 +30,7 @@ const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Elemen
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-900">
-                        {Array.from({ length: 15 }).map((_, i) => (
+                        {Array.from({ length: 20 }).map((_, i) => (
                             <tr key={i}>
                                 {[1, 2, 3, 4].map((j) => (
                                     <td key={j} className="px-4 py-2">

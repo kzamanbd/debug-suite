@@ -8,15 +8,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-23T19:04:53+00:00\n"
+"POT-Creation-Date: 2025-08-18T15:48:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: debug-suite\n"
 
 #. Plugin Name of the plugin
 #: debug-suite.php
-#: includes/Admin.php:121
-#: includes/Admin.php:122
+#: includes/Admin.php:136
+#: includes/Admin.php:137
 msgid "Debug Suite"
 msgstr ""
 
@@ -44,34 +44,80 @@ msgstr ""
 msgid "Missing Dependencies Detected [Debug Suite Plugin]"
 msgstr ""
 
-#: includes/Admin.php:52
-#: assets/js/debug-suite.js:4
-msgid "Overview"
-msgstr ""
-
-#: includes/Admin.php:56
+#: includes/Admin.php:57
 #: assets/js/debug-suite.js:4
 msgid "Debug Log"
 msgstr ""
 
-#: includes/Admin.php:60
+#: includes/Admin.php:62
+#: assets/js/debug-suite.js:4
+msgid "Email Log"
+msgstr ""
+
+#: includes/Admin.php:67
+#: assets/js/debug-suite.js:4
+msgid "Overview"
+msgstr ""
+
+#: includes/Admin.php:72
 msgid "Configuration"
 msgstr ""
 
-#: includes/Admin.php:153
+#: includes/Admin.php:169
 msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#. translators: 1: GitHub URL, 2: Buy Me a Coffee URL
+#: includes/Admin.php:297
+msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">View on GitHub</a> &nbsp;|&nbsp; <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">Buy Me a Coffee</a>"
+msgstr ""
+
+#: includes/API/EmailLogController.php:201
+msgid "Invalid or missing email IDs."
+msgstr ""
+
+#: includes/API/EmailLogController.php:261
+msgid "Current page of the collection."
+msgstr ""
+
+#: includes/API/EmailLogController.php:268
+msgid "Maximum number of items to be returned in result set."
+msgstr ""
+
+#: includes/API/EmailLogController.php:276
+msgid "Limit results to those matching a string."
+msgstr ""
+
+#: includes/API/EmailLogController.php:281
+msgid "Limit results to emails with a specific status."
+msgstr ""
+
+#: includes/API/EmailLogController.php:287
+msgid "Limit results to a specific receiver email."
+msgstr ""
+
+#: includes/API/EmailLogController.php:293
+msgid "Sort collection by email attribute."
+msgstr ""
+
+#: includes/API/EmailLogController.php:299
+msgid "Order sort attribute ascending or descending."
 msgstr ""
 
 #: includes/API/LogsController.php:113
 msgid "Log file path. If not provided, uses the current debug log file."
 msgstr ""
 
-#: includes/API/LogsController.php:166
+#: includes/API/LogsController.php:167
 #: includes/Services/DebugLog/WPLogReaderService.php:693
 msgid "Log file cleared successfully."
 msgstr ""
 
-#: includes/API/RestController.php:42
+#: includes/API/RestController.php:41
+msgid "You are not currently logged in."
+msgstr ""
+
+#: includes/API/RestController.php:46
 msgid "You do not have permission to access this endpoint."
 msgstr ""
 
@@ -95,35 +141,70 @@ msgstr ""
 msgid "Invalid parameters provided."
 msgstr ""
 
-#: includes/API/SettingsController.php:145
+#. translators: %s is the setting name, e.g. 'debug'
+#: includes/API/SettingsController.php:131
+msgid "Invalid value for %s. Expected boolean."
+msgstr ""
+
+#: includes/API/SettingsController.php:139
+msgid "No valid settings provided to update."
+msgstr ""
+
+#: includes/API/SettingsController.php:159
 msgid "Settings updated successfully."
 msgstr ""
 
-#: includes/API/SettingsController.php:158
+#: includes/API/SettingsController.php:172
 msgid "Settings reset to defaults successfully."
 msgstr ""
 
-#: includes/API/SettingsController.php:171
+#: includes/API/SettingsController.php:185
 msgid "Full view request processed successfully."
 msgstr ""
 
-#: includes/Internal/HookManager.php:14
+#: includes/Internal/HookManager.php:17
 msgid "Settings"
 msgstr ""
 
-#: includes/Services/DebugLog/LogsService.php:106
+#: includes/Internal/HookManager.php:43
+msgid "Debug Suite Database Update Required"
+msgstr ""
+
+#. translators: %1$s: current database version, %2$s: latest version
+#: includes/Internal/HookManager.php:49
+msgid "Debug Suite database needs to be updated from version %1$s to %2$s to ensure proper functionality."
+msgstr ""
+
+#: includes/Internal/HookManager.php:57
+msgid "Update Database Now"
+msgstr ""
+
+#: includes/Internal/HookManager.php:82
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/Internal/HookManager.php:93
+msgid "Database updated successfully!"
+msgstr ""
+
+#. translators: %s: error message
+#: includes/Internal/HookManager.php:101
+msgid "Database update failed: %s"
+msgstr ""
+
+#: includes/Services/DebugLog/LogsService.php:97
 msgid "No log file path provided or configured."
 msgstr ""
 
-#: includes/Services/DebugLog/LogsService.php:114
+#: includes/Services/DebugLog/LogsService.php:105
 msgid "The requested log file was not found."
 msgstr ""
 
-#: includes/Services/DebugLog/LogsService.php:123
+#: includes/Services/DebugLog/LogsService.php:114
 msgid "Access to this file is not allowed."
 msgstr ""
 
-#: includes/Services/DebugLog/LogsService.php:145
+#: includes/Services/DebugLog/LogsService.php:136
 msgid "Failed to read the log file."
 msgstr ""
 
@@ -153,6 +234,53 @@ msgstr ""
 msgid "Failed to clear log file."
 msgstr ""
 
+#: includes/Services/EmailLog/EmailLogService.php:184
+msgid "Failed to retrieve email logs."
+msgstr ""
+
+#: includes/Services/EmailLog/EmailLogService.php:214
+msgid "All Statuses"
+msgstr ""
+
+#: includes/Services/EmailLog/EmailLogService.php:218
+#: assets/js/debug-suite.js:4
+msgid "Successful"
+msgstr ""
+
+#: includes/Services/EmailLog/EmailLogService.php:222
+#: assets/js/debug-suite.js:4
+msgid "Failed"
+msgstr ""
+
+#: includes/Services/EmailLog/EmailLogService.php:230
+msgid "Failed to retrieve filter options."
+msgstr ""
+
+#: includes/Services/EmailLog/EmailLogService.php:255
+msgid "No email IDs provided."
+msgstr ""
+
+#. translators: %d is the number of deleted emails.
+#: includes/Services/EmailLog/EmailLogService.php:264
+msgid "%d emails deleted."
+msgstr ""
+
+#: includes/Services/EmailLog/EmailLogService.php:276
+msgid "All emails cleared."
+msgstr ""
+
+#: includes/Services/EmailLog/EmailLogService.php:290
+msgid "Email not found."
+msgstr ""
+
+#: includes/Services/EmailLog/EmailLogService.php:304
+msgid "Email resent."
+msgstr ""
+
+#: includes/Services/EmailLog/EmailLogService.php:308
+msgid "Failed to resend email."
+msgstr ""
+
 #: includes/Services/OverviewService.php:56
 msgid "Failed to retrieve log statistics."
 msgstr ""
@@ -161,13 +289,8 @@ msgstr ""
 msgid "Not defined"
 msgstr ""
 
-#: includes/Services/SettingsService.php:59
-msgid "No settings provided."
-msgstr ""
-
 #: includes/Services/SettingsService.php:63
-#: includes/Services/SettingsService.php:112
-msgid "wp-config.php file not found."
+msgid "No settings provided to update."
 msgstr ""
 
 #: includes/Services/SettingsService.php:67
@@ -193,8 +316,12 @@ msgstr ""
 msgid "Failed to write wp-config.php file."
 msgstr ""
 
+#: includes/Services/SettingsService.php:112
+msgid "wp-config.php file not found."
+msgstr ""
+
 #: assets/js/debug-suite.js:1
-msgid "Ok"
+msgid "Continue"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
@@ -285,6 +412,10 @@ msgid "Saving..."
 msgstr ""
 
 #: assets/js/debug-suite.js:1
+msgid "Select Option"
+msgstr ""
+
+#: assets/js/debug-suite.js:1
 msgid "All Levels"
 msgstr ""
 
@@ -293,6 +424,7 @@ msgid "Critical"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
+#: assets/js/debug-suite.js:4
 msgid "Error"
 msgstr ""
 
@@ -337,10 +469,6 @@ msgid "Sort by Level"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-msgid "Ok, Clear"
-msgstr ""
-
-#: assets/js/debug-suite.js:1
 msgid "Select a log file"
 msgstr ""
 
@@ -349,7 +477,7 @@ msgid "Parsed"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
-msgid "Raw File"
+msgid "Raw"
 msgstr ""
 
 #: assets/js/debug-suite.js:1
@@ -462,6 +590,158 @@ msgid "Retry"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
+msgid "Previous"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Next"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "to"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "of"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "results"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Email Details"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Loading email details..."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Sent:"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Success"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Email Information"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "To:"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Subject:"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Message:"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Attachments"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Email Headers"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Error Information"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Close"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "All"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "All Receivers"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Bulk actions"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Delete"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Resend"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "items"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Are you sure you want to apply the selected bulk action?"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Apply"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Receiver"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Status"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Search..."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Are you sure you want to clear all email logs? This action cannot be undone."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Clear All"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Refresh"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Sent Date"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Subject"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Actions"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Loading emails..."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "No email entries found matching your criteria."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "View"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Failed to load email logs."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
 msgid "Processing..."
 msgstr ""
 
@@ -490,10 +770,6 @@ msgid "Selected:"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-msgid "of"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
 msgid "files"
 msgstr ""
 
@@ -515,14 +791,6 @@ msgstr ""
 
 #: assets/js/debug-suite.js:4
 msgid "Entries"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Actions"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "View"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
@@ -726,10 +994,6 @@ msgid "Easy to analyze"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-msgid "Previous"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
 msgid "Step"
 msgstr ""
 
@@ -746,19 +1010,7 @@ msgid "Finish Setup"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-msgid "Next"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Dashboard data refreshed"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
 msgid "Failed to load dashboard data"
-msgstr ""
-
-#: assets/js/debug-suite.js:4
-msgid "Refresh"
 msgstr ""
 
 #: assets/js/debug-suite.js:4
@@ -938,7 +1190,7 @@ msgid "Monitor your WordPress debug activity and system performance."
 msgstr ""
 
 #: assets/js/debug-suite.js:4
-msgid "View and manage your debug logs."
+msgid "View and manage your email logs."
 msgstr ""
 
 #: assets/js/debug-suite.js:4

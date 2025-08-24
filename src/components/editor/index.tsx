@@ -1,12 +1,10 @@
+import type { EditorOptions, IStandaloneCodeEditor } from '@/types';
 import { classNames } from '@/utils';
 import MonacoEditor, { type Monaco, type OnMount } from '@monaco-editor/react';
 import { __ } from '@wordpress/i18n';
-import { type editor } from 'monaco-editor';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { getLanguage, registerLanguages } from './languages';
 import { validateCode, type ValidationError } from './validators';
-
-type EditorOptions = editor.IStandaloneEditorConstructionOptions;
 
 interface EditorProps {
     /** The content to display in the editor */
@@ -44,8 +42,9 @@ const Editor: React.FC<EditorProps> = ({
     loadingText
 }) => {
     const [isInternalLoading, setIsInternalLoading] = useState(true);
-    const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+    const editorRef = useRef<IStandaloneCodeEditor | null>(null);
     const monacoRef = useRef<Monaco | null>(null);
+    const isLoading = (loading || isInternalLoading) && showSpinner;
 
     const defaultOptions: EditorOptions = useMemo(() => {
         return {
@@ -84,6 +83,13 @@ const Editor: React.FC<EditorProps> = ({
         } else {
             monaco.editor.setTheme('vs-light');
         }
+        const model = editor.getModel();
+        // Attach listener for content changes
+        model?.onDidChangeContent(() => {
+            // Scroll to bottom when new content is added
+            const lineCount = model.getLineCount();
+            editor.revealLine(lineCount);
+        });
     };
 
     const handleOnChange = (code: string | undefined) => {
@@ -105,8 +111,6 @@ const Editor: React.FC<EditorProps> = ({
             }
         }
     }, [language]);
-
-    const isLoading = (loading || isInternalLoading) && showSpinner;
 
     return (
         <div className={classNames('relative', className)}>

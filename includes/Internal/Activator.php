@@ -7,6 +7,8 @@
 
 namespace DebugSuite\Internal;
 
+use DebugSuite\Install;
+
 /**
  * Plugin activation handler for Debug Suite.
  *
@@ -32,5 +34,8 @@ class Activator {
 
 		// Add activation redirect transient
 		set_transient( 'debug_suite_activation_redirect', true, 30 );
+
+		// Install database tables
+		Install::do_install();
 	}
 }
