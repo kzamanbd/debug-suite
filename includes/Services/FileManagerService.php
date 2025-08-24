@@ -60,7 +60,7 @@ class FileManagerService implements ServiceInterface {
 	/**
 	 * Helper function to get the file or directory info
 	 *
-	 * @param $item SplFileInfo object
+	 * @param SplFileInfo $item
 	 *
 	 * @return object
 	 */
