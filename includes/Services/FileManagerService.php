@@ -49,7 +49,7 @@ class FileManagerService implements ServiceInterface {
 	/**
 	 * Helper function to format file sizes into readable format
 	 *
-	 * @param $bytes int
+	 * @param int $bytes
 	 *
 	 * @return string
 	 */
