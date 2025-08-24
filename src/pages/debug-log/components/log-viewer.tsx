@@ -4,7 +4,7 @@
  * @since 1.0.0
  */
 import Button from '@/components/base/button';
-import DateTimeHtml from '@/components/date-time';
+import DateTimeHtml from '@/components/base/date-time';
 import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { useRef, useState } from '@wordpress/element';
@@ -93,7 +93,7 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                 <tbody className="divide-y divide-gray-200">
                     {logs.length === 0 ? (
                         <tr>
-                            <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                            <td colSpan={4} className="h-[500px] px-6 py-12 text-center text-gray-500">
                                 {loading ? (
                                     <div className="flex items-center justify-center">
                                         <RefreshCwIcon className="mr-2 h-5 w-5 animate-spin" />

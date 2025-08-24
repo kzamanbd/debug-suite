@@ -1,4 +1,8 @@
+import type { editor } from 'monaco-editor';
 import type { ReactNode } from 'react';
+
+export type IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
+export type EditorOptions = editor.IStandaloneEditorConstructionOptions;
 
 export type DialogType = 'success' | 'error' | 'warning' | 'confirm';
 
@@ -21,7 +25,7 @@ export interface DialogState {
     cancelText?: string;
     options: DialogOptions;
     resolve?: (value: boolean) => void;
-    reject?: () => void;
+    reject?: (value: string) => void;
 }
 
 export interface DialogModalProps {
@@ -66,7 +70,6 @@ declare global {
             debug: boolean;
             debug_log: boolean;
             debug_display: boolean;
-            root_path: string;
             content_url: string;
             wp_version: string;
             php_version: string;

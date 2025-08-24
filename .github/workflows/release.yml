@@ -1,0 +1,45 @@
+name: 🚀 Deploy and Release Plugin to WP.org
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release-to-wp-org:
+    name: Release to WordPress.org
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+      - name: Production Build
+        run: |
+          composer install --no-dev -o
+          npm install
+          npm run build
+      - name: Install SVN ( Subversion )
+        run: |
+          sudo apt-get update
+          sudo apt-get install subversion
+      - name: WordPress Plugin Deploy
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        with:
+          generate-zip: true
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: debug-suite
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{steps.deploy.outputs.zip-path}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

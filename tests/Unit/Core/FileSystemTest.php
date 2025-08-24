@@ -7,7 +7,7 @@
  * @group   filesystem
  */
 
-namespace DebugSuite\Tests\Unit\Supports;
+namespace DebugSuite\Tests\Unit\Core;
 
 use DebugSuite\Core\FileSystem;
 use DebugSuite\Tests\Helpers\TestCase;

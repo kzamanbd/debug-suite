@@ -78,8 +78,8 @@ jobs:
       - name: 🔧 Run Integration Tests
         run: |
           echo "🚧 Integration tests are currently being set up..."
-          echo "📝 TODO: Configure integration test environment"
-          echo "⏭️ Skipping integration tests for now"
+          composer run test:integration
+          echo "✅ Integration tests completed"
       - name: 📊 Upload Test Results
         uses: actions/upload-artifact@v4
         if: always()

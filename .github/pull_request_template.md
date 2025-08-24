@@ -1,10 +1,8 @@
-# Submissions
-
-## Changes proposed in this Pull Request
+# Changes proposed in this Pull Request
 
 <!-- Describe the changes made to this Pull Request and the reason for such changes. -->
 
-### Related Pull Request(s)
+## Related Pull Request(s)
 
 * Full PR Link
 

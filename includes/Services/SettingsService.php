@@ -44,7 +44,11 @@ class SettingsService implements ServiceInterface {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->config_file_path = ABSPATH . 'wp-config.php';
+		// Use WordPress function to get proper config file path
+		if ( ! function_exists( 'get_home_path' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+		$this->config_file_path = get_home_path() . 'wp-config.php';
 	}
 
 	/**

@@ -10,8 +10,9 @@
 
 namespace DebugSuite\Providers;
 
-use DebugSuite\API\FileManagerController;
+use DebugSuite\API\EmailLogController;
 use DebugSuite\API\LogsController;
+use DebugSuite\API\FileManagerController;
 use DebugSuite\API\OverviewController;
 use DebugSuite\API\SettingsController;
 use DebugSuite\Core\Container\AbstractServiceProvider;
@@ -38,6 +39,7 @@ class RestControllerProvider extends AbstractServiceProvider {
 		FileManagerController::class,
 		SettingsController::class,
 		OverviewController::class,
+		EmailLogController::class,
 	];
 
 	public function register( Container $container ): void {
@@ -48,6 +50,7 @@ class RestControllerProvider extends AbstractServiceProvider {
 				FileManagerController::class => $container->autowire( FileManagerController::class ),
 				SettingsController::class    => $container->autowire( SettingsController::class ),
 				OverviewController::class    => $container->autowire( OverviewController::class ),
+				EmailLogController::class    => $container->autowire( EmailLogController::class ),
 			]
 		);
 	}

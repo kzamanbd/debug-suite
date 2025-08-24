@@ -13,6 +13,8 @@ namespace DebugSuite\Tests\Integration\API;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\API\LogsController;
 use DebugSuite\Services\DebugLog\LogsService;
+use DebugSuite\Services\DebugLog\WPLogReaderService;
+use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use WP_REST_Request;
 use WP_REST_Server;
 
@@ -55,8 +57,10 @@ class LogsControllerTest extends DebugSuiteTestCase {
 		$wp_rest_server = new WP_REST_Server();
 		do_action( 'rest_api_init' );
 
-		// Create service and controller (LogsService has no constructor parameters)
-		$this->service = new LogsService();
+		// Create service dependencies and service with dependency injection
+		$log_reader = new WPLogReaderService();
+		$log_discovery = new LogDiscoveryService();
+		$this->service = new LogsService( $log_reader, $log_discovery );
 		$this->controller = new LogsController( $this->service );
 		
 		// Register routes
@@ -76,8 +80,8 @@ class LogsControllerTest extends DebugSuiteTestCase {
 		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs' );
 		$response = rest_get_server()->dispatch( $request );
 		
-		// WordPress REST API returns 403 for unauthorized access, not 401
-		$this->assertEquals( 403, $response->get_status() );
+		// WordPress REST API returns 401 for unauthorized access
+		$this->assertEquals( 401, $response->get_status() );
 	}
 
 	/**
@@ -141,6 +145,7 @@ class LogsControllerTest extends DebugSuiteTestCase {
 		file_put_contents( $log_file, $test_content );
 		
 		$request = new WP_REST_Request( 'DELETE', '/' . $this->namespace . '/logs/clear' );
+		$request->set_param( 'file', $log_file );
 		$response = rest_get_server()->dispatch( $request );
 		
 		$this->assertEquals( 200, $response->get_status() );
@@ -229,7 +234,7 @@ class LogsControllerTest extends DebugSuiteTestCase {
 		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/logs/raw' );
 		$response = rest_get_server()->dispatch( $request );
 
-		// WordPress REST API returns 403 for unauthorized access, not 401
-		$this->assertEquals( 403, $response->get_status() );
+		// WordPress REST API returns 401 for unauthorized access
+		$this->assertEquals( 401, $response->get_status() );
 	}
 }

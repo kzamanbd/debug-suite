@@ -8,6 +8,7 @@
 namespace DebugSuite\Core\Container;
 
 use DebugSuite\Interfaces\Hookable;
+use Exception;
 
 /**
  * Service Manager for managing service providers and the container.
@@ -65,13 +66,13 @@ class ServiceManager {
 	 * @param ServiceProviderInterface|string $provider Provider instance or class name.
 	 *
 	 * @return ServiceProviderInterface
-	 * @throws \Exception If provider is invalid.
+	 * @throws Exception If provider is invalid.
 	 */
 	public function register( $provider ): ServiceProviderInterface {
 		// If provider is a string, instantiate it
 		if ( is_string( $provider ) ) {
 			if ( ! class_exists( $provider ) ) {
-				throw new \Exception( "Provider class [{$provider}] does not exist." ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+				throw new Exception( esc_html( "Provider class [$provider] does not exist." ) );
 			}
 
 			$provider = new $provider();
@@ -79,7 +80,7 @@ class ServiceManager {
 
 		// Validate provider implements interface
 		if ( ! $provider instanceof ServiceProviderInterface ) {
-			throw new \Exception( 'Provider must implement ServiceProviderInterface.' );
+			throw new Exception( 'Provider must implement ServiceProviderInterface.' );
 		}
 
 		// Get provider class name for indexing
