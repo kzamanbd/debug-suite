@@ -1,10 +1,13 @@
-name: Deploy and Release Plugin to WP.org
+name: 🚀 Deploy and Release Plugin to WP.org
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
-  releaseToWPOrg:
+  release-to-wp-org:
     name: Release to WordPress.org
     runs-on: ubuntu-latest
     steps:
@@ -16,7 +19,7 @@ jobs:
           php-version: '8.1'
           coverage: none
           tools: composer:v2
-      - name: Build
+      - name: Production Build
         run: |
           composer install --no-dev -o
           npm install
