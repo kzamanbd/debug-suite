@@ -4,7 +4,6 @@ assets/src
 assets/css/style.css.map
 tests
 nbproject
-Gruntfile.js
 package.json
 docs.md
 changelog.txt
@@ -16,10 +15,13 @@ phpunit.xml
 README.md
 plugin-deploy.sh
 package-lock.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
 phpcs.ruleset.xml
 src
 CONTRIBUTING.md
 config.json
+phpcs.xml
 phpcs.xml.dist
 webpack.config.js
 composer.lock
