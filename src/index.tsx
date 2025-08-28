@@ -1,6 +1,7 @@
 import domReady from '@wordpress/dom-ready';
 import { createRoot } from '@wordpress/element';
 import App from './App';
+import ConsoleApp from './console';
 import activeMenuLink from './utils/menu';
 
 domReady(() => {
@@ -22,6 +23,15 @@ domReady(() => {
 
         // Append to head
         document.head.appendChild(link);
+    }
+
+    // load the standalone app
+
+    const consoleContainer = document.getElementById('debug-suite-console-app');
+    if (consoleContainer) {
+        // mount the console app
+        const root = createRoot(consoleContainer);
+        root.render(<ConsoleApp />);
     }
 });
 

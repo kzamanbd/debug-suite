@@ -10,6 +10,7 @@ namespace DebugSuite;
 
 use DebugSuite\Interfaces\Hookable;
 use Exception;
+use WP_Admin_Bar;
 
 /**
  * Admin functionality for the Debug Suite plugin.
@@ -36,10 +37,13 @@ class Admin implements Hookable {
 	public function register_hooks(): void {
 		add_action( 'admin_init', [ $this, 'handle_activation_redirect' ] );
 		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 		add_action( 'admin_print_scripts', [ $this, 'hide_unrelated_notices' ] );
 		add_filter( 'admin_footer_text', [ $this, 'admin_footer' ], 1, 2 );
 		add_filter( 'admin_body_class', [ $this, 'add_admin_body_class' ] );
+		add_action( 'admin_bar_menu', [ $this, 'add_admin_bar_menu' ] );
+		add_action( 'wp_after_admin_bar_render', [ $this, 'add_footer' ] );
 	}
 
 	/**
@@ -207,7 +211,7 @@ class Admin implements Hookable {
 	 */
 	public function admin_enqueue_scripts(): void {
 		// Only enqueue on our plugin's admin page
-		if ( ! debug_suite_current_page() ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
@@ -306,5 +310,27 @@ class Admin implements Hookable {
 			'https://github.com/kzamanbd/debug-suite',
 			'https://coff.ee/kzamanbd'
 		);
+	}
+
+	/**
+	 * Add custom items to the admin bar.
+	 *
+	 * @param WP_Admin_Bar $admin_bar The admin bar instance.
+	 *
+	 * @since DEBUG_SUITE_SINCE
+	 *
+	 * @return void
+	 */
+	public function add_admin_bar_menu( WP_Admin_Bar $admin_bar ): void {
+		$admin_bar->add_node(
+			[
+				'id'    => 'debug-suite',
+				'parent' => 'top-secondary',
+				'title' => __( 'Debug', 'debug-suite' ),
+			]
+		);
+	}
+	public function add_footer() {
+		echo '<div id="debug-suite-console-app" class="debug-suite-root-app"></div>';
 	}
 }
