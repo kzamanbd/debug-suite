@@ -1,9 +1,14 @@
+import DebugLog from '@/pages/debug-log';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Modal } from './components/base';
+import { Bug, SquareTerminal } from 'lucide-react';
+import { Button, Modal } from './components/base';
+import QueryConsole from './pages/query-console';
+import { classNames } from './utils';
 
 const ConsoleApp = () => {
     const [openModal, setOpenModal] = useState(false);
+    const [activeTab, setActiveTab] = useState<'query-console' | 'logs'>('query-console');
     const barClickHandler = () => {
         setOpenModal(true);
     };
@@ -19,7 +24,30 @@ const ConsoleApp = () => {
             </div>
 
             <Modal open={openModal} onClose={onClose} fullScreen>
-                <h2>{__('Debug Console', 'debug-suite')}</h2>
+                <Modal.Title className="flex items-center gap-4">
+                    <Button
+                        variant="text"
+                        onClick={() => setActiveTab('query-console')}
+                        className={classNames({ 'text-primary': activeTab === 'query-console' })}>
+                        <SquareTerminal size={20} />
+                        <span>Console</span>
+                    </Button>
+                    <Button
+                        variant="text"
+                        onClick={() => setActiveTab('logs')}
+                        className={classNames({ 'text-primary': activeTab === 'logs' })}>
+                        <Bug size={20} />
+                        <span>Debug Log</span>
+                    </Button>
+                </Modal.Title>
+                <Modal.Content>
+                    {openModal && (
+                        <>
+                            <DebugLog className={classNames(activeTab === 'query-console' && 'hidden')} />
+                            <QueryConsole className={classNames(activeTab === 'logs' && 'hidden')} />
+                        </>
+                    )}
+                </Modal.Content>
             </Modal>
         </>
     );
