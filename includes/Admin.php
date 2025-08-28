@@ -43,7 +43,6 @@ class Admin implements Hookable {
 		add_filter( 'admin_footer_text', [ $this, 'admin_footer' ], 1, 2 );
 		add_filter( 'admin_body_class', [ $this, 'add_admin_body_class' ] );
 		add_action( 'admin_bar_menu', [ $this, 'add_admin_bar_menu' ] );
-		add_action( 'wp_after_admin_bar_render', [ $this, 'add_footer' ] );
 	}
 
 	/**
@@ -329,8 +328,5 @@ class Admin implements Hookable {
 				'title' => __( 'Debug', 'debug-suite' ),
 			]
 		);
-	}
-	public function add_footer() {
-		echo '<div id="debug-suite-console-app" class="debug-suite-root-app"></div>';
 	}
 }
