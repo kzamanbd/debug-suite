@@ -1,4 +1,5 @@
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { Modal } from './components/base';
 
 const ConsoleApp = () => {
@@ -11,19 +12,16 @@ const ConsoleApp = () => {
         setOpenModal(false);
     };
 
-    useEffect(() => {
-        const barElement = document.getElementById('wp-admin-bar-debug-suite');
-        barElement?.addEventListener('click', barClickHandler);
-
-        return () => {
-            barElement?.removeEventListener('click', barClickHandler);
-        };
-    }, []);
-
     return (
-        <Modal open={openModal} onClose={onClose} fullScreen>
-            <h2>Debug Console</h2>
-        </Modal>
+        <>
+            <div role="button" onClick={barClickHandler} className="ab-item ab-empty-item">
+                {__('Debug', 'debug-suite')}
+            </div>
+
+            <Modal open={openModal} onClose={onClose} fullScreen>
+                <h2>{__('Debug Console', 'debug-suite')}</h2>
+            </Modal>
+        </>
     );
 };
 

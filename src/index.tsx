@@ -27,7 +27,7 @@ domReady(() => {
 
     // load the standalone app
 
-    const consoleContainer = document.getElementById('debug-suite-console-app');
+    const consoleContainer = document.getElementById('wp-admin-bar-debug-suite');
     if (consoleContainer) {
         // mount the console app
         const root = createRoot(consoleContainer);
