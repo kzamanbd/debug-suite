@@ -59,8 +59,6 @@ README.md
 CHANGELOG.md
 CONTRIBUTING.md
 LICENSE.md
-composer.json
-package.json
 pnpm-workspace.yaml
 
 # IDE/Editor Files
@@ -109,3 +107,7 @@ tmp
 .Trashes
 ehthumbs.db
 Thumbs.db 
+eslint.config.mjs
+.prettierignore
+.cursorrules
+.svnignore
