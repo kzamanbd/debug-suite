@@ -17,6 +17,13 @@ const ConsoleApp = () => {
         setOpenModal(false);
     };
 
+    const Renderer = () => {
+        if (activeTab === 'query-console') {
+            return <QueryConsole />;
+        }
+        return <DebugLog />;
+    };
+
     return (
         <>
             <div role="button" onClick={barClickHandler} className="ab-item ab-empty-item">
@@ -40,14 +47,7 @@ const ConsoleApp = () => {
                         <span>Debug Log</span>
                     </Button>
                 </Modal.Title>
-                <Modal.Content>
-                    {openModal && (
-                        <>
-                            <DebugLog className={classNames(activeTab === 'query-console' && 'hidden')} />
-                            <QueryConsole className={classNames(activeTab === 'logs' && 'hidden')} />
-                        </>
-                    )}
-                </Modal.Content>
+                <Modal.Content>{openModal && <Renderer />}</Modal.Content>
             </Modal>
         </>
     );
