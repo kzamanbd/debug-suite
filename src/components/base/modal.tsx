@@ -1,5 +1,6 @@
 import { classNames } from '@/utils';
 import { Dialog, DialogBackdrop, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
+import { X } from 'lucide-react';
 import type { HTMLAttributes } from 'react';
 import React, { Fragment } from 'react';
 
@@ -56,7 +57,7 @@ const Modal = ({ children, showXButton = true, className, open, fullScreen = fal
                                     type="button"
                                     onClick={onClose}
                                     className="absolute top-2 right-2 rounded-lg p-1.5 text-sm text-gray-500 transition-colors duration-150 outline-none hover:text-gray-700 focus:outline-none">
-                                    &#10005;
+                                    <X size={20} />
                                 </button>
                             )}
                         </DialogPanel>
