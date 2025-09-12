@@ -1,8 +1,8 @@
-import { DialogContext } from '@/components/dialog-provider';
 import type { DialogOptions } from '@/types';
-import { useContext } from 'react';
+import { showDialog } from '@/utils/dialog';
 
 export const useConfirm = (defaultOptions?: DialogOptions) => {
-    const confirmDialog = useContext(DialogContext);
-    return (message: string, options?: DialogOptions) => confirmDialog(message, { ...defaultOptions, ...options });
+    return (message: string, options?: DialogOptions) => {
+        return showDialog(message, { type: 'confirm', ...defaultOptions, ...options });
+    };
 };

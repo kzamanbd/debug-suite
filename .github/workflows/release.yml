@@ -22,12 +22,9 @@ jobs:
       - name: Production Build
         run: |
           composer install --no-dev -o
-          npm install
-          npm run build
-      - name: Install SVN ( Subversion )
-        run: |
-          sudo apt-get update
-          sudo apt-get install subversion
+          npm install -g pnpm
+          pnpm install
+          pnpm run build
       - name: WordPress Plugin Deploy
         id: deploy
         uses: 10up/action-wordpress-plugin-deploy@stable

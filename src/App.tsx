@@ -1,8 +1,9 @@
 import { SlotFillProvider } from '@wordpress/components';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { ToastProvider } from './components/base/toast';
-import { DialogProvider } from './components/dialog-provider';
+import ConfirmDialog from './components/confirm-dialog';
 import Layout from './components/layout';
+import './index.css';
 import { withRouter } from './routing';
 import type { DebugSuiteRoute } from './routing/routes';
 import routes from './routing/routes';
@@ -25,13 +26,14 @@ const App = () => {
     const router = createHashRouter(mappedRoutes);
 
     return (
-        <DialogProvider>
+        <>
             <SlotFillProvider>
                 <ToastProvider>
                     <RouterProvider router={router} />
                 </ToastProvider>
             </SlotFillProvider>
-        </DialogProvider>
+            <ConfirmDialog />
+        </>
     );
 };
 

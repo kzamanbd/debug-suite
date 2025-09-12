@@ -2,7 +2,7 @@ import { classNames } from '@/utils';
 import { LoaderCircle } from 'lucide-react';
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 
-export type ButtonVariant = 'primary' | 'success' | 'danger' | 'warning' | 'default' | 'info';
+export type ButtonVariant = 'primary' | 'success' | 'danger' | 'warning' | 'default' | 'info' | 'text';
 
 interface ButtonOwnProps<T extends ElementType> {
     as?: T;
@@ -26,7 +26,8 @@ const variantClasses: Record<ButtonVariant, string> = {
         'bg-warning shadow-warning-100 border-warning text-white bg-gradient-to-br from-yellow-400 to-yellow-500 dark:bg-yellow-600 dark:hover:bg-yellow-700 hover:from-yellow-500 hover:to-yellow-600',
     default:
         'bg-white text-gray-800 hover:bg-gray-50 hover:text-gray-900 border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-gray-100',
-    info: 'bg-info shadow-info-100 border-info text-white bg-gradient-to-br from-blue-400 to-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700 hover:from-blue-500 hover:to-blue-600'
+    info: 'bg-info shadow-info-100 border-info text-white bg-gradient-to-br from-blue-400 to-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700 hover:from-blue-500 hover:to-blue-600',
+    text: 'bg-transparent text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'
 };
 
 const sizeClasses = {
@@ -66,7 +67,8 @@ const Button = <T extends ElementType = 'button'>({
                 variantClasses[variant],
                 sizeClasses[size],
                 className,
-                loading && 'cursor-wait opacity-75'
+                loading && 'cursor-wait opacity-75',
+                variant === 'text' && 'border-0 p-0 hover:underline'
             )}
             disabled={isButton ? loading || disabled : undefined}
             aria-disabled={loading || disabled}
