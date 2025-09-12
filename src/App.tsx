@@ -3,6 +3,7 @@ import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { ToastProvider } from './components/base/toast';
 import ConfirmDialog from './components/confirm-dialog';
 import Layout from './components/layout';
+import './index.css';
 import { withRouter } from './routing';
 import type { DebugSuiteRoute } from './routing/routes';
 import routes from './routing/routes';
