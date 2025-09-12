@@ -1,12 +1,10 @@
 import type { DialogOptions, DialogState } from '@/types';
-import React, { createContext, useCallback, useState } from 'react';
+import { registerDialog, unregisterDialog } from '@/utils/dialog';
+import React, { useCallback, useEffect, useState } from 'react';
 import DialogModal from './base/dialog-modal';
 
-const DialogContext = createContext<(message: string, options?: DialogOptions) => Promise<boolean>>(() => {
-    throw new Error('DialogProvider is missing');
-});
-
-const DialogProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Confirm Dialog component (no context needed)
+const ConfirmDialog: React.FC = () => {
     const [state, setState] = useState<DialogState>({
         open: false,
         message: '',
@@ -40,18 +38,21 @@ const DialogProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =
         });
     };
 
+    // Register/unregister with global dialog system
+    useEffect(() => {
+        registerDialog(openDialog);
+        return () => unregisterDialog();
+    }, [openDialog]);
+
     return (
-        <DialogContext.Provider value={openDialog}>
-            {children}
-            <DialogModal
-                open={state.open}
-                title={state.title}
-                message={state.message}
-                onClose={handleClose}
-                options={state.options}
-            />
-        </DialogContext.Provider>
+        <DialogModal
+            open={state.open}
+            title={state.title}
+            message={state.message}
+            onClose={handleClose}
+            options={state.options}
+        />
     );
 };
 
-export { DialogContext, DialogProvider };
+export default ConfirmDialog;

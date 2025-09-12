@@ -25,3 +25,6 @@ export const mutationObserver = (
 export const classNames = (...inputs: ClassValue[]) => {
     return twMerge(clsx(inputs));
 };
+
+// Export dialog utilities
+export { showDialog } from './dialog';
