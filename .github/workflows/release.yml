@@ -25,10 +25,6 @@ jobs:
           npm install -g pnpm
           pnpm install
           pnpm run build
-      - name: Install SVN ( Subversion )
-        run: |
-          sudo apt-get update
-          sudo apt-get install subversion
       - name: WordPress Plugin Deploy
         id: deploy
         uses: 10up/action-wordpress-plugin-deploy@stable
