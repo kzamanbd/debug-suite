@@ -20,6 +20,7 @@
     <exclude-pattern>dependencies/*</exclude-pattern>
     <exclude-pattern>*.twig</exclude-pattern>
     <exclude-pattern>*.css</exclude-pattern>
+    <exclude-pattern>*.js</exclude-pattern>
     <exclude-pattern>*.scss</exclude-pattern>
     <exclude-pattern>languages/*</exclude-pattern>
 
