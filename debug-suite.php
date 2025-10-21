@@ -45,6 +45,7 @@ use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
 use DebugSuite\Providers\AppServiceProvider;
 use DebugSuite\Providers\RestControllerProvider;
+use DebugSuite\Traits\Singleton;
 
 /**
  * Main plugin bootstrap and orchestration class for Debug Suite.
@@ -56,21 +57,14 @@ use DebugSuite\Providers\RestControllerProvider;
  */
 final class DebugSuite {
 
+	use Singleton;
+
 	/**
 	* Plugin version
 	*
 	* @var string
 	*/
 	public string $version = '1.0.1';
-
-	/**
-	 * Singleton instance of the Debug Suite plugin.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var DebugSuite|null
-	 */
-	private static ?DebugSuite $instance = null;
 
 	/**
 	 * Service manager instance.
@@ -187,20 +181,6 @@ final class DebugSuite {
 	}
 
 	/**
-	 * Initializes the DebugSuite class
-	 *
-	 * Checks for an existing DebugSuite instance
-	 * and if it doesn't find one, create it.
-	 */
-	public static function init(): ?DebugSuite {
-		if ( self::$instance === null ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-	}
-
-	/**
 	 * Get the container instance.
 	 *
 	 * @return   Container
@@ -240,7 +220,7 @@ final class DebugSuite {
  * @since    1.0.0
  */
 function debug_suite_init(): void { // phpcs:ignore Universal.Files.SeparateFunctionsFromOO.Mixed
-	DebugSuite::init();
+	DebugSuite::instance();
 }
 
 debug_suite_init();
