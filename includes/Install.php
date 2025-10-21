@@ -7,7 +7,7 @@
 
 namespace DebugSuite;
 
-use DebugSuite\Internal\DatabaseManager;
+use DebugSuite\Foundation\DatabaseManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.

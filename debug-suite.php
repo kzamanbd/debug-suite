@@ -39,8 +39,8 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	die( esc_html__( 'Missing Dependencies Detected [Debug Suite Plugin]', 'debug-suite' ) );
 }
 
-use DebugSuite\Internal\Activator;
-use DebugSuite\Internal\Deactivator;
+use DebugSuite\Foundation\Activator;
+use DebugSuite\Foundation\Deactivator;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
 use DebugSuite\Providers\AppServiceProvider;
@@ -106,14 +106,37 @@ final class DebugSuite {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @throws Exception If a service cannot be resolved during initialization.
+	 * @throws Exception|Throwable If a service cannot be resolved during initialization.
 	 */
 	public function __construct() {
 		$this->define_constants();
+		$this->init_hooks();
 		$this->init_container();
 		$this->register_providers();
-		$this->boot();
+	}
 
+	/**
+	 * Define the constants used by the plugin.
+	 *
+	 * @return void
+	 */
+	public function define_constants(): void {
+		if ( ! defined( 'DEBUG_SUITE_VERSION' ) ) {
+			define( 'DEBUG_SUITE_VERSION', $this->version );
+		}
+		if ( ! defined( 'DEBUG_SUITE_FILE' ) ) {
+			define( 'DEBUG_SUITE_FILE', __FILE__ );
+		}
+		if ( ! defined( 'DEBUG_SUITE_PLUGIN_DIR' ) ) {
+			define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+		}
+		if ( ! defined( 'DEBUG_SUITE_PLUGIN_URL' ) ) {
+			define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		}
+	}
+
+
+	public function init_hooks(): void {
 		// Activation hook
 		register_activation_hook( __FILE__, [ Activator::class, 'activate' ] );
 		// Deactivation hook
@@ -155,49 +178,12 @@ final class DebugSuite {
 	 * @since    1.0.0
 	 * @access   private
 	 * @return void
+	 * @throws Exception If a service cannot be resolved.
 	 */
 	private function register_providers(): void {
-		$providers = [
-			AppServiceProvider::class,
-			RestControllerProvider::class,
-		];
-
-		$this->service_manager->register_providers( $providers );
-	}
-
-	/**
-	 * Boot all registered services.
-	 *
-	 * Initializes all service providers and automatically registers hooks
-	 * for services implementing the Hookable interface.
-	 *
-	 * @throws Exception If a service cannot be resolved.
-	 * @since    1.0.0
-	 * @access   private
-	 * @return void
-	 */
-	private function boot(): void {
+		$this->service_manager->register( AppServiceProvider::class );
+		$this->service_manager->register( RestControllerProvider::class );
 		$this->service_manager->boot();
-	}
-
-	/**
-	 * Define the constants used by the plugin.
-	 *
-	 * @return void
-	 */
-	public function define_constants(): void {
-		if ( ! defined( 'DEBUG_SUITE_VERSION' ) ) {
-			define( 'DEBUG_SUITE_VERSION', $this->version );
-		}
-		if ( ! defined( 'DEBUG_SUITE_FILE' ) ) {
-			define( 'DEBUG_SUITE_FILE', __FILE__ );
-		}
-		if ( ! defined( 'DEBUG_SUITE_PLUGIN_DIR' ) ) {
-			define( 'DEBUG_SUITE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-		}
-		if ( ! defined( 'DEBUG_SUITE_PLUGIN_URL' ) ) {
-			define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-		}
 	}
 
 	/**

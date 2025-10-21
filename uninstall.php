@@ -22,7 +22,7 @@
  */
 
 // If uninstall not called from WordPress, then exit.
-use DebugSuite\Internal\DatabaseManager;
+use DebugSuite\Foundation\DatabaseManager;
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;

@@ -8,7 +8,7 @@
 namespace DebugSuite\Tests\Unit\Services\EmailLog;
 
 use DebugSuite\Core\ServiceResponse;
-use DebugSuite\Internal\DatabaseManager;
+use DebugSuite\Foundation\DatabaseManager;
 use DebugSuite\Services\EmailLog\EmailLogService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use DebugSuite\Install;
