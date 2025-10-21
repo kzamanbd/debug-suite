@@ -25,7 +25,7 @@ if ( ! function_exists( 'debug_suite' ) ) {
 	 * @return DebugSuite The main plugin instance.
 	 */
 	function debug_suite(): DebugSuite {
-		return DebugSuite::init();
+		return DebugSuite::instance();
 	}
 }
 

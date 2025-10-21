@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class RestControllerProvider extends AbstractServiceProvider {
+class RestRouteProvider extends AbstractServiceProvider {
 
 	protected array $provides = [
 		LogsController::class,

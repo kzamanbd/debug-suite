@@ -44,7 +44,7 @@ use DebugSuite\Foundation\Deactivator;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Core\Container\ServiceManager;
 use DebugSuite\Providers\AppServiceProvider;
-use DebugSuite\Providers\RestControllerProvider;
+use DebugSuite\Providers\RestRouteProvider;
 use DebugSuite\Traits\Singleton;
 
 /**
@@ -102,7 +102,7 @@ final class DebugSuite {
 	 *
 	 * @throws Exception|Throwable If a service cannot be resolved during initialization.
 	 */
-	public function __construct() {
+	private function __construct() {
 		$this->define_constants();
 		$this->init_hooks();
 		$this->init_container();
@@ -157,9 +157,9 @@ final class DebugSuite {
 
 		// Register the container and service manager as singletons
 		$this->container->instance( 'container', $this->container );
+		$this->container->instance( Container::class, $this->container );
 		$this->container->instance( 'service_manager', $this->service_manager );
 		$this->container->instance( ServiceManager::class, $this->service_manager );
-		$this->container->instance( Container::class, $this->container );
 
 		// Register the main plugin instance
 		$this->container->instance( DebugSuite::class, $this );
@@ -176,7 +176,7 @@ final class DebugSuite {
 	 */
 	private function register_providers(): void {
 		$this->service_manager->register( AppServiceProvider::class );
-		$this->service_manager->register( RestControllerProvider::class );
+		$this->service_manager->register( RestRouteProvider::class );
 		$this->service_manager->boot();
 	}
 
