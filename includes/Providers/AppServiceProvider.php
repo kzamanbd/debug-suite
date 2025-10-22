@@ -13,15 +13,14 @@ namespace DebugSuite\Providers;
 
 use DebugSuite\Admin;
 use DebugSuite\Assets;
+use DebugSuite\Core\BaseServiceProvider;
 use DebugSuite\Core\Container\AbstractServiceProvider;
 use DebugSuite\Core\Container\Container;
 use DebugSuite\Foundation\DatabaseManager;
 use DebugSuite\Foundation\HookManager;
-use DebugSuite\Foundation\ModuleManager;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
-use DebugSuite\Services\EmailLog\EmailLogService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;
 
@@ -39,29 +38,36 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class AppServiceProvider extends AbstractServiceProvider {
+class AppServiceProvider extends BaseServiceProvider {
 
-	protected array $provides = [
+	protected array $tags = [ 'app-service' ];
+
+	protected array $services = [
 		Admin::class,
 		Assets::class,
 		HookManager::class,
 		DatabaseManager::class,
-		WPLogReaderService::class,
-		LogDiscoveryService::class,
-		LogsService::class,
 		SettingsService::class,
-		OverviewService::class,
-		EmailLogService::class,
 	];
 
-	public function register( Container $container ): void {
+	public function register(): void {
 		// Register debug log services with dependency injection
-		$container->add(
-			[
-				WPLogReaderService::class  => $container->object( WPLogReaderService::class ),
-				LogDiscoveryService::class => $container->object( LogDiscoveryService::class ),
-				LogsService::class         => $container->autowire( LogsService::class ),
-			]
+		foreach ( $this->services as $service ) {
+			$definition = $this->share_with_implements_tags( $service );
+			$this->add_tags( $definition, $this->tags );
+		}
+
+		$this->add_tags(
+			$this->share_with_implements_tags( LogsService::class )
+			->addArgument( new WPLogReaderService() )
+			->addArgument( new LogDiscoveryService() ),
+			$this->tags
+		);
+
+		$this->add_tags(
+			$this->share_with_implements_tags( OverviewService::class )
+			->addArgument( $this->container->get( LogsService::class ) ),
+			$this->tags
 		);
 	}
 }

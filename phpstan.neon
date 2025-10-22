@@ -3,6 +3,7 @@ parameters:
     paths:
         - includes/
         - debug-suite.php
+        - overrides/
     
     # Suppress PHP warnings and notes
     reportUnmatchedIgnoredErrors: false

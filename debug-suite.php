@@ -39,13 +39,21 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	die( esc_html__( 'Missing Dependencies Detected [Debug Suite Plugin]', 'debug-suite' ) );
 }
 
+use DebugSuite\Core\Container;
 use DebugSuite\Foundation\Activator;
 use DebugSuite\Foundation\Deactivator;
-use DebugSuite\Core\Container\Container;
-use DebugSuite\Core\Container\ServiceManager;
-use DebugSuite\Providers\AppServiceProvider;
-use DebugSuite\Providers\RestRouteProvider;
+use DebugSuite\Interfaces\Hookable;
+use DebugSuite\Providers\ServiceProvider;
 use DebugSuite\Traits\Singleton;
+
+
+global $debug_suite_container;
+
+// Declare the $wc_pocket_cart as global to access from the inside of the function.
+$debug_suite_container = new Container();
+
+// Register the service providers.
+$debug_suite_container->addServiceProvider( new ServiceProvider() );
 
 /**
  * Main plugin bootstrap and orchestration class for Debug Suite.
@@ -67,30 +75,6 @@ final class DebugSuite {
 	public string $version = '1.0.1';
 
 	/**
-	 * Service manager instance.
-	 *
-	 * Manages the lifecycle of service providers including registration,
-	 * booting, and automatic hook registration for Hookable services.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var ServiceManager
-	 */
-	private ServiceManager $service_manager;
-
-	/**
-	 * Dependency injection container.
-	 *
-	 * Provides service resolution, autowiring, and dependency management
-	 * with service definition support.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var Container
-	 */
-	private Container $container;
-
-	/**
 	 * Initialize the Debug Suite plugin.
 	 *
 	 * Sets up the dependency injection container,
@@ -105,8 +89,6 @@ final class DebugSuite {
 	private function __construct() {
 		$this->define_constants();
 		$this->init_hooks();
-		$this->init_container();
-		$this->register_providers();
 	}
 
 	/**
@@ -135,49 +117,16 @@ final class DebugSuite {
 		register_activation_hook( __FILE__, [ Activator::class, 'activate' ] );
 		// Deactivation hook
 		register_deactivation_hook( __FILE__, [ Deactivator::class, 'deactivate' ] );
-	}
 
-	/**
-	 * Initialize the dependency injection container.
-	 *
-	 * Creates and configures the DI Container with enhanced features,
-	 * service manager, and registers the container and manager as singleton
-	 * instances for easy access throughout the application lifecycle.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return void
-	 */
-	private function init_container(): void {
-		$this->container       = Container::get_instance();
-		$this->service_manager = new ServiceManager( $this->container );
-
-		// Enable enhanced container features
-		$this->container->set_autowiring( true );
-
-		// Register the container and service manager as singletons
-		$this->container->instance( 'container', $this->container );
-		$this->container->instance( Container::class, $this->container );
-		$this->container->instance( 'service_manager', $this->service_manager );
-		$this->container->instance( ServiceManager::class, $this->service_manager );
-
-		// Register the main plugin instance
-		$this->container->instance( DebugSuite::class, $this );
-		$this->container->instance( 'debug_suite', $this );
-	}
-
-	/**
-	 * Register all service providers.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @return void
-	 * @throws Exception If a service cannot be resolved.
-	 */
-	private function register_providers(): void {
-		$this->service_manager->register( AppServiceProvider::class );
-		$this->service_manager->register( RestRouteProvider::class );
-		$this->service_manager->boot();
+		$hooks = $this->container()->get( Hookable::class );
+		foreach ( $hooks as $hook ) {
+			/**
+			 * Hookable $hook
+			 *
+			 * @var Hookable $hook
+			 */
+			$hook->register_hooks();
+		}
 	}
 
 	/**
@@ -187,30 +136,8 @@ final class DebugSuite {
 	 * @since    1.0.0
 	 */
 	public function container(): Container {
-		return $this->container;
-	}
-
-	/**
-	 * Get the service manager instance.
-	 *
-	 * @return   ServiceManager
-	 * @since    1.0.0
-	 */
-	public function get_service_manager(): ServiceManager {
-		return $this->service_manager;
-	}
-
-	/**
-	 * Resolve a service from the container.
-	 *
-	 * @param string $service Service name.
-	 *
-	 * @return   mixed
-	 * @throws   Exception|Throwable If the service cannot be resolved.
-	 * @since    1.0.0
-	 */
-	public function resolve( string $service ): mixed {
-		return $this->container->resolve( $service );
+		global $debug_suite_container;
+		return $debug_suite_container;
 	}
 }
 

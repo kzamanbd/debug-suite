@@ -10,12 +10,13 @@
 
 namespace DebugSuite\Providers;
 
-use DebugSuite\API\EmailLogController;
 use DebugSuite\API\LogsController;
 use DebugSuite\API\OverviewController;
 use DebugSuite\API\SettingsController;
-use DebugSuite\Core\Container\AbstractServiceProvider;
-use DebugSuite\Core\Container\Container;
+use DebugSuite\Core\BaseServiceProvider;
+use DebugSuite\Services\DebugLog\LogsService;
+use DebugSuite\Services\OverviewService;
+use DebugSuite\Services\SettingsService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -31,24 +32,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class RestRouteProvider extends AbstractServiceProvider {
+class RestRouteProvider extends BaseServiceProvider {
 
 	protected array $provides = [
-		LogsController::class,
-		SettingsController::class,
-		OverviewController::class,
-		EmailLogController::class,
+		LogsController::class => LogsService::class,
+		SettingsController::class => SettingsService::class,
+		OverviewController::class => OverviewService::class,
 	];
 
-	public function register( Container $container ): void {
-		// REST API Controllers with automatic dependency injection
-		$container->add(
-			[
-				LogsController::class        => $container->autowire( LogsController::class ),
-				SettingsController::class    => $container->autowire( SettingsController::class ),
-				OverviewController::class    => $container->autowire( OverviewController::class ),
-				EmailLogController::class    => $container->autowire( EmailLogController::class ),
-			]
-		);
+	public function register(): void {
+		// Register REST API controllers with dependency injection
+		foreach ( $this->provides as $controller => $dependency ) {
+			$definition = $this->share_with_implements_tags( $controller )->addArgument( $this->container->get( $dependency ) );
+			$this->add_tags( $definition, [ 'rest-controller' ] );
+		}
 	}
 }

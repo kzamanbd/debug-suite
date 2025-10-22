@@ -9,14 +9,13 @@ namespace DebugSuite\Tests\Unit\Services\EmailLog;
 
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Foundation\DatabaseManager;
-use DebugSuite\Services\EmailLog\EmailLogService;
+use DebugSuite\Modules\EmailLog\Services\EmailLogService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
-use DebugSuite\Install;
 
 /**
  * Test EmailLogService functionality.
  *
- * @covers \DebugSuite\Services\EmailLog\EmailLogService
+ * @covers \DebugSuite\Modules\EmailLog\Services\EmailLogService
  * @group services
  * @group email-log
  */

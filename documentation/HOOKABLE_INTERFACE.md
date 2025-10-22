@@ -55,9 +55,7 @@ class Admin implements Hookable {
 ### Service Provider
 
 ```php
-use DebugSuite\Core\AbstractServiceProvider;
-use DebugSuite\Core\Container;
-use DebugSuite\Admin\Admin;
+use DebugSuite\Admin;use DebugSuite\Core\AbstractServiceProvider;use DebugSuite\Core\Container;
 
 class AdminServiceProvider extends AbstractServiceProvider {
     protected $provides = [ Admin::class ];
