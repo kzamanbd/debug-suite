@@ -14,8 +14,6 @@ namespace DebugSuite\Providers;
 use DebugSuite\Admin;
 use DebugSuite\Assets;
 use DebugSuite\Core\BaseServiceProvider;
-use DebugSuite\Core\Container\AbstractServiceProvider;
-use DebugSuite\Core\Container\Container;
 use DebugSuite\Foundation\DatabaseManager;
 use DebugSuite\Foundation\HookManager;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
