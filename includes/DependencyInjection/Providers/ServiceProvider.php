@@ -3,7 +3,6 @@
 namespace DebugSuite\DependencyInjection\Providers;
 
 use DebugSuite\DependencyInjection\BootableServiceProvider;
-use DebugSuite\Modules\EmailLog\Providers\EmailLogServiceProvider;
 
 class ServiceProvider extends BootableServiceProvider {
 
