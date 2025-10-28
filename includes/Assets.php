@@ -116,7 +116,6 @@ class Assets implements Hookable {
 			'debug_log'     => defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG,
 			'debug_display' => defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY,
 			'content_url'   => content_url(),
-			'favicon'       => DEBUG_SUITE_PLUGIN_URL . 'assets/images/logo.png',
 			'wp_version'    => get_bloginfo( 'version' ),
 			'php_version'   => phpversion(),
 			'logs'          => $files,

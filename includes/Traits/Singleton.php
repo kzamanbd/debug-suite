@@ -2,6 +2,8 @@
 
 namespace DebugSuite\Traits;
 
+use Exception;
+
 trait Singleton {
 
 
@@ -30,7 +32,7 @@ trait Singleton {
 	/**
 	 * Cloning is forbidden.
 	 *
-	 * @since 2.1
+	 * @throws Exception
 	 */
 	public function __clone() {
 		wp_die( 'Cloning is forbidden.' );
@@ -39,7 +41,7 @@ trait Singleton {
 	/**
 	 * Unserializing instances of this class is forbidden.
 	 *
-	 * @since 2.1
+	 * @throws Exception
 	 */
 	public function __wakeup() {
 		wp_die( 'Unserializing instances of this class is forbidden.' );

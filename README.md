@@ -71,10 +71,10 @@ vendor/bin/phpstan analyse
 
 ## 📚 Documentation
 
-- [Architecture Guide](documentation/README.md)
-- [REST API Reference](documentation/REST_API_ARCHITECTURE.md)
-- [Testing Guide](documentation/TESTING.md)
-- [Hookable Interface](documentation/HOOKABLE_INTERFACE.md)
+- [Architecture Guide](docs/README.md)
+- [REST API Reference](docs/REST_API_ARCHITECTURE.md)
+- [Testing Guide](docs/TESTING.md)
+- [Hookable Interface](docs/HOOKABLE_INTERFACE.md)
 
 ## 🤝 Contributing
 
@@ -91,7 +91,7 @@ GPL v2 or later - see [LICENSE.txt](LICENSE.txt)
 
 - [GitHub Issues](https://github.com/kzamanbd/debug-suite/issues)
 - [GitHub Discussions](https://github.com/kzamanbd/debug-suite/discussions)
-- [Documentation](documentation/)
+- [Documentation](docs/)
 
 ---
 
