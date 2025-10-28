@@ -1,7 +1,7 @@
 import CustomSwitch from '@/components/base/switch';
 import { useToast } from '@/components/base/toast';
 import apiFetch from '@wordpress/api-fetch';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { AlertTriangle, Bug, CheckCircle2, Eye, EyeOff, FileText, Loader2, Shield, Zap } from 'lucide-react';
 
@@ -17,42 +17,14 @@ interface SettingsResponse {
     message?: string;
 }
 
-const DebugConfig = () => {
+interface ConfigProp {
+    config: DebugSettings;
+}
+
+const DebugConfig = ({ config }: ConfigProp) => {
     const toast = useToast();
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [settings, setSettings] = useState<DebugSettings>({
-        debug: false,
-        debug_log: false,
-        debug_display: false
-    });
-
-    useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                const response = await apiFetch<{
-                    WP_DEBUG: boolean;
-                    WP_DEBUG_LOG: boolean;
-                    WP_DEBUG_DISPLAY: boolean;
-                }>({
-                    path: '/debug-suite/v1/settings',
-                    method: 'GET'
-                });
-
-                setSettings({
-                    debug: response.WP_DEBUG,
-                    debug_log: response.WP_DEBUG_LOG,
-                    debug_display: response.WP_DEBUG_DISPLAY
-                });
-            } catch (error) {
-                console.error('Error fetching settings:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        void fetchSettings();
-    }, []);
+    const [settings, setSettings] = useState<DebugSettings>(config);
 
     const updateSetting = async (values: Partial<DebugSettings>) => {
         setSaving(true);
@@ -96,16 +68,6 @@ const DebugConfig = () => {
         });
     };
 
-    if (loading) {
-        return (
-            <div className="flex min-h-96 items-center justify-center">
-                <div className="text-center">
-                    <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
-                    <p className="mt-2 text-sm text-gray-600">{__('Loading debug settings...', 'debug-suite')}</p>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="space-y-4">

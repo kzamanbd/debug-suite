@@ -11,12 +11,6 @@ import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DebugConfig from './debug-config';
 
-interface OnboardingSettings {
-    debug: string | boolean;
-    debug_log: string | boolean;
-    debug_display: string | boolean;
-}
-
 const steps = [
     {
         id: 1,
@@ -44,7 +38,7 @@ const SetupGuide = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
-    const [settings, setSettings] = useState<OnboardingSettings>({
+    const [settings, setSettings] = useState({
         debug: false,
         debug_log: false,
         debug_display: false
@@ -126,7 +120,7 @@ const SetupGuide = () => {
     }
 
     if(isCompleted) {
-        return <DebugConfig />;
+        return <DebugConfig config={settings} />;
     }
 
     return (
