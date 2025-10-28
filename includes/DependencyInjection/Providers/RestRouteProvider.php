@@ -8,12 +8,12 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Providers;
+namespace DebugSuite\DependencyInjection\Providers;
 
 use DebugSuite\API\LogsController;
 use DebugSuite\API\OverviewController;
 use DebugSuite\API\SettingsController;
-use DebugSuite\Core\BaseServiceProvider;
+use DebugSuite\DependencyInjection\BaseServiceProvider;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;

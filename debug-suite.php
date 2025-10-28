@@ -39,11 +39,11 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	die( esc_html__( 'Missing Dependencies Detected [Debug Suite Plugin]', 'debug-suite' ) );
 }
 
-use DebugSuite\Core\Container;
-use DebugSuite\Foundation\Activator;
-use DebugSuite\Foundation\Deactivator;
+use DebugSuite\Core\Activator;
+use DebugSuite\Core\Deactivator;
+use DebugSuite\DependencyInjection\Container;
+use DebugSuite\DependencyInjection\Providers\ServiceProvider;
 use DebugSuite\Interfaces\Hookable;
-use DebugSuite\Providers\ServiceProvider;
 use DebugSuite\Traits\Singleton;
 
 

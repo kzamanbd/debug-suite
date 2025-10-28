@@ -1,8 +1,8 @@
 <?php
 
-namespace DebugSuite\Providers;
+namespace DebugSuite\DependencyInjection\Providers;
 
-use DebugSuite\Core\BootableServiceProvider;
+use DebugSuite\DependencyInjection\BootableServiceProvider;
 use DebugSuite\Modules\EmailLog\Providers\EmailLogServiceProvider;
 
 class ServiceProvider extends BootableServiceProvider {

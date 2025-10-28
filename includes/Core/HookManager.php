@@ -1,6 +1,6 @@
 <?php
 
-namespace DebugSuite\Foundation;
+namespace DebugSuite\Core;
 
 use DebugSuite\Interfaces\Hookable;
 use Exception;

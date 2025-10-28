@@ -3,7 +3,7 @@
  * An extension to the Definition class to prevent constructor injection from being possible.
  */
 
-namespace DebugSuite\Core;
+namespace DebugSuite\DependencyInjection;
 
 use DebugSuite\Packages\League\Container\Definition\Definition as BaseDefinition;
 

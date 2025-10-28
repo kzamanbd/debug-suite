@@ -3,7 +3,7 @@
 namespace DebugSuite\Modules\EmailLog\Providers;
 
 use DebugSuite\API\EmailLogController;
-use DebugSuite\Core\BaseServiceProvider;
+use DebugSuite\DependencyInjection\BaseServiceProvider;
 use DebugSuite\Modules\EmailLog\Hooks;
 use DebugSuite\Modules\EmailLog\Services\EmailLogService;
 

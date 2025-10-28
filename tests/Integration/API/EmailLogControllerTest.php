@@ -8,7 +8,7 @@
 namespace DebugSuite\Tests\Integration\API;
 
 use DebugSuite\API\EmailLogController;
-use DebugSuite\Foundation\DatabaseManager;
+use DebugSuite\Core\DatabaseManager;
 use DebugSuite\Modules\EmailLog\Services\EmailLogService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use WP_REST_Request;
