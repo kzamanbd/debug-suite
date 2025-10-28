@@ -61,9 +61,7 @@ module.exports = {
         new webpack.DefinePlugin({
             process: {}
         }),
-        new MiniCssExtractPlugin({
-            filename: '../css/[name].css'
-        })
+        new MiniCssExtractPlugin()
     ],
     externals: {
         react: 'React',
