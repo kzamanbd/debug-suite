@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Foundation;
+namespace DebugSuite\Core;
 
 use DebugSuite\Install;
 

@@ -21,7 +21,6 @@ use Exception;
  */
 class Admin implements Hookable {
 
-
 	/**
 	 * Register hooks for WordPress.
 	 *
@@ -57,11 +56,6 @@ class Admin implements Hookable {
 					'title' => __( 'Debug Log', 'debug-suite' ),
 					'path' => 'debug-log',
 					'order' => 1,
-				],
-				[
-					'title' => __( 'Email Log', 'debug-suite' ),
-					'path' => 'email-log',
-					'order' => 2,
 				],
 				[
 					'title' => __( 'Overview', 'debug-suite' ),

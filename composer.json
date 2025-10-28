@@ -29,11 +29,15 @@
         "squizlabs/php_codesniffer": "^3.7",
         "wp-coding-standards/wpcs": "^3.1",
         "wp-phpunit/wp-phpunit": "^6.4",
-        "yoast/phpunit-polyfills": "^1.0"
+        "yoast/phpunit-polyfills": "^1.0",
+        "league/container": "^4.0",
+        "coenjacobs/mozart": "^0.7.1"
     },
     "autoload": {
         "psr-4": {
-            "DebugSuite\\": "includes/"
+            "DebugSuite\\": "includes/",
+            "DebugSuite\\Modules\\EmailLog\\": "modules/email-log/includes/",
+            "DebugSuite\\Packages\\": "override/"
         },
         "files": [
             "includes/helpers.php"
@@ -45,6 +49,14 @@
         }
     },
     "scripts": {
+        "post-install-cmd": [
+            "[ $COMPOSER_DEV_MODE -eq 0 ] || \"vendor/bin/mozart\" compose",
+            "composer dump-autoload"
+        ],
+        "post-update-cmd": [
+            "[ $COMPOSER_DEV_MODE -eq 0 ] || \"vendor/bin/mozart\" compose",
+            "composer dump-autoload"
+        ],
         "phpcs": "vendor/bin/phpcs --standard=phpcs.xml",
         "phpcs:check": "vendor/bin/phpcs --standard=phpcs.xml --report=summary",
         "phpcs:full": "vendor/bin/phpcs --standard=phpcs.xml --report=full",
@@ -87,6 +99,16 @@
             "plugin_slug": "debug-suite",
             "requires_php": "8.1",
             "requires_wp": "6.0"
+        },
+        "mozart": {
+            "dep_namespace": "DebugSuite\\Packages\\",
+            "dep_directory": "/override/",
+            "classmap_directory": "/override/",
+            "classmap_prefix": "DebugSuite_",
+            "packages": [
+                "league/container"
+            ],
+            "delete_vendor_directories": true
         }
     }
 }

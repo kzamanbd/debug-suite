@@ -8,7 +8,9 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Models;
+namespace DebugSuite\Modules\EmailLog\Models;
+
+use DebugSuite\Models\BaseModel;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
