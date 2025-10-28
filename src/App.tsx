@@ -1,6 +1,7 @@
+import { ToastProvider } from '@/components/base/toast';
 import { SlotFillProvider } from '@wordpress/components';
+import { applyFilters } from '@wordpress/hooks';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
-import { ToastProvider } from './components/base/toast';
 import ConfirmDialog from './components/confirm-dialog';
 import Layout from './components/layout';
 import './index.css';
@@ -9,8 +10,9 @@ import type { DebugSuiteRoute } from './routing/routes';
 import routes from './routing/routes';
 
 const App = () => {
+    const filteredRoutes = applyFilters('debug-suite-routes', routes) as DebugSuiteRoute[];
     // Map the routes to include withRouter for each route element
-    const mappedRoutes = routes.map((route: DebugSuiteRoute) => {
+    const mappedRoutes = filteredRoutes.map((route: DebugSuiteRoute) => {
         const ResolvedComponent = withRouter(route.element);
 
         return {
