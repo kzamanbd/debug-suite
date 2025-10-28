@@ -34,3 +34,7 @@ DEVELOPER.md
 eslint.config.mjs
 .prettierignore
 .cursorrules
+.prettierrc
+.vscode
+composer.json
+composer.lock
