@@ -69,7 +69,7 @@ class Admin implements Hookable {
 				],
 				[
 					'title' => __( 'Configuration', 'debug-suite' ),
-					'path' => 'config',
+					'path' => 'setup',
 					'order' => 4,
 				],
 			]

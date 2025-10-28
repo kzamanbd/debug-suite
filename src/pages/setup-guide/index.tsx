@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { AlertTriangle, Archive, ArrowRight, CheckCircle2, Eye, FileText, Settings, Shield, Zap } from 'lucide-react';
 import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DebugConfig from './debug-config';
 
 interface OnboardingSettings {
     debug: string | boolean;
@@ -37,7 +38,7 @@ const steps = [
     }
 ];
 
-const Onboarding = () => {
+const SetupGuide = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const [loading, setLoading] = useState(true);
@@ -48,6 +49,8 @@ const Onboarding = () => {
         debug_log: false,
         debug_display: false
     });
+
+    const [isCompleted, setIsCompleted] = useState(false);
 
     useEffect(() => {
         const checkOnboardingStatus = async () => {
@@ -61,10 +64,7 @@ const Onboarding = () => {
                     path: '/debug-suite/v1/settings?check_onboarding=true',
                     method: 'GET'
                 });
-                if (response.completed) {
-                    void navigate('/');
-                    return;
-                }
+                setIsCompleted(response.completed);
 
                 setSettings({
                     debug: response.WP_DEBUG,
@@ -94,7 +94,7 @@ const Onboarding = () => {
                 });
 
                 toast.success(__('Settings saved successfully!', 'debug-suite'));
-                void navigate('/');
+                setIsCompleted(true)
             } catch (error) {
                 console.error('Error saving settings:', error);
                 toast.error(__('Failed to save settings.', 'debug-suite'));
@@ -123,6 +123,10 @@ const Onboarding = () => {
                 </div>
             </div>
         );
+    }
+
+    if(isCompleted) {
+        return <DebugConfig />;
     }
 
     return (
@@ -502,4 +506,4 @@ const Onboarding = () => {
     );
 };
 
-export default Onboarding;
+export default SetupGuide;
