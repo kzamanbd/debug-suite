@@ -22,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class DatabaseManager implements Hookable {
 	public function register_hooks(): void {
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		add_action( 'init', [ $this, 'wpdb_table_shortcuts' ], 1 );
 	}
 
@@ -55,10 +56,6 @@ class DatabaseManager implements Hookable {
 	 * @return void
 	 */
 	public static function create_tables(): void {
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-
-		static::create_email_logs_table();
-
 		// Update database version
 		static::update_db_version( DEBUG_SUITE_VERSION );
 	}

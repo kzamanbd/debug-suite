@@ -1,6 +1,6 @@
 <?php
 
-namespace DebugSuite\Traits;
+namespace DebugSuite\Core;
 
 use Exception;
 

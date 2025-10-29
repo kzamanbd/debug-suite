@@ -24,10 +24,11 @@ abstract class BaseServiceProvider extends AbstractServiceProvider {
 	/**
 	 * Check if the service provider can provide the given service alias.
 	 *
-	 * @param string $alias The service alias to check.
+	 * @param string $id The service alias to check.
+	 *
 	 * @return bool True if the service provider can provide the service, false otherwise.
 	 */
-	public function provides( string $alias ): bool {
+	public function provides( string $id ): bool {
 		static $implements = [];
 
 		foreach ( $this->services as $class ) {
@@ -43,7 +44,7 @@ abstract class BaseServiceProvider extends AbstractServiceProvider {
 
 		$implements = array_unique( $implements );
 
-		return array_key_exists( $alias, $implements ) || in_array( $alias, $this->services, true ) || in_array( $alias, $this->tags, true );
+		return array_key_exists( $id, $implements ) || in_array( $id, $this->services, true ) || in_array( $id, $this->tags, true );
 	}
 
 	/**

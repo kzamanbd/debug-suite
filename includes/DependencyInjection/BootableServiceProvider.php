@@ -15,5 +15,4 @@ use DebugSuite\Packages\League\Container\ServiceProvider\BootableServiceProvider
  * Note that `AbstractInterfaceServiceProvider` likely serves as a better base class for service providers
  * tasked with registering classes that implement interfaces.
  */
-abstract class BootableServiceProvider extends BaseServiceProvider implements BootableServiceProviderInterface {
-}
+abstract class BootableServiceProvider extends BaseServiceProvider implements BootableServiceProviderInterface {}

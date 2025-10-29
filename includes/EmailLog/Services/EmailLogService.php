@@ -8,12 +8,12 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Services;
+namespace DebugSuite\EmailLog\Services;
 
 use DebugSuite\Core\ServiceResponse;
+use DebugSuite\EmailLog\Models\EmailLog;
 use DebugSuite\Interfaces\Hookable;
 use DebugSuite\Interfaces\ServiceInterface;
-use DebugSuite\Models\EmailLog;
 use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
