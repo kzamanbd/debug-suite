@@ -1,15 +1,5 @@
 <?php
 /**
- * The plugin bootstrap file
- *
- * WordPress reads this file to generate the plugin information in the plugin
- * admin area. This file includes all dependencies, registers activation and
- * deactivation functions, and initializes the dependency
- * injection container.
- *
- * @link              https://kzaman.me/plugins/debug-suite
- * @package           DebugSuite
- *
  * Plugin Name:       Debug Suite
  * Plugin Slug:       debug-suite
  * Plugin URI:        https://kzaman.me/plugins/debug-suite?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
@@ -21,9 +11,8 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       debug-suite
  * Domain Path:       /languages
- *
- * Requires PHP: 8.1
- * Tested up to: 6.8
+ * Requires PHP:      8.1
+ * Requires at least: 6.8
  */
 
 // If this file is called directly, abort.
