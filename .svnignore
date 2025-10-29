@@ -24,7 +24,6 @@ config.json
 phpcs.xml
 phpcs.xml.dist
 webpack.config.js
-composer.lock
 .editorconfig
 .wordpress-org
 .distignore
