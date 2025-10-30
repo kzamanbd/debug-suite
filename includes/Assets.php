@@ -66,9 +66,9 @@ class Assets implements Hookable {
 			$admin_assets = require $admin_assets;
 
 			$styles['debug-suite-style'] = [
-				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/css/debug-suite.css',
+				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/js/debug-suite.css',
 				'version' => $admin_assets['version'],
-				'deps'    => [], // CSS files typically don't need JavaScript dependencies
+				'deps'    => [],
 			];
 		}
 
@@ -90,26 +90,32 @@ class Assets implements Hookable {
 		$styles  = $this->styles();
 
 		foreach ( $scripts as $handle => $script ) {
-			$deps = $script['deps'] ?? [];
-
-			wp_register_script( $handle, $script['src'], $deps, $script['version'], true );
+			wp_register_script(
+				$handle,
+				$script['src'],
+				$script['deps'],
+				$script['version'],
+				true
+			);
 		}
 
 		foreach ( $styles as $handle => $style ) {
-			$deps = $style['deps'] ?? [];
-
-			wp_register_style( $handle, $style['src'], $deps, $style['version'] );
+			wp_register_style(
+				$handle,
+				$style['src'],
+				$style['deps'],
+				$style['version']
+			);
 		}
 	}
 
 	public static function get_localized_data(): array {
-		$files = debug_suite()->resolve( LogsService::class )->supported_log_files();
+		$files = debug_suite()->container()->get( LogsService::class )->supported_log_files();
 		$constants = [
-			'debug'         => defined( 'WP_DEBUG' ) ? WP_DEBUG : false,
-			'debug_log'     => defined( 'WP_DEBUG_LOG' ) ? WP_DEBUG_LOG : false,
-			'debug_display' => defined( 'WP_DEBUG_DISPLAY' ) ? WP_DEBUG_DISPLAY : false,
+			'debug'         => defined( 'WP_DEBUG' ) && WP_DEBUG,
+			'debug_log'     => defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG,
+			'debug_display' => defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY,
 			'content_url'   => content_url(),
-			'favicon'       => DEBUG_SUITE_PLUGIN_URL . 'assets/images/logo.png',
 			'wp_version'    => get_bloginfo( 'version' ),
 			'php_version'   => phpversion(),
 			'logs'          => $files,

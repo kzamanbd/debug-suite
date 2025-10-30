@@ -1,6 +1,7 @@
 const defaults = require('@wordpress/scripts/config/webpack.config');
 const path = require('path');
 const webpack = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const entries = {
     'debug-suite': './src/index.tsx'
@@ -21,11 +22,46 @@ module.exports = {
             '@': path.resolve(__dirname, 'src')
         }
     },
+    module: {
+        ...defaults.module,
+        rules: [
+            // Filter out any default CSS rules
+            ...defaults.module.rules.filter((rule) => {
+                if (rule.test && rule.test.toString) {
+                    const testStr = rule.test.toString();
+                    return !(testStr.includes('css') || testStr.includes('scss') || testStr.includes('sass'));
+                }
+                return true;
+            }),
+            // Add our own CSS rule only
+            {
+                test: /\.css$/i,
+                include: path.resolve(__dirname, 'src'),
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 1,
+                            sourceMap: false
+                        }
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            sourceMap: false
+                        }
+                    }
+                ]
+            }
+        ]
+    },
     plugins: [
         ...defaults.plugins,
         new webpack.DefinePlugin({
-            'process': {}
-        })
+            process: {}
+        }),
+        new MiniCssExtractPlugin()
     ],
     externals: {
         react: 'React',
@@ -37,6 +73,9 @@ module.exports = {
         buildDependencies: {
             config: [__filename]
         }
+    },
+    watchOptions: {
+        ignored: ['**/assets/**'] // Ignore the generated build files to avoid unnecessary rebuilds
     },
     optimization: {
         ...defaults.optimization,

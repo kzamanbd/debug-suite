@@ -16,8 +16,9 @@
 
 # Package Managers
 node_modules
-vendor
 composer.lock
+composer.json
+package.json
 package-lock.json
 pnpm-lock.yaml
 yarn.lock

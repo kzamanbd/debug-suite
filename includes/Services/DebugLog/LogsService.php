@@ -29,8 +29,8 @@ class LogsService implements ServiceInterface {
 	 * @param LogDiscoveryService $log_discovery Log file discovery service.
 	 */
 	public function __construct(
-		private WPLogReaderService $log_reader,
-		private LogDiscoveryService $log_discovery
+		private readonly WPLogReaderService $log_reader,
+		private readonly LogDiscoveryService $log_discovery
 	) {}
 
 	/**

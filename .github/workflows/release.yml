@@ -1,10 +1,9 @@
 name: 🚀 Deploy and Release Plugin to WP.org
 
 on:
-  workflow_dispatch:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 jobs:
   release-to-wp-org:
@@ -16,19 +15,17 @@ jobs:
       - name: Setup PHP 8.1
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: "8.1"
           coverage: none
           tools: composer:v2
       - name: Production Build
         run: |
+          composer install
           composer install --no-dev -o
+          # Build frontend assets
           npm install -g pnpm
           pnpm install
           pnpm run build
-      - name: Install SVN ( Subversion )
-        run: |
-          sudo apt-get update
-          sudo apt-get install subversion
       - name: WordPress Plugin Deploy
         id: deploy
         uses: 10up/action-wordpress-plugin-deploy@stable
