@@ -88,7 +88,7 @@ const SetupGuide = () => {
                 });
 
                 toast.success(__('Settings saved successfully!', 'debug-suite'));
-                setIsCompleted(true)
+                setIsCompleted(true);
             } catch (error) {
                 console.error('Error saving settings:', error);
                 toast.error(__('Failed to save settings.', 'debug-suite'));
@@ -119,7 +119,7 @@ const SetupGuide = () => {
         );
     }
 
-    if(isCompleted) {
+    if (isCompleted) {
         return <DebugConfig config={settings} />;
     }
 
@@ -139,7 +139,7 @@ const SetupGuide = () => {
 
                         {/* Step Indicators */}
                         <div className="grid grid-cols-3">
-                            {steps.map((step, _index) => {
+                            {steps.map((step) => {
                                 const StepIcon = step.icon;
                                 const isActive = currentStep === step.id;
                                 const isCompleted = currentStep > step.id;
