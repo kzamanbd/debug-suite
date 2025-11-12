@@ -1,6 +1,6 @@
 {
     "name": "debug-suite",
-    "version": "1.0.1",
+    "version": "1.0.4",
     "description": "WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.",
     "main": "index.js",
     "scripts": {
@@ -29,6 +29,7 @@
         "@wordpress/date": "^5.26.0",
         "@wordpress/dom-ready": "^4.26.0",
         "@wordpress/element": "^6.26.0",
+        "@wordpress/hooks": "^4.33.0",
         "@wordpress/i18n": "^5.26.0",
         "@wordpress/plugins": "^7.26.0",
         "@wordpress/url": "^4.26.0",
@@ -63,8 +64,8 @@
         "prettier": "^3.6.2",
         "prettier-plugin-tailwindcss": "^0.6.13",
         "replace-in-file": "^8.3.0",
-        "tailwindcss": "^4.1.11",
         "style-loader": "^4.0.0",
+        "tailwindcss": "^4.1.11",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.35.1"
     }

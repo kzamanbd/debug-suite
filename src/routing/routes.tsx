@@ -1,10 +1,9 @@
-import DebugConfig from '@/pages/debug-config';
 import DebugLog from '@/pages/debug-log';
 import EmailLog from '@/pages/email-log';
 import FileManager from '@/pages/file-manager';
 import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
-import Onboarding from '@/pages/onboarding';
+import SetupGuide from '@/pages/setup-guide';
 import Overview from '@/pages/overview';
 import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
@@ -20,19 +19,9 @@ export interface DebugSuiteRoute {
 }
 const routes: DebugSuiteRoute[] = [
     {
-        id: 'onboarding',
-        path: '/onboarding',
-        element: <Onboarding />
-    },
-    {
-        id: 'config',
-        path: '/config',
-        title: __('Debug Config', 'debug-suite'),
-        description: __(
-            "Welcome! Let's set up your WordPress debugging environment in just a few steps.",
-            'debug-suite'
-        ),
-        element: <DebugConfig />
+        id: 'setup-guide',
+        path: '/setup',
+        element: <SetupGuide />
     },
     {
         id: 'overview',

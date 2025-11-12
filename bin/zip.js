@@ -2,19 +2,18 @@ const fs = require('fs-extra');
 const { exec } = require('child_process');
 
 const pluginFiles = [
-    '.wordpress-org', // This is a hidden file, so it should be copied as is.
     'assets/',
     'includes/',
+    'override/',
     'languages/',
     'vendor/',
-    'CHANGELOG.md',
     'readme.txt',
     'debug-suite.php',
     'uninstall.php',
     'composer.json',
 ];
 
-const removeFiles = ['assets/src', 'composer.lock'];
+const removeFiles = ['composer.lock'];
 
 const { version } = JSON.parse(fs.readFileSync('package.json'));
 
