@@ -31,21 +31,28 @@ const ConsoleApp = () => {
             </div>
 
             <Modal open={openModal} onClose={onClose} fullScreen>
-                <Modal.Title className="flex items-center gap-4">
-                    <Button
-                        variant="text"
-                        onClick={() => setActiveTab('query-console')}
-                        className={classNames({ 'text-primary': activeTab === 'query-console' })}>
-                        <SquareTerminal size={20} />
-                        <span>Console</span>
-                    </Button>
-                    <Button
-                        variant="text"
-                        onClick={() => setActiveTab('logs')}
-                        className={classNames({ 'text-primary': activeTab === 'logs' })}>
-                        <Bug size={20} />
-                        <span>Debug Log</span>
-                    </Button>
+                <Modal.Title className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <Button
+                            variant="text"
+                            onClick={() => setActiveTab('query-console')}
+                            className={classNames({ 'text-primary': activeTab === 'query-console' })}>
+                            <SquareTerminal size={20} />
+                            <span>Console</span>
+                        </Button>
+                        <Button
+                            variant="text"
+                            onClick={() => setActiveTab('logs')}
+                            className={classNames({ 'text-primary': activeTab === 'logs' })}>
+                            <Bug size={20} />
+                            <span>Debug Log</span>
+                        </Button>
+                    </div>
+                    {activeTab === 'logs' && (
+                        <Button className="mr-8" variant="text">
+                            Clear
+                        </Button>
+                    )}
                 </Modal.Title>
                 <Modal.Content>{openModal && <Renderer />}</Modal.Content>
             </Modal>
