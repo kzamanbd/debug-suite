@@ -1,10 +1,10 @@
 import DebugLog from '@/pages/debug-log';
-import EmailLog from '@/pages/email-log';
 import ManageLogs from '@/pages/manage-logs';
 import Module from '@/pages/module';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
 import SetupGuide from '@/pages/setup-guide';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -37,13 +37,6 @@ const routes: DebugSuiteRoute[] = [
         element: <DebugLog />
     },
     {
-        id: 'email-log',
-        title: __('Email Log', 'debug-suite'),
-        description: __('View and manage your email logs.', 'debug-suite'),
-        path: '/email-log',
-        element: <EmailLog />
-    },
-    {
         id: 'file-logs-manage',
         title: __('Manage File Logs', 'debug-suite'),
         description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
@@ -64,4 +57,4 @@ const routes: DebugSuiteRoute[] = [
         className: 'hidden'
     }
 ];
-export default routes;
+export default applyFilters('debugSuite.routes', routes);

@@ -4,7 +4,8 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const entries = {
-    'debug-suite': './src/index.tsx'
+    'debug-suite': './src/index.tsx',
+    'email-log': './modules/email-log/client/index.tsx'
 };
 
 module.exports = {
