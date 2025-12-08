@@ -1,9 +1,10 @@
 import DebugLog from '@/pages/debug-log';
 import EmailLog from '@/pages/email-log';
 import ManageLogs from '@/pages/manage-logs';
+import Module from '@/pages/module';
 import NotFound from '@/pages/not-found';
-import SetupGuide from '@/pages/setup-guide';
 import Overview from '@/pages/overview';
+import SetupGuide from '@/pages/setup-guide';
 import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -48,6 +49,13 @@ const routes: DebugSuiteRoute[] = [
         description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
         path: '/file-logs/manage',
         element: <ManageLogs />
+    },
+    {
+        id: 'module',
+        title: __('Module', 'debug-suite'),
+        description: __('Manage your application modules.', 'debug-suite'),
+        path: '/module',
+        element: <Module />
     },
     {
         id: 'not-found',

@@ -8,8 +8,8 @@
 namespace DebugSuite\Tests\Integration\API;
 
 use DebugSuite\Core\DatabaseManager;
-use DebugSuite\EmailLog\API\EmailLogController;
-use DebugSuite\EmailLog\Services\EmailLogService;
+use DebugSuite\Modules\EmailLog\API\EmailLogController;
+use DebugSuite\Modules\EmailLog\Services\EmailLogService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -17,7 +17,7 @@ use WP_REST_Server;
 /**
  * EmailLogController integration tests.
  *
- * @covers \DebugSuite\EmailLog\API\EmailLogController
+ * @covers \DebugSuite\Modules\EmailLog\API\EmailLogController
  * @group api
  * @group integration
  * @group email-log

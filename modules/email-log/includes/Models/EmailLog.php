@@ -8,7 +8,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\EmailLog\Models;
+namespace DebugSuite\Modules\EmailLog\Models;
 
 use DebugSuite\Models\BaseModel;
 

@@ -9,13 +9,13 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\DependencyInjection\Providers;
+namespace DebugSuite\Dependency\Providers;
 
 use DebugSuite\Admin;
 use DebugSuite\Assets;
 use DebugSuite\Core\DatabaseManager;
 use DebugSuite\Core\HookManager;
-use DebugSuite\DependencyInjection\BaseServiceProvider;
+use DebugSuite\Dependency\BaseServiceProvider;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;

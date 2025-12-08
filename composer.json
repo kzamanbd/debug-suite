@@ -36,7 +36,8 @@
     "autoload": {
         "psr-4": {
             "DebugSuite\\": "includes/",
-            "DebugSuite\\Packages\\": "override/"
+            "DebugSuite\\Packages\\": "override/",
+            "DebugSuite\\Modules\\EmailLog\\": "modules/email-log/includes"
         },
         "files": [
             "includes/helpers.php"

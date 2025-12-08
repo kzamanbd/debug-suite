@@ -3,7 +3,7 @@
  * AbstractServiceProvider class file.
  */
 
-namespace DebugSuite\DependencyInjection;
+namespace DebugSuite\Dependency;
 
 use DebugSuite\Packages\League\Container\ServiceProvider\BootableServiceProviderInterface;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace DebugSuite\EmailLog;
+namespace DebugSuite\Modules\EmailLog;
 
 use DebugSuite\Core\DatabaseManager;
 use DebugSuite\Interfaces\Hookable;
