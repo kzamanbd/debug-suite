@@ -3,7 +3,7 @@ import ManageLogs from '@/pages/manage-logs';
 import Modules from '@/pages/modules';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
-import SetupGuide from '@/pages/setup-guide';
+import SetupGuide from '@/pages/settings';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
@@ -20,7 +20,7 @@ export interface DebugSuiteRoute {
 const routes: DebugSuiteRoute[] = [
     {
         id: 'setup-guide',
-        path: '/setup',
+        path: '/settings',
         element: <SetupGuide />
     },
     {

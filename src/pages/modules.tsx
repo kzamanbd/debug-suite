@@ -1,21 +1,7 @@
 import Card from '@/components/base/card';
 import CustomSwitch from '@/components/base/switch';
 import { __ } from '@wordpress/i18n';
-import {
-    Activity,
-    Bug,
-    Database,
-    Globe,
-    HardDrive,
-    LayoutDashboard,
-    Mail,
-    Search,
-    Server,
-    Settings,
-    Shield,
-    Terminal,
-    Zap
-} from 'lucide-react';
+import { Activity, Bug, Database, Globe, HardDrive, Mail, Search, Server, Settings, Zap } from 'lucide-react';
 import { useState } from 'react';
 
 interface ModuleItem {
@@ -25,6 +11,7 @@ interface ModuleItem {
     icon: React.ElementType;
     enabled: boolean;
     category: 'core' | 'logging' | 'performance' | 'tools';
+    available: boolean;
 }
 
 const initialModules: ModuleItem[] = [
@@ -34,7 +21,8 @@ const initialModules: ModuleItem[] = [
         description: __('Capture and view WordPress debug.log entries in real-time.', 'debug-suite'),
         icon: Bug,
         enabled: true,
-        category: 'logging'
+        category: 'logging',
+        available: true
     },
     {
         id: 'email-log',
@@ -42,7 +30,8 @@ const initialModules: ModuleItem[] = [
         description: __('Log all outgoing emails sent by WordPress for debugging.', 'debug-suite'),
         icon: Mail,
         enabled: true,
-        category: 'logging'
+        category: 'logging',
+        available: true
     },
     {
         id: 'system-info',
@@ -50,7 +39,8 @@ const initialModules: ModuleItem[] = [
         description: __('View detailed server, PHP, and WordPress environment information.', 'debug-suite'),
         icon: Server,
         enabled: true,
-        category: 'core'
+        category: 'core',
+        available: false
     },
     {
         id: 'file-manager',
@@ -58,7 +48,8 @@ const initialModules: ModuleItem[] = [
         description: __('Browse and manage your WordPress file system directly from the dashboard.', 'debug-suite'),
         icon: HardDrive,
         enabled: false,
-        category: 'tools'
+        category: 'tools',
+        available: false
     },
     {
         id: 'query-monitor',
@@ -66,7 +57,8 @@ const initialModules: ModuleItem[] = [
         description: __('Analyze database queries and identify performance bottlenecks.', 'debug-suite'),
         icon: Database,
         enabled: false,
-        category: 'performance'
+        category: 'performance',
+        available: false
     },
     {
         id: 'cron-manager',
@@ -74,7 +66,8 @@ const initialModules: ModuleItem[] = [
         description: __('View and control WordPress cron jobs and scheduled events.', 'debug-suite'),
         icon: Activity,
         enabled: true,
-        category: 'tools'
+        category: 'tools',
+        available: false
     },
     {
         id: 'api-logger',
@@ -82,7 +75,8 @@ const initialModules: ModuleItem[] = [
         description: __('Log and inspect REST API requests and responses.', 'debug-suite'),
         icon: Globe,
         enabled: false,
-        category: 'logging'
+        category: 'logging',
+        available: false
     },
     {
         id: 'options-viewer',
@@ -90,23 +84,8 @@ const initialModules: ModuleItem[] = [
         description: __('Inspect and manage WordPress options in the database.', 'debug-suite'),
         icon: Settings,
         enabled: true,
-        category: 'tools'
-    },
-    {
-        id: 'terminal',
-        title: __('Terminal', 'debug-suite'),
-        description: __('Execute WP-CLI commands directly from your browser.', 'debug-suite'),
-        icon: Terminal,
-        enabled: false,
-        category: 'tools'
-    },
-    {
-        id: 'security-check',
-        title: __('Security Check', 'debug-suite'),
-        description: __('Scan for common security vulnerabilities and misconfigurations.', 'debug-suite'),
-        icon: Shield,
-        enabled: true,
-        category: 'core'
+        category: 'tools',
+        available: false
     },
     {
         id: 'asset-manager',
@@ -114,15 +93,8 @@ const initialModules: ModuleItem[] = [
         description: __('Manage enqueued scripts and styles to optimize performance.', 'debug-suite'),
         icon: Zap,
         enabled: false,
-        category: 'performance'
-    },
-    {
-        id: 'dashboard-widgets',
-        title: __('Dashboard Widgets', 'debug-suite'),
-        description: __('Enable or disable custom dashboard widgets for quick insights.', 'debug-suite'),
-        icon: LayoutDashboard,
-        enabled: true,
-        category: 'core'
+        category: 'performance',
+        available: false
     }
 ];
 
@@ -142,7 +114,7 @@ const Modules = () => {
             module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             module.description.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesCategory = selectedCategory === 'all' || module.category === selectedCategory;
-        return matchesSearch && matchesCategory;
+        return matchesSearch && matchesCategory && module.available;
     });
 
     const categories = [

@@ -1,7 +1,7 @@
-import { ToastProvider } from '@/components/base/toast';
 import { SlotFillProvider } from '@wordpress/components';
 import { applyFilters } from '@wordpress/hooks';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import ConfirmDialog from './components/confirm-dialog';
 import Layout from './components/layout';
 import './index.css';
@@ -30,9 +30,8 @@ const App = () => {
     return (
         <>
             <SlotFillProvider>
-                <ToastProvider>
-                    <RouterProvider router={router} />
-                </ToastProvider>
+                <RouterProvider router={router} />
+                <Toaster position="bottom-center" richColors />
             </SlotFillProvider>
             <ConfirmDialog />
         </>

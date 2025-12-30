@@ -1,7 +1,6 @@
 import Button from '@/components/base/button';
 import Card from '@/components/base/card';
 import CustomSwitch from '@/components/base/switch';
-import { useToast } from '@/components/base/toast';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect, useState } from '@wordpress/element';
@@ -9,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { AlertTriangle, Archive, ArrowRight, CheckCircle2, Eye, FileText, Settings, Shield, Zap } from 'lucide-react';
 import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import DebugConfig from './debug-config';
 
 const steps = [
@@ -34,7 +34,6 @@ const steps = [
 
 const SetupGuide = () => {
     const navigate = useNavigate();
-    const toast = useToast();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
