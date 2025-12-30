@@ -1,6 +1,6 @@
 import DebugLog from '@/pages/debug-log';
 import ManageLogs from '@/pages/manage-logs';
-import Module from '@/pages/module';
+import Modules from '@/pages/modules';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
 import SetupGuide from '@/pages/setup-guide';
@@ -47,8 +47,8 @@ const routes: DebugSuiteRoute[] = [
         id: 'module',
         title: __('Module', 'debug-suite'),
         description: __('Manage your application modules.', 'debug-suite'),
-        path: '/module',
-        element: <Module />
+        path: '/modules',
+        element: <Modules />
     },
     {
         id: 'not-found',

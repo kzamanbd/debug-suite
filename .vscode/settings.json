@@ -2,8 +2,9 @@
     "intelephense.environment.includePaths": ["../../../../"],
     "php.workspace.includePath": "../../../../",
     "editor.formatOnSave": true,
+    "phpSniffer.autoDetect": true,
     "[php]": {
-        "editor.formatOnSave": false
+        "editor.defaultFormatter": "wongjn.php-sniffer"
     },
     "cSpell.words": ["ABSPATH", "kses", "phpunit"]
 }

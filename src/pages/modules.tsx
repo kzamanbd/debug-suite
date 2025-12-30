@@ -126,7 +126,7 @@ const initialModules: ModuleItem[] = [
     }
 ];
 
-const Module = () => {
+const Modules = () => {
     const [modules, setModules] = useState<ModuleItem[]>(initialModules);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -255,4 +255,4 @@ const Module = () => {
     );
 };
 
-export default Module;
+export default Modules;
