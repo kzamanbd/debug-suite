@@ -1,5 +1,7 @@
 import Card from '@/components/base/card';
 import CustomSwitch from '@/components/base/switch';
+import { DebugState } from '@/types';
+import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -7,27 +9,21 @@ import { AlertTriangle, Bug, CheckCircle2, Eye, EyeOff, FileText, Settings, Shie
 import type React from 'react';
 import { toast } from 'sonner';
 
-interface DebugSettings {
-    debug: boolean;
-    debug_log: boolean;
-    debug_display: boolean;
-}
-
 interface SettingsResponse {
     success: boolean;
-    settings: DebugSettings;
+    settings: DebugState;
     message?: string;
 }
 
 interface ConfigProp {
-    config: DebugSettings;
+    config: DebugState;
 }
 
 const DebugConfig = ({ config }: ConfigProp) => {
     const [saving, setSaving] = useState(false);
-    const [settings, setSettings] = useState<DebugSettings>(config);
+    const [settings, setSettings] = useState<DebugState>(config);
 
-    const updateSetting = async (values: Partial<DebugSettings>) => {
+    const updateSetting = async (values: Partial<DebugState>) => {
         setSaving(true);
         const updatedSettings = { ...settings, ...values };
         try {
@@ -48,7 +44,7 @@ const DebugConfig = ({ config }: ConfigProp) => {
     };
 
     const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const key = event.target.name as keyof DebugSettings;
+        const key = event.target.name as keyof DebugState;
         const value = event.target.checked;
         setSettings((prev) => ({
             ...prev,
@@ -91,7 +87,10 @@ const DebugConfig = ({ config }: ConfigProp) => {
                         <button
                             onClick={() => updateEnv(true)}
                             disabled={saving}
-                            className="group border-primary/20 bg-primary/5 hover:bg-primary/10 flex items-center gap-4 rounded-xl border p-4 text-left transition-all duration-200 hover:shadow-md disabled:opacity-50">
+                            className={classNames(
+                                'group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 text-left transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700',
+                                settings.debug && 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                            )}>
                             <div className="bg-primary/20 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110">
                                 <Bug className="h-5 w-5" />
                             </div>
@@ -103,14 +102,22 @@ const DebugConfig = ({ config }: ConfigProp) => {
                                     {__('Enable Debug & Logging', 'debug-suite')}
                                 </div>
                             </div>
-                            <CheckCircle2 className="text-primary ml-auto h-5 w-5 opacity-0 transition-opacity group-hover:opacity-100" />
+                            <CheckCircle2
+                                className={classNames(
+                                    'ml-auto h-5 w-5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100',
+                                    settings.debug && 'text-primary opacity-100'
+                                )}
+                            />
                         </button>
 
                         <button
                             onClick={() => updateEnv(false)}
                             disabled={saving}
-                            className="group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 text-left transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 transition-transform group-hover:scale-110 dark:bg-gray-700 dark:text-gray-400">
+                            className={classNames(
+                                'group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 text-left transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700',
+                                !settings.debug && 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                            )}>
+                            <div className="bg-primary/20 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110">
                                 <Shield className="h-5 w-5" />
                             </div>
                             <div>
@@ -121,7 +128,12 @@ const DebugConfig = ({ config }: ConfigProp) => {
                                     {__('Disable All Debugging', 'debug-suite')}
                                 </div>
                             </div>
-                            <CheckCircle2 className="ml-auto h-5 w-5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100" />
+                            <CheckCircle2
+                                className={classNames(
+                                    'ml-auto h-5 w-5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100',
+                                    !settings.debug && 'text-primary opacity-100'
+                                )}
+                            />
                         </button>
                     </div>
                 </Card.Body>

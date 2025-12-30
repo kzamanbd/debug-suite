@@ -117,10 +117,12 @@ class SettingsService implements ServiceInterface {
 			return ServiceResponse::failure( __( 'Failed to read wp-config.php file.', 'debug-suite' ), 'file_read_error' );
 		}
 
-		$settings = [];
+		$settings = [
+			'onboarding_completed' => get_option( 'debug_suite_onboarding_completed', false ),
+		];
 		foreach ( $this->supported_constants as $constant => $default ) {
 			$value = $this->extract_constant_value( $content, $constant, $default );
-			$settings[ $constant ] = $value === 'true'; // Convert to boolean
+			$settings[ strtolower( $constant ) ] = $value === 'true'; // Convert to boolean
 		}
 
 		return ServiceResponse::success( $settings );

@@ -3,11 +3,10 @@ import Card from '@/components/base/card';
 import CustomSwitch from '@/components/base/switch';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { AlertTriangle, Archive, ArrowRight, CheckCircle2, Eye, FileText, Settings, Shield, Zap } from 'lucide-react';
 import type { ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import DebugConfig from './debug-config';
 
@@ -33,48 +32,15 @@ const steps = [
 ];
 
 const SetupGuide = () => {
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [settings, setSettings] = useState({
-        debug: false,
-        debug_log: false,
-        debug_display: false
+        debug: window.debugSuite.debug || false,
+        debug_log: window.debugSuite.debug_log || false,
+        debug_display: window.debugSuite.debug_display || false
     });
 
     const [isCompleted, setIsCompleted] = useState(false);
-
-    useEffect(() => {
-        const checkOnboardingStatus = async () => {
-            try {
-                const response = await apiFetch<{
-                    WP_DEBUG: boolean;
-                    WP_DEBUG_LOG: boolean;
-                    WP_DEBUG_DISPLAY: boolean;
-                    completed: boolean;
-                }>({
-                    path: '/debug-suite/v1/settings?check_onboarding=true',
-                    method: 'GET'
-                });
-                setIsCompleted(response.completed);
-
-                setSettings({
-                    debug: response.WP_DEBUG,
-                    debug_log: response.WP_DEBUG_LOG,
-                    debug_display: response.WP_DEBUG_DISPLAY
-                });
-
-                setLoading(false);
-            } catch (error) {
-                console.error('Error checking onboarding status:', error);
-                toast.error(__('Failed to check onboarding status.', 'debug-suite'));
-                void navigate('/');
-            }
-        };
-
-        void checkOnboardingStatus();
-    }, [navigate, toast]);
 
     const nextStep = async () => {
         if (currentStep === steps.length) {
@@ -103,22 +69,7 @@ const SetupGuide = () => {
         setCurrentStep((prev) => prev - 1);
     };
 
-    if (loading) {
-        return (
-            <div className="-m-5 flex h-screen items-center justify-center rounded-lg bg-gradient-to-br from-blue-50 to-indigo-100">
-                <div className="text-center">
-                    <div className="relative flex items-center justify-center">
-                        <div className="border-primary h-16 w-16 animate-spin rounded-full border-4 border-t-transparent"></div>
-                    </div>
-                    <div className="mt-4 text-sm font-medium text-gray-600">
-                        {__('Loading Debug Suite...', 'debug-suite')}
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (isCompleted) {
+    if (window.debugSuite.onboarding_completed || isCompleted) {
         return <DebugConfig config={settings} />;
     }
 
