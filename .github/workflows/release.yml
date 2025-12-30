@@ -5,6 +5,10 @@ on:
     tags:
       - "v*.*.*"
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   release-to-wp-org:
     name: Release to WordPress.org
