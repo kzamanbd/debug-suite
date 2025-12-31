@@ -157,7 +157,7 @@ class PageManager implements Hookable {
 				[
 					'title' => __( 'Debug Log', 'debug-suite' ),
 					'path' => 'debug-log',
-					'order' => 1,
+					'order' => 4,
 				],
 				[
 					'title' => __( 'Overview', 'debug-suite' ),
