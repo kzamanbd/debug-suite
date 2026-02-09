@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { Activity, Database, Globe, HardDrive, Mail, Search, Server, Settings, Zap } from 'lucide-react';
 import { useState } from 'react';
 
-interface ModuleItem {
+interface FeatureItem {
     id: string;
     title: string;
     description: string;
@@ -15,7 +15,7 @@ interface ModuleItem {
     available: boolean;
 }
 
-const initialModules: ModuleItem[] = [
+const initialFeatures: FeatureItem[] = [
     {
         id: 'email-log',
         title: __('Email Log', 'debug-suite'),
@@ -90,18 +90,18 @@ const initialModules: ModuleItem[] = [
     }
 ];
 
-const Modules = () => {
-    const [modules, setModules] = useState<ModuleItem[]>(initialModules);
+const Feature = () => {
+    const [features, setFeatures] = useState<FeatureItem[]>(initialFeatures);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-    const toggleModule = (id: string) => {
-        setModules((prev) =>
-            prev.map((module) => (module.id === id ? { ...module, enabled: !module.enabled } : module))
+    const toggleFeature = (id: string) => {
+        setFeatures((prev) =>
+            prev.map((feature) => (feature.id === id ? { ...feature, enabled: !feature.enabled } : feature))
         );
     };
 
-    const filteredModules = modules.filter((item) => {
+    const filteredFeatures = features.filter((item) => {
         const matchesSearch =
             item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -126,7 +126,7 @@ const Modules = () => {
                             <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder={__('Search modules...', 'debug-suite')}
+                                placeholder={__('Search features...', 'debug-suite')}
                                 className="focus:border-primary-500 focus:ring-primary-500 h-10 w-full rounded-md border border-gray-300 bg-white pr-4 pl-10 text-sm focus:ring-1 focus:outline-none sm:w-64 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -152,7 +152,7 @@ const Modules = () => {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredModules.map((item) => (
+                {filteredFeatures.map((item) => (
                     <Card
                         key={item.id}
                         className={`group relative overflow-hidden border transition-all duration-300 hover:shadow-md ${
@@ -172,7 +172,7 @@ const Modules = () => {
                                 </div>
                                 <CustomSwitch
                                     checked={item.enabled}
-                                    onChange={() => toggleModule(item.id)}
+                                    onChange={() => toggleFeature(item.id)}
                                     className="shrink-0"
                                 />
                             </div>
@@ -196,13 +196,13 @@ const Modules = () => {
                 ))}
             </div>
 
-            {filteredModules.length === 0 && (
+            {filteredFeatures.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                     <div className="rounded-full bg-gray-100 p-3 dark:bg-gray-800">
                         <Search className="h-6 w-6 text-gray-400" />
                     </div>
                     <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-                        {__('No modules found', 'debug-suite')}
+                        {__('No features found', 'debug-suite')}
                     </h3>
                     <p className="mt-1 text-gray-500 dark:text-gray-400">
                         {__('Try adjusting your search or category filter.', 'debug-suite')}
@@ -221,4 +221,4 @@ const Modules = () => {
     );
 };
 
-export default Modules;
+export default Feature;

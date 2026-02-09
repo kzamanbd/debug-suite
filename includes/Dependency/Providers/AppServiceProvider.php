@@ -22,7 +22,7 @@ use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;
 use DebugSuite\Pages\PageManager;
-use DebugSuite\Pages\Modules;
+use DebugSuite\Pages\Feature;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -49,7 +49,7 @@ class AppServiceProvider extends BaseServiceProvider {
 		DatabaseManager::class,
 		SettingsService::class,
 		PageManager::class,
-		Modules::class,
+		Feature::class,
 	];
 
 	public function register(): void {
