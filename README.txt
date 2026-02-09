@@ -3,7 +3,7 @@ Contributors: kzamanbd
 Donate link: https://kzaman.me/plugins/debug-suite/
 Tags: debug, development, debugging, error-log, developer-tools
 Requires at least: 6.8
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 8.1
 Stable tag: 1.1.0
 License: GPLv2 or later
