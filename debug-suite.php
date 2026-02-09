@@ -32,8 +32,8 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 use DebugSuite\Core\Activator;
 use DebugSuite\Core\Deactivator;
 use DebugSuite\Core\Singleton;
-use DebugSuite\Dependency\Container;
-use DebugSuite\Dependency\Providers\ServiceProvider;
+use DebugSuite\Container\Container;
+use DebugSuite\Container\Providers\ServiceProvider;
 use DebugSuite\Interfaces\Hookable;
 
 

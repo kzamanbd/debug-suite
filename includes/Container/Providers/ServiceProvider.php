@@ -1,8 +1,8 @@
 <?php
 
-namespace DebugSuite\Dependency\Providers;
+namespace DebugSuite\Container\Providers;
 
-use DebugSuite\Dependency\BootableServiceProvider;
+use DebugSuite\Container\BootableServiceProvider;
 
 class ServiceProvider extends BootableServiceProvider {
 

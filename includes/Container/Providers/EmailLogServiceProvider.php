@@ -1,9 +1,9 @@
 <?php
 
-namespace DebugSuite\Dependency\Providers;
+namespace DebugSuite\Container\Providers;
 
 use DebugSuite\API\EmailLogController;
-use DebugSuite\Dependency\BaseServiceProvider;
+use DebugSuite\Container\BaseServiceProvider;
 use DebugSuite\Pages\EmailLogPage;
 use DebugSuite\Services\EmailLogService;
 
