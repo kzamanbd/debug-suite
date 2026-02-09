@@ -126,6 +126,10 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 
 == Changelog ==
 
+= 1.1.1 =
+* Fix hook name for email logs table creation in DatabaseManager
+* Use plugin slug when creating email logs table
+
 = 1.1.0 =
 * Feature management: new Features page with REST API and service integration
 * Page structure: new PageManager, AbstractPage, Pageable interfaces for admin pages
@@ -146,6 +150,9 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 * Enterprise-grade architecture
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Fixes email logs table creation (hook name and plugin slug). Recommended for all 1.1.0 users.
 
 = 1.1.0 =
 Feature management, new page architecture, and restructured Email Log module. Requires PHP 8.1 and WordPress 6.8 or higher.
