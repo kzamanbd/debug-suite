@@ -49,12 +49,18 @@ const routes: DebugSuiteRoute[] = [
         description: __('Manage your application features.', 'debug-suite'),
         path: '/feature',
         element: <Feature />
-    },
-    {
-        id: 'not-found',
-        path: '*',
-        element: <NotFound />,
-        className: 'hidden'
     }
 ];
-export default applyFilters('debugSuite.routes', routes);
+
+const notFoundRoute: DebugSuiteRoute = {
+    id: 'not-found',
+    path: '*',
+    element: <NotFound />,
+    className: 'hidden'
+};
+
+export const getRoutes = (): DebugSuiteRoute[] => {
+    const filtered = applyFilters('debugSuite.routes', [...routes]) as DebugSuiteRoute[] | undefined;
+    const resolved = Array.isArray(filtered) ? filtered : [...routes];
+    return [...resolved, notFoundRoute];
+};

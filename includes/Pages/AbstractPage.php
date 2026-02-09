@@ -19,6 +19,7 @@ abstract class AbstractPage implements Pageable, Hookable {
         }
 
         add_filter( 'debug_suite_admin_dashboard_pages', [ $this, 'enlist' ] );
+        add_action( 'init', [ $this, 'register' ] );
     }
 
     public function enlist( $pages ) {

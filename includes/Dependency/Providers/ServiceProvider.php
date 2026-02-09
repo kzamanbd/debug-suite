@@ -10,7 +10,7 @@ class ServiceProvider extends BootableServiceProvider {
 		$this->getContainer()->addServiceProvider( new AppServiceProvider() );
 		$this->getContainer()->addServiceProvider( new RestRouteProvider() );
 
-		if ( get_option( 'debug_suite_email_log_enable', false ) ) {
+		if ( debug_suite_is_feature_enabled( 'email-log' ) ) {
 			$this->getContainer()->addServiceProvider( new EmailLogServiceProvider() );
 		}
 	}

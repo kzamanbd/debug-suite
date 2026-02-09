@@ -20,6 +20,7 @@ use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Services\OverviewService;
+use DebugSuite\Services\FeatureService;
 use DebugSuite\Services\SettingsService;
 use DebugSuite\Pages\PageManager;
 use DebugSuite\Pages\Feature;
@@ -48,6 +49,7 @@ class AppServiceProvider extends BaseServiceProvider {
 		HookManager::class,
 		DatabaseManager::class,
 		SettingsService::class,
+		FeatureService::class,
 		PageManager::class,
 		Feature::class,
 	];
