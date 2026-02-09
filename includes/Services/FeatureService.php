@@ -68,6 +68,8 @@ class FeatureService implements ServiceInterface {
 	/**
 	 * Update a single feature's enabled state and persist to options.
 	 *
+	 * Fires debug_suite_{feature_id}_activated when the feature is activated (enabled).
+	 *
 	 * @param string $feature_id Feature ID.
 	 * @param bool   $enabled    Whether the feature is enabled.
 	 * @return bool True if option was updated, false otherwise.
@@ -83,12 +85,21 @@ class FeatureService implements ServiceInterface {
 			$current = [];
 		}
 
+		$was_enabled = ! empty( $current[ $feature_id ] );
 		$current[ $feature_id ] = $enabled;
-		return update_option( self::OPTION_NAME, $current );
+		$updated = update_option( self::OPTION_NAME, $current );
+
+		if ( $updated && $enabled && ! $was_enabled ) {
+			do_action( 'debug_suite_' . $feature_id . '_activated', $feature_id );
+		}
+
+		return $updated;
 	}
 
 	/**
 	 * Update multiple feature states at once.
+	 *
+	 * Fires debug_suite_{feature_id}_activated for each feature that is activated (enabled).
 	 *
 	 * @param array<string, bool> $features Map of feature_id => enabled.
 	 * @return bool True if option was updated.
@@ -100,12 +111,25 @@ class FeatureService implements ServiceInterface {
 			$current = [];
 		}
 
+		$activated = [];
 		foreach ( $features as $id => $enabled ) {
 			if ( array_key_exists( $id, $defaults ) ) {
-				$current[ $id ] = (bool) $enabled;
+				$enabled = (bool) $enabled;
+				if ( $enabled && empty( $current[ $id ] ) ) {
+					$activated[] = $id;
+				}
+				$current[ $id ] = $enabled;
 			}
 		}
 
-		return update_option( self::OPTION_NAME, $current );
+		$updated = update_option( self::OPTION_NAME, $current );
+
+		if ( $updated ) {
+			foreach ( $activated as $feature_id ) {
+				do_action( 'debug_suite_' . $feature_id . '_activated', $feature_id );
+			}
+		}
+
+		return $updated;
 	}
 }
