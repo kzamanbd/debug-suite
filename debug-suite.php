@@ -99,9 +99,6 @@ final class DebugSuite {
 		if ( ! defined( 'DEBUG_SUITE_PLUGIN_URL' ) ) {
 			define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 		}
-		if ( ! defined( 'DEBUG_SUITE_MODULES_URL' ) ) {
-			define( 'DEBUG_SUITE_MODULES_URL', plugin_dir_url( __FILE__ ) . 'modules/' );
-		}
 	}
 
 

@@ -63,7 +63,7 @@ class EmailLogPage extends AbstractPage {
     public function register(): void {
 		wp_register_script(
 			'debug-suite-email-log',
-			DEBUG_SUITE_MODULES_URL . 'email-log/assets/js/email-log.js',
+			DEBUG_SUITE_PLUGIN_URL . 'assets/js/email-log.js',
 			[ 'debug-suite-admin' ],
 			DEBUG_SUITE_VERSION,
 			true
