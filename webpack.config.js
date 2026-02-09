@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const entries = {
     'debug-suite': './src/index.tsx',
-    'email-log': './modules/email-log/client/index.tsx'
+    '../../modules/email-log/assets/js/main': './modules/email-log/client/index.tsx'
 };
 
 module.exports = {

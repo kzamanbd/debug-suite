@@ -39,6 +39,7 @@
         <!-- Exclude inline comment punctuation rule -->
         <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar"/>
         <exclude name="Generic.Functions.CallTimePassByReference"/>
+        <exclude name="Generic.WhiteSpace.DisallowSpaceIndent"/>
     </rule>
 
     <!-- WordPress.org CRITICAL Requirements -->
@@ -140,7 +141,9 @@
     <rule ref="Squiz.Commenting">
         <severity>0</severity>
     </rule>
-
+    <rule ref="Generic.Commenting.DocComment.MissingShort">
+        <severity>0</severity>
+    </rule>
 
     <rule ref="WordPress.Files.FileName">
         <severity>0</severity>

@@ -165,3 +165,4 @@ vendor
 .phpunit.result.cache
 build
 tmp
+modules/**/assets/js/
