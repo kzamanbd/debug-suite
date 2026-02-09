@@ -14,7 +14,6 @@ use DebugSuite\Interfaces\Hookable;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
-
 /**
  * Database tables manager class.
  *
@@ -22,8 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class DatabaseManager implements Hookable {
 	public function register_hooks(): void {
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		add_action( 'init', [ $this, 'wpdb_table_shortcuts' ], 1 );
+		add_action( 'debug_suite_email-log_activated', [ $this, 'create_email_logs_table' ] );
 	}
 
 	public function wpdb_table_shortcuts(): void {
@@ -65,7 +64,11 @@ class DatabaseManager implements Hookable {
 	 *
 	 * @return void
 	 */
-	public static function create_email_logs_table(): void {
+	public static function create_email_logs_table( $feature ): void {
+		if ( $feature !== 'email-log' ) {
+			return;
+		}
+
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . 'debug_suite_email_logs';

@@ -1,9 +1,10 @@
 import Card from '@/components/base/card';
 import CustomSwitch from '@/components/base/switch';
 import { Fill } from '@wordpress/components';
+import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { Activity, Database, Globe, HardDrive, Mail, Search, Server, Settings, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface FeatureItem {
     id: string;
@@ -90,16 +91,61 @@ const initialFeatures: FeatureItem[] = [
     }
 ];
 
+const API_BASE = '/debug-suite/v1/features';
+
 const Feature = () => {
     const [features, setFeatures] = useState<FeatureItem[]>(initialFeatures);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [loading, setLoading] = useState(true);
+    const [savingId, setSavingId] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const toggleFeature = (id: string) => {
-        setFeatures((prev) =>
-            prev.map((feature) => (feature.id === id ? { ...feature, enabled: !feature.enabled } : feature))
-        );
-    };
+    const fetchFeatures = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await apiFetch<{ features: Record<string, boolean> }>({ path: API_BASE });
+            const saved = response?.features ?? {};
+            setFeatures((prev) =>
+                prev.map((f) => ({
+                    ...f,
+                    enabled: typeof saved[f.id] === 'boolean' ? saved[f.id] : f.enabled
+                }))
+            );
+        } catch (err) {
+            setError(__('Failed to load features.', 'debug-suite'));
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchFeatures();
+    }, [fetchFeatures]);
+
+    const toggleFeature = useCallback(
+        async (id: string) => {
+            const next = !features.find((f) => f.id === id)?.enabled;
+            setFeatures((prev) => prev.map((f) => (f.id === id ? { ...f, enabled: next } : f)));
+            setSavingId(id);
+            setError(null);
+            try {
+                await apiFetch({
+                    path: API_BASE,
+                    method: 'POST',
+                    data: { feature_id: id, enabled: next }
+                });
+                window.location.reload();
+            } catch (err) {
+                setError(__('Failed to save. Please try again.', 'debug-suite'));
+                setFeatures((prev) => prev.map((f) => (f.id === id ? { ...f, enabled: !next } : f)));
+            } finally {
+                setSavingId(null);
+            }
+        },
+        [features]
+    );
 
     const filteredFeatures = features.filter((item) => {
         const matchesSearch =
@@ -117,8 +163,21 @@ const Feature = () => {
         { id: 'tools', label: __('Tools', 'debug-suite') }
     ];
 
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <div className="text-gray-500 dark:text-gray-400">{__('Loading features…', 'debug-suite')}</div>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
+            {error && (
+                <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                    {error}
+                </div>
+            )}
             <Fill name="debug-suite-layout-header-right">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -173,6 +232,7 @@ const Feature = () => {
                                 <CustomSwitch
                                     checked={item.enabled}
                                     onChange={() => toggleFeature(item.id)}
+                                    disabled={savingId === item.id}
                                     className="shrink-0"
                                 />
                             </div>

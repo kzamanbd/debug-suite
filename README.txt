@@ -2,10 +2,10 @@
 Contributors: kzamanbd
 Donate link: https://kzaman.me/plugins/debug-suite/
 Tags: debug, development, debugging, error-log, developer-tools
-Requires at least: 5.7
-Tested up to: 6.8
+Requires at least: 6.8
+Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 1.0.4
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,6 +126,21 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 
 == Changelog ==
 
+= 1.1.1 =
+* Fix hook name for email logs table creation in DatabaseManager
+* Use plugin slug when creating email logs table
+
+= 1.1.0 =
+* Feature management: new Features page with REST API and service integration
+* Page structure: new PageManager, AbstractPage, Pageable interfaces for admin pages
+* Email Log: restructured module, new entry points, viewer, controls, and skeleton components
+* Refactored Email Log module and dependency namespaces (moved from EmailLog subfolder to core)
+* Renamed Module page to Modules and updated routes
+* New Feature and Email Log admin pages with PageManager integration
+* Debug Config moved to Settings (from Setup Guide) with updated settings structure
+* Fix ESLint configuration and improve code formatting in SetupGuide component
+* Bump WordPress compatibility (Requires at least: 6.8, Tested up to: 6.8)
+
 = 1.0.0 =
 * Initial release with core features
 * Advanced log management system
@@ -135,6 +150,12 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 * Enterprise-grade architecture
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Fixes email logs table creation (hook name and plugin slug). Recommended for all 1.1.0 users.
+
+= 1.1.0 =
+Feature management, new page architecture, and restructured Email Log module. Requires PHP 8.1 and WordPress 6.8 or higher.
 
 = 1.0.0 =
 Initial release of Debug Suite - Requires PHP 8.1 or higher.

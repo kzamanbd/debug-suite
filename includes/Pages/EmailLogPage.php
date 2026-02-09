@@ -24,7 +24,7 @@ class EmailLogPage extends AbstractPage {
             'menu_title' => __( 'Email Log', 'debug-suite' ),
             'route'      => 'email-log',
             'capability' => $capability,
-            'position'   => 30,
+            'position'   => $position ?? 30,
         ];
 	}
 
@@ -64,7 +64,7 @@ class EmailLogPage extends AbstractPage {
 		wp_register_script(
 			'debug-suite-email-log',
 			DEBUG_SUITE_PLUGIN_URL . 'assets/js/email-log.js',
-			[ 'debug-suite-admin' ],
+			[ 'debug-suite-script' ],
 			DEBUG_SUITE_VERSION,
 			true
 		);

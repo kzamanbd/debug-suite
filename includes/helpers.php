@@ -15,6 +15,7 @@
  */
 
 use DebugSuite\Core\Container\ServiceManager;
+use DebugSuite\Services\FeatureService;
 
 if ( ! function_exists( 'debug_suite' ) ) {
 	/**
@@ -59,5 +60,28 @@ if ( ! function_exists( 'debug_suite_current_page' ) ) {
 	function debug_suite_current_page(): bool {
 		$current_screen = get_current_screen();
 		return $current_screen && strpos( $current_screen->id, 'debug-suite' ) !== false;
+	}
+}
+
+if ( ! function_exists( 'debug_suite_is_feature_enabled' ) ) {
+	/**
+	 * Check whether a feature is enabled (from options, with defaults from FeatureService).
+	 *
+	 * Use this when deciding to load feature-specific code (e.g. service providers).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $feature_id Feature ID (e.g. 'email-log').
+	 * @return bool True if the feature is enabled, false otherwise.
+	 */
+	function debug_suite_is_feature_enabled( string $feature_id ): bool {
+		$saved = get_option( FeatureService::OPTION_NAME, [] );
+		if ( ! is_array( $saved ) ) {
+			$saved = [];
+		}
+		$defaults = FeatureService::get_default_features();
+		return array_key_exists( $feature_id, $saved )
+			? (bool) $saved[ $feature_id ]
+			: ( isset( $defaults[ $feature_id ] ) ? $defaults[ $feature_id ] : false );
 	}
 }

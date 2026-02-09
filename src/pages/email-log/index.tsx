@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { EmailDetail, EmailLogControls, EmailLogSkeleton, EmailLogViewer } from './components';
 import { useEmailLogActions, useEmailLogEntries } from './hooks';
 import type { BulkAction, EmailLogEntry } from './types';
+import { DebugSuiteRoute } from '@/routing/routes';
 
 const EmailLog = () => {
     const {
@@ -115,7 +116,7 @@ const EmailLog = () => {
 };
 
 domReady(() => {
-    addFilter('debugSuite.routes', 'debug-suite/email-log', (routes) => {
+    addFilter('debugSuite.routes', 'debug-suite/email-log', (routes: DebugSuiteRoute[]) => {
         routes.push({
             id: 'email-log',
             title: __('Email Log', 'debug-suite'),
@@ -123,5 +124,6 @@ domReady(() => {
             path: '/email-log',
             element: <EmailLog />
         });
+        return routes;
     });
 });
