@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DatabaseManager implements Hookable {
 	public function register_hooks(): void {
 		add_action( 'init', [ $this, 'wpdb_table_shortcuts' ], 1 );
-		add_action( 'debug_suite_email_log_activated', [ $this, 'create_email_logs_table' ] );
+		add_action( 'debug_suite_email-log_activated', [ $this, 'create_email_logs_table' ] );
 	}
 
 	public function wpdb_table_shortcuts(): void {
