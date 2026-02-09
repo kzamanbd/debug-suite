@@ -74,7 +74,7 @@ class EmailLogControllerTest extends DebugSuiteTestCase {
 		$this->controller->register_routes();
 
 		// Create table
-		DatabaseManager::create_email_logs_table();
+		DatabaseManager::create_email_logs_table( 'email-log' );
 
 		// Create admin user
 		$this->create_admin_user();

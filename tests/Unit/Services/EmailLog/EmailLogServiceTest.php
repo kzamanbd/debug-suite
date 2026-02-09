@@ -35,7 +35,7 @@ class EmailLogServiceTest extends DebugSuiteTestCase {
         parent::set_up();
         
         // Create the email logs table for testing
-        DatabaseManager::create_email_logs_table();
+        DatabaseManager::create_email_logs_table( 'email-log' );
         
         $this->service = new EmailLogService();
     }
