@@ -64,7 +64,11 @@ class DatabaseManager implements Hookable {
 	 *
 	 * @return void
 	 */
-	public static function create_email_logs_table(): void {
+	public static function create_email_logs_table( $feature ): void {
+		if ( $feature !== 'email-log' ) {
+			return;
+		}
+
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . 'debug_suite_email_logs';
