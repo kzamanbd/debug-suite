@@ -5,10 +5,9 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Modules\EmailLog\API;
+namespace DebugSuite\API;
 
-use DebugSuite\API\RestController;
-use DebugSuite\Modules\EmailLog\Services\EmailLogService;
+use DebugSuite\Services\EmailLogService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;

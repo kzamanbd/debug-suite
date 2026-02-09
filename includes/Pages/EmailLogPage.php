@@ -2,7 +2,7 @@
 
 namespace DebugSuite\Pages;
 
-class Modules extends AbstractPage {
+class EmailLogPage extends AbstractPage {
 
     /**
      * Get the ID of the page.
@@ -12,7 +12,7 @@ class Modules extends AbstractPage {
      * @return string
      */
 	public function get_id(): string {
-		return 'modules';
+		return 'email-log';
 	}
 
 	/**
@@ -20,9 +20,9 @@ class Modules extends AbstractPage {
 	 */
 	public function menu( string $capability, string $position ): array {
 		return [
-            'page_title' => __( 'Debug Suite Modules', 'debug-suite' ),
-            'menu_title' => __( 'Modules', 'debug-suite' ),
-            'route'      => 'modules',
+            'page_title' => __( 'Debug Suite Email Log', 'debug-suite' ),
+            'menu_title' => __( 'Email Log', 'debug-suite' ),
+            'route'      => 'email-log',
             'capability' => $capability,
             'position'   => 30,
         ];
@@ -32,16 +32,14 @@ class Modules extends AbstractPage {
 	 * @inheritDoc
 	 */
 	public function settings(): array {
-		return [
-            'modules' => [],
-        ];
+		return [];
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function scripts(): array {
-        return [];
+        return [ 'debug-suite-email-log' ];
 	}
 
     /**
@@ -62,5 +60,13 @@ class Modules extends AbstractPage {
      *
      * @return void
      */
-    public function register(): void {}
+    public function register(): void {
+		wp_register_script(
+			'debug-suite-email-log',
+			DEBUG_SUITE_MODULES_URL . 'email-log/assets/js/email-log.js',
+			[ 'debug-suite-admin' ],
+			DEBUG_SUITE_VERSION,
+			true
+		);
+	}
 }
