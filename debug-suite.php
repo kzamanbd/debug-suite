@@ -4,7 +4,7 @@
  * Plugin Slug:       debug-suite
  * Plugin URI:        https://kzaman.me/plugins/debug-suite?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
  * Description:       WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.
- * Version:           1.0.4
+ * Version:           1.1.0
  * Author:            Kamruzzaman
  * Author URI:        https://kzaman.me/plugins/debug-suite/
  * License:           GPL-2.0 or later
@@ -62,7 +62,7 @@ final class DebugSuite {
 	*
 	* @var string
 	*/
-	public string $version = '1.0.4';
+	public string $version = '1.1.0';
 
 	/**
 	 * Initialize the Debug Suite plugin.
