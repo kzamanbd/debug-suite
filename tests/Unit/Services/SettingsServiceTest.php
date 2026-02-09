@@ -83,15 +83,15 @@ EOT;
 		// Check the extracted settings
 		$settings = $result->get_data();
 		$this->assertIsArray($settings);
-		$this->assertArrayHasKey('WP_DEBUG', $settings);
-		$this->assertArrayHasKey('WP_DEBUG_LOG', $settings);
-		$this->assertArrayHasKey('WP_DEBUG_DISPLAY', $settings);
+		$this->assertArrayHasKey('wp_debug', $settings);
+		$this->assertArrayHasKey('wp_debug_log', $settings);
+		$this->assertArrayHasKey('wp_debug_display', $settings);
 		
 		// Verify values match what's in our mock config file
-		$this->assertFalse($settings['WP_DEBUG']);
-		$this->assertFalse($settings['WP_DEBUG_LOG']);
+		$this->assertFalse($settings['wp_debug']);
+		$this->assertFalse($settings['wp_debug_log']);
 		// WP_DEBUG_DISPLAY is not in the mock file, so should default to false
-		$this->assertFalse($settings['WP_DEBUG_DISPLAY']);
+		$this->assertFalse($settings['wp_debug_display']);
 	}
 
 	/**
@@ -216,9 +216,9 @@ EOT;
 		$current_settings = $this->service->get_settings()->get_data();
 		
 		// All settings should be set to 'false'
-		$this->assertFalse($current_settings['WP_DEBUG']);
-		$this->assertFalse($current_settings['WP_DEBUG_LOG']);
-		$this->assertFalse($current_settings['WP_DEBUG_DISPLAY']);
+		$this->assertFalse($current_settings['wp_debug']);
+		$this->assertFalse($current_settings['wp_debug_log']);
+		$this->assertFalse($current_settings['wp_debug_display']);
 	}
 
 	/**

@@ -2,7 +2,6 @@ import Alert from '@/components/base/alert';
 import Badge from '@/components/base/badge';
 import Button from '@/components/base/button';
 import Card from '@/components/base/card';
-import { useToast } from '@/components/base/toast';
 
 import apiFetch from '@wordpress/api-fetch';
 import { Fill } from '@wordpress/components';
@@ -28,6 +27,7 @@ import {
     Zap
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface DashboardStats {
     logs: {
@@ -105,7 +105,6 @@ const Overview = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const navigate = useNavigate();
-    const toast = useToast();
 
     const fetchDashboardData = useCallback(async () => {
         try {
@@ -157,7 +156,7 @@ const Overview = () => {
             setLoading(false);
             setRefreshing(false);
         }
-    }, [navigate, toast]);
+    }, [navigate]);
 
     useEffect(() => {
         void fetchDashboardData();

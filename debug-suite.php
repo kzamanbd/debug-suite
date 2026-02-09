@@ -32,8 +32,8 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 use DebugSuite\Core\Activator;
 use DebugSuite\Core\Deactivator;
 use DebugSuite\Core\Singleton;
-use DebugSuite\DependencyInjection\Container;
-use DebugSuite\DependencyInjection\Providers\ServiceProvider;
+use DebugSuite\Dependency\Container;
+use DebugSuite\Dependency\Providers\ServiceProvider;
 use DebugSuite\Interfaces\Hookable;
 
 
@@ -98,6 +98,9 @@ final class DebugSuite {
 		}
 		if ( ! defined( 'DEBUG_SUITE_PLUGIN_URL' ) ) {
 			define( 'DEBUG_SUITE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		}
+		if ( ! defined( 'DEBUG_SUITE_MODULES_URL' ) ) {
+			define( 'DEBUG_SUITE_MODULES_URL', plugin_dir_url( __FILE__ ) . 'modules/' );
 		}
 	}
 

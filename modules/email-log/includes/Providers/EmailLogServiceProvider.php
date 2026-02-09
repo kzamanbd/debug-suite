@@ -1,17 +1,17 @@
 <?php
 
-namespace DebugSuite\EmailLog\Providers;
+namespace DebugSuite\Modules\EmailLog\Providers;
 
-use DebugSuite\DependencyInjection\BaseServiceProvider;
-use DebugSuite\EmailLog\API\EmailLogController;
-use DebugSuite\EmailLog\EmailLogHookRegistry;
-use DebugSuite\EmailLog\Services\EmailLogService;
+use DebugSuite\Dependency\BaseServiceProvider;
+use DebugSuite\Modules\EmailLog\API\EmailLogController;
+use DebugSuite\Modules\EmailLog\EmailLogPage;
+use DebugSuite\Modules\EmailLog\Services\EmailLogService;
 
 class EmailLogServiceProvider extends BaseServiceProvider {
 	protected array $tags = [ 'email-log-service' ];
 
 	protected array $services = [
-		EmailLogHookRegistry::class,
+		EmailLogPage::class,
 		EmailLogService::class,
 	];
 	public function register(): void {

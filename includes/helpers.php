@@ -29,18 +29,6 @@ if ( ! function_exists( 'debug_suite' ) ) {
 	}
 }
 
-if ( ! function_exists( 'debug_suite_service_manager' ) ) {
-	/**
-	 * Get the Debug Suite service manager instance.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return ServiceManager The service manager instance.
-	 */
-	function debug_suite_service_manager(): ServiceManager {
-		return debug_suite()->get_service_manager();
-	}
-}
 
 if ( ! function_exists( 'debug_suite_date' ) ) {
 	/**

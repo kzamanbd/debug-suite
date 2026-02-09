@@ -9,18 +9,20 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\DependencyInjection\Providers;
+namespace DebugSuite\Dependency\Providers;
 
 use DebugSuite\Admin;
 use DebugSuite\Assets;
 use DebugSuite\Core\DatabaseManager;
 use DebugSuite\Core\HookManager;
-use DebugSuite\DependencyInjection\BaseServiceProvider;
+use DebugSuite\Dependency\BaseServiceProvider;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;
+use DebugSuite\Pages\PageManager;
+use DebugSuite\Pages\Modules;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -46,6 +48,8 @@ class AppServiceProvider extends BaseServiceProvider {
 		HookManager::class,
 		DatabaseManager::class,
 		SettingsService::class,
+		PageManager::class,
+		Modules::class,
 	];
 
 	public function register(): void {
