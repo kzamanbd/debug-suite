@@ -334,7 +334,7 @@ class ApiLog extends BaseModel {
 			return $data;
 		}
 
-		return wp_json_encode( $data ) ?: '{}';
+		return wp_json_encode( $data ) ?? '{}';
 	}
 
 	/**

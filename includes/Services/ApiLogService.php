@@ -103,7 +103,7 @@ class ApiLogService implements ServiceInterface, Hookable {
 			'route'           => $route,
 			'url'             => rest_url( $route ),
 			'request_headers' => $request->get_headers(),
-			'request_body'    => $body_params ?: [],
+			'request_body'    => $body_params ?? [],
 			'request_params'  => ! empty( $all_params ) ? $all_params : $request->get_query_params(),
 			'user_id'         => get_current_user_id(),
 			'user_ip'         => self::get_client_ip(),
@@ -145,7 +145,7 @@ class ApiLogService implements ServiceInterface, Hookable {
             [
 				'response_status'  => $result->get_status(),
 				'response_headers' => $result->get_headers(),
-				'response_body'    => $response_body ?: '',
+				'response_body'    => $response_body ?? '',
 				'duration'         => $duration,
 			]
         );
