@@ -174,7 +174,7 @@ const ApiLogViewer = ({
                                 </td>
                                 <td className="px-2 py-3 whitespace-nowrap">
                                     <span
-                                        className={`inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-semibold ${methodColors[entry.method] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+                                        className={`inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-semibold ${methodColors[entry.method] || 'border-gray-200 bg-gray-100 text-gray-800'}`}>
                                         {entry.method}
                                     </span>
                                 </td>

@@ -47,26 +47,28 @@ const ApiLogControls = ({
     const { clearAllLogs } = useApiLogAPI();
     const [selectedBulkAction, setSelectedBulkAction] = useState<Option | null>(null);
 
-    const methodOptions = filterOptions.methods.length > 0
-        ? filterOptions.methods
-        : [
-            { value: 'all', label: __('All Methods', 'debug-suite') },
-            { value: 'GET', label: 'GET' },
-            { value: 'POST', label: 'POST' },
-            { value: 'PUT', label: 'PUT' },
-            { value: 'DELETE', label: 'DELETE' },
-            { value: 'PATCH', label: 'PATCH' }
-        ];
+    const methodOptions =
+        filterOptions.methods.length > 0
+            ? filterOptions.methods
+            : [
+                  { value: 'all', label: __('All Methods', 'debug-suite') },
+                  { value: 'GET', label: 'GET' },
+                  { value: 'POST', label: 'POST' },
+                  { value: 'PUT', label: 'PUT' },
+                  { value: 'DELETE', label: 'DELETE' },
+                  { value: 'PATCH', label: 'PATCH' }
+              ];
 
-    const statusOptions = filterOptions.statuses.length > 0
-        ? filterOptions.statuses
-        : [
-            { value: 'all', label: __('All Statuses', 'debug-suite') },
-            { value: 'success', label: __('2xx Success', 'debug-suite') },
-            { value: 'redirect', label: __('3xx Redirect', 'debug-suite') },
-            { value: 'client_error', label: __('4xx Client Error', 'debug-suite') },
-            { value: 'server_error', label: __('5xx Server Error', 'debug-suite') }
-        ];
+    const statusOptions =
+        filterOptions.statuses.length > 0
+            ? filterOptions.statuses
+            : [
+                  { value: 'all', label: __('All Statuses', 'debug-suite') },
+                  { value: 'success', label: __('2xx Success', 'debug-suite') },
+                  { value: 'redirect', label: __('3xx Redirect', 'debug-suite') },
+                  { value: 'client_error', label: __('4xx Client Error', 'debug-suite') },
+                  { value: 'server_error', label: __('5xx Server Error', 'debug-suite') }
+              ];
 
     const bulkActionOptions = [
         { value: '', label: __('Bulk actions', 'debug-suite') },

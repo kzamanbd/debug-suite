@@ -65,57 +65,34 @@ const ApiDetail = ({ isOpen, onClose, entry, loading = false }: ApiDetailProps) 
         {
             key: 'request-headers',
             label: __('Request Headers', 'debug-suite'),
-            content: (
-                <JsonBlock
-                    data={entry?.request_headers}
-                    emptyMessage={__('No request headers', 'debug-suite')}
-                />
-            )
+            content: <JsonBlock data={entry?.request_headers} emptyMessage={__('No request headers', 'debug-suite')} />
         },
         {
             key: 'request-body',
             label: __('Request Body', 'debug-suite'),
-            content: (
-                <JsonBlock
-                    data={entry?.request_body}
-                    emptyMessage={__('No request body', 'debug-suite')}
-                />
-            )
+            content: <JsonBlock data={entry?.request_body} emptyMessage={__('No request body', 'debug-suite')} />
         },
         {
             key: 'request-params',
             label: __('Request Params', 'debug-suite'),
-            content: (
-                <JsonBlock
-                    data={entry?.request_params}
-                    emptyMessage={__('No query parameters', 'debug-suite')}
-                />
-            )
+            content: <JsonBlock data={entry?.request_params} emptyMessage={__('No query parameters', 'debug-suite')} />
         },
         {
             key: 'response-headers',
             label: __('Response Headers', 'debug-suite'),
             content: (
-                <JsonBlock
-                    data={entry?.response_headers}
-                    emptyMessage={__('No response headers', 'debug-suite')}
-                />
+                <JsonBlock data={entry?.response_headers} emptyMessage={__('No response headers', 'debug-suite')} />
             )
         },
         {
             key: 'response-body',
             label: __('Response Body', 'debug-suite'),
-            content: (
-                <JsonBlock
-                    data={entry?.response_body}
-                    emptyMessage={__('No response body', 'debug-suite')}
-                />
-            )
+            content: <JsonBlock data={entry?.response_body} emptyMessage={__('No response body', 'debug-suite')} />
         }
     ];
 
     return (
-        <Modal open={isOpen} onClose={onClose} className="max-w-3xl" showXButton={true}>
+        <Modal open={isOpen} onClose={onClose} className="max-w-5xl" showXButton={true}>
             <Modal.Title className="flex items-center gap-2">
                 <Globe className="text-primary h-5 w-5" />
                 {__('API Request Details', 'debug-suite')}
@@ -125,9 +102,7 @@ const ApiDetail = ({ isOpen, onClose, entry, loading = false }: ApiDetailProps) 
                 {loading ? (
                     <div className="flex items-center justify-center py-8">
                         <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
-                        <span className="ml-3 text-gray-600">
-                            {__('Loading request details...', 'debug-suite')}
-                        </span>
+                        <span className="ml-3 text-gray-600">{__('Loading request details...', 'debug-suite')}</span>
                     </div>
                 ) : entry ? (
                     <div className="space-y-6">
