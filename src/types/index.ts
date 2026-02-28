@@ -64,9 +64,9 @@ export interface LogFile {
 }
 
 export interface DebugState {
-    debug: boolean | string;
-    debug_log: boolean | string;
-    debug_display: boolean | string;
+    wp_debug: boolean | string;
+    wp_debug_log: boolean | string;
+    wp_debug_display: boolean | string;
 }
 
 // global window type
