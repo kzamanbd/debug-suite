@@ -69,7 +69,7 @@ const initialFeatures: FeatureItem[] = [
         icon: Globe,
         enabled: false,
         category: 'logging',
-        available: false
+        available: true
     },
     {
         id: 'options-viewer',

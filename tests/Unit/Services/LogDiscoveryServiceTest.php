@@ -5,7 +5,7 @@
  * @package DebugSuite\Tests\Unit\Services\DebugLog
  */
 
-namespace DebugSuite\Tests\Unit\Services\DebugLog;
+namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
