@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Tests\Unit\Services\EmailLog;
+namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Core\DatabaseManager;
 use DebugSuite\Core\ServiceResponse;

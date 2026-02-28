@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Tests\Unit\Services\ApiLog;
+namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Core\DatabaseManager;
 use DebugSuite\Core\ServiceResponse;
