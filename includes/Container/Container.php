@@ -3,7 +3,7 @@
  * ExtendedContainer class file.
  */
 
-namespace DebugSuite\Dependency;
+namespace DebugSuite\Container;
 
 use DebugSuite\Packages\League\Container\Container as BaseContainer;
 

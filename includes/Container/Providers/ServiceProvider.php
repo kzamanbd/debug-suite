@@ -1,8 +1,8 @@
 <?php
 
-namespace DebugSuite\Dependency\Providers;
+namespace DebugSuite\Container\Providers;
 
-use DebugSuite\Dependency\BootableServiceProvider;
+use DebugSuite\Container\BootableServiceProvider;
 
 class ServiceProvider extends BootableServiceProvider {
 
@@ -12,6 +12,10 @@ class ServiceProvider extends BootableServiceProvider {
 
 		if ( debug_suite_is_feature_enabled( 'email-log' ) ) {
 			$this->getContainer()->addServiceProvider( new EmailLogServiceProvider() );
+		}
+
+		if ( debug_suite_is_feature_enabled( 'api-logger' ) ) {
+			$this->getContainer()->addServiceProvider( new ApiLogServiceProvider() );
 		}
 	}
 

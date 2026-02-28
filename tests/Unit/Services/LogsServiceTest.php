@@ -7,11 +7,11 @@
  * @group   logs
  */
 
-namespace DebugSuite\Tests\Unit\Services\DebugLog;
+namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Core\ServiceResponse;
-use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
+use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Tests\Helpers\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;

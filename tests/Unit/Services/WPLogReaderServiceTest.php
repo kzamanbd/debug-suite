@@ -5,7 +5,7 @@
  * @package DebugSuite
  */
 
-namespace DebugSuite\Tests\Unit\Services\DebugLog;
+namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
