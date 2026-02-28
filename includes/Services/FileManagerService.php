@@ -42,7 +42,7 @@ class FileManagerService implements ServiceInterface {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->base_path = get_option( 'debug_suite_file_manager_base_path', WP_CONTENT_DIR );
+		$this->base_path = get_option( 'debug_suite_file_manager_base_path', ABSPATH );
 		$this->load_directory_size = get_option( 'debug_suite_load_directory_size', false );
 	}
 
