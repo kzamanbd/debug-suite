@@ -14,7 +14,6 @@ use DebugSuite\Interfaces\Hookable;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
-
 /**
  * Database tables manager class.
  *
@@ -22,14 +21,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class DatabaseManager implements Hookable {
 	public function register_hooks(): void {
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		add_action( 'init', [ $this, 'wpdb_table_shortcuts' ], 1 );
+		add_action( 'debug_suite_email-log_activated', [ $this, 'create_email_logs_table' ] );
+		add_action( 'debug_suite_api-logger_activated', [ $this, 'create_api_logs_table' ] );
 	}
 
 	public function wpdb_table_shortcuts(): void {
 		global $wpdb;
 		// Define custom table names for the plugin
 		$wpdb->debug_suite_email_logs = $wpdb->prefix . 'debug_suite_email_logs';
+		$wpdb->debug_suite_api_logs   = $wpdb->prefix . 'debug_suite_api_logs';
 	}
 	/**
 	 * Get the current database version.
@@ -65,7 +66,11 @@ class DatabaseManager implements Hookable {
 	 *
 	 * @return void
 	 */
-	public static function create_email_logs_table(): void {
+	public static function create_email_logs_table( $feature ): void {
+		if ( $feature !== 'email-log' ) {
+			return;
+		}
+
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . 'debug_suite_email_logs';
@@ -100,6 +105,54 @@ class DatabaseManager implements Hookable {
 	}
 
 	/**
+	 * Create the API logs table.
+	 *
+	 * @param string $feature Feature ID.
+	 * @return void
+	 */
+	public static function create_api_logs_table( $feature ): void {
+		if ( $feature !== 'api-logger' ) {
+			return;
+		}
+
+		global $wpdb;
+
+		$table_name      = $wpdb->prefix . 'debug_suite_api_logs';
+		$charset_collate = $wpdb->get_charset_collate();
+
+		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			method varchar(10) NOT NULL DEFAULT '',
+			route varchar(500) NOT NULL DEFAULT '',
+			url text NOT NULL,
+			request_headers longtext NOT NULL DEFAULT '',
+			request_body longtext NOT NULL DEFAULT '',
+			request_params longtext NOT NULL DEFAULT '',
+			response_status int(5) NOT NULL DEFAULT 0,
+			response_headers longtext NOT NULL DEFAULT '',
+			response_body longtext NOT NULL DEFAULT '',
+			duration float NOT NULL DEFAULT 0,
+			user_id bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+			user_ip varchar(45) NOT NULL DEFAULT '',
+			source varchar(200) NOT NULL DEFAULT '',
+			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			KEY method (method),
+			KEY route (route(191)),
+			KEY response_status (response_status),
+			KEY user_id (user_id),
+			KEY created_at (created_at)
+		) $charset_collate;";
+
+		if ( ! function_exists( 'dbDelta' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		}
+
+		dbDelta( $sql );
+	}
+
+	/**
 	 * Drop all plugin tables.
 	 *
 	 * @return void
@@ -108,6 +161,7 @@ class DatabaseManager implements Hookable {
 		global $wpdb;
 
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}debug_suite_email_logs" );
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}debug_suite_api_logs" );
 
 		// Remove a database version option
 		delete_option( 'debug_suite_db_version' );

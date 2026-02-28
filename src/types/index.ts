@@ -63,19 +63,23 @@ export interface LogFile {
     type: string;
 }
 
+export interface DebugState {
+    wp_debug: boolean | string;
+    wp_debug_log: boolean | string;
+    wp_debug_display: boolean | string;
+}
+
 // global window type
 declare global {
     interface Window {
         debugSuite: {
-            debug: boolean;
-            debug_log: boolean;
-            debug_display: boolean;
+            onboarding_completed: boolean;
             content_url: string;
             wp_version: string;
             php_version: string;
             favicon: string;
             site_name: string;
             logs: LogFile[];
-        };
+        } & DebugState;
     }
 }

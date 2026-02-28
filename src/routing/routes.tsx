@@ -1,10 +1,10 @@
 import DebugLog from '@/pages/debug-log';
-import EmailLog from '@/pages/email-log';
-import FileManager from '@/pages/file-manager';
 import ManageLogs from '@/pages/manage-logs';
+import Feature from '@/pages/feature';
 import NotFound from '@/pages/not-found';
-import SetupGuide from '@/pages/setup-guide';
 import Overview from '@/pages/overview';
+import SetupGuide from '@/pages/settings';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -20,7 +20,7 @@ export interface DebugSuiteRoute {
 const routes: DebugSuiteRoute[] = [
     {
         id: 'setup-guide',
-        path: '/setup',
+        path: '/settings',
         element: <SetupGuide />
     },
     {
@@ -37,20 +37,6 @@ const routes: DebugSuiteRoute[] = [
         element: <DebugLog />
     },
     {
-        id: 'email-log',
-        title: __('Email Log', 'debug-suite'),
-        description: __('View and manage your email logs.', 'debug-suite'),
-        path: '/email-log',
-        element: <EmailLog />
-    },
-    {
-        id: 'file-manager',
-        title: __('File Manager', 'debug-suite'),
-        description: __('Manage files and directories on your server.', 'debug-suite'),
-        path: '/file-manager',
-        element: <FileManager />
-    },
-    {
         id: 'file-logs-manage',
         title: __('Manage File Logs', 'debug-suite'),
         description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
@@ -58,10 +44,23 @@ const routes: DebugSuiteRoute[] = [
         element: <ManageLogs />
     },
     {
-        id: 'not-found',
-        path: '*',
-        element: <NotFound />,
-        className: 'hidden'
+        id: 'feature',
+        title: __('Features', 'debug-suite'),
+        description: __('Manage your application features.', 'debug-suite'),
+        path: '/feature',
+        element: <Feature />
     }
 ];
-export default routes;
+
+const notFoundRoute: DebugSuiteRoute = {
+    id: 'not-found',
+    path: '*',
+    element: <NotFound />,
+    className: 'hidden'
+};
+
+export const getRoutes = (): DebugSuiteRoute[] => {
+    const filtered = applyFilters('debugSuite.routes', [...routes]) as DebugSuiteRoute[] | undefined;
+    const resolved = Array.isArray(filtered) ? filtered : [...routes];
+    return [...resolved, notFoundRoute];
+};
