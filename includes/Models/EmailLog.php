@@ -6,6 +6,13 @@
  * filtering, searching, and statistics.
  *
  * @package DebugSuite
+ *
+ * @method static static|null create_from_mail_data( array $mail_data, string $status, string $error_message = '' )
+ * @method static array       get_statistics()
+ * @method static array       get_filtered( array $filters = [] )
+ * @method static int         count_filtered( array $filters = [] )
+ * @method static array       get_unique_receivers()
+ * @method static int         delete_by_ids( array $ids )
  */
 
 namespace DebugSuite\Models;
@@ -17,17 +24,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * EmailLog model class.
  *
- * @property int   $id              Unique identifier for the email log.
- * @property string $to_email       Recipient email address.
- * @property string $subject        Email subject.
- * @property string $message        Email message body.
- * @property string $headers        Email headers.
- * @property string $attachments    JSON encoded attachments.
- * @property string $status         Email status (success/failed).
- * @property string $error_message  Error message if email sending failed.
- * @property string $sent_date      Date and time when the email was sent.
- * @property string $created_at     Timestamp when the log was created.
- * @property string $updated_at     Timestamp when the log was last updated.
+ * @property int    $id              Unique identifier for the email log.
+ * @property string $to_email        Recipient email address.
+ * @property string $subject         Email subject.
+ * @property string $message         Email message body.
+ * @property string $headers         Email headers.
+ * @property array  $attachments     Attachments (auto-cast from JSON).
+ * @property string $status          Email status (success/failed).
+ * @property string $error_message   Error message if email sending failed.
+ * @property string $sent_date       Date and time when the email was sent.
+ * @property string $created_at      Timestamp when the log was created.
+ * @property string $updated_at      Timestamp when the log was last updated.
  *
  * @since 1.0.0
  */
@@ -74,34 +81,35 @@ class EmailLog extends BaseModel {
 	protected static array $timestamps = [ 'created_at', 'updated_at' ];
 
 	/**
+	 * Attribute casting definitions.
+	 *
+	 * @var array<string, string>
+	 */
+	protected static array $casts = [
+		'id'          => 'integer',
+		'attachments' => 'json',
+	];
+
+	/**
 	 * Email status constants.
 	 */
 	const STATUS_SUCCESS = 'success';
-	const STATUS_FAILED = 'failed';
-
-
+	const STATUS_FAILED  = 'failed';
 
 	/**
 	 * Get email statistics.
 	 *
 	 * @return array
 	 */
-	public static function get_statistics(): array {
-		$wpdb = static::get_wpdb();
-		$table_name = static::get_table_name();
-
-		$query = "
-			SELECT 
-				COUNT(*) as total_emails,
-				SUM(CASE WHEN status = %s THEN 1 ELSE 0 END) as successful,
-				SUM(CASE WHEN status = %s THEN 1 ELSE 0 END) as failed
-			FROM {$table_name}
-		";
-
-		$stats = $wpdb->get_row(
-			$wpdb->prepare( $query, self::STATUS_SUCCESS, self::STATUS_FAILED ),
-			ARRAY_A
-		);
+	protected function get_statistics(): array {
+		$stats = $this->query()
+			->select_raw(
+				'COUNT(*) as total_emails, '
+				. 'SUM(CASE WHEN status = %s THEN 1 ELSE 0 END) as successful, '
+				. 'SUM(CASE WHEN status = %s THEN 1 ELSE 0 END) as failed'
+			)
+			->where_raw( '1 = 1', [ self::STATUS_SUCCESS, self::STATUS_FAILED ] )
+			->get_row();
 
 		if ( ! $stats ) {
 			return [
@@ -112,9 +120,9 @@ class EmailLog extends BaseModel {
 			];
 		}
 
-		$total = (int) $stats['total_emails'];
+		$total      = (int) $stats['total_emails'];
 		$successful = (int) $stats['successful'];
-		$failed = (int) $stats['failed'];
+		$failed     = (int) $stats['failed'];
 
 		$success_rate = $total > 0 ? round( ( $successful / $total ) * 100, 2 ) : 0;
 
@@ -129,24 +137,27 @@ class EmailLog extends BaseModel {
 	/**
 	 * Create email log from wp_mail data.
 	 *
-	 * @param array  $mail_data Mail data.
-	 * @param string $status Email status.
+	 * The attachments field is automatically JSON-encoded via $casts
+	 * when passed as an array through fill()/set_attribute().
+	 *
+	 * @param array  $mail_data     Mail data.
+	 * @param string $status        Email status.
 	 * @param string $error_message Optional error message.
 	 * @return static|null
 	 */
-	public static function create_from_mail_data( array $mail_data, string $status, string $error_message = '' ): ?static {
+	protected function create_from_mail_data( array $mail_data, string $status, string $error_message = '' ): ?static {
 		$attributes = [
 			'to_email'      => self::format_mail_recipients( $mail_data['to'] ?? '' ),
 			'subject'       => $mail_data['subject'] ?? '',
 			'message'       => $mail_data['message'] ?? '',
 			'headers'       => self::format_mail_headers( $mail_data['headers'] ?? '' ),
-			'attachments'   => self::format_mail_attachments( $mail_data['attachments'] ?? '' ),
+			'attachments'   => self::format_mail_attachments( $mail_data['attachments'] ?? [] ),
 			'status'        => $status,
 			'error_message' => $error_message,
 			'sent_date'     => current_time( 'mysql' ),
 		];
 
-		return static::create( $attributes );
+		return $this->create( $attributes );
 	}
 
 	/**
@@ -172,11 +183,13 @@ class EmailLog extends BaseModel {
 	/**
 	 * Format mail attachments for storage.
 	 *
+	 * Returns an array which will be auto-encoded to JSON via $casts.
+	 *
 	 * @param mixed $attachments Attachments data.
-	 * @return string
+	 * @return array
 	 */
-	private static function format_mail_attachments( mixed $attachments ): string {
-		return is_array( $attachments ) ? wp_json_encode( $attachments ) : '';
+	private static function format_mail_attachments( mixed $attachments ): array {
+		return is_array( $attachments ) ? $attachments : [];
 	}
 
 	/**
@@ -185,10 +198,7 @@ class EmailLog extends BaseModel {
 	 * @param array $filters Filter options.
 	 * @return array
 	 */
-	public static function get_filtered( array $filters = [] ): array {
-		$wpdb = static::get_wpdb();
-		$table_name = static::get_table_name();
-
+	protected function get_filtered( array $filters = [] ): array {
 		$defaults = [
 			'search'     => '',
 			'status'     => 'all',
@@ -201,25 +211,16 @@ class EmailLog extends BaseModel {
 
 		$filters = wp_parse_args( $filters, $defaults );
 
-		// Build WHERE clause using helper method
-		$where_data = self::build_where_clause( $filters );
-		$where_clause = $where_data['where_clause'];
-		$prepare_values = $where_data['prepare_values'];
+		$query = $this->query();
+		$this->apply_filters( $query, $filters );
 
 		$sort_by = sanitize_sql_orderby( $filters['sort_by'] );
-		$sort_order = strtoupper( $filters['sort_order'] ) === 'ASC' ? 'ASC' : 'DESC';
 
-		$query = "SELECT * FROM $table_name $where_clause ORDER BY $sort_by $sort_order LIMIT %d OFFSET %d";
-
-		$prepare_values[] = (int) $filters['limit'];
-		$prepare_values[] = (int) $filters['offset'];
-
-		$results = $wpdb->get_results(
-			$wpdb->prepare( $query, $prepare_values ),
-			ARRAY_A
-		);
-
-		return array_map( [ static::class, 'from_array' ], $results ?? [] );
+		return $query
+			->order_by( $sort_by, $filters['sort_order'] )
+			->limit( (int) $filters['limit'] )
+			->offset( (int) $filters['offset'] )
+			->get();
 	}
 
 	/**
@@ -228,10 +229,7 @@ class EmailLog extends BaseModel {
 	 * @param array $filters Filter options.
 	 * @return int
 	 */
-	public static function count_filtered( array $filters = [] ): int {
-		$wpdb = static::get_wpdb();
-		$table_name = static::get_table_name();
-
+	protected function count_filtered( array $filters = [] ): int {
 		$defaults = [
 			'search'   => '',
 			'status'   => 'all',
@@ -240,16 +238,10 @@ class EmailLog extends BaseModel {
 
 		$filters = wp_parse_args( $filters, $defaults );
 
-		// Build WHERE clause using helper method
-		$where_data = self::build_where_clause( $filters );
-		$where_clause = $where_data['where_clause'];
-		$prepare_values = $where_data['prepare_values'];
+		$query = $this->query();
+		$this->apply_filters( $query, $filters );
 
-		$query = "SELECT COUNT(*) FROM $table_name $where_clause";
-
-		return (int) $wpdb->get_var(
-			empty( $prepare_values ) ? $query : $wpdb->prepare( $query, $prepare_values )
-		);
+		return $query->count();
 	}
 
 	/**
@@ -257,13 +249,12 @@ class EmailLog extends BaseModel {
 	 *
 	 * @return array
 	 */
-	public static function get_unique_receivers(): array {
-		$wpdb       = static::get_wpdb();
-		$table_name = static::get_table_name();
-
-		// No dynamic values in query; safe to run directly without prepare().
-		$query = "SELECT DISTINCT to_email FROM $table_name WHERE to_email != '' ORDER BY to_email ASC";
-		return $wpdb->get_col( $query );
+	protected function get_unique_receivers(): array {
+		return $this->query()
+			->distinct()
+			->where_not_empty( 'to_email' )
+			->order_by( 'to_email', 'ASC' )
+			->pluck( 'to_email' );
 	}
 
 	/**
@@ -272,51 +263,51 @@ class EmailLog extends BaseModel {
 	 * @param array $ids Array of email log IDs.
 	 * @return int Number of deleted rows.
 	 */
-	public static function delete_by_ids( array $ids ): int {
-		// Sanitize and filter IDs
+	protected function delete_by_ids( array $ids ): int {
+		// Sanitize and filter IDs.
 		$sanitized_ids = array_filter( array_map( 'absint', $ids ) );
 
 		if ( empty( $sanitized_ids ) ) {
 			return 0;
 		}
 
-		return static::delete_where( [ static::$primary_key => $sanitized_ids ] );
+		return $this->destroy( $sanitized_ids );
 	}
-
-
 
 	/**
 	 * Format email entry for API response.
+	 *
+	 * Casts are applied automatically via magic __get -> get_attribute():
+	 * - id returns integer, attachments returns decoded array.
 	 *
 	 * @return array
 	 */
 	public function to_array(): array {
 		return [
-			'id'            => $this->id,
-			'sent_date'     => $this->sent_date,
-			'receiver'      => $this->to_email,
-			'subject'       => $this->subject,
-			'message'       => $this->message,
-			'headers'       => $this->headers,
-			'attachments'   => $this->attachments,
-			'status'        => $this->status,
-			'error'         => $this->error_message,
-			'created_at'    => $this->created_at,
+			'id'          => $this->id,
+			'sent_date'   => $this->sent_date,
+			'receiver'    => $this->to_email,
+			'subject'     => $this->subject,
+			'message'     => $this->message,
+			'headers'     => $this->headers,
+			'attachments' => $this->attachments,
+			'status'      => $this->status,
+			'error'       => $this->error_message,
+			'created_at'  => $this->created_at,
 		];
 	}
 
 	/**
 	 * Get parsed attachments as array.
 	 *
+	 * Leverages the 'json' cast on attachments attribute.
+	 *
 	 * @return array
 	 */
 	public function get_attachments(): array {
-		if ( empty( $this->attachments ) ) {
-			return [];
-		}
+		$attachments = $this->attachments; // JSON cast handles decode.
 
-		$decoded = json_decode( $this->attachments, true );
-		return is_array( $decoded ) ? $decoded : [];
+		return is_array( $attachments ) ? $attachments : [];
 	}
 
 	/**
@@ -325,46 +316,32 @@ class EmailLog extends BaseModel {
 	 * @return array
 	 */
 	public function get_headers(): array {
-		return empty( $this->headers ) ? [] : explode( "\n", $this->headers );
+		$headers = $this->attributes['headers'] ?? '';
+
+		return empty( $headers ) ? [] : explode( "\n", $headers );
 	}
 
 	/**
-	 * Build WHERE clause conditions for filters.
+	 * Apply filter conditions to a query builder.
 	 *
-	 * @param array $filters Validated filter options.
-	 * @return array Array containing where_clause string and prepare_values array.
+	 * @param QueryBuilder $query   The query builder instance.
+	 * @param array        $filters Validated filter options.
+	 * @return void
 	 */
-	private static function build_where_clause( array $filters ): array {
-		$wpdb = static::get_wpdb();
-		$where_conditions = [];
-		$prepare_values = [];
-
-		// Search filter
+	private function apply_filters( QueryBuilder $query, array $filters ): void {
+		// Search filter.
 		if ( ! empty( $filters['search'] ) ) {
-			$search_term = '%' . $wpdb->esc_like( $filters['search'] ) . '%';
-			$where_conditions[] = '(subject LIKE %s OR to_email LIKE %s OR message LIKE %s)';
-			$prepare_values[] = $search_term;
-			$prepare_values[] = $search_term;
-			$prepare_values[] = $search_term;
+			$query->where_any( [ 'subject', 'to_email', 'message' ], 'LIKE', $filters['search'] );
 		}
 
-		// Status filter
+		// Status filter.
 		if ( $filters['status'] !== 'all' ) {
-			$where_conditions[] = 'status = %s';
-			$prepare_values[] = $filters['status'];
+			$query->where( 'status', $filters['status'] );
 		}
 
-		// Receiver filter
+		// Receiver filter.
 		if ( ! empty( $filters['receiver'] ) ) {
-			$where_conditions[] = 'to_email LIKE %s';
-			$prepare_values[] = '%' . $wpdb->esc_like( $filters['receiver'] ) . '%';
+			$query->where( 'to_email', 'LIKE', $filters['receiver'] );
 		}
-
-		$where_clause = empty( $where_conditions ) ? '' : 'WHERE ' . implode( ' AND ', $where_conditions );
-
-		return [
-			'where_clause'    => $where_clause,
-			'prepare_values'  => $prepare_values,
-		];
 	}
 }

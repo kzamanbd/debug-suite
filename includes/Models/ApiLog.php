@@ -6,6 +6,13 @@
  * filtering, searching, and statistics.
  *
  * @package DebugSuite
+ *
+ * @method static static|null create_from_request( array $data )
+ * @method static array       get_statistics()
+ * @method static array       get_filtered( array $filters = [] )
+ * @method static int         count_filtered( array $filters = [] )
+ * @method static array       get_unique_routes()
+ * @method static int         delete_by_ids( array $ids )
  */
 
 namespace DebugSuite\Models;
@@ -21,11 +28,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string $method           HTTP method (GET, POST, PUT, DELETE, PATCH).
  * @property string $route            REST API route.
  * @property string $url              Full request URL.
- * @property string $request_headers  JSON encoded request headers.
- * @property string $request_body     JSON encoded request body.
- * @property string $request_params   JSON encoded request parameters.
+ * @property array  $request_headers  Request headers (auto-cast from JSON).
+ * @property array  $request_body     Request body (auto-cast from JSON).
+ * @property array  $request_params   Request parameters (auto-cast from JSON).
  * @property int    $response_status  HTTP response status code.
- * @property string $response_headers JSON encoded response headers.
+ * @property array  $response_headers Response headers (auto-cast from JSON).
  * @property string $response_body    Response body (truncated).
  * @property float  $duration         Request duration in milliseconds.
  * @property int    $user_id          WordPress user ID who made the request.
@@ -84,6 +91,22 @@ class ApiLog extends BaseModel {
 	protected static array $timestamps = [ 'created_at', 'updated_at' ];
 
 	/**
+	 * Attribute casting definitions.
+	 *
+	 * @var array<string, string>
+	 */
+	protected static array $casts = [
+		'id'               => 'integer',
+		'request_headers'  => 'json',
+		'request_body'     => 'json',
+		'request_params'   => 'json',
+		'response_headers' => 'json',
+		'response_status'  => 'integer',
+		'duration'         => 'float',
+		'user_id'          => 'integer',
+	];
+
+	/**
 	 * HTTP method constants.
 	 */
 	const METHOD_GET    = 'GET';
@@ -100,27 +123,30 @@ class ApiLog extends BaseModel {
 	/**
 	 * Create API log from request/response data.
 	 *
+	 * JSON fields (request_headers, request_body, etc.) are automatically
+	 * encoded via $casts when set through fill()/set_attribute().
+	 *
 	 * @param array $data Request and response data.
 	 * @return static|null
 	 */
-	public static function create_from_request( array $data ): ?static {
+	protected function create_from_request( array $data ): ?static {
 		$attributes = [
 			'method'           => strtoupper( $data['method'] ?? '' ),
 			'route'            => $data['route'] ?? '',
 			'url'              => $data['url'] ?? '',
-			'request_headers'  => self::encode_json( $data['request_headers'] ?? [] ),
-			'request_body'     => self::encode_json( $data['request_body'] ?? [] ),
-			'request_params'   => self::encode_json( $data['request_params'] ?? [] ),
-			'response_status'  => (int) ( $data['response_status'] ?? 0 ),
-			'response_headers' => self::encode_json( $data['response_headers'] ?? [] ),
+			'request_headers'  => $data['request_headers'] ?? [],
+			'request_body'     => $data['request_body'] ?? [],
+			'request_params'   => $data['request_params'] ?? [],
+			'response_status'  => $data['response_status'] ?? 0,
+			'response_headers' => $data['response_headers'] ?? [],
 			'response_body'    => self::truncate_body( $data['response_body'] ?? '' ),
 			'duration'         => round( (float) ( $data['duration'] ?? 0 ), 2 ),
-			'user_id'          => (int) ( $data['user_id'] ?? 0 ),
+			'user_id'          => $data['user_id'] ?? 0,
 			'user_ip'          => $data['user_ip'] ?? '',
 			'source'           => $data['source'] ?? '',
 		];
 
-		return static::create( $attributes );
+		return $this->create( $attributes );
 	}
 
 	/**
@@ -128,21 +154,15 @@ class ApiLog extends BaseModel {
 	 *
 	 * @return array
 	 */
-	public static function get_statistics(): array {
-		$wpdb       = static::get_wpdb();
-		$table_name = static::get_table_name();
-
-		$query = "
-			SELECT
-				COUNT(*) as total_requests,
-				SUM(CASE WHEN response_status >= 200 AND response_status < 300 THEN 1 ELSE 0 END) as successful,
-				SUM(CASE WHEN response_status >= 400 THEN 1 ELSE 0 END) as failed,
-				ROUND(AVG(duration), 2) as avg_duration
-			FROM {$table_name}
-		";
-
-		// No dynamic values; safe to run directly.
-		$stats = $wpdb->get_row( $query, ARRAY_A );
+	protected function get_statistics(): array {
+		$stats = $this->query()
+			->select_raw(
+				'COUNT(*) as total_requests, '
+				. 'SUM(CASE WHEN response_status >= 200 AND response_status < 300 THEN 1 ELSE 0 END) as successful, '
+				. 'SUM(CASE WHEN response_status >= 400 THEN 1 ELSE 0 END) as failed, '
+				. 'ROUND(AVG(duration), 2) as avg_duration'
+			)
+			->get_row();
 
 		if ( ! $stats ) {
 			return [
@@ -167,10 +187,7 @@ class ApiLog extends BaseModel {
 	 * @param array $filters Filter options.
 	 * @return array
 	 */
-	public static function get_filtered( array $filters = [] ): array {
-		$wpdb       = static::get_wpdb();
-		$table_name = static::get_table_name();
-
+	protected function get_filtered( array $filters = [] ): array {
 		$defaults = [
 			'search'     => '',
 			'method'     => 'all',
@@ -184,24 +201,16 @@ class ApiLog extends BaseModel {
 
 		$filters = wp_parse_args( $filters, $defaults );
 
-		$where_data      = self::build_where_clause( $filters );
-		$where_clause    = $where_data['where_clause'];
-		$prepare_values  = $where_data['prepare_values'];
+		$query = $this->query();
+		$this->apply_filters( $query, $filters );
 
-		$sort_by    = sanitize_sql_orderby( $filters['sort_by'] );
-		$sort_order = strtoupper( $filters['sort_order'] ) === 'ASC' ? 'ASC' : 'DESC';
+		$sort_by = sanitize_sql_orderby( $filters['sort_by'] );
 
-		$query = "SELECT * FROM $table_name $where_clause ORDER BY $sort_by $sort_order LIMIT %d OFFSET %d";
-
-		$prepare_values[] = (int) $filters['limit'];
-		$prepare_values[] = (int) $filters['offset'];
-
-		$results = $wpdb->get_results(
-			$wpdb->prepare( $query, $prepare_values ),
-			ARRAY_A
-		);
-
-		return array_map( [ static::class, 'from_array' ], $results ?? [] );
+		return $query
+			->order_by( $sort_by, $filters['sort_order'] )
+			->limit( (int) $filters['limit'] )
+			->offset( (int) $filters['offset'] )
+			->get();
 	}
 
 	/**
@@ -210,10 +219,7 @@ class ApiLog extends BaseModel {
 	 * @param array $filters Filter options.
 	 * @return int
 	 */
-	public static function count_filtered( array $filters = [] ): int {
-		$wpdb       = static::get_wpdb();
-		$table_name = static::get_table_name();
-
+	protected function count_filtered( array $filters = [] ): int {
 		$defaults = [
 			'search' => '',
 			'method' => 'all',
@@ -223,15 +229,10 @@ class ApiLog extends BaseModel {
 
 		$filters = wp_parse_args( $filters, $defaults );
 
-		$where_data     = self::build_where_clause( $filters );
-		$where_clause   = $where_data['where_clause'];
-		$prepare_values = $where_data['prepare_values'];
+		$query = $this->query();
+		$this->apply_filters( $query, $filters );
 
-		$query = "SELECT COUNT(*) FROM $table_name $where_clause";
-
-		return (int) $wpdb->get_var(
-			empty( $prepare_values ) ? $query : $wpdb->prepare( $query, $prepare_values )
-		);
+		return $query->count();
 	}
 
 	/**
@@ -239,13 +240,13 @@ class ApiLog extends BaseModel {
 	 *
 	 * @return array
 	 */
-	public static function get_unique_routes(): array {
-		$wpdb       = static::get_wpdb();
-		$table_name = static::get_table_name();
-
-		// No dynamic values; safe to run directly.
-		$query = "SELECT DISTINCT route FROM $table_name WHERE route != '' ORDER BY route ASC LIMIT 100";
-		return $wpdb->get_col( $query );
+	protected function get_unique_routes(): array {
+		return $this->query()
+			->distinct()
+			->where_not_empty( 'route' )
+			->order_by( 'route', 'ASC' )
+			->limit( 100 )
+			->pluck( 'route' );
 	}
 
 	/**
@@ -254,35 +255,39 @@ class ApiLog extends BaseModel {
 	 * @param array $ids Array of API log IDs.
 	 * @return int Number of deleted rows.
 	 */
-	public static function delete_by_ids( array $ids ): int {
+	protected function delete_by_ids( array $ids ): int {
 		$sanitized_ids = array_filter( array_map( 'absint', $ids ) );
 
 		if ( empty( $sanitized_ids ) ) {
 			return 0;
 		}
 
-		return static::delete_where( [ static::$primary_key => $sanitized_ids ] );
+		return $this->destroy( $sanitized_ids );
 	}
 
 	/**
 	 * Format API log entry for API response.
 	 *
+	 * Casts are applied automatically via magic __get -> get_attribute():
+	 * - JSON fields return decoded arrays.
+	 * - Integer/float fields return proper types.
+	 *
 	 * @return array
 	 */
 	public function to_array(): array {
 		return [
-			'id'               => (int) $this->id,
+			'id'               => $this->id,
 			'method'           => $this->method,
 			'route'            => $this->route,
 			'url'              => $this->url,
-			'request_headers'  => $this->get_decoded( 'request_headers' ),
-			'request_body'     => $this->get_decoded( 'request_body' ),
-			'request_params'   => $this->get_decoded( 'request_params' ),
-			'response_status'  => (int) $this->response_status,
-			'response_headers' => $this->get_decoded( 'response_headers' ),
+			'request_headers'  => $this->request_headers,
+			'request_body'     => $this->request_body,
+			'request_params'   => $this->request_params,
+			'response_status'  => $this->response_status,
+			'response_headers' => $this->response_headers,
 			'response_body'    => $this->response_body,
-			'duration'         => (float) $this->duration,
-			'user_id'          => (int) $this->user_id,
+			'duration'         => $this->duration,
+			'user_id'          => $this->user_id,
 			'user_ip'          => $this->user_ip,
 			'source'           => $this->source,
 			'created_at'       => $this->created_at,
@@ -296,45 +301,15 @@ class ApiLog extends BaseModel {
 	 */
 	public function to_list_array(): array {
 		return [
-			'id'              => (int) $this->id,
+			'id'              => $this->id,
 			'method'          => $this->method,
 			'route'           => $this->route,
-			'response_status' => (int) $this->response_status,
-			'duration'        => (float) $this->duration,
-			'user_id'         => (int) $this->user_id,
+			'response_status' => $this->response_status,
+			'duration'        => $this->duration,
+			'user_id'         => $this->user_id,
 			'source'          => $this->source,
 			'created_at'      => $this->created_at,
 		];
-	}
-
-	/**
-	 * Decode a JSON-encoded attribute.
-	 *
-	 * @param string $key Attribute key.
-	 * @return mixed
-	 */
-	private function get_decoded( string $key ): mixed {
-		$value = $this->get_attribute( $key );
-		if ( empty( $value ) ) {
-			return [];
-		}
-
-		$decoded = json_decode( $value, true );
-		return is_array( $decoded ) ? $decoded : $value;
-	}
-
-	/**
-	 * JSON encode data safely.
-	 *
-	 * @param mixed $data Data to encode.
-	 * @return string
-	 */
-	private static function encode_json( mixed $data ): string {
-		if ( is_string( $data ) ) {
-			return $data;
-		}
-
-		return wp_json_encode( $data ) ?? '{}';
 	}
 
 	/**
@@ -351,60 +326,55 @@ class ApiLog extends BaseModel {
 	}
 
 	/**
-	 * Build WHERE clause conditions for filters.
+	 * Apply filter conditions to a query builder.
 	 *
-	 * @param array $filters Validated filter options.
-	 * @return array Array containing where_clause string and prepare_values array.
+	 * @param QueryBuilder $query   The query builder instance.
+	 * @param array        $filters Validated filter options.
+	 * @return void
 	 */
-	private static function build_where_clause( array $filters ): array {
-		$wpdb             = static::get_wpdb();
-		$where_conditions = [];
-		$prepare_values   = [];
-
-		// Search filter
+	private function apply_filters( QueryBuilder $query, array $filters ): void {
+		// Search filter.
 		if ( ! empty( $filters['search'] ) ) {
-			$search_term      = '%' . $wpdb->esc_like( $filters['search'] ) . '%';
-			$where_conditions[] = '(route LIKE %s OR url LIKE %s OR source LIKE %s)';
-			$prepare_values[]   = $search_term;
-			$prepare_values[]   = $search_term;
-			$prepare_values[]   = $search_term;
+			$query->where_any( [ 'route', 'url', 'source' ], 'LIKE', $filters['search'] );
 		}
 
-		// Method filter
+		// Method filter.
 		if ( $filters['method'] !== 'all' ) {
-			$where_conditions[] = 'method = %s';
-			$prepare_values[]   = strtoupper( $filters['method'] );
+			$query->where( 'method', strtoupper( $filters['method'] ) );
 		}
 
-		// Status filter
+		// Status filter.
 		if ( $filters['status'] !== 'all' ) {
-			switch ( $filters['status'] ) {
-				case 'success':
-					$where_conditions[] = '(response_status >= 200 AND response_status < 300)';
-					break;
-				case 'redirect':
-					$where_conditions[] = '(response_status >= 300 AND response_status < 400)';
-					break;
-				case 'client_error':
-					$where_conditions[] = '(response_status >= 400 AND response_status < 500)';
-					break;
-				case 'server_error':
-					$where_conditions[] = '(response_status >= 500)';
-					break;
-			}
+			$this->apply_status_filter( $query, $filters['status'] );
 		}
 
-		// Route filter
+		// Route filter.
 		if ( ! empty( $filters['route'] ) ) {
-			$where_conditions[] = 'route LIKE %s';
-			$prepare_values[]   = '%' . $wpdb->esc_like( $filters['route'] ) . '%';
+			$query->where( 'route', 'LIKE', $filters['route'] );
 		}
+	}
 
-		$where_clause = empty( $where_conditions ) ? '' : 'WHERE ' . implode( ' AND ', $where_conditions );
-
-		return [
-			'where_clause'   => $where_clause,
-			'prepare_values' => $prepare_values,
-		];
+	/**
+	 * Apply HTTP status range filter to a query builder.
+	 *
+	 * @param QueryBuilder $query  The query builder instance.
+	 * @param string       $status Status category (success, redirect, client_error, server_error).
+	 * @return void
+	 */
+	private function apply_status_filter( QueryBuilder $query, string $status ): void {
+		switch ( $status ) {
+			case 'success':
+				$query->where_raw( '(response_status >= %d AND response_status < %d)', [ 200, 300 ] );
+				break;
+			case 'redirect':
+				$query->where_raw( '(response_status >= %d AND response_status < %d)', [ 300, 400 ] );
+				break;
+			case 'client_error':
+				$query->where_raw( '(response_status >= %d AND response_status < %d)', [ 400, 500 ] );
+				break;
+			case 'server_error':
+				$query->where_raw( '(response_status >= %d)', [ 500 ] );
+				break;
+		}
 	}
 }
