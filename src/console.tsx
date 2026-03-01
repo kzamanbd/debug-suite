@@ -1,4 +1,5 @@
 import DebugLog from '@/pages/debug-log';
+import { Slot, SlotFillProvider } from '@wordpress/components';
 import domReady from '@wordpress/dom-ready';
 import { createRoot, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -22,17 +23,17 @@ const ConsoleApp = () => {
         if (activeTab === 'query-console') {
             return <QueryConsole />;
         }
-        return <DebugLog />;
+        return <DebugLog className="[&>div]:rounded-none [&>div]:border-t-transparent" />;
     };
 
     return (
-        <>
+        <SlotFillProvider>
             <div role="button" onClick={barClickHandler} className="ab-item ab-empty-item">
                 {__('Debug', 'debug-suite')}
             </div>
 
             <Modal open={openModal} onClose={onClose} fullScreen>
-                <Modal.Title className="flex items-center justify-between gap-4">
+                <Modal.Title className="flex items-center justify-between gap-4 bg-white">
                     <div className="flex items-center gap-4">
                         <Button
                             variant="text"
@@ -49,15 +50,13 @@ const ConsoleApp = () => {
                             <span>Debug Log</span>
                         </Button>
                     </div>
-                    {activeTab === 'logs' && (
-                        <Button className="mr-8" variant="text">
-                            Clear
-                        </Button>
-                    )}
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Slot name="console-logs-actions" />
+                    </div>
                 </Modal.Title>
-                <Modal.Content>{openModal && <Renderer />}</Modal.Content>
+                <Modal.Content className="px-4 py-0">{openModal && <Renderer />}</Modal.Content>
             </Modal>
-        </>
+        </SlotFillProvider>
     );
 };
 

@@ -74,7 +74,9 @@ export type TitleProps = {
 
 const Title: React.FunctionComponent<TitleProps> = ({ children, className, ...rest }) => {
     return (
-        <div className={classNames('rounded-t-lg border-b bg-gray-100 p-4 font-semibold', className)} {...rest}>
+        <div
+            className={classNames('mr-4 rounded-t-lg border-b bg-gray-100 p-4 pr-10 font-semibold', className)}
+            {...rest}>
             {children}
         </div>
     );
