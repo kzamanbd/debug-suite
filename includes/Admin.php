@@ -131,5 +131,12 @@ class Admin implements Hookable {
 				'title' => __( 'Debug', 'debug-suite' ),
 			]
 		);
+		wp_enqueue_script( 'debug-console-script' );
+		wp_enqueue_style( 'debug-suite-style' );
+		wp_localize_script(
+			'debug-console-script',
+			'debugSuite',
+			Assets::get_localized_data()
+		);
 	}
 }

@@ -1,5 +1,6 @@
 import DebugLog from '@/pages/debug-log';
-import { useState } from '@wordpress/element';
+import domReady from '@wordpress/dom-ready';
+import { createRoot, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Bug, SquareTerminal } from 'lucide-react';
 import { Button, Modal } from './components/base';
@@ -60,4 +61,11 @@ const ConsoleApp = () => {
     );
 };
 
-export default ConsoleApp;
+domReady(() => {
+    const consoleContainer = document.getElementById('wp-admin-bar-debug-suite');
+    if (consoleContainer) {
+        // mount the console app
+        const root = createRoot(consoleContainer);
+        root.render(<ConsoleApp />);
+    }
+});
