@@ -1,6 +1,6 @@
 {
-    "intelephense.environment.includePaths": ["../../../../"],
-    "php.workspace.includePath": "../../../../",
+    "intelephense.environment.includePaths": ["../../../"],
+    "php.workspace.includePath": "../../../",
     "editor.formatOnSave": true,
     "phpSniffer.autoDetect": true,
     "editor.codeActionsOnSave": {
