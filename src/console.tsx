@@ -7,11 +7,10 @@ import { createRoot, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Bug, SquareTerminal, X as XIcon } from 'lucide-react';
 import QueryConsole from './pages/query-console';
-import { classNames } from './utils';
 
 const ConsoleApp = () => {
     const [openModal, setOpenModal] = useState(false);
-    const [activeTab, setActiveTab] = useState<'query-console' | 'logs'>('query-console');
+    const [activeTab, setActiveTab] = useState<'query-console' | 'logs'>('logs');
     const barClickHandler = () => {
         setOpenModal(true);
     };
@@ -34,18 +33,16 @@ const ConsoleApp = () => {
                     <DialogHeader className="border-border flex shrink-0 flex-row items-center justify-between gap-4 border-b bg-white p-4">
                         <DialogTitle className="flex items-center gap-4">
                             <Button
-                                variant="ghost"
-                                onClick={() => setActiveTab('query-console')}
-                                className={classNames({ 'text-primary': activeTab === 'query-console' })}>
-                                <SquareTerminal size={20} />
-                                <span>Console</span>
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                onClick={() => setActiveTab('logs')}
-                                className={classNames({ 'text-primary': activeTab === 'logs' })}>
+                                variant={activeTab === 'logs' ? 'secondary' : 'ghost'}
+                                onClick={() => setActiveTab('logs')}>
                                 <Bug size={20} />
                                 <span>Debug Log</span>
+                            </Button>
+                            <Button
+                                variant={activeTab === 'query-console' ? 'secondary' : 'ghost'}
+                                onClick={() => setActiveTab('query-console')}>
+                                <SquareTerminal size={20} />
+                                <span>Console</span>
                             </Button>
                         </DialogTitle>
                         <div className="flex items-center gap-4">
