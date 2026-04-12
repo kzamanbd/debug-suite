@@ -1,4 +1,3 @@
-import DebugLog from '@/pages/debug-log';
 import ManageLogs from '@/pages/manage-logs';
 import Feature from '@/pages/feature';
 import NotFound from '@/pages/not-found';
@@ -29,12 +28,6 @@ const routes: DebugSuiteRoute[] = [
         description: __('Monitor your WordPress debug activity and system performance.', 'debug-suite'),
         path: '/',
         element: <Overview />
-    },
-    {
-        id: 'debug-log',
-        title: __('Debug Log', 'debug-suite'),
-        path: '/debug-log',
-        element: <DebugLog />
     },
     {
         id: 'file-logs-manage',

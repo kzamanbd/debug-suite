@@ -3,8 +3,16 @@
  *
  * @since 1.2.0
  */
-import { DateTimeHtml, Modal } from '@/components/base';
+import { DateTimeHtml } from '@/components/base';
 import ContentTabs from '@/components/base/content-tabs';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from '@/components/ui/dialog';
 import { __ } from '@wordpress/i18n';
 import { Calendar, Clock, Globe, User } from 'lucide-react';
 import type { ApiLogEntry } from '../types';
@@ -92,74 +100,81 @@ const ApiDetail = ({ isOpen, onClose, entry, loading = false }: ApiDetailProps) 
     ];
 
     return (
-        <Modal open={isOpen} onClose={onClose} className="max-w-5xl" showXButton={true}>
-            <Modal.Title className="flex items-center gap-2">
-                <Globe className="text-primary h-5 w-5" />
-                {__('API Request Details', 'debug-suite')}
-            </Modal.Title>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="flex max-h-[90vh] max-w-5xl flex-col gap-0 p-0 sm:max-w-5xl">
+                <DialogHeader className="flex-none border-b p-6 pb-4">
+                    <DialogTitle className="flex items-center gap-2 text-xl">
+                        <Globe className="text-primary h-5 w-5" />
+                        {__('API Request Details', 'debug-suite')}
+                    </DialogTitle>
+                    <DialogDescription className="sr-only">Detailed view of the API logs.</DialogDescription>
+                </DialogHeader>
 
-            <Modal.Content className="max-h-[80vh] overflow-y-auto">
-                {loading ? (
-                    <div className="flex items-center justify-center py-8">
-                        <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
-                        <span className="ml-3 text-gray-600">{__('Loading request details...', 'debug-suite')}</span>
-                    </div>
-                ) : entry ? (
-                    <div className="space-y-6">
-                        {/* Overview */}
-                        <div className="rounded-lg border bg-gray-50 p-4">
-                            <div className="mb-3 flex items-center gap-3">
-                                <span
-                                    className={`inline-flex items-center rounded border px-2 py-0.5 text-xs font-semibold ${methodColors[entry.method] || 'bg-gray-100 text-gray-800'}`}>
-                                    {entry.method}
-                                </span>
-                                <code className="flex-1 truncate text-sm text-gray-900">{entry.route}</code>
-                                <span
-                                    className={`inline-flex items-center rounded border px-2 py-0.5 text-xs font-medium ${getStatusColor(entry.response_status)}`}>
-                                    {entry.response_status}
-                                </span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
-                                <div className="flex items-center gap-1.5 text-gray-600">
-                                    <Clock className="h-3.5 w-3.5" />
-                                    <span>{entry.duration.toFixed(1)}ms</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 text-gray-600">
-                                    <Calendar className="h-3.5 w-3.5" />
-                                    <DateTimeHtml date={entry.created_at} />
-                                </div>
-                                {entry.user_id > 0 && (
-                                    <div className="flex items-center gap-1.5 text-gray-600">
-                                        <User className="h-3.5 w-3.5" />
-                                        <span>
-                                            {__('User', 'debug-suite')} #{entry.user_id}
-                                        </span>
-                                    </div>
-                                )}
-                                {entry.user_ip && (
-                                    <div className="flex items-center gap-1.5 text-gray-600">
-                                        <Globe className="h-3.5 w-3.5" />
-                                        <span>{entry.user_ip}</span>
-                                    </div>
-                                )}
-                            </div>
+                <div className="flex-1 overflow-y-auto p-6 pt-4">
+                    {loading ? (
+                        <div className="flex items-center justify-center py-8">
+                            <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
+                            <span className="ml-3 text-gray-600">
+                                {__('Loading request details...', 'debug-suite')}
+                            </span>
                         </div>
+                    ) : entry ? (
+                        <div className="space-y-6">
+                            {/* Overview */}
+                            <div className="rounded-lg border bg-gray-50 p-4">
+                                <div className="mb-3 flex items-center gap-3">
+                                    <span
+                                        className={`inline-flex items-center rounded border px-2 py-0.5 text-xs font-semibold ${methodColors[entry.method] || 'bg-gray-100 text-gray-800'}`}>
+                                        {entry.method}
+                                    </span>
+                                    <code className="flex-1 truncate text-sm text-gray-900">{entry.route}</code>
+                                    <span
+                                        className={`inline-flex items-center rounded border px-2 py-0.5 text-xs font-medium ${getStatusColor(entry.response_status)}`}>
+                                        {entry.response_status}
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
+                                    <div className="flex items-center gap-1.5 text-gray-600">
+                                        <Clock className="h-3.5 w-3.5" />
+                                        <span>{entry.duration.toFixed(1)}ms</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-gray-600">
+                                        <Calendar className="h-3.5 w-3.5" />
+                                        <DateTimeHtml date={entry.created_at} />
+                                    </div>
+                                    {entry.user_id > 0 && (
+                                        <div className="flex items-center gap-1.5 text-gray-600">
+                                            <User className="h-3.5 w-3.5" />
+                                            <span>
+                                                {__('User', 'debug-suite')} #{entry.user_id}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {entry.user_ip && (
+                                        <div className="flex items-center gap-1.5 text-gray-600">
+                                            <Globe className="h-3.5 w-3.5" />
+                                            <span>{entry.user_ip}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
-                        {/* Tabbed Content */}
-                        <ContentTabs tabs={tabs} />
-                    </div>
-                ) : null}
-            </Modal.Content>
+                            {/* Tabbed Content */}
+                            <ContentTabs tabs={tabs} />
+                        </div>
+                    ) : null}
+                </div>
 
-            <Modal.Footer className="flex justify-end">
-                <button
-                    type="button"
-                    onClick={onClose}
-                    className="focus:ring-primary rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none">
-                    {__('Close', 'debug-suite')}
-                </button>
-            </Modal.Footer>
-        </Modal>
+                <DialogFooter className="flex flex-none justify-end border-t p-6">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="focus:ring-primary rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none">
+                        {__('Close', 'debug-suite')}
+                    </button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

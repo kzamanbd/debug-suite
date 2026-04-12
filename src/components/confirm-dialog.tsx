@@ -32,7 +32,7 @@ const ConfirmDialog: React.FC = () => {
             if (confirmed) {
                 prev.resolve?.(true);
             } else {
-                prev.reject?.('[Dialog] closed without confirmation');
+                prev.resolve?.(false);
             }
             return { ...prev, open: false };
         });

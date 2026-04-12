@@ -11,7 +11,6 @@ export { default as Checkbox } from './checkbox';
 export { default as ContentTabs } from './content-tabs';
 export { default as DateTimeHtml } from './date-time';
 export { default as DialogModal } from './dialog-modal';
-export { default as Modal } from './modal';
 export { default as Pagination } from './pagination';
 export { default as RadioButton } from './radio-button';
 export { default as SimpleSelect } from './select';

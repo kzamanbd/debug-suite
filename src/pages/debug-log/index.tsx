@@ -3,13 +3,14 @@
  *
  * @since 1.0.0
  */
+import { classNames } from '@/utils';
 import { useEffect, useState } from '@wordpress/element';
 import { LogControls, LogViewer, RawFileViewer } from './components';
 import FileLogsSkeleton from './components/logs-skeleton';
 import { useLogActions, useLogEntries, useRawFileContent } from './hooks';
 import type { LogFilters, ViewMode } from './types';
 
-const FileLogs = () => {
+const FileLogs = ({ className }: { className?: string }) => {
     const {
         logs,
         loading: logsLoading,
@@ -90,7 +91,7 @@ const FileLogs = () => {
     }
 
     return (
-        <div className="flex h-full flex-col">
+        <div className={classNames('flex h-full flex-col', className)}>
             <LogControls
                 filters={filters}
                 viewMode={viewMode}
