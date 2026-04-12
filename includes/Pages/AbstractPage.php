@@ -13,8 +13,8 @@ abstract class AbstractPage implements Pageable, Hookable {
      *
      * @return void
      */
-    public function register_hooks(): void {
-        if ( ! is_admin() ) {
+    public function register_hooks( $force = false ): void {
+        if ( ! is_admin() && ! $force ) {
             return;
         }
 
