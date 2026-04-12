@@ -56,12 +56,13 @@ class SwaggerPage extends AbstractPage {
             debug_suite_template(
                 'swagger',
                 [
-					'base_api'   => $base_api,
-					'schema_url' => $schema_url,
-					'docs_path'  => $docs_path,
-					'title'      => $title,
-					'logo_url'   => $logo_url,
-                    'namespaces' => SwaggerService::get_namespaces(),
+					'base_api'          => $base_api,
+					'schema_url'        => $schema_url,
+					'docs_path'         => $docs_path,
+					'title'             => $title,
+					'logo_url'          => $logo_url,
+                    'namespaces'        => SwaggerService::get_namespaces(),
+                    'current_namespace' => SwaggerService::get_clean_namespace(),
 				]
             );
             exit;

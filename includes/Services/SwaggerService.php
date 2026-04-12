@@ -22,17 +22,22 @@ class SwaggerService implements ServiceInterface {
 
     public function swagger() {
 
-        global $wp_version;
-
         $logo_url = get_site_icon_url();
         if ( ! $logo_url && function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
             $logo_url = wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' );
         }
 
+        $namespace = self::get_clean_namespace();
+        $version   = '1.0.0';
+
+        if ( preg_match( '/v\d+(?:\.\d+)?/i', $namespace, $matches ) ) {
+            $version = strtolower( $matches[0] );
+        }
+
         $info = [
             'title'       => get_option( 'blogname' ) . ' API',
             'description' => get_option( 'blogdescription' ),
-            'version'     => $wp_version,
+            'version'     => $version,
             'contact'     => [
                 'email' => get_option( 'admin_email' ),
             ],
@@ -91,7 +96,11 @@ class SwaggerService implements ServiceInterface {
     }
 
     public static function get_namespace() {
-        return '/' . trim( get_option( 'debug_suite_swagger_api_basepath', '/dokan/v1' ), '/' );
+        $namespace = isset( $_REQUEST['namespace'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['namespace'] ) ) : '';
+        if ( ! empty( $namespace ) ) {
+            return '/' . trim( $namespace, '/' );
+        }
+        return '/' . trim( get_option( 'debug_suite_swagger_api_basepath', 'wp/v2' ), '/' );
     }
 
     public static function get_clean_namespace() {
@@ -130,7 +139,7 @@ class SwaggerService implements ServiceInterface {
         if ( mb_strpos( $endpoint, '(?P<' ) !== false ) {
             $endpoint = preg_replace_callback(
                 '/\(\?P\<(.*?)>(.*)\)+/',
-                function ( $match ) use ( $endpoint ) {
+                function ( $match ) {
 					return '{' . $match[1] . '}';
 				},
                 $endpoint
@@ -213,6 +222,9 @@ class SwaggerService implements ServiceInterface {
                     $responses = $arg['responses'];
                 }
 
+                $is_public = isset( $arg['permission_callback'] ) && '__return_true' === $arg['permission_callback'];
+                $security  = $is_public ? [] : $this->get_security();
+
                 $conf = [
                     'tags' => $tags,
                     'summary' => isset( $arg['summary'] ) ? $arg['summary'] : '',
@@ -220,7 +232,7 @@ class SwaggerService implements ServiceInterface {
                     'consumes' => $consumes,
                     'produces' => $produces,
                     'parameters' => $parameters,
-                    'security' => $this->get_security(),
+                    'security' => $security,
                     'responses' => $responses,
                 ];
 
@@ -408,11 +420,6 @@ class SwaggerService implements ServiceInterface {
                 'type'        => 'http',
                 'scheme'      => 'basic',
                 'description' => 'Basic Authentication (e.g., using WordPress Application Passwords)',
-            ],
-            // Stoplight also detects `type: 'basic'` if in legacy mode
-            'basicAuthLegacy' => [
-                'type'        => 'basic',
-                'description' => 'Basic Authentication (Legacy Swagger 2.0)',
             ],
         ];
         return apply_filters( 'debug_suite_swagger_api_security_definitions', $definitions );

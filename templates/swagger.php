@@ -7,6 +7,7 @@
  * @var string $schema_url
  * @var string $logo_url
  * @var array $namespaces
+ * @var string $current_namespace
  *
  * @phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedScript
  * @phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
@@ -94,6 +95,34 @@
         flex: 1;
         overflow: hidden;
       }
+      .debug-suite-loader-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        color: #9cb1c6;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      .debug-suite-spinner {
+        animation: rotate 2s linear infinite;
+        width: 40px;
+        height: 40px;
+        margin-bottom: 16px;
+      }
+      .debug-suite-spinner .path {
+        stroke: #6366f1;
+        stroke-linecap: round;
+        animation: dash 1.5s ease-in-out infinite;
+      }
+      @keyframes rotate {
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes dash {
+        0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+        50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+        100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+      }
     </style>
   </head>
   <body>
@@ -108,7 +137,7 @@
         <span style="font-weight: 500;">Select an Namespace</span>
         <select id="schema-selector">
           <?php foreach ( $namespaces as $debug_suite_item ) : ?>
-            <option value="<?php echo esc_attr( user_trailingslashit( home_url( $debug_suite_item . '/schema' ) ) ); ?>">
+            <option value="<?php echo esc_attr( $debug_suite_item ); ?>" <?php selected( $current_namespace, $debug_suite_item ); ?>>
 				      <?php echo esc_html( $debug_suite_item ); ?>
             </option>
           <?php endforeach; ?>
@@ -118,11 +147,18 @@
         <span>Powered by Debug Suite</span>
       </div>
     </div>
-    <div id="docs-container"></div>
+    <div id="docs-container">
+      <div class="debug-suite-loader-wrapper">
+        <svg class="debug-suite-spinner" viewBox="0 0 50 50">
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+        </svg>
+        <p>Loading API Schema...</p>
+      </div>
+    </div>
     <script>
       (function () {
         
-        const schema_url = '<?php echo esc_js( $schema_url ); ?>';
+        const base_schema_url = '<?php echo esc_js( $schema_url ); ?>';
         // Dynamically calculate the base path to gracefully handle reverse proxies
         let currentPath = window.location.pathname;
         let targetPath = '<?php echo esc_js( $docs_path ); ?>';
@@ -131,14 +167,60 @@
 
         const selector = document.getElementById('schema-selector');
         const container = document.getElementById('docs-container');
+        
         // Function to render the elements-api instance for a specific schema
-        function renderDocs(schemaUrl) {
-            container.innerHTML = '<elements-api router="history" layout="sidebar" basePath="' + basePath + '"></elements-api>';
-            const apiElement = container.querySelector('elements-api');
-            apiElement.apiDescriptionUrl = schemaUrl;
+        async function renderDocs(schemaUrl) {
+            container.innerHTML = `
+              <div class="debug-suite-loader-wrapper">
+                <svg class="debug-suite-spinner" viewBox="0 0 50 50">
+                  <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                </svg>
+                <p>Loading API Schema...</p>
+              </div>
+            `;
+
+            try {
+                const response = await fetch(schemaUrl);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const schema = await response.json();
+                
+                container.innerHTML = '<elements-api router="history" layout="sidebar" basePath="' + basePath + '"></elements-api>';
+                const apiElement = container.querySelector('elements-api');
+                apiElement.apiDescriptionDocument = schema;
+            } catch (error) {
+                container.innerHTML = `
+                  <div class="debug-suite-loader-wrapper">
+                    <p style="color: #ef4444;">Error loading API schema. Please try again.</p>
+                  </div>
+                `;
+                console.error('Error fetching schema:', error);
+            }
         }
 
-        renderDocs(schema_url);
+        function loadSchemaFromSelector(isInit = false) {
+            let namespace = selector.value;
+            
+            if (isInit) {
+                const storedNamespace = localStorage.getItem('debug_suite_swagger_namespace');
+                if (storedNamespace && Array.from(selector.options).some(opt => opt.value === storedNamespace)) {
+                    namespace = storedNamespace;
+                    selector.value = namespace;
+                }
+            } else {
+                localStorage.setItem('debug_suite_swagger_namespace', namespace);
+            }
+
+            const separator = base_schema_url.indexOf('?') !== -1 ? '&' : '?';
+            const dynamicSchemaUrl = `${base_schema_url}${separator}namespace=${encodeURIComponent(namespace)}`;
+            
+            renderDocs(dynamicSchemaUrl);
+        }
+
+        // Initialize on load
+        loadSchemaFromSelector(true);
+
+        // Re-render on change
+        selector.addEventListener('change', () => loadSchemaFromSelector(false));
       })();
     </script>
   </body>
