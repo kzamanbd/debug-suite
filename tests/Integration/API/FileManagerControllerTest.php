@@ -77,7 +77,7 @@ class FileManagerControllerTest extends DebugSuiteTestCase {
 		$reflection = new ReflectionClass($this->service);
 		$property = $reflection->getProperty('base_path');
 		$property->setAccessible(true); // Make sure we can modify private property
-		$property->setValue($this->service, $this->test_dir);
+		$property->setValue($this->service, trailingslashit( $this->test_dir ) );
 		
 		$this->controller = new FileManagerController( $this->service );
 		
@@ -98,8 +98,8 @@ class FileManagerControllerTest extends DebugSuiteTestCase {
 		$request = new WP_REST_Request( 'GET', '/' . $this->namespace . '/files' );
 		$response = rest_get_server()->dispatch( $request );
 		
-		// WordPress REST API returns 403 for unauthorized access, not 401
-		$this->assertEquals( 403, $response->get_status() );
+		// The custom RestController permissions_check returns 401 when not logged in
+		$this->assertEquals( 401, $response->get_status() );
 	}
 
 	/**
@@ -170,6 +170,7 @@ class FileManagerControllerTest extends DebugSuiteTestCase {
 		$response = rest_get_server()->dispatch( $request );
 		
 		$this->assertEquals( 200, $response->get_status() );
+
 		
 		$data = $response->get_data();
 		$this->assertIsArray( $data );
