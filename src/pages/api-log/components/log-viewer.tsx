@@ -99,7 +99,7 @@ const ApiLogViewer = ({
     }
 
     return (
-        <div className="flex flex-1 flex-col overflow-hidden rounded-lg border bg-white">
+        <div className="flex flex-1 flex-col rounded-lg border bg-white">
             <table className="min-w-full table-fixed divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                     <tr>

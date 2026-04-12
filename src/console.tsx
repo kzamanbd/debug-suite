@@ -1,11 +1,11 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import DebugLog from '@/pages/debug-log';
 import { Slot, SlotFillProvider } from '@wordpress/components';
 import domReady from '@wordpress/dom-ready';
 import { createRoot, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Bug, SquareTerminal } from 'lucide-react';
-import { Button } from './components/base';
+import { Bug, SquareTerminal, X as XIcon } from 'lucide-react';
 import QueryConsole from './pages/query-console';
 import { classNames } from './utils';
 
@@ -16,11 +16,11 @@ const ConsoleApp = () => {
         setOpenModal(true);
     };
 
-    const Renderer = () => {
+    const ContentRenderer = () => {
         if (activeTab === 'query-console') {
             return <QueryConsole />;
         }
-        return <DebugLog className="[&>div]:rounded-none [&>div]:border-t-transparent" />;
+        return <DebugLog />;
     };
 
     return (
@@ -30,29 +30,37 @@ const ConsoleApp = () => {
             </div>
 
             <Dialog open={openModal} onOpenChange={setOpenModal}>
-                <DialogContent fullScreen className="bg-background">
-                    <DialogHeader className="flex flex-row items-center justify-between gap-4 border-b bg-white p-4">
+                <DialogContent fullScreen showCloseButton={false} className="bg-background overflow-hidden">
+                    <DialogHeader className="border-border flex shrink-0 flex-row items-center justify-between gap-4 border-b bg-white p-4">
                         <DialogTitle className="flex items-center gap-4">
                             <Button
-                                variant="text"
+                                variant="ghost"
                                 onClick={() => setActiveTab('query-console')}
                                 className={classNames({ 'text-primary': activeTab === 'query-console' })}>
                                 <SquareTerminal size={20} />
                                 <span>Console</span>
                             </Button>
                             <Button
-                                variant="text"
+                                variant="ghost"
                                 onClick={() => setActiveTab('logs')}
                                 className={classNames({ 'text-primary': activeTab === 'logs' })}>
                                 <Bug size={20} />
                                 <span>Debug Log</span>
                             </Button>
                         </DialogTitle>
-                        <div className="flex flex-wrap items-center gap-2 pr-10">
-                            <Slot name="console-logs-actions" />
+                        <div className="flex items-center gap-4">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <Slot name="console-logs-actions" />
+                            </div>
+                            <DialogClose render={<Button variant="ghost" className="bg-secondary" size="icon-sm" />}>
+                                <XIcon size={16} />
+                                <span className="sr-only">Close</span>
+                            </DialogClose>
                         </div>
                     </DialogHeader>
-                    <div className="bg-background flex-1 overflow-y-auto">{openModal && <Renderer />}</div>
+                    <div className="bg-background min-h-0 flex-1 overflow-y-auto p-4">
+                        {openModal && <ContentRenderer />}
+                    </div>
                 </DialogContent>
             </Dialog>
         </SlotFillProvider>
