@@ -18,7 +18,7 @@ const FileLogsSkeleton = ({ className = '' }: FileLogsSkeletonProps): JSX.Elemen
     return (
         <div className={classNames('space-y-6', className)}>
             {/* Table skeleton */}
-            <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+            <div className="overflow-x-auto rounded-lg border border-t-0 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                     <thead className="bg-gray-50 dark:bg-gray-900">
                         <tr>
