@@ -1,8 +1,8 @@
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from '@/components/ui/dialog';
 import type { DialogModalProps, DialogType, DialogTypeProps } from '@/types';
 import { classNames } from '@/utils';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from 'react';
-import Modal from './modal';
 
 const typeMap: Record<DialogType, DialogTypeProps> = {
     success: {
@@ -112,15 +112,17 @@ const DialogModal: React.FC<DialogModalProps> = ({ title, message, open, options
     const iconClassName = typeMap[type].iconClass || '';
     const buttonClassName = typeMap[type].buttonClass || '';
 
-    const handleClose = () => {
-        if (!allowOutsideClick) return;
-        onClose(false);
+    const handleClose = (isOpen: boolean) => {
+        if (!isOpen) {
+            if (!allowOutsideClick) return;
+            onClose(false);
+        }
     };
 
     return (
-        <Modal open={open} onClose={handleClose} showXButton={false} className="max-w-md">
-            <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-                <Modal.Content>
+        <Dialog open={open} onOpenChange={handleClose}>
+            <DialogContent showCloseButton={false} className="max-w-md p-6">
+                <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                     <div className="sm:flex sm:items-start">
                         <div
                             className={classNames(
@@ -130,39 +132,39 @@ const DialogModal: React.FC<DialogModalProps> = ({ title, message, open, options
                             {currentIcon}
                         </div>
                         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 className="text-base font-semibold text-gray-900">{currentTitle}</h3>
-                            <div className="mt-2">
+                            <DialogTitle className="text-base font-semibold text-gray-900">{currentTitle}</DialogTitle>
+                            <DialogDescription className="mt-2">
                                 <p className="text-sm text-gray-500">{message}</p>
-                            </div>
+                            </DialogDescription>
                         </div>
                     </div>
-                </Modal.Content>
-                <Modal.Footer>
-                    <div className="sm:flex sm:flex-row-reverse">
-                        {showOk && (
-                            <button
-                                type="button"
-                                onClick={() => onClose(true)}
-                                className={classNames(
-                                    'inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-xs sm:ml-3 sm:w-auto',
-                                    buttonClassName
-                                )}>
-                                {okText}
-                            </button>
-                        )}
-                        {showCancel && type === 'confirm' && (
-                            <button
-                                type="button"
-                                data-autofocus
-                                onClick={() => onClose(false)}
-                                className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">
-                                {cancelText}
-                            </button>
-                        )}
-                    </div>
-                </Modal.Footer>
-            </div>
-        </Modal>
+                    <DialogFooter className="mt-4">
+                        <div className="sm:flex sm:flex-row-reverse">
+                            {showOk && (
+                                <button
+                                    type="button"
+                                    onClick={() => onClose(true)}
+                                    className={classNames(
+                                        'inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-xs sm:ml-3 sm:w-auto',
+                                        buttonClassName
+                                    )}>
+                                    {okText}
+                                </button>
+                            )}
+                            {showCancel && type === 'confirm' && (
+                                <button
+                                    type="button"
+                                    data-autofocus
+                                    onClick={() => onClose(false)}
+                                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                                    {cancelText}
+                                </button>
+                            )}
+                        </div>
+                    </DialogFooter>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 
