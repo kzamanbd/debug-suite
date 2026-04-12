@@ -119,7 +119,7 @@ class Admin implements Hookable {
 	 *
 	 * @param WP_Admin_Bar $admin_bar The admin bar instance.
 	 *
-	 * @since DEBUG_SUITE_SINCE
+	 * @since 1.1.2
 	 *
 	 * @return void
 	 */

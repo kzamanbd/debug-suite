@@ -5,7 +5,7 @@ Tags: debug, development, debugging, error-log, developer-tools
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,6 +126,12 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 
 == Changelog ==
 
+= 1.1.2 =
+* feat: add REST API logger/debugger feature
+* refactor(container): restructure container and service provider classes
+* refactor: improve code structure for readability and maintainability
+* chore: update debug bar integration
+
 = 1.1.1 =
 * Fix hook name for email logs table creation in DatabaseManager
 * Use plugin slug when creating email logs table
@@ -150,6 +156,9 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 * Enterprise-grade architecture
 
 == Upgrade Notice ==
+
+= 1.1.2 =
+Introduces REST API logger/debugger feature and improved container service registration. Recommended for all users.
 
 = 1.1.1 =
 Fixes email logs table creation (hook name and plugin slug). Recommended for all 1.1.0 users.
