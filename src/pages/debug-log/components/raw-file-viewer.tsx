@@ -45,7 +45,7 @@ const RawFileViewer = ({ content, loading, onRefresh, selectedFile }: RawFileVie
     }
 
     return (
-        <div className={classNames('flex flex-1 flex-col overflow-hidden rounded-lg border bg-white')}>
+        <div className={classNames('flex flex-1 flex-col rounded-lg border bg-white')}>
             {/* Toolbar */}
             <div className="rounded-t-lg border-b border-gray-200 bg-gray-50 px-4 py-3">
                 <div className="flex items-center justify-between gap-4">

@@ -3,6 +3,7 @@
 namespace DebugSuite;
 
 use DebugSuite\Interfaces\Hookable;
+use WP_Admin_Bar;
 
 /**
  * Admin Service class.
@@ -19,6 +20,7 @@ class Admin implements Hookable {
 	public function register_hooks(): void {
 		add_action( 'admin_init', [ $this, 'handle_activation_redirect' ] );
 		add_action( 'admin_print_scripts', [ $this, 'hide_unrelated_notices' ] );
+		add_action( 'admin_bar_menu', [ $this, 'add_admin_bar_menu' ] );
 	}
 
 	/**
@@ -110,5 +112,31 @@ class Admin implements Hookable {
 				unset( $wp_filter[ $action ]->callbacks[ $priority ][ $name ] );
 			}
 		}
+	}
+
+	/**
+	 * Add custom items to the admin bar.
+	 *
+	 * @param WP_Admin_Bar $admin_bar The admin bar instance.
+	 *
+	 * @since 1.1.2
+	 *
+	 * @return void
+	 */
+	public function add_admin_bar_menu( WP_Admin_Bar $admin_bar ): void {
+		$admin_bar->add_node(
+			[
+				'id'    => 'debug-suite',
+				'parent' => 'top-secondary',
+				'title' => __( 'Debug', 'debug-suite' ),
+			]
+		);
+		wp_enqueue_script( 'debug-console-script' );
+		wp_enqueue_style( 'debug-suite-style' );
+		wp_localize_script(
+			'debug-console-script',
+			'debugSuite',
+			Assets::get_localized_data()
+		);
 	}
 }

@@ -46,6 +46,17 @@ class Assets implements Hookable {
 			];
 		}
 
+		$assets = DEBUG_SUITE_PLUGIN_DIR . 'assets/js/debug-console.asset.php';
+		if ( file_exists( $assets ) ) {
+			$assets = require $assets;
+
+			$scripts['debug-console-script'] = [
+				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/js/debug-console.js',
+				'version' => $assets['version'],
+				'deps'    => $assets['dependencies'],
+			];
+		}
+
 		return apply_filters( 'debug_suite_assets_scripts', $scripts );
 	}
 
@@ -67,7 +78,7 @@ class Assets implements Hookable {
 			$admin_assets = require $admin_assets;
 
 			$styles['debug-suite-style'] = [
-				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/js/debug-suite.css',
+				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/css/debug-suite.css',
 				'version' => $admin_assets['version'],
 				'deps'    => [],
 			];

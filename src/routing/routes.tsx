@@ -1,10 +1,9 @@
-import DebugLog from '@/pages/debug-log';
-import ManageLogs from '@/pages/manage-logs';
 import Feature from '@/pages/feature';
+import FileManager from '@/pages/file-manager';
+import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
 import SetupGuide from '@/pages/settings';
-import FileManager from '@/pages/file-manager';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
@@ -37,12 +36,6 @@ const routes: DebugSuiteRoute[] = [
         description: __('Manage files and directories on your server.', 'debug-suite'),
         path: '/file-manager',
         element: <FileManager />
-    },
-    {
-        id: 'debug-log',
-        title: __('Debug Log', 'debug-suite'),
-        path: '/debug-log',
-        element: <DebugLog />
     },
     {
         id: 'file-logs-manage',

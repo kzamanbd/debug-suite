@@ -1,8 +1,12 @@
 {
-    "intelephense.environment.includePaths": ["../../../../"],
-    "php.workspace.includePath": "../../../../",
+    "intelephense.environment.includePaths": ["../../../"],
+    "php.workspace.includePath": "../../../",
     "editor.formatOnSave": true,
     "phpSniffer.autoDetect": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "explicit"
+    },
     "[php]": {
         "editor.defaultFormatter": "wongjn.php-sniffer"
     },
