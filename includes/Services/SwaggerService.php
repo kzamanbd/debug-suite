@@ -16,6 +16,10 @@ class SwaggerService implements ServiceInterface {
         return apply_filters( 'debug_suite_swagger_api_rewrite_api_base', 'debug-api' );
     }
 
+    public static function get_namespaces() {
+        return rest_get_server()->get_namespaces();
+    }
+
     public function swagger() {
 
         global $wp_version;

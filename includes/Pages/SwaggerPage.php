@@ -8,9 +8,9 @@ class SwaggerPage extends AbstractPage {
 
     public function register_hooks( $force = true ): void {
         parent::register_hooks( $force );
-        add_filter( 'init', [ $this, 'routes' ] );
-        add_action( 'template_redirect', [ $this, 'render_template' ] );
         add_action( 'wp', [ $this, 'swagger_schema' ] );
+        add_filter( 'init', [ $this, 'rewrite_routes' ] );
+        add_action( 'template_redirect', [ $this, 'render_template' ] );
         add_filter( 'redirect_canonical', [ $this, 'disable_canonical_redirect' ], 10, 2 );
     }
 
@@ -21,7 +21,7 @@ class SwaggerPage extends AbstractPage {
         return $redirect_url;
     }
 
-    public function routes() {
+    public function rewrite_routes() {
         $base = SwaggerService::rewrite_base_api();
         add_rewrite_tag( '%debug-suite-swagger%', '([^&]+)' );
         add_rewrite_rule( '^' . $base . '/docs/?(.*)?', 'index.php?debug-suite-swagger=docs', 'top' );
@@ -48,23 +48,22 @@ class SwaggerPage extends AbstractPage {
             $schema_url = user_trailingslashit( home_url( $base_api . '/schema' ) );
             $docs_path  = user_trailingslashit( '/' . $base_api . '/docs' );
             $title      = get_bloginfo( 'name' );
+            $logo_url = get_site_icon_url();
+            if ( ! $logo_url && function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
+                $logo_url = wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' );
+            }
 
-            $service = new SwaggerService();
-
-            // Allow extending schemas via filter
-            $schemas = apply_filters(
-                'debug_suite_swagger_schemas',
+            debug_suite_template(
+                'swagger',
                 [
-					'default' => [
-						'name' => __( 'WP REST API', 'debug-suite' ),
-						'data' => $service->swagger(),
-					],
+					'base_api'   => $base_api,
+					'schema_url' => $schema_url,
+					'docs_path'  => $docs_path,
+					'title'      => $title,
+					'logo_url'   => $logo_url,
+                    'namespaces' => SwaggerService::get_namespaces(),
 				]
             );
-
-            $schemas_json = wp_json_encode( $schemas );
-
-            include dirname( __DIR__, 2 ) . '/templates/swagger.php';
             exit;
         }
     }

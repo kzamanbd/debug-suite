@@ -14,7 +14,6 @@
  * @author     Kamruzzaman <kzamanbn@gmail.com>
  */
 
-use DebugSuite\Core\Container\ServiceManager;
 use DebugSuite\Services\FeatureService;
 
 if ( ! function_exists( 'debug_suite' ) ) {
@@ -83,5 +82,29 @@ if ( ! function_exists( 'debug_suite_is_feature_enabled' ) ) {
 		return array_key_exists( $feature_id, $saved )
 			? (bool) $saved[ $feature_id ]
 			: ( isset( $defaults[ $feature_id ] ) ? $defaults[ $feature_id ] : false );
+	}
+}
+
+if ( ! function_exists( 'debug_suite_template' ) ) {
+	/**
+	 * Render a template file with variables.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $template_name Name of the template file without extension (e.g. 'swagger').
+	 * @param array  $context       Array of variables to extract into the template.
+	 *
+	 * @return void
+	 */
+	function debug_suite_template( string $template_name, array $context = [] ): void {
+		if ( ! empty( $context ) ) {
+			extract( $context ); // phpcs:ignore
+		}
+
+		$template_path = DEBUG_SUITE_PLUGIN_DIR . 'templates/' . ltrim( $template_name, '/' ) . '.php';
+
+		if ( file_exists( $template_path ) ) {
+			include $template_path;
+		}
 	}
 }

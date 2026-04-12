@@ -4,7 +4,9 @@
  *
  * @var string $title
  * @var string $docs_path
- * @var string $schemas_json
+ * @var string $schema_url
+ * @var string $logo_url
+ * @var array $namespaces
  *
  * @phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedScript
  * @phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
@@ -98,18 +100,19 @@
     <div id="docs-header">
       <div class="docs-header-left">
         <h1>
-          <?php
-			$logo_url = get_site_icon_url() ?: ( function_exists( 'has_custom_logo' ) && has_custom_logo() ? wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' ) : '' );
-			if ( $logo_url ) {
-				echo '<img src="' . esc_url( $logo_url ) . '" width="24" alt="Logo">';
-			}
-			?>
+          <?php echo '<img src="' . esc_url( $logo_url ) . '" width="24" alt="Logo">'; ?>
           <?php echo esc_html( $title ); ?> <!-- API Docs -->
         </h1>
       </div>
       <div class="docs-header-center">
-        <span style="font-weight: 500;">Select an Example</span>
-        <select id="schema-selector"></select>
+        <span style="font-weight: 500;">Select an Namespace</span>
+        <select id="schema-selector">
+          <?php foreach ( $namespaces as $debug_suite_item ) : ?>
+            <option value="<?php echo esc_attr( user_trailingslashit( home_url( $debug_suite_item . '/schema' ) ) ); ?>">
+				      <?php echo esc_html( $debug_suite_item ); ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
       </div>
       <div class="docs-header-right">
         <span>Powered by Debug Suite</span>
@@ -118,10 +121,8 @@
     <div id="docs-container"></div>
     <script>
       (function () {
-        // Parse schemas provided by PHP
-        const schemas = <?php echo $schemas_json; ?>;
-        const schemaKeys = Object.keys(schemas);
         
+        const schema_url = '<?php echo esc_js( $schema_url ); ?>';
         // Dynamically calculate the base path to gracefully handle reverse proxies
         let currentPath = window.location.pathname;
         let targetPath = '<?php echo esc_js( $docs_path ); ?>';
@@ -130,37 +131,14 @@
 
         const selector = document.getElementById('schema-selector');
         const container = document.getElementById('docs-container');
-
-        // Populate dropdown
-        schemaKeys.forEach(key => {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = schemas[key].name;
-            selector.appendChild(option);
-        });
-
         // Function to render the elements-api instance for a specific schema
-        function renderDocs(schemaKey) {
-            const schemaData = schemas[schemaKey].data;
+        function renderDocs(schemaUrl) {
             container.innerHTML = '<elements-api router="history" layout="sidebar" basePath="' + basePath + '"></elements-api>';
             const apiElement = container.querySelector('elements-api');
-            apiElement.apiDescriptionDocument = schemaData;
+            apiElement.apiDescriptionUrl = schemaUrl;
         }
 
-        // Render default (first available)
-        if (schemaKeys.length > 0) {
-            renderDocs(schemaKeys[0]);
-        } else {
-            // Fallback in case the array is empty
-            container.innerHTML = '<p style="padding: 24px; font-family: sans-serif;">No API Schemas available.</p>';
-            selector.disabled = true;
-        }
-
-        // Listen for dropdown changes
-        selector.addEventListener('change', function(e) {
-            renderDocs(e.target.value);
-            // Optionally update URL/history if desired
-        });
+        renderDocs(schema_url);
       })();
     </script>
   </body>
