@@ -1,5 +1,6 @@
-import ManageLogs from '@/pages/manage-logs';
 import Feature from '@/pages/feature';
+import FileManager from '@/pages/file-manager';
+import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
 import SetupGuide from '@/pages/settings';
@@ -28,6 +29,13 @@ const routes: DebugSuiteRoute[] = [
         description: __('Monitor your WordPress debug activity and system performance.', 'debug-suite'),
         path: '/',
         element: <Overview />
+    },
+    {
+        id: 'file-manager',
+        title: __('File Manager', 'debug-suite'),
+        description: __('Manage files and directories on your server.', 'debug-suite'),
+        path: '/file-manager',
+        element: <FileManager />
     },
     {
         id: 'file-logs-manage',

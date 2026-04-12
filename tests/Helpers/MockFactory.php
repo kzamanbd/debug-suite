@@ -94,6 +94,34 @@ class MockFactory {
 	}
 
 	/**
+	 * Create a file manager service.
+	 *
+	 * @return mixed
+	 */
+	public function create_file_manager_service() {
+		// Create a minimal implementation using anonymous class
+		return new class {
+			public function get_directory_tree( string $path = '', array $options = [] ) {
+				return ServiceResponse::success([
+					'path' => $path,
+					'files' => [],
+				]);
+			}
+			
+			public function get_file_contents( string $path ) {
+				return ServiceResponse::success([
+					'content' => '',
+					'path' => $path,
+				]);
+			}
+			
+			public function save_file_contents( string $path, string $content, array $options = [] ) {
+				return ServiceResponse::success();
+			}
+		};
+	}
+
+	/**
 	 * Create a settings service.
 	 *
 	 * @return mixed

@@ -24,6 +24,7 @@ use DebugSuite\Services\FeatureService;
 use DebugSuite\Services\SettingsService;
 use DebugSuite\Pages\PageManager;
 use DebugSuite\Pages\Feature;
+use DebugSuite\Services\FileManagerService;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -52,6 +53,7 @@ class AppServiceProvider extends BaseServiceProvider {
 		FeatureService::class,
 		PageManager::class,
 		Feature::class,
+		FileManagerService::class,
 	];
 
 	public function register(): void {

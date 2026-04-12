@@ -19,6 +19,8 @@ use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\FeatureService;
 use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;
+use DebugSuite\Services\FileManagerService;
+use DebugSuite\API\FileManagerController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -37,10 +39,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class RestRouteProvider extends BaseServiceProvider {
 
 	protected array $provides = [
-		LogsController::class      => LogsService::class,
-		SettingsController::class  => SettingsService::class,
-		OverviewController::class  => OverviewService::class,
-		FeatureController::class   => FeatureService::class,
+		LogsController::class           => LogsService::class,
+		SettingsController::class       => SettingsService::class,
+		OverviewController::class       => OverviewService::class,
+		FeatureController::class        => FeatureService::class,
+		FileManagerController::class    => FileManagerService::class,
 	];
 
 	public function register(): void {
