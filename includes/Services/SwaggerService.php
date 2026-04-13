@@ -78,13 +78,6 @@ class SwaggerService implements ServiceInterface {
             ],
         ];
 
-        if ( $logo_url ) {
-            $info['x-logo'] = [
-                'url'     => $logo_url,
-                'altText' => get_option( 'blogname' ) . ' Logo',
-            ];
-        }
-
         $schema = [
             'openapi' => '3.0.0',
             'info' => $info,

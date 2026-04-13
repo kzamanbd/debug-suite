@@ -8,6 +8,7 @@
  * @var string $logo_url
  * @var array $namespaces
  * @var string $current_namespace
+ * @var string $debug_suite_favicon_url
  *
  * @phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedScript
  * @phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
@@ -19,6 +20,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title><?php echo esc_html( $title ); ?> API Docs</title>
+    <?php if ( $debug_suite_favicon_url ) : ?>
+      <link rel="icon" href="<?php echo esc_url( $debug_suite_favicon_url ); ?>" sizes="32x32">
+      <link rel="apple-touch-icon" href="<?php echo esc_url( $debug_suite_favicon_url ); ?>">
+    <?php endif; ?>
     <!-- We do not use wp_head() or wp_footer() here to intentionally strip out any theme/plugin CSS and JS -->
     <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">

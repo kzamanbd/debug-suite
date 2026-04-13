@@ -55,6 +55,11 @@ class SwaggerPage extends AbstractPage {
             if ( ! $logo_url && function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
                 $logo_url = wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' );
             }
+            $debug_suite_favicon_url = get_site_icon_url( 32 );
+
+			if ( ! $debug_suite_favicon_url && function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
+				$debug_suite_favicon_url = wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' );
+			}
 
             debug_suite_template(
                 'swagger',
@@ -66,6 +71,7 @@ class SwaggerPage extends AbstractPage {
 					'logo_url'          => $logo_url,
                     'namespaces'        => SwaggerService::get_namespaces(),
                     'current_namespace' => SwaggerService::get_clean_namespace(),
+                    'debug_suite_favicon_url' => $debug_suite_favicon_url,
 				]
             );
             exit;
