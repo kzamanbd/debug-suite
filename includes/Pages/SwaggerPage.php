@@ -6,10 +6,9 @@ use DebugSuite\Services\SwaggerService;
 
 class SwaggerPage extends AbstractPage {
 
-    public function register_hooks( $force = true ): void {
+    public function register_hooks( $force = false ): void {
         parent::register_hooks( $force );
-        add_action( 'wp', [ $this, 'swagger_schema' ] );
-        add_filter( 'init', [ $this, 'rewrite_routes' ] );
+        add_action( 'init', [ $this, 'rewrite_routes' ] );
         add_action( 'template_redirect', [ $this, 'render_template' ] );
         add_filter( 'redirect_canonical', [ $this, 'disable_canonical_redirect' ], 10, 2 );
     }
@@ -21,11 +20,11 @@ class SwaggerPage extends AbstractPage {
         return $redirect_url;
     }
 
-    public function rewrite_routes() {
-        $base = SwaggerService::rewrite_base_api();
+    public static function rewrite_routes() {
+        $base = preg_quote( SwaggerService::rewrite_base_api(), '/' );
         add_rewrite_tag( '%debug-suite-swagger%', '([^&]+)' );
-        add_rewrite_rule( '^' . $base . '/docs/?(.*)?', 'index.php?debug-suite-swagger=docs', 'top' );
-        add_rewrite_rule( '^' . $base . '/schema/?', 'index.php?debug-suite-swagger=schema', 'top' );
+        add_rewrite_rule( '^' . $base . '/docs/?$', 'index.php?debug-suite-swagger=docs', 'top' );
+        add_rewrite_rule( '^' . $base . '/schema/?$', 'index.php?debug-suite-swagger=schema', 'top' );
     }
 
     public function swagger_schema() {
@@ -41,6 +40,10 @@ class SwaggerPage extends AbstractPage {
 
         if ( ! $view ) {
             return;
+        }
+
+        if ( 'schema' === $view ) {
+            $this->swagger_schema();
         }
 
         if ( 'docs' === $view ) {

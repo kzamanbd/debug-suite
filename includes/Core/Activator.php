@@ -8,6 +8,7 @@
 namespace DebugSuite\Core;
 
 use DebugSuite\Install;
+use DebugSuite\Pages\SwaggerPage;
 
 /**
  * Plugin activation handler for Debug Suite.
@@ -37,5 +38,9 @@ class Activator {
 
 		// Install database tables
 		Install::do_install();
+
+		// Register Swagger rewrite rules before flushing.
+		SwaggerPage::rewrite_routes();
+		flush_rewrite_rules( false );
 	}
 }

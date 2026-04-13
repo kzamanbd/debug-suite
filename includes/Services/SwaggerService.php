@@ -12,15 +12,50 @@ use DebugSuite\Interfaces\ServiceInterface;
 
 class SwaggerService implements ServiceInterface {
 
+    /**
+     * Cached schema documents for the current request.
+     *
+     * @var array<string, array>
+     */
+    private static array $schema_cache = [];
+
+    /**
+     * Cached namespace lists for the current request.
+     *
+     * @var array<string, array<string>>
+     */
+    private static array $namespace_cache = [];
+
     public static function rewrite_base_api() {
         return apply_filters( 'debug_suite_swagger_api_rewrite_api_base', 'debug-api' );
     }
 
     public static function get_namespaces() {
-        return rest_get_server()->get_namespaces();
+        $cache_key = self::get_namespace_cache_key();
+
+        if ( isset( self::$namespace_cache[ $cache_key ] ) ) {
+            return self::$namespace_cache[ $cache_key ];
+        }
+
+        $namespaces = rest_get_server()->get_namespaces();
+        self::$namespace_cache[ $cache_key ] = $namespaces;
+
+        return $namespaces;
     }
 
     public function swagger() {
+        $cache_key = $this->get_schema_cache_key();
+
+        if ( isset( self::$schema_cache[ $cache_key ] ) ) {
+            return self::$schema_cache[ $cache_key ];
+        }
+
+        $cached_schema = get_transient( $cache_key );
+        if ( false !== $cached_schema && is_array( $cached_schema ) ) {
+            self::$schema_cache[ $cache_key ] = $cached_schema;
+
+            return $cached_schema;
+        }
 
         $logo_url = get_site_icon_url();
         if ( ! $logo_url && function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
@@ -50,7 +85,7 @@ class SwaggerService implements ServiceInterface {
             ];
         }
 
-        return [
+        $schema = [
             'openapi' => '3.0.0',
             'info' => $info,
             'host' => $this->get_host(),
@@ -66,6 +101,44 @@ class SwaggerService implements ServiceInterface {
                 'securitySchemes' => $this->security_definitions(),
             ],
         ];
+
+        self::$schema_cache[ $cache_key ] = $schema;
+        set_transient( $cache_key, $schema, HOUR_IN_SECONDS );
+
+        return $schema;
+    }
+
+    private static function get_namespace_cache_key(): string {
+        return md5(
+            implode(
+                '|',
+                [
+                    self::get_namespace(),
+                    get_option( 'blogname' ),
+                    get_option( 'debug_suite_swagger_api_basepath', 'wp/v2' ),
+                    home_url(),
+                ]
+            )
+        );
+    }
+
+    private function get_schema_cache_key(): string {
+        return 'debug_suite_swagger_schema_' . md5(
+            implode(
+                '|',
+                [
+                    self::get_namespace(),
+                    DEBUG_SUITE_VERSION,
+                    home_url(),
+                    rest_get_url_prefix(),
+                    get_option( 'blogname' ),
+                    get_option( 'blogdescription' ),
+                    get_option( 'admin_email' ),
+                    (string) get_option( 'site_icon' ),
+                    (string) get_theme_mod( 'custom_logo' ),
+                ]
+            )
+        );
     }
 
     public function get_host() {
@@ -83,7 +156,7 @@ class SwaggerService implements ServiceInterface {
 
     public function get_base_path() {
         $path = parse_url( home_url(), PHP_URL_PATH );
-        return rtrim( $path, '/' ) . '/' . ltrim( rest_get_url_prefix(), '/' );
+        return rtrim( $path ?? '', '/' ) . '/' . ltrim( rest_get_url_prefix(), '/' );
     }
 
     public function get_schemes() {
