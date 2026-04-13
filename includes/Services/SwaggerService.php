@@ -38,6 +38,15 @@ class SwaggerService implements ServiceInterface {
         }
 
         $namespaces = rest_get_server()->get_namespaces();
+        usort(
+            $namespaces,
+            function ( $a, $b ) {
+				$a_prefix = explode( '/', $a )[0];
+				$b_prefix = explode( '/', $b )[0];
+
+				return [ $a_prefix, $a ] <=> [ $b_prefix, $b ];
+			}
+        );
         self::$namespace_cache[ $cache_key ] = $namespaces;
 
         return $namespaces;

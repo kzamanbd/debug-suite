@@ -6,7 +6,7 @@ use DebugSuite\Services\SwaggerService;
 
 class SwaggerPage extends AbstractPage {
 
-    public function register_hooks( $force = false ): void {
+    public function register_hooks( $force = true ): void {
         parent::register_hooks( $force );
         add_action( 'init', [ $this, 'rewrite_routes' ] );
         add_action( 'template_redirect', [ $this, 'render_template' ] );
@@ -23,7 +23,7 @@ class SwaggerPage extends AbstractPage {
     public static function rewrite_routes() {
         $base = preg_quote( SwaggerService::rewrite_base_api(), '/' );
         add_rewrite_tag( '%debug-suite-swagger%', '([^&]+)' );
-        add_rewrite_rule( '^' . $base . '/docs/?$', 'index.php?debug-suite-swagger=docs', 'top' );
+        add_rewrite_rule( '^' . $base . '/docs(?:/.*)?$', 'index.php?debug-suite-swagger=docs', 'top' );
         add_rewrite_rule( '^' . $base . '/schema/?$', 'index.php?debug-suite-swagger=schema', 'top' );
     }
 
