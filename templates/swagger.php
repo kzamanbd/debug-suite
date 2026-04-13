@@ -135,7 +135,7 @@
       <div class="docs-header-left">
         <h1>
           <?php echo '<img src="' . esc_url( $logo_url ) . '" width="24" alt="Logo">'; ?>
-          <?php echo esc_html( $title ); ?> <!-- API Docs -->
+          <span id="swagger-title"><?php echo esc_html( $title ); ?></span>
         </h1>
       </div>
       <div class="docs-header-center">
@@ -172,6 +172,7 @@
 
         const selector = document.getElementById('schema-selector');
         const container = document.getElementById('docs-container');
+        const titleElement = document.getElementById('swagger-title');
         
         // Function to render the elements-api instance for a specific schema
         async function renderDocs(schemaUrl) {
@@ -188,6 +189,11 @@
                 const response = await fetch(schemaUrl);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const schema = await response.json();
+
+                if (schema?.info?.title && titleElement) {
+                  titleElement.textContent = schema.info.title;
+                  document.title = `${schema.info.title} Docs`;
+                }
                 
                 container.innerHTML = '<elements-api router="history" layout="sidebar" basePath="' + basePath + '"></elements-api>';
                 const apiElement = container.querySelector('elements-api');

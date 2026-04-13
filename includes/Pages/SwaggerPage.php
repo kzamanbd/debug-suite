@@ -10,10 +10,10 @@ class SwaggerPage extends AbstractPage {
         parent::register_hooks( $force );
         add_action( 'init', [ $this, 'rewrite_routes' ] );
         add_action( 'template_redirect', [ $this, 'render_template' ] );
-        add_filter( 'redirect_canonical', [ $this, 'disable_canonical_redirect' ], 10, 2 );
+        add_filter( 'redirect_canonical', [ $this, 'disable_canonical_redirect' ] );
     }
 
-    public function disable_canonical_redirect( $redirect_url, $requested_url ) {
+    public function disable_canonical_redirect( $redirect_url ) {
         if ( get_query_var( 'debug-suite-swagger' ) === 'docs' ) {
             return false;
         }
@@ -50,7 +50,7 @@ class SwaggerPage extends AbstractPage {
             $base_api   = SwaggerService::rewrite_base_api();
             $schema_url = user_trailingslashit( home_url( $base_api . '/schema' ) );
             $docs_path  = user_trailingslashit( '/' . $base_api . '/docs' );
-            $title      = get_bloginfo( 'name' );
+            $title      = SwaggerService::get_info_title( SwaggerService::get_clean_namespace() );
             $logo_url = get_site_icon_url();
             if ( ! $logo_url && function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
                 $logo_url = wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' );
@@ -95,7 +95,7 @@ class SwaggerPage extends AbstractPage {
 	public function menu( string $capability, string $position ): array {
 		return [
             'page_title' => __( 'Debug Suite Swagger Docs', 'debug-suite' ),
-            'menu_title' => __( 'Swagger Docs', 'debug-suite' ),
+            'menu_title' => __( 'API Docs', 'debug-suite' ),
             'capability' => $capability,
             'position'   => $position ?? 30,
             'route'      => home_url( SwaggerService::rewrite_base_api() . '/docs' ),

@@ -27,7 +27,7 @@ class SwaggerService implements ServiceInterface {
     private static array $namespace_cache = [];
 
     public static function rewrite_base_api() {
-        return apply_filters( 'debug_suite_swagger_api_rewrite_api_base', 'debug-api' );
+        return 'debug-api';
     }
 
     public static function get_namespaces() {
@@ -41,6 +41,31 @@ class SwaggerService implements ServiceInterface {
         self::$namespace_cache[ $cache_key ] = $namespaces;
 
         return $namespaces;
+    }
+
+    public static function get_info_title( ?string $namespace = null ): string {
+        $namespace = $namespace ? trim( $namespace, '/' ) : self::get_clean_namespace();
+        $title = get_option( 'blogname' ) . ' API';
+
+        if ( '' === $namespace ) {
+            return $title;
+        }
+
+        $segments = explode( '/', $namespace );
+        $slug = strtolower( trim( $segments[0] ?? '', '/' ) );
+
+        if ( '' === $slug ) {
+            return $title;
+        }
+
+        if ( 'wp' === $slug ) {
+            $title = 'WordPress REST API';
+        } else {
+            $title = trim( preg_replace( '/[-_]+/', ' ', $slug ) );
+            $title = ucwords( $title ) . ' API';
+        }
+
+        return $title;
     }
 
     public function swagger() {
@@ -70,7 +95,7 @@ class SwaggerService implements ServiceInterface {
         }
 
         $info = [
-            'title'       => get_option( 'blogname' ) . ' API',
+            'title'       => self::get_info_title( $namespace ),
             'description' => get_option( 'blogdescription' ),
             'version'     => $version,
             'contact'     => [
