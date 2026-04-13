@@ -84,7 +84,13 @@ class SwaggerPage extends AbstractPage {
 	 * @inheritDoc
 	 */
 	public function menu( string $capability, string $position ): array {
-		return [];
+		return [
+            'page_title' => __( 'Debug Suite Swagger Docs', 'debug-suite' ),
+            'menu_title' => __( 'Swagger Docs', 'debug-suite' ),
+            'capability' => $capability,
+            'position'   => $position ?? 30,
+            'route'      => home_url( SwaggerService::rewrite_base_api() . '/docs' ),
+        ];
 	}
 
 	/**

@@ -206,11 +206,16 @@ class PageManager implements Hookable {
         );
 
 		foreach ( $sorted_menus as $menu ) {
-			$path = str_replace( '#/', '#', 'admin.php?page=' . $slug . '#' . $menu['path'] );
+			if ( filter_var( $menu['path'], FILTER_VALIDATE_URL ) ) {
+				$path = $menu['path'];
+			} else {
+				$path = str_replace( '#/', '#', 'admin.php?page=' . $slug . '#' . $menu['path'] );
+			}
+
 			$submenu[ $slug ][] = [
 				$menu['title'],
 				$capability,
-				$path,
+				$menu['target'] ?? $path,
 			];
 		}
 	}
