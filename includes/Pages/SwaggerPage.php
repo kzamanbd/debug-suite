@@ -81,7 +81,7 @@ class SwaggerPage extends AbstractPage {
     /**
      * Get the ID of the page.
      *
-     * @since 1.0.0
+     * @since DEBUG_SUITE_SINCE
      *
      * @return string
      */
@@ -89,9 +89,11 @@ class SwaggerPage extends AbstractPage {
 		return 'swagger';
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+    /**
+     * @inheritDoc
+     *
+     * @since DEBUG_SUITE_SINCE
+     */
 	public function menu( string $capability, string $position ): array {
 		return [
             'page_title' => __( 'Debug Suite Swagger Docs', 'debug-suite' ),
@@ -102,18 +104,22 @@ class SwaggerPage extends AbstractPage {
         ];
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+    /**
+     * @inheritDoc
+     *
+     * @since DEBUG_SUITE_SINCE
+     */
 	public function settings(): array {
 		return [
             'schema' => user_trailingslashit( home_url( SwaggerService::rewrite_base_api() . '/schema' ) ),
         ];
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+    /**
+     * @inheritDoc
+     *
+     * @since DEBUG_SUITE_SINCE
+     */
 	public function scripts(): array {
         return [ 'debug-suite-swagger' ];
 	}
@@ -121,7 +127,7 @@ class SwaggerPage extends AbstractPage {
     /**
      * Get the styles.
      *
-     * @since 1.0.0
+     * @since DEBUG_SUITE_SINCE
      *
      * @return array<string> An array of style handles.
      */
@@ -129,13 +135,13 @@ class SwaggerPage extends AbstractPage {
         return [];
     }
 
-    /**
-     * Register the page scripts and styles.
-     *
-     * @since 1.0.0
-     *
-     * @return void
-     */
+        /**
+         * Register the page scripts and styles.
+         *
+         * @since DEBUG_SUITE_SINCE
+         *
+         * @return void
+         */
     public function register(): void {
 		wp_register_script(
 			'debug-suite-swagger',

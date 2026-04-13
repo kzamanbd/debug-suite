@@ -43,6 +43,14 @@ class SwaggerService implements ServiceInterface {
         return $namespaces;
     }
 
+    /**
+     * Build a human-readable title for the selected schema namespace.
+     *
+     * @since DEBUG_SUITE_SINCE
+     *
+     * @param string|null $namespace Optional namespace to resolve.
+     * @return string
+     */
     public static function get_info_title( ?string $namespace = null ): string {
         $namespace = $namespace ? trim( $namespace, '/' ) : self::get_clean_namespace();
         $title = get_option( 'blogname' ) . ' API';
