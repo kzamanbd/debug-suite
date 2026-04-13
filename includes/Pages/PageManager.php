@@ -215,7 +215,7 @@ class PageManager implements Hookable {
 			$submenu[ $slug ][] = [
 				$menu['title'],
 				$capability,
-				$menu['target'] ?? $path,
+				$path,
 			];
 		}
 	}
