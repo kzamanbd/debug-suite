@@ -55,7 +55,7 @@ class SwaggerService implements ServiceInterface {
     /**
      * Build a human-readable title for the selected schema namespace.
      *
-     * @since DEBUG_SUITE_SINCE
+     * @since 1.1.3
      *
      * @param string|null $namespace Optional namespace to resolve.
      * @return string

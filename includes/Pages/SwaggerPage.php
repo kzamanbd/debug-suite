@@ -84,7 +84,7 @@ class SwaggerPage extends AbstractPage {
     /**
      * Get the ID of the page.
      *
-     * @since DEBUG_SUITE_SINCE
+     * @since 1.1.3
      *
      * @return string
      */
@@ -95,7 +95,7 @@ class SwaggerPage extends AbstractPage {
     /**
      * @inheritDoc
      *
-     * @since DEBUG_SUITE_SINCE
+     * @since 1.1.3
      */
 	public function menu( string $capability, string $position ): array {
 		return [
@@ -110,7 +110,7 @@ class SwaggerPage extends AbstractPage {
     /**
      * @inheritDoc
      *
-     * @since DEBUG_SUITE_SINCE
+     * @since 1.1.3
      */
 	public function settings(): array {
 		return [
@@ -121,7 +121,7 @@ class SwaggerPage extends AbstractPage {
     /**
      * @inheritDoc
      *
-     * @since DEBUG_SUITE_SINCE
+     * @since 1.1.3
      */
 	public function scripts(): array {
         return [ 'debug-suite-swagger' ];
@@ -130,7 +130,7 @@ class SwaggerPage extends AbstractPage {
     /**
      * Get the styles.
      *
-     * @since DEBUG_SUITE_SINCE
+     * @since 1.1.3
      *
      * @return array<string> An array of style handles.
      */
@@ -141,7 +141,7 @@ class SwaggerPage extends AbstractPage {
         /**
          * Register the page scripts and styles.
          *
-         * @since DEBUG_SUITE_SINCE
+         * @since 1.1.3
          *
          * @return void
          */

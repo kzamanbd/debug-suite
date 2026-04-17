@@ -17,9 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * 1.1.2 upgrade class.
  * Resolves previous user notifications and forced updates by refreshing swagger rewrites silently.
  *
- * @since 1.1.2
+ * @since 1.1.3
  */
-class Upgrade_1_1_2 extends AbstractUpgrader { // phpcs:ignore
+class Upgrade_1_1_3 extends AbstractUpgrader { // phpcs:ignore
 
 	/**
 	 * Run the upgrade routine.

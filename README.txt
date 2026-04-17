@@ -5,7 +5,7 @@ Tags: debug, development, debugging, error-log, developer-tools
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,29 +17,30 @@ Debug Suite is a comprehensive WordPress development toolkit that transforms how
 
 = 🚀 Key Features =
 
-* **Advanced Log Management**
-  * Real-time log file monitoring
-  * Configurable log levels and filtering
-  * Searchable log entries with context
-  * Log file rotation and cleanup
+* **Smart Error Log Viewer**
+  * Read your WordPress error logs without ever leaving the dashboard or using FTP.
+  * Say goodbye to messy text files—view errors in a clean, organized, and searchable layout.
+  * Filter by severity (warnings, notices, errors) so you can fix what matters most first.
 
-* **Error Tracking & Debugging**
-  * Detailed error tracking and reporting
-  * Stack trace analysis
-  * Query debugging and optimization
-  * Performance profiling
+* **Outgoing Email Tracker**
+  * Never wonder if a user received a receipt or notification again.
+  * Keep a complete history of every email sent by your WordPress site.
+  * Quickly view recipients, subject lines, contents, and delivery status at a glance.
 
-* **Developer Tools**
-  * Built-in code editor with syntax highlighting
-  * File system management interface
-  * Database query analyzer
-  * REST API debugging tools
+* **API Traffic Monitor**
+  * Keep an eye on the apps, plugins, and external services connecting to your site.
+  * Easily view incoming requests, spot slow responses, and catch connection errors.
+  * Search and filter through your site's API traffic to troubleshoot integrations fast.
 
-* **Modern Architecture**
-  * Dependency injection container
-  * Service layer pattern
-  * React/TypeScript frontend
-  * Enterprise-grade codebase
+* **Interactive API Documentation**
+  * Explore your site's API endpoints through a beautiful, easy-to-read visual interface.
+  * Automatically generates organized documentation for all your different API routes.
+  * Perfect for helping developers and external services understand how to connect to your site.
+
+* **Lightning-Fast & Customizable**
+  * Only use what you need! Turn specific tools on or off with a single click.
+  * Enjoy a smooth, modern experience that never slows down your admin area.
+  * Designed to be lightweight, secure, and completely impact-free on your live website's performance.
 
 = 🎯 Perfect for =
 
@@ -47,20 +48,6 @@ Debug Suite is a comprehensive WordPress development toolkit that transforms how
 * Agency developers managing multiple sites
 * DevOps teams monitoring WordPress installations
 * Site administrators debugging production issues
-
-= 🛡️ Security First =
-
-* Secure by default - strict file permissions
-* Role-based access control
-* Sanitized and escaped data handling
-* WordPress security best practices
-
-= 🔧 Technical Requirements =
-
-* WordPress 5.7 or higher
-* PHP 8.1 or higher
-* Modern browser with JavaScript enabled
-* Write permissions for log directories
 
 = 🌟 Pro Features (Coming Soon) =
 
@@ -126,6 +113,12 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 
 == Changelog ==
 
+= 1.1.3 =
+* feat: added an interactive database upgrader using WP Admin Notices and jQuery AJAX.
+* feat: implemented OOP-based `AbstractUpgrader` framework for repeatable database upgrades.
+* fix: enhanced Swagger UI with improved schema title handling and dynamic API document rendering.
+* fix: added fallback default logo rendering in Swagger UI when none is configured.
+
 = 1.1.2 =
 * feat: add REST API logger/debugger feature
 * refactor(container): restructure container and service provider classes
@@ -156,6 +149,9 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 * Enterprise-grade architecture
 
 == Upgrade Notice ==
+
+= 1.1.3 =
+Introduces robust interactive database upgrader and enhanced Swagger UI documentation support with fallback rendering. Recommended for all users.
 
 = 1.1.2 =
 Introduces REST API logger/debugger feature and improved container service registration. Recommended for all users.

@@ -24,7 +24,7 @@ class Upgrader implements Hookable {
 	 * @var array<string, string>
 	 */
 	private const UPDATES = [
-		'1.1.2' => \DebugSuite\Upgrades\Upgrade_1_1_2::class,
+		'1.1.3' => \DebugSuite\Upgrades\Upgrade_1_1_3::class,
 	];
 
 	/**
