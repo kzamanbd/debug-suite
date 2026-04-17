@@ -62,7 +62,7 @@ final class DebugSuite {
 	*
 	* @var string
 	*/
-	public string $version = '1.1.1';
+	public string $version = '1.1.2';
 
 	/**
 	 * Initialize the Debug Suite plugin.

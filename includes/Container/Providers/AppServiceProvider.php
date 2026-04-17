@@ -15,7 +15,9 @@ use DebugSuite\Admin;
 use DebugSuite\Assets;
 use DebugSuite\Core\DatabaseManager;
 use DebugSuite\Core\HookManager;
+use DebugSuite\Core\Upgrader;
 use DebugSuite\Container\BaseServiceProvider;
+use DebugSuite\Pages\SwaggerPage;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
@@ -46,12 +48,14 @@ class AppServiceProvider extends BaseServiceProvider {
 	protected array $services = [
 		Admin::class,
 		Assets::class,
+		Upgrader::class,
 		HookManager::class,
 		DatabaseManager::class,
 		SettingsService::class,
 		FeatureService::class,
 		PageManager::class,
 		Feature::class,
+		SwaggerPage::class,
 	];
 
 	public function register(): void {
