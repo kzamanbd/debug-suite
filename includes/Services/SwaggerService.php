@@ -27,7 +27,7 @@ class SwaggerService implements ServiceInterface {
     private static array $namespace_cache = [];
 
     public static function rewrite_base_api() {
-        return 'debug-api';
+        return 'debug-suite/api';
     }
 
     public static function get_namespaces() {

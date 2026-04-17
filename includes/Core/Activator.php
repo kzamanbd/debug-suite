@@ -38,8 +38,14 @@ class Activator {
 
 		// Install database tables
 		Install::do_install();
+	}
 
-		// Register Swagger rewrite rules before flushing.
+	/**
+	 * Refresh Swagger rewrite rules on demand.
+	 *
+	 * @return void
+	 */
+	public static function refresh_swagger_rewrite_rules(): void {
 		SwaggerPage::rewrite_routes();
 		flush_rewrite_rules( false );
 	}

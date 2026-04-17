@@ -15,6 +15,7 @@ use DebugSuite\Admin;
 use DebugSuite\Assets;
 use DebugSuite\Core\DatabaseManager;
 use DebugSuite\Core\HookManager;
+use DebugSuite\Core\Upgrader;
 use DebugSuite\Container\BaseServiceProvider;
 use DebugSuite\Pages\SwaggerPage;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
@@ -47,6 +48,7 @@ class AppServiceProvider extends BaseServiceProvider {
 	protected array $services = [
 		Admin::class,
 		Assets::class,
+		Upgrader::class,
 		HookManager::class,
 		DatabaseManager::class,
 		SettingsService::class,
