@@ -55,6 +55,9 @@ class SwaggerPage extends AbstractPage {
             if ( ! $logo_url && function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
                 $logo_url = wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' );
             }
+            if ( empty( $logo_url ) ) {
+				$logo_url = DEBUG_SUITE_PLUGIN_URL . 'assets/images/logo.png';
+			}
             $debug_suite_favicon_url = get_site_icon_url( 32 );
 
 			if ( ! $debug_suite_favicon_url && function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
