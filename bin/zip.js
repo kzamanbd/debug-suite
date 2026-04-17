@@ -6,32 +6,27 @@ const pluginFiles = [
     'includes/',
     'override/',
     'languages/',
+    'templates/',
     'vendor/',
     'readme.txt',
     'debug-suite.php',
     'uninstall.php',
-    'composer.json',
+    'composer.json'
 ];
 
-const removeFiles = ['composer.lock'];
+const removeFiles = ['composer.lock', 'composer.json'];
 
 const { version } = JSON.parse(fs.readFileSync('package.json'));
 
 exec(
     'rm -rf *',
     {
-        cwd: 'build',
+        cwd: 'build'
     },
     (error) => {
         if (error) {
-            console.log(
-                '\x1b[33m%s\x1b[0m',
-                `⚠️ Could not find the build directory.`
-            );
-            console.log(
-                '\x1b[32m%s\x1b[0m',
-                `🗂 Creating the build directory ...`
-            );
+            console.log('\x1b[33m%s\x1b[0m', `⚠️ Could not find the build directory.`);
+            console.log('\x1b[32m%s\x1b[0m', `🗂 Creating the build directory ...`);
             // Making build folder.
             fs.mkdirp('build');
         }
@@ -60,18 +55,13 @@ exec(
             },
             (error) => {
                 if (error) {
-                    console.log(
-                        '\x1b[31m%s\x1b[0m',
-                        `❌ Could not install composer in ${dest} directory.`
-                    );
+                    console.log('\x1b[31m%s\x1b[0m', `❌ Could not install composer in ${dest} directory.`);
                     console.log('\x1b[41m\x1b[30m%s\x1b[0m', error);
 
                     return;
                 }
 
-                console.log(
-                    `⚡️ Installed composer packages in ${dest} directory.`
-                );
+                console.log(`⚡️ Installed composer packages in ${dest} directory.`);
 
                 // Removing files that is not needed in the production now.
                 removeFiles.forEach((file) => {
@@ -91,20 +81,14 @@ exec(
                     },
                     (error) => {
                         if (error) {
-                            console.log(
-                                '\x1b[31m%s\x1b[0m',
-                                `❌ Could not make ${zipFile}.`
-                            );
+                            console.log('\x1b[31m%s\x1b[0m', `❌ Could not make ${zipFile}.`);
                             console.log('\x1b[41m\x1b[30m%s\x1b[0m', error);
 
                             return;
                         }
 
                         fs.removeSync(dest);
-                        console.log(
-                            '\x1b[32m%s\x1b[0m',
-                            `✅  ${zipFile} is ready. 🎉`
-                        );
+                        console.log('\x1b[32m%s\x1b[0m', `✅  ${zipFile} is ready. 🎉`);
                     }
                 );
             }
