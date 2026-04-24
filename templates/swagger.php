@@ -135,7 +135,7 @@
       <div class="docs-header-left">
         <h1>
           <?php echo '<img src="' . esc_url( $logo_url ) . '" width="24" alt="Logo">'; ?>
-          <span id="swagger-title"><?php echo esc_html( $title ); ?></span>
+          <a href="/" id="swagger-title"><?php echo esc_html( $title ); ?></a>
         </h1>
       </div>
       <div class="docs-header-center">

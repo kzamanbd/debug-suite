@@ -529,6 +529,12 @@ class SwaggerService implements ServiceInterface {
                 'scheme'      => 'basic',
                 'description' => 'Basic Authentication (e.g., using WordPress Application Passwords)',
             ],
+            'bearerAuth' => [
+                'type'         => 'http',
+                'scheme'       => 'bearer',
+                'bearerFormat' => 'JWT',
+                'description'  => 'Bearer token authentication (e.g., JWT or OAuth access token). Provide the token without the "Bearer " prefix.',
+            ],
         ];
         return apply_filters( 'debug_suite_swagger_api_security_definitions', $definitions );
     }
