@@ -25,8 +25,7 @@
       <link rel="apple-touch-icon" href="<?php echo esc_url( $debug_suite_favicon_url ); ?>">
     <?php endif; ?>
     <!-- We do not use wp_head() or wp_footer() here to intentionally strip out any theme/plugin CSS and JS -->
-    <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
     <style>
       body,
       html {
@@ -93,7 +92,7 @@
         transition: border-color 0.2s;
       }
       .docs-header a {
-        color: white;
+        color: white !important;
       }
       #docs-header select:hover,
       #docs-header select:focus {
@@ -101,7 +100,14 @@
       }
       #docs-container {
         flex: 1;
-        overflow: hidden;
+        overflow: auto;
+        background: #ffffff;
+      }
+      #scalar-target {
+        height: 100%;
+      }
+      .docs-header a {
+        color: white;
       }
       .debug-suite-loader-wrapper {
         display: flex;
@@ -165,28 +171,31 @@
     </div>
     <script>
       (function () {
-        
         const base_schema_url = '<?php echo esc_js( $schema_url ); ?>';
-        // Dynamically calculate the base path to gracefully handle reverse proxies
-        let currentPath = window.location.pathname;
-        let targetPath = '<?php echo esc_js( $docs_path ); ?>';
-        let matchIndex = currentPath.indexOf(targetPath);
-        let basePath = matchIndex !== -1 ? currentPath.substring(0, matchIndex + targetPath.length) : currentPath;
 
         const selector = document.getElementById('schema-selector');
         const container = document.getElementById('docs-container');
         const titleElement = document.getElementById('openapi-title');
-        
-        // Function to render the elements-api instance for a specific schema
-        async function renderDocs(schemaUrl) {
+
+        const LOADER_HTML = `
+          <div class="debug-suite-loader-wrapper">
+            <svg class="debug-suite-spinner" viewBox="0 0 50 50">
+              <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
+            <p>Loading API Schema...</p>
+          </div>
+        `;
+
+        function renderError(message) {
             container.innerHTML = `
               <div class="debug-suite-loader-wrapper">
-                <svg class="debug-suite-spinner" viewBox="0 0 50 50">
-                  <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-                </svg>
-                <p>Loading API Schema...</p>
+                <p style="color: #ef4444;">${message}</p>
               </div>
             `;
+        }
+
+        async function renderDocs(schemaUrl) {
+            container.innerHTML = LOADER_HTML;
 
             try {
                 const response = await fetch(schemaUrl);
@@ -194,26 +203,33 @@
                 const schema = await response.json();
 
                 if (schema?.info?.title && titleElement) {
-                  titleElement.textContent = schema.info.title;
-                  document.title = `${schema.info.title} Docs`;
+                    titleElement.textContent = schema.info.title;
+                    document.title = `${schema.info.title} Docs`;
                 }
-                
-                container.innerHTML = '<elements-api router="history" layout="sidebar" basePath="' + basePath + '"></elements-api>';
-                const apiElement = container.querySelector('elements-api');
-                apiElement.apiDescriptionDocument = schema;
+
+                if (typeof window.Scalar?.createApiReference !== 'function') {
+                    renderError('Scalar API Reference failed to load. Please refresh the page.');
+                    return;
+                }
+
+                container.innerHTML = '<div id="scalar-target"></div>';
+                window.Scalar.createApiReference('#scalar-target', {
+                    content: schema,
+                    layout: 'modern',
+                    theme: 'default',
+                    hideDarkModeToggle: false,
+                    hideClientButton: false,
+                    showSidebar: true,
+                });
             } catch (error) {
-                container.innerHTML = `
-                  <div class="debug-suite-loader-wrapper">
-                    <p style="color: #ef4444;">Error loading API schema. Please try again.</p>
-                  </div>
-                `;
+                renderError('Error loading API schema. Please try again.');
                 console.error('Error fetching schema:', error);
             }
         }
 
         function loadSchemaFromSelector(isInit = false) {
             let namespace = selector.value;
-            
+
             if (isInit) {
                 const storedNamespace = localStorage.getItem('debug_suite_openapi_namespace');
                 if (storedNamespace && Array.from(selector.options).some(opt => opt.value === storedNamespace)) {
@@ -226,7 +242,7 @@
 
             const separator = base_schema_url.indexOf('?') !== -1 ? '&' : '?';
             const dynamicSchemaUrl = `${base_schema_url}${separator}namespace=${encodeURIComponent(namespace)}`;
-            
+
             renderDocs(dynamicSchemaUrl);
         }
 
