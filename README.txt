@@ -116,8 +116,8 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 = 1.1.3 =
 * feat: added an interactive database upgrader using WP Admin Notices and jQuery AJAX.
 * feat: implemented OOP-based `AbstractUpgrader` framework for repeatable database upgrades.
-* fix: enhanced Swagger UI with improved schema title handling and dynamic API document rendering.
-* fix: added fallback default logo rendering in Swagger UI when none is configured.
+* fix: enhanced OpenAPI docs with improved schema title handling and dynamic API document rendering.
+* fix: added fallback default logo rendering in the OpenAPI docs when none is configured.
 
 = 1.1.2 =
 * feat: add REST API logger/debugger feature
@@ -151,7 +151,7 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 == Upgrade Notice ==
 
 = 1.1.3 =
-Introduces robust interactive database upgrader and enhanced Swagger UI documentation support with fallback rendering. Recommended for all users.
+Introduces robust interactive database upgrader and enhanced OpenAPI documentation support with fallback rendering. Recommended for all users.
 
 = 1.1.2 =
 Introduces REST API logger/debugger feature and improved container service registration. Recommended for all users.

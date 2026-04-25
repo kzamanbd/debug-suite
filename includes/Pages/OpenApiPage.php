@@ -2,9 +2,9 @@
 
 namespace DebugSuite\Pages;
 
-use DebugSuite\Services\SwaggerService;
+use DebugSuite\Services\OpenApiService;
 
-class SwaggerPage extends AbstractPage {
+class OpenApiPage extends AbstractPage {
 
     public function register_hooks( $force = true ): void {
         parent::register_hooks( $force );
@@ -14,43 +14,43 @@ class SwaggerPage extends AbstractPage {
     }
 
     public function disable_canonical_redirect( $redirect_url ) {
-        if ( get_query_var( 'debug-suite-swagger' ) === 'docs' ) {
+        if ( get_query_var( 'debug-suite-openapi' ) === 'docs' ) {
             return false;
         }
         return $redirect_url;
     }
 
     public static function rewrite_routes() {
-        $base = preg_quote( SwaggerService::rewrite_base_api(), '/' );
-        add_rewrite_tag( '%debug-suite-swagger%', '([^&]+)' );
-        add_rewrite_rule( '^' . $base . '/docs(?:/.*)?$', 'index.php?debug-suite-swagger=docs', 'top' );
-        add_rewrite_rule( '^' . $base . '/schema/?$', 'index.php?debug-suite-swagger=schema', 'top' );
+        $base = preg_quote( OpenApiService::rewrite_base_api(), '/' );
+        add_rewrite_tag( '%debug-suite-openapi%', '([^&]+)' );
+        add_rewrite_rule( '^' . $base . '/docs(?:/.*)?$', 'index.php?debug-suite-openapi=docs', 'top' );
+        add_rewrite_rule( '^' . $base . '/schema/?$', 'index.php?debug-suite-openapi=schema', 'top' );
     }
 
-    public function swagger_schema() {
-        if ( get_query_var( 'debug-suite-swagger' ) === 'schema' ) {
-            $service = new SwaggerService();
-            $response = $service->swagger();
+    public function render_schema() {
+        if ( get_query_var( 'debug-suite-openapi' ) === 'schema' ) {
+            $service = new OpenApiService();
+            $response = $service->get_schema();
             wp_send_json( $response );
         }
     }
 
     public function render_template() {
-        $view = get_query_var( 'debug-suite-swagger' );
+        $view = get_query_var( 'debug-suite-openapi' );
 
         if ( ! $view ) {
             return;
         }
 
         if ( 'schema' === $view ) {
-            $this->swagger_schema();
+            $this->render_schema();
         }
 
         if ( 'docs' === $view ) {
-            $base_api   = SwaggerService::rewrite_base_api();
+            $base_api   = OpenApiService::rewrite_base_api();
             $schema_url = user_trailingslashit( home_url( $base_api . '/schema' ) );
             $docs_path  = user_trailingslashit( '/' . $base_api . '/docs' );
-            $title      = SwaggerService::get_info_title( SwaggerService::get_clean_namespace() );
+            $title      = OpenApiService::get_info_title( OpenApiService::get_clean_namespace() );
             $logo_url = get_site_icon_url();
             if ( ! $logo_url && function_exists( 'has_custom_logo' ) && has_custom_logo() ) {
                 $logo_url = wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' );
@@ -65,15 +65,15 @@ class SwaggerPage extends AbstractPage {
 			}
 
             debug_suite_template(
-                'swagger',
+                'openapi',
                 [
 					'base_api'          => $base_api,
 					'schema_url'        => $schema_url,
 					'docs_path'         => $docs_path,
 					'title'             => $title,
 					'logo_url'          => $logo_url,
-                    'namespaces'        => SwaggerService::get_namespaces(),
-                    'current_namespace' => SwaggerService::get_clean_namespace(),
+                    'namespaces'        => OpenApiService::get_namespaces(),
+                    'current_namespace' => OpenApiService::get_clean_namespace(),
                     'debug_suite_favicon_url' => $debug_suite_favicon_url,
 				]
             );
@@ -89,7 +89,7 @@ class SwaggerPage extends AbstractPage {
      * @return string
      */
 	public function get_id(): string {
-		return 'swagger';
+		return 'openapi';
 	}
 
     /**
@@ -99,11 +99,11 @@ class SwaggerPage extends AbstractPage {
      */
 	public function menu( string $capability, string $position ): array {
 		return [
-            'page_title' => __( 'Debug Suite Swagger Docs', 'debug-suite' ),
+            'page_title' => __( 'Debug Suite OpenAPI Docs', 'debug-suite' ),
             'menu_title' => __( 'API Docs', 'debug-suite' ),
             'capability' => $capability,
             'position'   => $position ?? 30,
-            'route'      => home_url( SwaggerService::rewrite_base_api() . '/docs' ),
+            'route'      => home_url( OpenApiService::rewrite_base_api() . '/docs' ),
         ];
 	}
 
@@ -113,9 +113,7 @@ class SwaggerPage extends AbstractPage {
      * @since 1.1.3
      */
 	public function settings(): array {
-		return [
-            'schema' => user_trailingslashit( home_url( SwaggerService::rewrite_base_api() . '/schema' ) ),
-        ];
+		return [];
 	}
 
     /**
@@ -124,7 +122,7 @@ class SwaggerPage extends AbstractPage {
      * @since 1.1.3
      */
 	public function scripts(): array {
-        return [ 'debug-suite-swagger' ];
+        return [];
 	}
 
     /**
@@ -138,20 +136,14 @@ class SwaggerPage extends AbstractPage {
         return [];
     }
 
-        /**
-         * Register the page scripts and styles.
-         *
-         * @since 1.1.3
-         *
-         * @return void
-         */
+    /**
+     * Register the page scripts and styles.
+     *
+     * @since 1.1.3
+     *
+     * @return void
+     */
     public function register(): void {
-		wp_register_script(
-			'debug-suite-swagger',
-			DEBUG_SUITE_PLUGIN_URL . 'assets/js/swagger-stoplight.js',
-			[ 'debug-suite-script' ],
-			DEBUG_SUITE_VERSION,
-			true
-		);
+		// do stuff
 	}
 }

@@ -91,7 +91,7 @@ if ( ! function_exists( 'debug_suite_template' ) ) {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $template_name Name of the template file without extension (e.g. 'swagger').
+	 * @param string $template_name Name of the template file without extension (e.g. 'openapi').
 	 * @param array  $context       Array of variables to extract into the template.
 	 *
 	 * @return void

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Swagger service for Debug Suite business logic.
+ * OpenAPI service for Debug Suite business logic.
  *
  * @package DebugSuite
  */
@@ -11,7 +11,7 @@ namespace DebugSuite\Services;
 use DebugSuite\Interfaces\ServiceInterface;
 use Closure;
 
-class SwaggerService implements ServiceInterface {
+class OpenApiService implements ServiceInterface {
 
     /**
      * Cached schema documents for the current request.
@@ -86,7 +86,7 @@ class SwaggerService implements ServiceInterface {
         return $title;
     }
 
-    public function swagger() {
+    public function get_schema() {
         $cache_key = $this->get_schema_cache_key();
 
         if ( isset( self::$schema_cache[ $cache_key ] ) ) {
@@ -151,7 +151,7 @@ class SwaggerService implements ServiceInterface {
                 [
                     self::get_namespace(),
                     get_option( 'blogname' ),
-                    get_option( 'debug_suite_swagger_api_basepath', 'wp/v2' ),
+                    get_option( 'debug_suite_openapi_api_basepath', 'wp/v2' ),
                     home_url(),
                 ]
             )
@@ -159,7 +159,7 @@ class SwaggerService implements ServiceInterface {
     }
 
     private function get_schema_cache_key(): string {
-        return 'debug_suite_swagger_schema_' . md5(
+        return 'debug_suite_openapi_schema_' . md5(
             implode(
                 '|',
                 [
@@ -209,7 +209,7 @@ class SwaggerService implements ServiceInterface {
         if ( ! empty( $namespace ) ) {
             return '/' . trim( $namespace, '/' );
         }
-        return '/' . trim( get_option( 'debug_suite_swagger_api_basepath', 'wp/v2' ), '/' );
+        return '/' . trim( get_option( 'debug_suite_openapi_api_basepath', 'wp/v2' ), '/' );
     }
 
     public static function get_clean_namespace() {
@@ -454,7 +454,7 @@ class SwaggerService implements ServiceInterface {
 
     public function build_params( $param, $mtd, $endpoint, $detail ) {
         /**
-         * When the type is object, SwaggerUI by default add empty `{}` to parameter value
+         * When the type is object, the renderer by default adds empty `{}` to parameter value
          * It's annoying so need to convert to just `string`
          */
         $type = $this->parse_type_object_to_string( $detail['type'] );
@@ -624,7 +624,7 @@ class SwaggerService implements ServiceInterface {
         }
 
         return apply_filters(
-            'debug_suite_swagger_api_responses_' . $method_endpoint,
+            'debug_suite_openapi_responses_' . $method_endpoint,
             $responses,
             $context
         );
@@ -1042,6 +1042,6 @@ class SwaggerService implements ServiceInterface {
                 'description'  => 'Bearer token authentication (e.g., JWT or OAuth access token). Provide the token without the "Bearer " prefix.',
             ],
         ];
-        return apply_filters( 'debug_suite_swagger_api_security_definitions', $definitions );
+        return apply_filters( 'debug_suite_openapi_security_definitions', $definitions );
     }
 }

@@ -17,7 +17,7 @@ use DebugSuite\Core\DatabaseManager;
 use DebugSuite\Core\HookManager;
 use DebugSuite\Core\Upgrader;
 use DebugSuite\Container\BaseServiceProvider;
-use DebugSuite\Pages\SwaggerPage;
+use DebugSuite\Pages\OpenApiPage;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
@@ -55,7 +55,7 @@ class AppServiceProvider extends BaseServiceProvider {
 		FeatureService::class,
 		PageManager::class,
 		Feature::class,
-		SwaggerPage::class,
+		OpenApiPage::class,
 	];
 
 	public function register(): void {

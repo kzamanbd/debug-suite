@@ -8,7 +8,7 @@
 namespace DebugSuite\Core;
 
 use DebugSuite\Install;
-use DebugSuite\Pages\SwaggerPage;
+use DebugSuite\Pages\OpenApiPage;
 
 /**
  * Plugin activation handler for Debug Suite.
@@ -41,12 +41,12 @@ class Activator {
 	}
 
 	/**
-	 * Refresh Swagger rewrite rules on demand.
+	 * Refresh OpenAPI rewrite rules on demand.
 	 *
 	 * @return void
 	 */
-	public static function refresh_swagger_rewrite_rules(): void {
-		SwaggerPage::rewrite_routes();
+	public static function refresh_openapi_rewrite_rules(): void {
+		OpenApiPage::rewrite_routes();
 		flush_rewrite_rules( false );
 	}
 }

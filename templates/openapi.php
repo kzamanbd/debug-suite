@@ -1,6 +1,6 @@
 <?php
 /**
- * Swagger UI documentation template.
+ * OpenAPI documentation template.
  *
  * @var string $title
  * @var string $docs_path
@@ -135,7 +135,7 @@
       <div class="docs-header-left">
         <h1>
           <?php echo '<img src="' . esc_url( $logo_url ) . '" width="24" alt="Logo">'; ?>
-          <a href="/" id="swagger-title"><?php echo esc_html( $title ); ?></a>
+          <a href="/" id="openapi-title"><?php echo esc_html( $title ); ?></a>
         </h1>
       </div>
       <div class="docs-header-center">
@@ -172,7 +172,7 @@
 
         const selector = document.getElementById('schema-selector');
         const container = document.getElementById('docs-container');
-        const titleElement = document.getElementById('swagger-title');
+        const titleElement = document.getElementById('openapi-title');
         
         // Function to render the elements-api instance for a specific schema
         async function renderDocs(schemaUrl) {
@@ -212,13 +212,13 @@
             let namespace = selector.value;
             
             if (isInit) {
-                const storedNamespace = localStorage.getItem('debug_suite_swagger_namespace');
+                const storedNamespace = localStorage.getItem('debug_suite_openapi_namespace');
                 if (storedNamespace && Array.from(selector.options).some(opt => opt.value === storedNamespace)) {
                     namespace = storedNamespace;
                     selector.value = namespace;
                 }
             } else {
-                localStorage.setItem('debug_suite_swagger_namespace', namespace);
+                localStorage.setItem('debug_suite_openapi_namespace', namespace);
             }
 
             const separator = base_schema_url.indexOf('?') !== -1 ? '&' : '?';

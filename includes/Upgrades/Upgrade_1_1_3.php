@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * 1.1.2 upgrade class.
- * Resolves previous user notifications and forced updates by refreshing swagger rewrites silently.
+ * Resolves previous user notifications and forced updates by refreshing OpenAPI rewrites silently.
  *
  * @since 1.1.3
  */
@@ -28,6 +28,6 @@ class Upgrade_1_1_3 extends AbstractUpgrader { // phpcs:ignore
 	 */
 	public function run(): void {
 		// Refresh rewrite rules automatically for this upgrade.
-		Activator::refresh_swagger_rewrite_rules();
+		Activator::refresh_openapi_rewrite_rules();
 	}
 }
