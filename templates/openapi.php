@@ -92,6 +92,9 @@
         outline: none;
         transition: border-color 0.2s;
       }
+      .docs-header a {
+        color: white;
+      }
       #docs-header select:hover,
       #docs-header select:focus {
         border-color: #556885;
