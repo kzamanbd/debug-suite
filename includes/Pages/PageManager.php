@@ -3,6 +3,7 @@
 namespace DebugSuite\Pages;
 
 use DebugSuite\Interfaces\Hookable;
+use DebugSuite\Interfaces\Pageable;
 use DebugSuite\Assets;
 use Exception;
 

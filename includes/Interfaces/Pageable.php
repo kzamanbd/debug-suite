@@ -1,11 +1,11 @@
 <?php
 
-namespace DebugSuite\Pages;
+namespace DebugSuite\Interfaces;
 
 /**
  * Interface Pageable.
  *
- * @package DebugSuite\Pages
+ * @package DebugSuite\Interfaces
  *
  * @since 1.0.0
  */

@@ -3,6 +3,7 @@
 namespace DebugSuite\Pages;
 
 use DebugSuite\Interfaces\Hookable;
+use DebugSuite\Interfaces\Pageable;
 
 abstract class AbstractPage implements Pageable, Hookable {
 
