@@ -78,6 +78,7 @@ declare global {
             wp_version: string;
             php_version: string;
             favicon: string;
+            logo: string;
             site_name: string;
             logs: LogFile[];
         } & DebugState;

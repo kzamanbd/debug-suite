@@ -130,6 +130,8 @@ class Assets implements Hookable {
 			'wp_version'    => get_bloginfo( 'version' ),
 			'php_version'   => phpversion(),
 			'logs'          => $files,
+			'logo'          => DEBUG_SUITE_PLUGIN_URL . 'assets/images/logo.png',
+			'site_name'     => get_bloginfo( 'name' ),
 		];
 		$options  = get_option( 'debug_suite_settings', [] );
 		$settings  = array_merge( $constants, $settings->get_data(), $options );

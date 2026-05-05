@@ -239,7 +239,7 @@ class PageManager implements Hookable {
 		}
 
 		ob_start();
-		echo '<div id="debug-suite-root-app" class="wrap debug-suite-root-app"></div>';
+		echo '<div id="debug-suite-root-app" class="debug-suite-root-app"></div>';
 		echo ob_get_clean(); // phpcs:ignore
 	}
 

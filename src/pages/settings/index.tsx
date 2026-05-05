@@ -1,29 +1,160 @@
-import Card from '@/components/base/card';
 import CustomSwitch from '@/components/base/switch';
-import { DebugState } from '@/types';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
-import { useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { AlertTriangle, Bug, CheckCircle2, Eye, EyeOff, FileText, Settings, Shield, Zap } from 'lucide-react';
+import {
+    Activity,
+    AlertTriangle,
+    ArrowRight,
+    Bug,
+    CheckCircle2,
+    Database,
+    Eye,
+    EyeOff,
+    FileText,
+    Globe,
+    HardDrive,
+    Layers,
+    Mail,
+    Search,
+    Server,
+    Settings as SettingsIcon,
+    Shield,
+    SlidersHorizontal,
+    Sparkles,
+    Zap
+} from 'lucide-react';
 import type React from 'react';
 import { toast } from 'sonner';
 
+type SettingsState = {
+    debug: boolean | string;
+    debug_log: boolean | string;
+    debug_display: boolean | string;
+};
+
 interface SettingsResponse {
     success: boolean;
-    settings: DebugState;
+    settings: SettingsState;
     message?: string;
 }
 
+interface FeatureItem {
+    id: string;
+    title: string;
+    description: string;
+    icon: React.ElementType;
+    enabled: boolean;
+    category: 'core' | 'logging' | 'performance' | 'tools';
+    available: boolean;
+}
+
+interface DebugToggle {
+    name: keyof SettingsState;
+    title: string;
+    description: string;
+    icon: React.ElementType;
+    danger?: boolean;
+}
+
+const initialFeatures: FeatureItem[] = [
+    {
+        id: 'email-log',
+        title: __('Email Log', 'debug-suite'),
+        description: __('Log all outgoing emails sent by WordPress for debugging.', 'debug-suite'),
+        icon: Mail,
+        enabled: true,
+        category: 'logging',
+        available: true
+    },
+    {
+        id: 'system-info',
+        title: __('System Info', 'debug-suite'),
+        description: __('View detailed server, PHP, and WordPress environment information.', 'debug-suite'),
+        icon: Server,
+        enabled: true,
+        category: 'core',
+        available: false
+    },
+    {
+        id: 'file-manager',
+        title: __('File Manager', 'debug-suite'),
+        description: __('Browse and manage your WordPress file system directly from the dashboard.', 'debug-suite'),
+        icon: HardDrive,
+        enabled: false,
+        category: 'tools',
+        available: false
+    },
+    {
+        id: 'query-monitor',
+        title: __('Query Monitor', 'debug-suite'),
+        description: __('Analyze database queries and identify performance bottlenecks.', 'debug-suite'),
+        icon: Database,
+        enabled: false,
+        category: 'performance',
+        available: false
+    },
+    {
+        id: 'cron-manager',
+        title: __('Cron Manager', 'debug-suite'),
+        description: __('View and control WordPress cron jobs and scheduled events.', 'debug-suite'),
+        icon: Activity,
+        enabled: true,
+        category: 'tools',
+        available: false
+    },
+    {
+        id: 'api-logger',
+        title: __('API Logger', 'debug-suite'),
+        description: __('Log and inspect REST API requests and responses.', 'debug-suite'),
+        icon: Globe,
+        enabled: false,
+        category: 'logging',
+        available: true
+    },
+    {
+        id: 'options-viewer',
+        title: __('Options Viewer', 'debug-suite'),
+        description: __('Inspect and manage WordPress options in the database.', 'debug-suite'),
+        icon: SettingsIcon,
+        enabled: true,
+        category: 'tools',
+        available: false
+    },
+    {
+        id: 'asset-manager',
+        title: __('Asset Manager', 'debug-suite'),
+        description: __('Manage enqueued scripts and styles to optimize performance.', 'debug-suite'),
+        icon: Zap,
+        enabled: false,
+        category: 'performance',
+        available: false
+    }
+];
+
+const FEATURES_API = '/debug-suite/v1/features';
+
+type TabKey = 'constants' | 'features';
+
 const DebugConfig = () => {
-    const [settings, setSettings] = useState({
+    const [settings, setSettings] = useState<SettingsState>({
         debug: window.debugSuite.wp_debug || false,
         debug_log: window.debugSuite.wp_debug_log || false,
         debug_display: window.debugSuite.wp_debug_display || false
     });
     const [saving, setSaving] = useState(false);
 
-    const updateSetting = async (values: Partial<DebugState>) => {
+    const [features, setFeatures] = useState<FeatureItem[]>(initialFeatures);
+    const [featuresLoading, setFeaturesLoading] = useState(true);
+    const [savingFeatureId, setSavingFeatureId] = useState<string | null>(null);
+    const [featuresError, setFeaturesError] = useState<string | null>(null);
+    const [featureSearch, setFeatureSearch] = useState('');
+    const [featureCategory, setFeatureCategory] = useState<string>('all');
+
+    const [activeTab, setActiveTab] = useState<TabKey>('constants');
+
+    const updateSetting = async (values: Partial<SettingsState> & Record<string, unknown>) => {
         setSaving(true);
         const updatedSettings = { ...settings, ...values };
         try {
@@ -44,7 +175,7 @@ const DebugConfig = () => {
     };
 
     const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const key = event.target.name as keyof DebugState;
+        const key = event.target.name as keyof SettingsState;
         const value = event.target.checked;
         setSettings((prev) => ({
             ...prev,
@@ -72,186 +203,539 @@ const DebugConfig = () => {
         );
     };
 
+    const fetchFeatures = useCallback(async () => {
+        setFeaturesLoading(true);
+        setFeaturesError(null);
+        try {
+            const response = await apiFetch<{ features: Record<string, boolean> }>({ path: FEATURES_API });
+            const saved = response?.features ?? {};
+            setFeatures((prev) =>
+                prev.map((f) => ({
+                    ...f,
+                    enabled: typeof saved[f.id] === 'boolean' ? saved[f.id] : f.enabled
+                }))
+            );
+        } catch (err) {
+            setFeaturesError(__('Failed to load features.', 'debug-suite'));
+        } finally {
+            setFeaturesLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchFeatures();
+    }, [fetchFeatures]);
+
+    const toggleFeature = useCallback(
+        async (id: string) => {
+            const next = !features.find((f) => f.id === id)?.enabled;
+            setFeatures((prev) => prev.map((f) => (f.id === id ? { ...f, enabled: next } : f)));
+            setSavingFeatureId(id);
+            setFeaturesError(null);
+            try {
+                await apiFetch({
+                    path: FEATURES_API,
+                    method: 'POST',
+                    data: { feature_id: id, enabled: next }
+                });
+                window.location.reload();
+            } catch (err) {
+                setFeaturesError(__('Failed to save. Please try again.', 'debug-suite'));
+                setFeatures((prev) => prev.map((f) => (f.id === id ? { ...f, enabled: !next } : f)));
+            } finally {
+                setSavingFeatureId(null);
+            }
+        },
+        [features]
+    );
+
+    const debugToggles: DebugToggle[] = [
+        {
+            name: 'debug',
+            title: __('WP_DEBUG', 'debug-suite'),
+            description: __(
+                'Enable the built-in WordPress debug mode to track PHP errors, notices, and warnings.',
+                'debug-suite'
+            ),
+            icon: Bug
+        },
+        {
+            name: 'debug_log',
+            title: __('WP_DEBUG_LOG', 'debug-suite'),
+            description: __(
+                'Save all errors to a debug.log file for later analysis. Recommended for production sites.',
+                'debug-suite'
+            ),
+            icon: FileText
+        },
+        {
+            name: 'debug_display',
+            title: __('WP_DEBUG_DISPLAY', 'debug-suite'),
+            description: __(
+                'Display errors directly on the screen. Disable on production to prevent information leakage.',
+                'debug-suite'
+            ),
+            icon: Eye,
+            danger: true
+        }
+    ];
+
+    const availableFeatures = useMemo(() => features.filter((f) => f.available), [features]);
+    const activeFeatureCount = useMemo(
+        () => availableFeatures.filter((f) => f.enabled).length,
+        [availableFeatures]
+    );
+    const activeConstantCount = useMemo(
+        () => [settings.debug, settings.debug_log, settings.debug_display].filter(Boolean).length,
+        [settings]
+    );
+
+    const filteredFeatures = features.filter((item) => {
+        const matchesSearch =
+            item.title.toLowerCase().includes(featureSearch.toLowerCase()) ||
+            item.description.toLowerCase().includes(featureSearch.toLowerCase());
+        const matchesCategory = featureCategory === 'all' || item.category === featureCategory;
+        return matchesSearch && matchesCategory && item.available;
+    });
+
+    const categories = [
+        { id: 'all', label: __('All', 'debug-suite'), count: availableFeatures.length },
+        {
+            id: 'core',
+            label: __('Core', 'debug-suite'),
+            count: availableFeatures.filter((f) => f.category === 'core').length
+        },
+        {
+            id: 'logging',
+            label: __('Logging', 'debug-suite'),
+            count: availableFeatures.filter((f) => f.category === 'logging').length
+        },
+        {
+            id: 'performance',
+            label: __('Performance', 'debug-suite'),
+            count: availableFeatures.filter((f) => f.category === 'performance').length
+        },
+        {
+            id: 'tools',
+            label: __('Tools', 'debug-suite'),
+            count: availableFeatures.filter((f) => f.category === 'tools').length
+        }
+    ];
+
+    const isDevMode = Boolean(settings.debug) && Boolean(settings.debug_log);
+    const isProdMode = !settings.debug && !settings.debug_log && !settings.debug_display;
+    const modeLabel = isDevMode
+        ? __('Development', 'debug-suite')
+        : isProdMode
+          ? __('Production', 'debug-suite')
+          : __('Custom', 'debug-suite');
+    const modeAccent = isDevMode
+        ? 'from-amber-500 to-orange-600'
+        : isProdMode
+          ? 'from-emerald-500 to-teal-600'
+          : 'from-indigo-500 to-purple-600';
+    const ModeIcon = isDevMode ? Bug : isProdMode ? Shield : SlidersHorizontal;
+
     return (
-        <div className="mx-auto max-w-4xl space-y-6">
-            {/* Quick Actions Card */}
-            <Card>
-                <Card.Header>
-                    <div className="flex items-center gap-2">
-                        <Zap className="text-primary h-5 w-5" />
-                        <Card.Title>{__('Quick Actions', 'debug-suite')}</Card.Title>
+        <div className="mx-auto w-full max-w-5xl space-y-6">
+            {/* Hero */}
+            <section
+                className={classNames(
+                    'relative overflow-hidden rounded-2xl bg-gradient-to-br p-6 text-white shadow-lg sm:p-8',
+                    modeAccent
+                )}>
+                <div
+                    aria-hidden
+                    className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-white/10 blur-3xl"
+                />
+                <div
+                    aria-hidden
+                    className="pointer-events-none absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-black/10 blur-3xl"
+                />
+                <div className="relative grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+                    <div>
+                        <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-medium uppercase tracking-wide backdrop-blur">
+                            <ModeIcon className="h-3.5 w-3.5" />
+                            {modeLabel}
+                            {__(' Mode', 'debug-suite')}
+                        </div>
+                        <h1 className="mt-3 text-2xl font-bold sm:text-3xl">
+                            {__('Debug Suite Settings', 'debug-suite')}
+                        </h1>
+                        <p className="mt-2 max-w-xl text-sm text-white/90 sm:text-base">
+                            {__(
+                                'Tune WordPress debug constants and toggle Debug Suite modules. Changes apply immediately.',
+                                'debug-suite'
+                            )}
+                        </p>
+
+                        <div className="mt-6 grid grid-cols-2 gap-3 sm:max-w-md">
+                            <div className="rounded-lg bg-white/15 px-4 py-3 backdrop-blur">
+                                <div className="text-xs text-white/70">
+                                    {__('Active Constants', 'debug-suite')}
+                                </div>
+                                <div className="mt-1 text-2xl font-semibold">
+                                    {activeConstantCount}
+                                    <span className="text-sm text-white/70">/{debugToggles.length}</span>
+                                </div>
+                            </div>
+                            <div className="rounded-lg bg-white/15 px-4 py-3 backdrop-blur">
+                                <div className="text-xs text-white/70">
+                                    {__('Active Features', 'debug-suite')}
+                                </div>
+                                <div className="mt-1 text-2xl font-semibold">
+                                    {activeFeatureCount}
+                                    <span className="text-sm text-white/70">/{availableFeatures.length}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </Card.Header>
-                <Card.Body>
-                    <div className="grid gap-4 md:grid-cols-2">
+
+                    <div className="grid gap-3">
                         <button
                             onClick={() => updateEnv(true)}
-                            disabled={saving}
+                            disabled={saving || isDevMode}
                             className={classNames(
-                                'group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 text-left transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700',
-                                settings.debug && 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                                'group flex items-center justify-between gap-3 rounded-xl border border-white/30 bg-white/10 px-4 py-3 text-left text-sm backdrop-blur transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60',
+                                isDevMode && 'ring-2 ring-white/70'
                             )}>
-                            <div className="bg-primary/20 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110">
-                                <Bug className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <div className="font-semibold text-gray-900 dark:text-white">
-                                    {__('Development Mode', 'debug-suite')}
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20">
+                                    <Bug className="h-4 w-4" />
                                 </div>
-                                <div className="text-sm text-gray-600 dark:text-gray-300">
-                                    {__('Enable Debug & Logging', 'debug-suite')}
+                                <div>
+                                    <div className="font-semibold">
+                                        {__('Switch to Development', 'debug-suite')}
+                                    </div>
+                                    <div className="text-xs text-white/80">
+                                        {__('Enable debug + logging', 'debug-suite')}
+                                    </div>
                                 </div>
                             </div>
-                            <CheckCircle2
-                                className={classNames(
-                                    'ml-auto h-5 w-5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100',
-                                    settings.debug && 'text-primary opacity-100'
-                                )}
-                            />
+                            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                         </button>
 
                         <button
                             onClick={() => updateEnv(false)}
-                            disabled={saving}
+                            disabled={saving || isProdMode}
                             className={classNames(
-                                'group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 text-left transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700',
-                                !settings.debug && 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                                'group flex items-center justify-between gap-3 rounded-xl border border-white/30 bg-white/10 px-4 py-3 text-left text-sm backdrop-blur transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60',
+                                isProdMode && 'ring-2 ring-white/70'
                             )}>
-                            <div className="bg-primary/20 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110">
-                                <Shield className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <div className="font-semibold text-gray-900 dark:text-white">
-                                    {__('Production Mode', 'debug-suite')}
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20">
+                                    <Shield className="h-4 w-4" />
                                 </div>
-                                <div className="text-sm text-gray-600 dark:text-gray-300">
-                                    {__('Disable All Debugging', 'debug-suite')}
+                                <div>
+                                    <div className="font-semibold">
+                                        {__('Switch to Production', 'debug-suite')}
+                                    </div>
+                                    <div className="text-xs text-white/80">
+                                        {__('Disable all debugging', 'debug-suite')}
+                                    </div>
                                 </div>
                             </div>
-                            <CheckCircle2
-                                className={classNames(
-                                    'ml-auto h-5 w-5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100',
-                                    !settings.debug && 'text-primary opacity-100'
-                                )}
-                            />
+                            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                         </button>
                     </div>
-                </Card.Body>
-            </Card>
+                </div>
+            </section>
 
-            {/* Settings List */}
-            <Card>
-                <Card.Header>
-                    <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                            <Settings className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                        </div>
-                        <div>
-                            <Card.Title>{__('Configuration', 'debug-suite')}</Card.Title>
-                            <Card.Subtitle>{__('Manage your WordPress debug constants', 'debug-suite')}</Card.Subtitle>
-                        </div>
-                    </div>
-                </Card.Header>
-                <Card.Body className="divide-y divide-gray-100 dark:divide-gray-700">
-                    {/* Debug Mode */}
-                    <div className="flex items-start justify-between py-4 first:pt-0">
-                        <div className="flex gap-4">
-                            <div
-                                className={`mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-colors ${settings.debug ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-400 dark:bg-gray-800'}`}>
-                                <Bug className="h-5 w-5" />
+            {/* Tab nav */}
+            <div className="sticky top-2 z-10 flex w-fit gap-1 rounded-xl border border-gray-200 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-gray-700 dark:bg-gray-900/80">
+                {(
+                    [
+                        {
+                            key: 'constants' as TabKey,
+                            label: __('Debug Constants', 'debug-suite'),
+                            icon: SlidersHorizontal,
+                            count: activeConstantCount
+                        },
+                        {
+                            key: 'features' as TabKey,
+                            label: __('Features', 'debug-suite'),
+                            icon: Layers,
+                            count: activeFeatureCount
+                        }
+                    ]
+                ).map((tab) => {
+                    const Icon = tab.icon;
+                    const active = activeTab === tab.key;
+                    return (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={classNames(
+                                'inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition',
+                                active
+                                    ? 'bg-primary text-white shadow-sm'
+                                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                            )}>
+                            <Icon className="h-4 w-4" />
+                            {tab.label}
+                            <span
+                                className={classNames(
+                                    'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold',
+                                    active
+                                        ? 'bg-white/25 text-white'
+                                        : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
+                                )}>
+                                {tab.count}
+                            </span>
+                        </button>
+                    );
+                })}
+            </div>
+
+            {activeTab === 'constants' && (
+                <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+                    <header className="flex items-start justify-between gap-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 to-white px-6 py-5 dark:border-gray-800 dark:from-gray-900 dark:to-gray-950">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg">
+                                <SlidersHorizontal className="h-5 w-5" />
                             </div>
                             <div>
-                                <h3 className="font-medium text-gray-900 dark:text-white">
-                                    {__('WP_DEBUG', 'debug-suite')}
-                                </h3>
-                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    {__(
-                                        'Enable the built-in WordPress debug mode to track PHP errors, notices, and warnings.',
-                                        'debug-suite'
-                                    )}
+                                <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                                    {__('WordPress Debug Constants', 'debug-suite')}
+                                </h2>
+                                <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                                    {__('Control wp-config.php debug flags', 'debug-suite')}
                                 </p>
-                                {settings.debug && (
-                                    <div className="mt-2 flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400">
-                                        <CheckCircle2 className="h-3 w-3" />
-                                        {__('Active', 'debug-suite')}
+                            </div>
+                        </div>
+                    </header>
+
+                    <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                        {debugToggles.map((toggle) => {
+                            const Icon = toggle.icon;
+                            const value = Boolean(settings[toggle.name]);
+                            const showWarning = toggle.danger && value;
+                            return (
+                                <label
+                                    key={toggle.name}
+                                    className={classNames(
+                                        'flex cursor-pointer items-start gap-4 px-6 py-5 transition hover:bg-gray-50 dark:hover:bg-gray-800/50',
+                                        value && 'bg-primary/[0.03] dark:bg-primary/10'
+                                    )}>
+                                    <div
+                                        className={classNames(
+                                            'mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-colors',
+                                            value
+                                                ? showWarning
+                                                    ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                                                    : 'bg-primary/10 text-primary'
+                                                : 'bg-gray-100 text-gray-400 dark:bg-gray-800'
+                                        )}>
+                                        {toggle.danger && !value ? (
+                                            <EyeOff className="h-5 w-5" />
+                                        ) : (
+                                            <Icon className="h-5 w-5" />
+                                        )}
                                     </div>
-                                )}
+                                    <div className="flex-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <h3 className="font-mono text-sm font-semibold text-gray-900 dark:text-white">
+                                                {toggle.title}
+                                            </h3>
+                                            {value ? (
+                                                <span
+                                                    className={classNames(
+                                                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
+                                                        showWarning
+                                                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                                                            : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                                    )}>
+                                                    {showWarning ? (
+                                                        <AlertTriangle className="h-3 w-3" />
+                                                    ) : (
+                                                        <CheckCircle2 className="h-3 w-3" />
+                                                    )}
+                                                    {showWarning
+                                                        ? __('Unsafe in production', 'debug-suite')
+                                                        : __('Active', 'debug-suite')}
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                                    {__('Off', 'debug-suite')}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                            {toggle.description}
+                                        </p>
+                                    </div>
+                                    <CustomSwitch
+                                        name={toggle.name}
+                                        checked={value}
+                                        onChange={changeHandler}
+                                        disabled={saving}
+                                        className="mt-1"
+                                    />
+                                </label>
+                            );
+                        })}
+                    </div>
+                </section>
+            )}
+
+            {activeTab === 'features' && (
+                <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+                    <header className="border-b border-gray-100 bg-gradient-to-br from-gray-50 to-white px-6 py-5 dark:border-gray-800 dark:from-gray-900 dark:to-gray-950">
+                        <div className="flex flex-wrap items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg">
+                                    <Sparkles className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                                        {__('Debug Suite Features', 'debug-suite')}
+                                    </h2>
+                                    <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                                        {__('Toggle modules on or off — page reloads on change', 'debug-suite')}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="relative">
+                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder={__('Search features...', 'debug-suite')}
+                                    className="focus:border-primary focus:ring-primary h-10 w-full rounded-lg border border-gray-200 bg-white pr-4 pl-10 text-sm focus:ring-1 focus:outline-none sm:w-72 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                                    value={featureSearch}
+                                    onChange={(e) => setFeatureSearch(e.target.value)}
+                                />
                             </div>
                         </div>
-                        <CustomSwitch
-                            name="debug"
-                            checked={Boolean(settings.debug)}
-                            onChange={changeHandler}
-                            disabled={saving}
-                            className="mt-1"
-                        />
-                    </div>
 
-                    {/* Debug Log */}
-                    <div className="flex items-start justify-between py-4">
-                        <div className="flex gap-4">
-                            <div
-                                className={`mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-colors ${settings.debug_log ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-400 dark:bg-gray-800'}`}>
-                                <FileText className="h-5 w-5" />
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {categories.map((category) => (
+                                <button
+                                    key={category.id}
+                                    onClick={() => setFeatureCategory(category.id)}
+                                    className={classNames(
+                                        'inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition',
+                                        featureCategory === category.id
+                                            ? 'border-primary bg-primary text-white'
+                                            : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                                    )}>
+                                    {category.label}
+                                    <span
+                                        className={classNames(
+                                            'inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold',
+                                            featureCategory === category.id
+                                                ? 'bg-white/25 text-white'
+                                                : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                                        )}>
+                                        {category.count}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    </header>
+
+                    <div className="p-6">
+                        {featuresError && (
+                            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                                {featuresError}
                             </div>
-                            <div>
-                                <h3 className="font-medium text-gray-900 dark:text-white">
-                                    {__('WP_DEBUG_LOG', 'debug-suite')}
+                        )}
+
+                        {featuresLoading ? (
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="h-36 animate-pulse rounded-xl border border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-gray-800/50"
+                                    />
+                                ))}
+                            </div>
+                        ) : filteredFeatures.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-16 text-center">
+                                <div className="rounded-full bg-gray-100 p-3 dark:bg-gray-800">
+                                    <Search className="h-6 w-6 text-gray-400" />
+                                </div>
+                                <h3 className="mt-4 text-base font-medium text-gray-900 dark:text-white">
+                                    {__('No features found', 'debug-suite')}
                                 </h3>
                                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    {__(
-                                        'Save all errors to a debug.log file for later analysis. Recommended for production sites.',
-                                        'debug-suite'
-                                    )}
+                                    {__('Try adjusting your search or category filter.', 'debug-suite')}
                                 </p>
+                                <button
+                                    onClick={() => {
+                                        setFeatureSearch('');
+                                        setFeatureCategory('all');
+                                    }}
+                                    className="text-primary hover:text-primary/80 mt-4 text-sm font-medium">
+                                    {__('Clear filters', 'debug-suite')}
+                                </button>
                             </div>
-                        </div>
-                        <CustomSwitch
-                            name="debug_log"
-                            checked={Boolean(settings.debug_log)}
-                            onChange={changeHandler}
-                            disabled={saving}
-                            className="mt-1"
-                        />
+                        ) : (
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {filteredFeatures.map((item) => {
+                                    const Icon = item.icon;
+                                    const isSaving = savingFeatureId === item.id;
+                                    return (
+                                        <div
+                                            key={item.id}
+                                            className={classNames(
+                                                'group relative flex flex-col rounded-xl border p-4 transition hover:shadow-md',
+                                                item.enabled
+                                                    ? 'border-primary/30 bg-primary/[0.03] dark:border-primary/40 dark:bg-primary/10'
+                                                    : 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800/30',
+                                                isSaving && 'opacity-60'
+                                            )}>
+                                            <div className="flex items-start justify-between">
+                                                <div
+                                                    className={classNames(
+                                                        'flex h-10 w-10 items-center justify-center rounded-lg transition',
+                                                        item.enabled
+                                                            ? 'bg-primary/15 text-primary'
+                                                            : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                                                    )}>
+                                                    <Icon className="h-5 w-5" />
+                                                </div>
+                                                <CustomSwitch
+                                                    checked={item.enabled}
+                                                    onChange={() => toggleFeature(item.id)}
+                                                    disabled={isSaving}
+                                                />
+                                            </div>
+                                            <h3 className="mt-3 text-base font-semibold text-gray-900 dark:text-white">
+                                                {item.title}
+                                            </h3>
+                                            <p className="mt-1 flex-1 text-sm text-gray-500 dark:text-gray-400">
+                                                {item.description}
+                                            </p>
+                                            <div className="mt-3 flex items-center justify-between">
+                                                <span
+                                                    className={classNames(
+                                                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
+                                                        item.enabled
+                                                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                                            : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                                                    )}>
+                                                    <span
+                                                        className={classNames(
+                                                            'h-1.5 w-1.5 rounded-full',
+                                                            item.enabled ? 'bg-emerald-500' : 'bg-gray-400'
+                                                        )}
+                                                    />
+                                                    {item.enabled
+                                                        ? __('Active', 'debug-suite')
+                                                        : __('Inactive', 'debug-suite')}
+                                                </span>
+                                                <span className="text-xs text-gray-400 capitalize">
+                                                    {item.category}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
-
-                    {/* Debug Display */}
-                    <div className="flex items-start justify-between py-4">
-                        <div className="flex gap-4">
-                            <div
-                                className={`mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-colors ${settings.debug_display ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30' : 'bg-gray-100 text-gray-400 dark:bg-gray-800'}`}>
-                                {settings.debug_display ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <h3 className="font-medium text-gray-900 dark:text-white">
-                                        {__('WP_DEBUG_DISPLAY', 'debug-suite')}
-                                    </h3>
-                                    {settings.debug_display && (
-                                        <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
-                                            <AlertTriangle className="mr-1 h-3 w-3" />
-                                            {__('Unsafe', 'debug-suite')}
-                                        </span>
-                                    )}
-                                </div>
-                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    {__(
-                                        'Display errors directly on the screen. This should be disabled on production sites to prevent information leakage.',
-                                        'debug-suite'
-                                    )}
-                                </p>
-                            </div>
-                        </div>
-                        <CustomSwitch
-                            name="debug_display"
-                            checked={Boolean(settings.debug_display)}
-                            onChange={changeHandler}
-                            disabled={saving}
-                            className="mt-1"
-                        />
-                    </div>
-                </Card.Body>
-            </Card>
+                </section>
+            )}
         </div>
     );
 };

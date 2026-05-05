@@ -1,5 +1,4 @@
 import ManageLogs from '@/pages/manage-logs';
-import Feature from '@/pages/feature';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
 import SetupGuide from '@/pages/settings';
@@ -35,13 +34,6 @@ const routes: DebugSuiteRoute[] = [
         description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
         path: '/file-logs/manage',
         element: <ManageLogs />
-    },
-    {
-        id: 'feature',
-        title: __('Features', 'debug-suite'),
-        description: __('Manage your application features.', 'debug-suite'),
-        path: '/feature',
-        element: <Feature />
     }
 ];
 

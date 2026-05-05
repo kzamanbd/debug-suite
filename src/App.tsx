@@ -1,6 +1,7 @@
 import { SlotFillProvider } from '@wordpress/components';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import Header from './components/brand-header';
 import ConfirmDialog from './components/confirm-dialog';
 import Layout from './components/layout';
 import './index.css';
@@ -27,6 +28,7 @@ const App = () => {
     return (
         <>
             <SlotFillProvider>
+                <Header logo={window.debugSuite.logo} />
                 <RouterProvider router={router} />
                 <Toaster position="bottom-center" richColors />
             </SlotFillProvider>

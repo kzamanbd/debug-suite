@@ -25,7 +25,6 @@ use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\FeatureService;
 use DebugSuite\Services\SettingsService;
 use DebugSuite\Pages\PageManager;
-use DebugSuite\Pages\Feature;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -54,7 +53,6 @@ class AppServiceProvider extends BaseServiceProvider {
 		SettingsService::class,
 		FeatureService::class,
 		PageManager::class,
-		Feature::class,
 		OpenApiPage::class,
 	];
 
