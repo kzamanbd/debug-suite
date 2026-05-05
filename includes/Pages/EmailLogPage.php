@@ -39,7 +39,7 @@ class EmailLogPage extends AbstractPage {
 	 * @inheritDoc
 	 */
 	public function scripts(): array {
-        return [ 'debug-suite-email-log' ];
+        return [];
 	}
 
     /**
@@ -61,12 +61,6 @@ class EmailLogPage extends AbstractPage {
      * @return void
      */
     public function register(): void {
-		wp_register_script(
-			'debug-suite-email-log',
-			DEBUG_SUITE_PLUGIN_URL . 'assets/js/email-log.js',
-			[ 'debug-suite-script' ],
-			DEBUG_SUITE_VERSION,
-			true
-		);
+        // No specific scripts or styles to register for this page.
 	}
 }

@@ -3,14 +3,10 @@
  *
  * @since 1.2.0
  */
-import domReady from '@wordpress/dom-ready';
 import { useCallback, useState } from '@wordpress/element';
-import { addFilter } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
 import { ApiDetail, ApiLogControls, ApiLogSkeleton, ApiLogViewer } from './components';
 import { useApiLogActions, useApiLogEntries } from './hooks';
 import type { ApiLogEntry, BulkAction } from './types';
-import { DebugSuiteRoute } from '@/routing/routes';
 
 const ApiLog = () => {
     const {
@@ -114,15 +110,4 @@ const ApiLog = () => {
     );
 };
 
-domReady(() => {
-    addFilter('debugSuite.routes', 'debug-suite/api-logger', (routes: DebugSuiteRoute[]) => {
-        routes.push({
-            id: 'api-logger',
-            title: __('API Logger', 'debug-suite'),
-            description: __('Monitor and debug REST API requests and responses.', 'debug-suite'),
-            path: '/api-logger',
-            element: <ApiLog />
-        });
-        return routes;
-    });
-});
+export default ApiLog;

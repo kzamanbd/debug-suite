@@ -1,3 +1,5 @@
+import ApiLog from '@/pages/api-log';
+import EmailLog from '@/pages/email-log';
 import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
@@ -34,6 +36,20 @@ const routes: DebugSuiteRoute[] = [
         description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
         path: '/file-logs/manage',
         element: <ManageLogs />
+    },
+    {
+        id: 'api-logger',
+        title: __('API Logger', 'debug-suite'),
+        description: __('Monitor and debug REST API requests and responses.', 'debug-suite'),
+        path: '/api-logger',
+        element: <ApiLog />
+    },
+    {
+        id: 'email-log',
+        title: __('Email Log', 'debug-suite'),
+        description: __('View and manage your email logs.', 'debug-suite'),
+        path: '/email-log',
+        element: <EmailLog />
     }
 ];
 

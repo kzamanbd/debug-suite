@@ -39,7 +39,7 @@ class ApiLogPage extends AbstractPage {
 	 * @inheritDoc
 	 */
 	public function scripts(): array {
-		return [ 'debug-suite-api-logger' ];
+		return [];
 	}
 
 	/**
@@ -61,12 +61,6 @@ class ApiLogPage extends AbstractPage {
 	 * @return void
 	 */
 	public function register(): void {
-		wp_register_script(
-			'debug-suite-api-logger',
-			DEBUG_SUITE_PLUGIN_URL . 'assets/js/api-logger.js',
-			[ 'debug-suite-script' ],
-			DEBUG_SUITE_VERSION,
-			true
-		);
+		// No specific scripts or styles to register for this page.
 	}
 }
