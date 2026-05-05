@@ -1,5 +1,5 @@
 import { classNames } from '@/utils';
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { Tabs } from '@base-ui/react/tabs';
 import type { ReactNode } from 'react';
 
 interface ContentTabsProps {
@@ -8,41 +8,37 @@ interface ContentTabsProps {
 }
 
 /**
- * ContentTabs component using Headless UI Tabs for modern, accessible tab navigation.
+ * ContentTabs component using Base UI Tabs (the upstream toolkit behind the
+ * shadcn `base-luma` style) for accessible tab navigation.
  *
  * @since 1.0.0
- * @param {ContentTabsProps} props - The props for the component.
- * @return {JSX.Element} The rendered component.
  */
 const ContentTabs = ({ tabs, className = '' }: ContentTabsProps): JSX.Element => {
+    const defaultValue = tabs[0]?.key ?? 0;
     return (
-        <TabGroup>
+        <Tabs.Root defaultValue={defaultValue}>
             <div className={classNames('mb-6', className)}>
-                <TabList className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
+                <Tabs.List className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
                     {tabs.map((tab) => (
-                        <Tab
+                        <Tabs.Tab
                             key={tab.key}
-                            className={({ selected }) =>
-                                classNames(
-                                    'px-4 py-2 text-sm font-medium transition-colors focus:outline-none',
-                                    selected
-                                        ? 'border-primary-600 text-primary-700 dark:text-primary-300 border-b-2'
-                                        : 'hover:text-primary-600 dark:hover:text-primary-300 text-gray-500 dark:text-gray-400'
-                                )
-                            }>
+                            value={tab.key}
+                            className={classNames(
+                                'px-4 py-2 text-sm font-medium transition-colors focus:outline-none',
+                                'text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-300',
+                                'data-[selected]:border-b-2 data-[selected]:border-primary-600 data-[selected]:text-primary-700 dark:data-[selected]:text-primary-300'
+                            )}>
                             {tab.label}
-                        </Tab>
+                        </Tabs.Tab>
                     ))}
-                </TabList>
+                </Tabs.List>
             </div>
-            <TabPanels>
-                {tabs.map((tab) => (
-                    <TabPanel key={tab.key} className="focus:outline-none">
-                        {tab.content}
-                    </TabPanel>
-                ))}
-            </TabPanels>
-        </TabGroup>
+            {tabs.map((tab) => (
+                <Tabs.Panel key={tab.key} value={tab.key} className="focus:outline-none">
+                    {tab.content}
+                </Tabs.Panel>
+            ))}
+        </Tabs.Root>
     );
 };
 

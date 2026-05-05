@@ -6,8 +6,7 @@
 import Button from '@/components/base/button';
 import DateTimeHtml from '@/components/base/date-time';
 import { classNames } from '@/utils';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import { useRef, useState } from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
     Bug,
@@ -46,6 +45,19 @@ const levelIcons: Record<string, ReactNode> = {
 const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onLoadMore }: LogViewerProps) => {
     const tableRef = useRef<HTMLTableElement>(null);
     const [copiedId, setCopiedId] = useState<string | number | null>(null);
+    const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+
+    const toggleRow = (index: number) => {
+        setExpandedRows((prev) => {
+            const next = new Set(prev);
+            if (next.has(index)) {
+                next.delete(index);
+            } else {
+                next.add(index);
+            }
+            return next;
+        });
+    };
 
     const toggleSortOrder = () => {
         const newOrder = filters.sortOrder === 'asc' ? 'desc' : 'asc';
@@ -116,15 +128,14 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                 ? __('Hide Dump', 'debug-suite')
                                 : __('Hide Trace', 'debug-suite');
 
+                            const open = expandedRows.has(index);
                             return (
-                                <Disclosure key={index}>
-                                    {({ open }) => (
-                                        <>
-                                            <tr
-                                                className={classNames(
-                                                    'transition-colors hover:bg-gray-50',
-                                                    open && 'bg-gray-50'
-                                                )}>
+                                <Fragment key={index}>
+                                    <tr
+                                        className={classNames(
+                                            'transition-colors hover:bg-gray-50',
+                                            open && 'bg-gray-50'
+                                        )}>
                                                 <td className="p-2 text-sm whitespace-nowrap text-gray-900">
                                                     <DateTimeHtml date={log.timestamp} />
                                                 </td>
@@ -159,11 +170,15 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                     <div className="flex items-center justify-end gap-1">
                                                         <div className="flex items-center gap-1">
                                                             {showDisclosure && (
-                                                                <DisclosureButton className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => toggleRow(index)}
+                                                                    aria-expanded={open}
+                                                                    className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
                                                                     <span className="text-primary-600 text-xs">
                                                                         {open ? hideText : showText}
                                                                     </span>
-                                                                </DisclosureButton>
+                                                                </button>
                                                             )}
                                                             <div
                                                                 role="button"
@@ -185,23 +200,21 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                                                         <span>{entryNumber}</span>
                                                     </div>
                                                 </td>
-                                            </tr>
-                                            {showDisclosure && (
-                                                <DisclosurePanel as="tr">
-                                                    <td colSpan={4} className="border-t border-gray-100 bg-gray-50 p-2">
-                                                        <div className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100">
-                                                            <pre className="font-mono text-xs whitespace-pre-wrap">
-                                                                {onlyDumped
-                                                                    ? log.raw_line
-                                                                    : JSON.stringify(log.stack_trace, null, 2)}
-                                                            </pre>
-                                                        </div>
-                                                    </td>
-                                                </DisclosurePanel>
-                                            )}
-                                        </>
+                                    </tr>
+                                    {showDisclosure && open && (
+                                        <tr>
+                                            <td colSpan={4} className="border-t border-gray-100 bg-gray-50 p-2">
+                                                <div className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100">
+                                                    <pre className="font-mono text-xs whitespace-pre-wrap">
+                                                        {onlyDumped
+                                                            ? log.raw_line
+                                                            : JSON.stringify(log.stack_trace, null, 2)}
+                                                    </pre>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     )}
-                                </Disclosure>
+                                </Fragment>
                             );
                         })
                     )}
