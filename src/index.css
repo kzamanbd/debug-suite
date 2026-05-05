@@ -188,11 +188,8 @@
 
 @layer components {
     .debug-suite-layout {
-        @apply mx-5 flex min-h-screen flex-col gap-4 rounded-md p-4;
+        @apply mx-5 flex min-h-screen flex-col gap-4 rounded-md;
     }
-}
-body:not(.debug-suite-full-view) .debug-suite-layout {
-    @apply mt-5;
 }
 .debug-suite-root-app input {
     height: auto !important;
@@ -245,10 +242,12 @@ div[data-headlessui-state='open'][role='dialog'] {
     overflow-x: hidden;
 }
 
-.root-debug-suite-full-view,
+.debug-suite-full-view .debug-suite-layout {
+    padding: 20px !important;
+}
 .debug-suite-full-view .debug-suite-layout,
 .debug-suite-full-view.admin-bar {
-    margin-top: 0 !important;
+    margin: 0 !important;
     border-radius: 0 !important;
 }
 
