@@ -1,8 +1,6 @@
-import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
 import Settings from '@/pages/settings';
 import { applyFilters } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
 
 export interface DebugSuiteRoute {
@@ -24,13 +22,6 @@ const routes: DebugSuiteRoute[] = [
         id: 'home',
         path: '/',
         element: <Settings />
-    },
-    {
-        id: 'file-logs-manage',
-        title: __('Manage File Logs', 'debug-suite'),
-        description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
-        path: '/file-logs/manage',
-        element: <ManageLogs />
     }
 ];
 
