@@ -156,11 +156,6 @@ class PageManager implements Hookable {
 			'debug_suite_menu_items',
 			[
 				[
-					'title' => __( 'Overview', 'debug-suite' ),
-					'path' => '/',
-					'order' => 3,
-				],
-				[
 					'title' => __( 'Settings', 'debug-suite' ),
 					'path' => 'settings',
 					'order' => 99,

@@ -21,11 +21,9 @@ use DebugSuite\Pages\OpenApiPage;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
-use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\FeatureService;
 use DebugSuite\Services\SettingsService;
 use DebugSuite\Pages\PageManager;
-use DebugSuite\Pages\Feature;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -54,7 +52,6 @@ class AppServiceProvider extends BaseServiceProvider {
 		SettingsService::class,
 		FeatureService::class,
 		PageManager::class,
-		Feature::class,
 		OpenApiPage::class,
 	];
 
@@ -69,12 +66,6 @@ class AppServiceProvider extends BaseServiceProvider {
 			$this->share_with_implements_tags( LogsService::class )
 			->addArgument( new WPLogReaderService() )
 			->addArgument( new LogDiscoveryService() ),
-			$this->tags
-		);
-
-		$this->add_tags(
-			$this->share_with_implements_tags( OverviewService::class )
-			->addArgument( $this->container->get( LogsService::class ) ),
 			$this->tags
 		);
 	}

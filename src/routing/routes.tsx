@@ -1,7 +1,5 @@
-import Feature from '@/pages/feature';
 import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
-import Overview from '@/pages/overview';
 import Settings from '@/pages/settings';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
@@ -23,11 +21,9 @@ const routes: DebugSuiteRoute[] = [
         element: <Settings />
     },
     {
-        id: 'overview',
-        title: __('Overview', 'debug-suite'),
-        description: __('Monitor your WordPress debug activity and system performance.', 'debug-suite'),
+        id: 'home',
         path: '/',
-        element: <Overview />
+        element: <Settings />
     },
     {
         id: 'file-logs-manage',
@@ -35,13 +31,6 @@ const routes: DebugSuiteRoute[] = [
         description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
         path: '/file-logs/manage',
         element: <ManageLogs />
-    },
-    {
-        id: 'feature',
-        title: __('Features', 'debug-suite'),
-        description: __('Manage your application features.', 'debug-suite'),
-        path: '/feature',
-        element: <Feature />
     }
 ];
 
