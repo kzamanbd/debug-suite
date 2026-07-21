@@ -13,7 +13,7 @@ const Card = ({ className, children, clickable, onClick, ...rest }: CardProps) =
     return (
         <div
             className={classNames(
-                'w-full rounded-lg border bg-white transition-all duration-300',
+                'w-full rounded-md border bg-white transition-all duration-300',
                 clickable && 'cursor-pointer hover:shadow-lg',
                 className
             )}
@@ -32,7 +32,7 @@ type CardHeaderProps = {
 
 const Header = ({ className, children, ...rest }: CardHeaderProps) => {
     return (
-        <div className={classNames('border-b bg-gray-50 px-6 py-4 first:rounded-t', className)} {...rest}>
+        <div className={classNames('border-b bg-gray-50 px-6 py-4 first:rounded-t-md', className)} {...rest}>
             {children}
         </div>
     );
@@ -88,7 +88,7 @@ type CardBodyProps = {
 
 const Body = ({ className, children, ...rest }: CardBodyProps) => {
     return (
-        <div className={classNames('p-6 first:rounded-t', className)} {...rest}>
+        <div className={classNames('p-6 first:rounded-t-md', className)} {...rest}>
             {children}
         </div>
     );
@@ -102,7 +102,7 @@ type CardFooterProps = {
 
 const Footer = ({ className, children, ...rest }: CardFooterProps) => {
     return (
-        <div className={classNames('border-t px-6 py-4 last:rounded-b', className)} {...rest}>
+        <div className={classNames('border-t px-6 py-4 last:rounded-b-md', className)} {...rest}>
             {children}
         </div>
     );
