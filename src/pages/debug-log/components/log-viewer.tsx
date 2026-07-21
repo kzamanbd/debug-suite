@@ -5,8 +5,7 @@
  */
 import { Button, DateTimeHtml } from '@/components/ui';
 import { classNames } from '@/utils';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import { useRef, useState } from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
     Bug,
@@ -46,6 +45,19 @@ const levelIcons: Record<string, ReactNode> = {
 const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onLoadMore }: LogViewerProps) => {
     const tableRef = useRef<HTMLTableElement>(null);
     const [copiedId, setCopiedId] = useState<string | number | null>(null);
+    const [openRows, setOpenRows] = useState<Set<number>>(new Set());
+
+    const toggleRow = (index: number) => {
+        setOpenRows((prev) => {
+            const next = new Set(prev);
+            if (next.has(index)) {
+                next.delete(index);
+            } else {
+                next.add(index);
+            }
+            return next;
+        });
+    };
 
     const toggleSortOrder = () => {
         const newOrder = filters.sortOrder === 'asc' ? 'desc' : 'asc';
@@ -115,93 +127,93 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                             const hideText = onlyDumped
                                 ? __('Hide Dump', 'debug-suite')
                                 : __('Hide Trace', 'debug-suite');
+                            const open = openRows.has(index);
 
                             return (
-                                <Disclosure key={index}>
-                                    {({ open }) => (
-                                        <>
-                                            <tr
+                                <Fragment key={index}>
+                                    <tr
+                                        className={classNames(
+                                            'transition-colors hover:bg-gray-50',
+                                            open && 'bg-gray-50'
+                                        )}>
+                                        <td className="p-2 text-sm whitespace-nowrap text-gray-900">
+                                            <DateTimeHtml date={log.timestamp} />
+                                        </td>
+                                        <td className="p-2 whitespace-nowrap">
+                                            <span
                                                 className={classNames(
-                                                    'transition-colors hover:bg-gray-50',
-                                                    open && 'bg-gray-50'
+                                                    'inline-flex items-center rounded-full border px-2 py-px text-xs font-medium',
+                                                    levelColors[log.level] || levelColors.debug
                                                 )}>
-                                                <td className="p-2 text-sm whitespace-nowrap text-gray-900">
-                                                    <DateTimeHtml date={log.timestamp} />
-                                                </td>
-                                                <td className="p-2 whitespace-nowrap">
-                                                    <span
-                                                        className={classNames(
-                                                            'inline-flex items-center rounded-full border px-2 py-px text-xs font-medium',
-                                                            levelColors[log.level] || levelColors.debug
-                                                        )}>
-                                                        <span className="mr-1">
-                                                            {levelIcons[log.level] || <Bug className="size-3" />}
-                                                        </span>
-                                                        {log.level.charAt(0).toUpperCase() + log.level.slice(1)}
-                                                    </span>
-                                                </td>
-                                                <td className="w-full max-w-0 p-2 text-sm text-gray-900">
-                                                    <div className="w-full text-left focus:outline-none">
-                                                        <div className="line-clamp-3 flex-1 overflow-hidden pr-4 break-words">
-                                                            {log.message}
-                                                        </div>
-                                                        {log.file_path && (
-                                                            <div className="mt-1 text-xs text-gray-500">
-                                                                <code className="rounded bg-gray-100 px-1 break-all">
-                                                                    {log.file_path}
-                                                                </code>
-                                                                {log.line && <span>:{log.line}</span>}
-                                                            </div>
+                                                <span className="mr-1">
+                                                    {levelIcons[log.level] || <Bug className="size-3" />}
+                                                </span>
+                                                {log.level.charAt(0).toUpperCase() + log.level.slice(1)}
+                                            </span>
+                                        </td>
+                                        <td className="w-full max-w-0 p-2 text-sm text-gray-900">
+                                            <div className="w-full text-left focus:outline-none">
+                                                <div className="line-clamp-3 flex-1 overflow-hidden pr-4 break-words">
+                                                    {log.message}
+                                                </div>
+                                                {log.file_path && (
+                                                    <div className="mt-1 text-xs text-gray-500">
+                                                        <code className="rounded bg-gray-100 px-1 break-all">
+                                                            {log.file_path}
+                                                        </code>
+                                                        {log.line && <span>:{log.line}</span>}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="w-20 p-2 text-right text-sm whitespace-nowrap text-gray-500">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <div className="flex items-center gap-1">
+                                                    {showDisclosure && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => toggleRow(index)}
+                                                            className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
+                                                            <span className="text-primary-600 text-xs">
+                                                                {open ? hideText : showText}
+                                                            </span>
+                                                        </button>
+                                                    )}
+                                                    <div
+                                                        role="button"
+                                                        tabIndex={0}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            void handleCopy(log.message, index);
+                                                        }}
+                                                        className="hover:text-primary-600 text-gray-400 focus:outline-none"
+                                                        title={__('Copy message', 'debug-suite')}>
+                                                        {copiedId === index ? (
+                                                            <CheckIcon className="h-4 w-4 text-green-500" />
+                                                        ) : (
+                                                            <ClipboardIcon className="h-4 w-4" />
                                                         )}
                                                     </div>
-                                                </td>
-                                                <td className="w-20 p-2 text-right text-sm whitespace-nowrap text-gray-500">
-                                                    <div className="flex items-center justify-end gap-1">
-                                                        <div className="flex items-center gap-1">
-                                                            {showDisclosure && (
-                                                                <DisclosureButton className="hover:text-primary-600 p-1 text-gray-400 focus:outline-none">
-                                                                    <span className="text-primary-600 text-xs">
-                                                                        {open ? hideText : showText}
-                                                                    </span>
-                                                                </DisclosureButton>
-                                                            )}
-                                                            <div
-                                                                role="button"
-                                                                tabIndex={0}
-                                                                onClick={(e) => {
-                                                                    e.preventDefault();
-                                                                    e.stopPropagation();
-                                                                    void handleCopy(log.message, index);
-                                                                }}
-                                                                className="hover:text-primary-600 text-gray-400 focus:outline-none"
-                                                                title={__('Copy message', 'debug-suite')}>
-                                                                {copiedId === index ? (
-                                                                    <CheckIcon className="h-4 w-4 text-green-500" />
-                                                                ) : (
-                                                                    <ClipboardIcon className="h-4 w-4" />
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <span>{entryNumber}</span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            {showDisclosure && (
-                                                <DisclosurePanel as="tr">
-                                                    <td colSpan={4} className="border-t border-gray-100 bg-gray-50 p-2">
-                                                        <div className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100">
-                                                            <pre className="font-mono text-xs whitespace-pre-wrap">
-                                                                {onlyDumped
-                                                                    ? log.raw_line
-                                                                    : JSON.stringify(log.stack_trace, null, 2)}
-                                                            </pre>
-                                                        </div>
-                                                    </td>
-                                                </DisclosurePanel>
-                                            )}
-                                        </>
+                                                </div>
+                                                <span>{entryNumber}</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {showDisclosure && open && (
+                                        <tr>
+                                            <td colSpan={4} className="border-t border-gray-100 bg-gray-50 p-2">
+                                                <div className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-gray-100">
+                                                    <pre className="font-mono text-xs whitespace-pre-wrap">
+                                                        {onlyDumped
+                                                            ? log.raw_line
+                                                            : JSON.stringify(log.stack_trace, null, 2)}
+                                                    </pre>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     )}
-                                </Disclosure>
+                                </Fragment>
                             );
                         })
                     )}

@@ -1,5 +1,5 @@
 import { classNames } from '@/utils';
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { Tabs } from '@base-ui/react/tabs';
 import type { ReactNode } from 'react';
 
 interface ContentTabsProps {
@@ -8,7 +8,7 @@ interface ContentTabsProps {
 }
 
 /**
- * ContentTabs component using Headless UI Tabs for modern, accessible tab navigation.
+ * ContentTabs component using Base UI Tabs for modern, accessible tab navigation.
  *
  * @since 1.0.0
  * @param {ContentTabsProps} props - The props for the component.
@@ -16,33 +16,32 @@ interface ContentTabsProps {
  */
 const ContentTabs = ({ tabs, className = '' }: ContentTabsProps): JSX.Element => {
     return (
-        <TabGroup>
+        <Tabs.Root defaultValue={tabs[0]?.key}>
             <div className={classNames('mb-6', className)}>
-                <TabList className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
+                <Tabs.List className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
                     {tabs.map((tab) => (
-                        <Tab
+                        <Tabs.Tab
                             key={tab.key}
-                            className={({ selected }) =>
+                            value={tab.key}
+                            className={({ active }) =>
                                 classNames(
                                     'px-4 py-2 text-sm font-medium transition-colors focus:outline-none',
-                                    selected
+                                    active
                                         ? 'border-primary-600 text-primary-700 dark:text-primary-300 border-b-2'
                                         : 'hover:text-primary-600 dark:hover:text-primary-300 text-gray-500 dark:text-gray-400'
                                 )
                             }>
                             {tab.label}
-                        </Tab>
+                        </Tabs.Tab>
                     ))}
-                </TabList>
+                </Tabs.List>
             </div>
-            <TabPanels>
-                {tabs.map((tab) => (
-                    <TabPanel key={tab.key} className="focus:outline-none">
-                        {tab.content}
-                    </TabPanel>
-                ))}
-            </TabPanels>
-        </TabGroup>
+            {tabs.map((tab) => (
+                <Tabs.Panel key={tab.key} value={tab.key} className="focus:outline-none">
+                    {tab.content}
+                </Tabs.Panel>
+            ))}
+        </Tabs.Root>
     );
 };
 
