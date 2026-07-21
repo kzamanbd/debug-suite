@@ -1,6 +1,7 @@
 {
     "name": "debug-suite",
     "version": "1.1.3",
+    "packageManager": "pnpm@10.28.1",
     "description": "WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place.",
     "main": "index.js",
     "scripts": {
