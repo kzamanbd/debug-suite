@@ -118,9 +118,9 @@ class SettingsController extends RestController {
 		$settings = [];
 		// Map request parameters to settings
 		$values = [
-			'debug'          => 'WP_DEBUG',
-			'debug_log'      => 'WP_DEBUG_LOG',
-			'debug_display'  => 'WP_DEBUG_DISPLAY',
+			'wp_debug'          => 'WP_DEBUG',
+			'wp_debug_log'      => 'WP_DEBUG_LOG',
+			'wp_debug_display'  => 'WP_DEBUG_DISPLAY',
 		];
 
 		foreach ( $values as $key => $value ) {
