@@ -1,12 +1,15 @@
-import { getRoutes } from '@/routing/routes';
+import { DebugSuiteRoute, getRoutes } from '@/routing/routes';
 import { classNames } from '@/utils';
+import { Slot } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { ExternalLink, Info } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from './ui/button';
+import ViewModeSwitcher from './view-mode-switcher';
 
 type NavProps = {
     logo?: string;
+    route?: DebugSuiteRoute;
 };
 
 const linkBase = 'rounded-full px-3 py-1.5 text-sm font-medium transition-colors';
@@ -15,7 +18,7 @@ const linkIdle = 'text-gray-600 hover:bg-gray-100 hover:text-gray-900';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) => classNames(linkBase, isActive ? linkActive : linkIdle);
 
-function Navigation({ logo }: NavProps) {
+function Navigation({ logo, route }: NavProps) {
     // Email Log registers its route via the `debugSuite.routes` filter only when
     // its bundle loads (feature enabled), so surface the link conditionally.
     const hasEmailLog = getRoutes().some((route) => route.id === 'email-log');
@@ -55,13 +58,17 @@ function Navigation({ logo }: NavProps) {
                     </NavLink>
                 </nav>
 
-                <Button
-                    variant="default"
-                    className="size-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:border-gray-900 hover:bg-gray-900 hover:text-white aria-expanded:border-gray-900 aria-expanded:bg-gray-900 aria-expanded:text-white"
-                    title={__('Help', 'debug-suite')}
-                    aria-label={__('Help', 'debug-suite')}>
-                    <Info className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Slot fillProps={{ route }} name="debug-suite-layout-header-right" />
+                    <ViewModeSwitcher />
+                    <Button
+                        variant="default"
+                        className="size-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:border-gray-900 hover:bg-gray-900 hover:text-white aria-expanded:border-gray-900 aria-expanded:bg-gray-900 aria-expanded:text-white"
+                        title={__('Help', 'debug-suite')}
+                        aria-label={__('Help', 'debug-suite')}>
+                        <Info className="h-4 w-4" />
+                    </Button>
+                </div>
             </div>
         </div>
     );

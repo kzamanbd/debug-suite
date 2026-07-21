@@ -1,24 +1,82 @@
 /**
  * Select component for Debug Suite UI.
  *
- * Uses react-select with full typing and accessibility support.
- * Replaces both Combobox and Listbox components with a unified interface.
+ * Built on Base UI Select (shadcn-style primitives) with full typing and
+ * accessibility support. Exposes a simple Option-based `SimpleSelect` wrapper
+ * plus the underlying styled primitives for advanced usage.
  *
  * @since 1.0.0
  */
-import { classNames } from '@/utils';
+import { cn } from '@/lib/utils';
+import { Select as SelectPrimitive } from '@base-ui/react/select';
 import { __ } from '@wordpress/i18n';
-import { ChevronDownIcon } from 'lucide-react';
-import type { DropdownIndicatorProps, GroupBase, Props } from 'react-select';
-import Select, { components } from 'react-select';
+import { CheckIcon, ChevronDownIcon } from 'lucide-react';
 
 export interface Option {
     value: string;
     label: string;
 }
 
-export interface SelectProps
-    extends Omit<Props<Option, false, GroupBase<Option>>, 'classNames' | 'value' | 'onChange'> {
+const SelectRoot = SelectPrimitive.Root;
+const SelectValue = SelectPrimitive.Value;
+
+function SelectTrigger({ className, children, ...props }: SelectPrimitive.Trigger.Props) {
+    return (
+        <SelectPrimitive.Trigger
+            data-slot="select-trigger"
+            className={cn(
+                'flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-none transition-colors outline-none select-none hover:border-gray-400 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[popup-open]:border-primary data-disabled:pointer-events-none data-disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-600 [&>span]:truncate',
+                className
+            )}
+            {...props}>
+            {children}
+            <SelectPrimitive.Icon className="shrink-0 text-gray-400">
+                <ChevronDownIcon className="size-4" />
+            </SelectPrimitive.Icon>
+        </SelectPrimitive.Trigger>
+    );
+}
+
+function SelectContent({ className, children, ...props }: SelectPrimitive.Popup.Props) {
+    return (
+        <SelectPrimitive.Portal>
+            <div className="debug-suite-root-app">
+                <SelectPrimitive.Positioner className="z-[99999] outline-none" sideOffset={4} alignItemWithTrigger={false}>
+                    <SelectPrimitive.Popup
+                        data-slot="select-content"
+                        className={cn(
+                            'max-h-[min(24rem,var(--available-height))] min-w-[var(--anchor-width)] origin-[var(--transform-origin)] overflow-y-auto overscroll-contain rounded-lg border border-gray-200 bg-white p-1 text-sm text-gray-900 shadow-lg outline-none data-[closed]:animate-out data-[closed]:fade-out-0 data-[open]:animate-in data-[open]:fade-in-0 data-[open]:zoom-in-95 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200',
+                            className
+                        )}
+                        {...props}>
+                        {children}
+                    </SelectPrimitive.Popup>
+                </SelectPrimitive.Positioner>
+            </div>
+        </SelectPrimitive.Portal>
+    );
+}
+
+function SelectItem({ className, children, ...props }: SelectPrimitive.Item.Props) {
+    return (
+        <SelectPrimitive.Item
+            data-slot="select-item"
+            className={cn(
+                'relative flex cursor-pointer items-center gap-2 rounded-md py-1.5 pr-2 pl-8 text-sm outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-gray-100 data-selected:font-medium dark:data-highlighted:bg-neutral-800',
+                className
+            )}
+            {...props}>
+            <span className="absolute left-2 flex size-4 items-center justify-center">
+                <SelectPrimitive.ItemIndicator>
+                    <CheckIcon className="size-4 text-primary" />
+                </SelectPrimitive.ItemIndicator>
+            </span>
+            <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+        </SelectPrimitive.Item>
+    );
+}
+
+export interface SelectProps {
     options: Option[];
     value?: Option | null;
     onChange?: (option: Option | null) => void;
@@ -27,21 +85,10 @@ export interface SelectProps
     error?: string;
     className?: string;
     isDisabled?: boolean;
-    menuPlacement?: 'auto' | 'bottom' | 'top';
-    menuPortalTarget?: HTMLElement;
-    formatOptionLabel?: (option: Option) => React.ReactNode;
+    /** Kept for API compatibility — Base UI Select has built-in keyboard typeahead. */
     searchable?: boolean;
-    simpleClass?: string;
+    formatOptionLabel?: (option: Option) => React.ReactNode;
 }
-
-// Custom dropdown indicator with Lucide icon
-const DropdownIndicator = (props: DropdownIndicatorProps<Option, false, GroupBase<Option>>) => {
-    return (
-        <components.DropdownIndicator {...props}>
-            <ChevronDownIcon className="size-4 text-gray-400 group-hover:text-gray-600" />
-        </components.DropdownIndicator>
-    );
-};
 
 const SimpleSelect = ({
     value,
@@ -49,83 +96,37 @@ const SimpleSelect = ({
     error,
     onChange,
     options,
-    className = '',
-    placeholder = 'Select an option...',
-    formatOptionLabel,
-    searchable = false,
-    ...props
+    className,
+    placeholder,
+    isDisabled,
+    formatOptionLabel
 }: SelectProps) => {
-    const renderOptionLabel = (option: Option) => {
-        if (formatOptionLabel) {
-            return formatOptionLabel(option);
-        }
-
-        return (
-            <div title={option.label} className="text-sm font-medium">
-                {option.label}
-            </div>
-        );
-    };
-
     return (
-        <div className={classNames('flex flex-col space-y-1', searchable && className)}>
+        <div className="flex flex-col space-y-1">
             {label && <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>}
-            {!searchable ? (
-                <select
-                    className={classNames(
-                        'rounded-lg border-gray-200 px-3 py-2 pe-9 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600',
-                        className
-                    )}
-                    value={value?.value}
-                    onChange={(e) => onChange?.(options.find((opt) => opt.value === e.target.value) || null)}>
-                    <option value="" disabled>
-                        {placeholder || __('Select Option', 'debug-suite')}
-                    </option>
+
+            <SelectRoot<Option>
+                items={options}
+                value={value ?? null}
+                onValueChange={(option) => onChange?.(option)}
+                disabled={isDisabled}
+                isItemEqualToValue={(a, b) => a?.value === b?.value}>
+                <SelectTrigger className={cn(error && 'border-red-300 focus-visible:border-red-400 focus-visible:ring-red-100', className)}>
+                    <SelectValue placeholder={placeholder || __('Select Option', 'debug-suite')} />
+                </SelectTrigger>
+                <SelectContent>
                     {options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
+                        <SelectItem key={option.value} value={option}>
+                            {formatOptionLabel ? formatOptionLabel(option) : option.label}
+                        </SelectItem>
                     ))}
-                </select>
-            ) : (
-                <Select<Option, false, GroupBase<Option>>
-                    components={{
-                        DropdownIndicator
-                    }}
-                    options={options}
-                    value={value}
-                    className="w-full"
-                    onChange={onChange}
-                    placeholder={placeholder}
-                    formatOptionLabel={renderOptionLabel}
-                    classNames={{
-                        control: (state) => {
-                            return classNames(
-                                'bg-white border rounded-lg shadow-none',
-                                error
-                                    ? 'border-red-300 hover:border-red-300'
-                                    : state.isFocused
-                                      ? 'border-primary-500 hover:border-primary-500'
-                                      : 'border-gray-300 hover:border-gray-400',
-                                props.isDisabled && 'bg-gray-50 border-gray-200'
-                            );
-                        },
-                        placeholder: () => 'text-gray-500',
-                        input: () => 'm-0 [&>input]:focus:shadow-none',
-                        valueContainer: () => 'py-0',
-                        option: (state) => {
-                            return classNames('cursor-pointer', state.isDisabled && 'cursor-not-allowed opacity-50');
-                        },
-                        noOptionsMessage: () => 'text-gray-500 p-1',
-                        dropdownIndicator: () => 'p-1.5'
-                    }}
-                    {...props}
-                />
-            )}
+                </SelectContent>
+            </SelectRoot>
 
             {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
         </div>
     );
 };
 
+export { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValue };
 export default SimpleSelect;

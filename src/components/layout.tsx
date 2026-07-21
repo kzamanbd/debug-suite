@@ -1,10 +1,8 @@
 import type { DebugSuiteRoute } from '@/routing/routes';
 import { classNames } from '@/utils';
-import { Slot } from '@wordpress/components';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import Navigation from './navigation';
-import ViewModeSwitcher from './view-mode-switcher';
 
 interface LayoutProps {
     children: ReactNode;
@@ -25,10 +23,7 @@ const LayoutHeader = ({ route }: { route: DebugSuiteRoute }) => {
                     ) : (
                         route.title
                     )}
-                    <div className="flex flex-wrap items-center gap-2">
-                        <Slot fillProps={{ route }} name="debug-suite-layout-header-right" />
-                        <ViewModeSwitcher />
-                    </div>
+                    <div className="flex flex-wrap items-center gap-2"></div>
                 </div>
                 {route.description && (
                     <div className="mt-2">
@@ -54,7 +49,7 @@ const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element =
 
     return (
         <>
-            <Navigation />
+            <Navigation route={route} />
             <div className={classNames(className, 'debug-suite-layout', route.className)}>
                 <LayoutHeader route={route} />
                 <main className="mt-6 flex-1">{children}</main>

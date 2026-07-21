@@ -12,7 +12,14 @@ export { default as DateTimeHtml } from './date-time';
 export { default as DialogModal } from './dialog-modal';
 export { default as Pagination } from './pagination';
 export { default as RadioButton } from './radio-button';
-export { default as SimpleSelect } from './select';
+export {
+    default as SimpleSelect,
+    SelectContent,
+    SelectItem,
+    SelectRoot,
+    SelectTrigger,
+    SelectValue
+} from './select';
 export { default as Switch } from './switch';
 export { default as TextInput } from './text-input';
 
