@@ -14,11 +14,6 @@ export interface DebugSuiteRoute {
 }
 const routes: DebugSuiteRoute[] = [
     {
-        id: 'setup-guide',
-        path: '/settings',
-        element: <Settings />
-    },
-    {
         id: 'home',
         path: '/',
         element: <Settings />
