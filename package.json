@@ -14,7 +14,13 @@
         "version": "node bin/version.js",
         "zip": "node bin/zip.js",
         "release": "pnpm build && pnpm make:pot && npm run zip",
-        "release:org": "npm run version && npm run release"
+        "release:org": "npm run version && npm run release",
+        "env:start": "wp-env start",
+        "env:stop": "wp-env stop",
+        "env:clean": "wp-env clean all",
+        "env:test": "wp-env run tests-cli --env-cwd=wp-content/plugins/debug-suite vendor/bin/phpunit --testsuite=all",
+        "env:test:unit": "wp-env run tests-cli --env-cwd=wp-content/plugins/debug-suite vendor/bin/phpunit --testsuite=unit",
+        "env:test:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/debug-suite vendor/bin/phpunit --testsuite=integration"
     },
     "author": "kamruzzaman",
     "license": "MIT",
@@ -45,6 +51,7 @@
         "@eslint/js": "^9.30.0",
         "@types/react": "^18.3.23",
         "@types/react-router-dom": "^5.3.3",
+        "@wordpress/env": "^11.11.0",
         "@wordpress/scripts": "^30.19.0",
         "css-loader": "^7.1.2",
         "eslint": "^9.30.0",
