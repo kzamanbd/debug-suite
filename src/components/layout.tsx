@@ -52,7 +52,7 @@ const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element =
     }, [route.path, route.title]);
 
     return (
-        <div className={classNames(className, 'debug-suite-layout')}>
+        <div className={classNames(className, 'debug-suite-layout', route.className)}>
             <LayoutHeader route={route} />
             <main className="flex-1">{children}</main>
         </div>

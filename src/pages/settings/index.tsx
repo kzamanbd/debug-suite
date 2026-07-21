@@ -305,7 +305,7 @@ const DebugConfig = () => {
     return (
         <div className="mx-auto w-full max-w-5xl space-y-6">
             {/* Tab nav */}
-            <div className="sticky top-2 z-10 flex w-fit gap-1 rounded-xl border border-gray-200 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-gray-700 dark:bg-gray-900/80">
+            <div className="flex w-fit gap-1 rounded-xl border border-gray-200 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-gray-700 dark:bg-gray-900/80">
                 {[
                     {
                         key: 'constants' as TabKey,
