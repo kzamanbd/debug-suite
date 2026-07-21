@@ -515,7 +515,7 @@ class QueryBuilder {
 		$wpdb       = $this->model->get_wpdb();
 		$table_name = $this->model->get_table_name();
 
-		return false !== $wpdb->query( "TRUNCATE TABLE {$table_name}" );
+		return false !== $wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %i', $table_name ) );
 	}
 
 	// =========================================================================
