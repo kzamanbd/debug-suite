@@ -199,13 +199,21 @@ class LogsServiceTest extends TestCase {
 	 * Test get_raw_file_content with empty file path.
 	 */
 	public function test_get_raw_file_content_no_file_path(): void {
-		// We can't easily mock ini_get in a unit test without runkit or similar extensions
-		// Instead, we'll test with an empty string directly
-		$result = $this->service->get_raw_file_content( '' );
+		// When no path is given the service falls back to ini_get( 'error_log' ).
+		// Force that empty so the "no path configured" branch is reachable
+		// regardless of the runtime environment (e.g. wp-env sets error_log).
+		$original_error_log = ini_get( 'error_log' );
+		ini_set( 'error_log', '' );
 
-		$this->assertTrue( $result->is_failure() );
-		$this->assertEquals( 'no_file_path', $result->get_error_code() );
-		$this->assertStringContainsString( 'No log file path provided', $result->get_error_message() );
+		try {
+			$result = $this->service->get_raw_file_content( '' );
+
+			$this->assertTrue( $result->is_failure() );
+			$this->assertEquals( 'no_file_path', $result->get_error_code() );
+			$this->assertStringContainsString( 'No log file path provided', $result->get_error_message() );
+		} finally {
+			ini_set( 'error_log', $original_error_log );
+		}
 	}
 
 	/**
