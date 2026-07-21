@@ -145,11 +145,11 @@
 
 @layer components {
     .debug-suite-layout {
-        @apply flex min-h-screen flex-col gap-4 rounded-md p-4;
+        @apply mx-6 flex min-h-screen flex-col gap-4 rounded p-4;
     }
 }
-body:not(.debug-suite-full-view) .debug-suite-layout {
-    @apply mt-5;
+#wpcontent:has(.debug-suite-root-app) {
+    padding-left: 0 !important;
 }
 .debug-suite-root-app input {
     height: auto !important;
@@ -227,6 +227,7 @@ div[data-headlessui-state='open'][role='dialog'] {
 .debug-suite-root-app h4,
 .debug-suite-root-app h5,
 .debug-suite-root-app h6,
+.debug-suite-root-app.wrap,
 .debug-suite-full-view .wrap,
 .debug-suite-full-view #wpbody,
 .debug-suite-full-view #wpwrap,

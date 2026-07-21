@@ -4,6 +4,7 @@ namespace DebugSuite;
 
 use DebugSuite\Interfaces\Hookable;
 use DebugSuite\Services\DebugLog\LogsService;
+use DebugSuite\Services\OpenApiService;
 use DebugSuite\Services\SettingsService;
 
 class Assets implements Hookable {
@@ -121,10 +122,13 @@ class Assets implements Hookable {
 		$settings = debug_suite()->container()->get( SettingsService::class )->get_settings();
 
 		$constants = [
-			'content_url'   => content_url(),
-			'wp_version'    => get_bloginfo( 'version' ),
-			'php_version'   => phpversion(),
-			'logs'          => $files,
+			'logs'             => $files,
+			'content_url'      => content_url(),
+			'wp_version'       => get_bloginfo( 'version' ),
+			'php_version'      => phpversion(),
+			'openapi_docs_url' => user_trailingslashit( home_url( OpenApiService::rewrite_base_api() . '/docs' ) ),
+			'logo_url'         => DEBUG_SUITE_PLUGIN_URL . 'assets/images/logo.png',
+			'version'          => DEBUG_SUITE_VERSION,
 		];
 		$options  = get_option( 'debug_suite_settings', [] );
 		$settings  = array_merge( $constants, $settings->get_data(), $options );

@@ -3,6 +3,7 @@ import { classNames } from '@/utils';
 import { Slot } from '@wordpress/components';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
+import Navigation from './navigation';
 import ViewModeSwitcher from './view-mode-switcher';
 
 interface LayoutProps {
@@ -52,10 +53,13 @@ const Layout = ({ route, children, className = '' }: LayoutProps): JSX.Element =
     }, [route.path, route.title]);
 
     return (
-        <div className={classNames(className, 'debug-suite-layout', route.className)}>
-            <LayoutHeader route={route} />
-            <main className="flex-1">{children}</main>
-        </div>
+        <>
+            <Navigation />
+            <div className={classNames(className, 'debug-suite-layout', route.className)}>
+                <LayoutHeader route={route} />
+                <main className="mt-6 flex-1">{children}</main>
+            </div>
+        </>
     );
 };
 
