@@ -35,16 +35,11 @@ function Navigation({ logo }: NavProps) {
                 </div>
 
                 <nav className="flex items-center gap-1">
-                    <NavLink to="/" end className={navLinkClass}>
-                        {__('Settings', 'debug-suite')}
-                    </NavLink>
-
                     {hasEmailLog && (
                         <NavLink to="/email-log" className={navLinkClass}>
                             {__('Email Log', 'debug-suite')}
                         </NavLink>
                     )}
-
                     {docsUrl && (
                         <a
                             href={docsUrl}
@@ -55,6 +50,9 @@ function Navigation({ logo }: NavProps) {
                             <ExternalLink className="h-3.5 w-3.5" />
                         </a>
                     )}
+                    <NavLink to="/" end className={navLinkClass}>
+                        {__('Settings', 'debug-suite')}
+                    </NavLink>
                 </nav>
 
                 <Button
