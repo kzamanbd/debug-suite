@@ -1,8 +1,8 @@
-import ManageLogs from '@/pages/manage-logs';
 import Feature from '@/pages/feature';
+import ManageLogs from '@/pages/manage-logs';
 import NotFound from '@/pages/not-found';
 import Overview from '@/pages/overview';
-import SetupGuide from '@/pages/settings';
+import Settings from '@/pages/settings';
 import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
@@ -20,7 +20,7 @@ const routes: DebugSuiteRoute[] = [
     {
         id: 'setup-guide',
         path: '/settings',
-        element: <SetupGuide />
+        element: <Settings />
     },
     {
         id: 'overview',

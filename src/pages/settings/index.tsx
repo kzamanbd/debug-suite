@@ -14,7 +14,7 @@ interface SettingsResponse {
     message?: string;
 }
 
-const DebugConfig = () => {
+const SettingsPage = () => {
     const [settings, setSettings] = useState({
         wp_debug: window.debugSuite.wp_debug || false,
         wp_debug_log: window.debugSuite.wp_debug_log || false,
@@ -208,4 +208,4 @@ const DebugConfig = () => {
     );
 };
 
-export default DebugConfig;
+export default SettingsPage;
