@@ -120,7 +120,6 @@ class SettingsController extends RestController {
 		$values = [
 			'wp_debug'          => 'WP_DEBUG',
 			'wp_debug_log'      => 'WP_DEBUG_LOG',
-			'wp_debug_display'  => 'WP_DEBUG_DISPLAY',
 		];
 
 		foreach ( $values as $key => $value ) {
