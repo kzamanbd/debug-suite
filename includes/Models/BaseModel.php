@@ -153,7 +153,7 @@ abstract class BaseModel implements Model {
 	 *
 	 * This enables Eloquent-style static usage:
 	 *     EmailLog::find( 1 );
-	 *     ApiLog::where( [ 'method' => 'GET' ] );
+	 *     EmailLog::where( [ 'status' => 'success' ] );
 	 *
 	 * @param string $method     Method name.
 	 * @param array  $parameters Method parameters.

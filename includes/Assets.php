@@ -73,16 +73,11 @@ class Assets implements Hookable {
 	public function styles(): array {
 		$styles = [];
 
-		$admin_assets = DEBUG_SUITE_PLUGIN_DIR . 'assets/js/debug-suite.asset.php';
-		if ( file_exists( $admin_assets ) ) {
-			$admin_assets = require $admin_assets;
-
-			$styles['debug-suite-style'] = [
-				'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/css/debug-suite.css',
-				'version' => $admin_assets['version'],
-				'deps'    => [],
-			];
-		}
+		$styles['debug-suite-style'] = [
+			'src'     => DEBUG_SUITE_PLUGIN_URL . 'assets/css/debug-suite.css',
+			'version' => filemtime( DEBUG_SUITE_PLUGIN_DIR . 'assets/css/debug-suite.css' ),
+			'deps'    => [],
+		];
 
 		return apply_filters( 'debug_suite_assets_styles', $styles );
 	}

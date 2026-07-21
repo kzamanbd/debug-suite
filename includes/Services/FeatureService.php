@@ -39,7 +39,6 @@ class FeatureService implements ServiceInterface {
 			'system-info'     => true,
 			'file-manager'    => false,
 			'query-monitor'   => false,
-			'api-logger'      => false,
 			'asset-manager'   => false,
 		];
 	}

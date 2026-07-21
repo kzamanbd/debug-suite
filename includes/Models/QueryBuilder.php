@@ -6,9 +6,9 @@
  * on top of WordPress $wpdb, eliminating raw SQL in child models.
  *
  * Usage:
- *     ApiLog::query()
- *         ->where( 'method', 'GET' )
- *         ->where( 'route', 'LIKE', 'posts' )
+ *     EmailLog::query()
+ *         ->where( 'status', 'success' )
+ *         ->where( 'subject', 'LIKE', 'invoice' )
  *         ->order_by( 'created_at', 'DESC' )
  *         ->limit( 20 )
  *         ->get();
@@ -18,8 +18,8 @@
  *         ->where_not_empty( 'to_email' )
  *         ->pluck( 'to_email' );
  *
- *     ApiLog::query()
- *         ->select_raw( 'COUNT(*) as total, AVG(duration) as avg' )
+ *     EmailLog::query()
+ *         ->select_raw( 'COUNT(*) as total, AVG(id) as avg' )
  *         ->get_row();
  *
  * @package DebugSuite

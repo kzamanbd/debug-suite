@@ -3,7 +3,7 @@ import CustomSwitch from '@/components/base/switch';
 import { Fill } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { Activity, Database, Globe, HardDrive, Mail, Search, Server, Settings, Zap } from 'lucide-react';
+import { Activity, Database, HardDrive, Mail, Search, Server, Settings, Zap } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 interface FeatureItem {
@@ -61,15 +61,6 @@ const initialFeatures: FeatureItem[] = [
         enabled: true,
         category: 'tools',
         available: false
-    },
-    {
-        id: 'api-logger',
-        title: __('API Logger', 'debug-suite'),
-        description: __('Log and inspect REST API requests and responses.', 'debug-suite'),
-        icon: Globe,
-        enabled: false,
-        category: 'logging',
-        available: true
     },
     {
         id: 'options-viewer',

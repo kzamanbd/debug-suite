@@ -1,11 +1,10 @@
 import Card from '@/components/base/card';
 import CustomSwitch from '@/components/base/switch';
 import { DebugState } from '@/types';
-import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { AlertTriangle, Bug, CheckCircle2, Eye, EyeOff, FileText, Settings, Shield, Zap } from 'lucide-react';
+import { AlertTriangle, Bug, CheckCircle2, Eye, EyeOff, FileText, Settings } from 'lucide-react';
 import type React from 'react';
 import { toast } from 'sonner';
 
@@ -74,71 +73,6 @@ const DebugConfig = () => {
 
     return (
         <div className="mx-auto max-w-4xl space-y-6">
-            {/* Quick Actions Card */}
-            <Card>
-                <Card.Header>
-                    <div className="flex items-center gap-2">
-                        <Zap className="text-primary h-5 w-5" />
-                        <Card.Title>{__('Quick Actions', 'debug-suite')}</Card.Title>
-                    </div>
-                </Card.Header>
-                <Card.Body>
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <button
-                            onClick={() => updateEnv(true)}
-                            disabled={saving}
-                            className={classNames(
-                                'group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 text-left transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700',
-                                settings.debug && 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                            )}>
-                            <div className="bg-primary/20 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110">
-                                <Bug className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <div className="font-semibold text-gray-900 dark:text-white">
-                                    {__('Development Mode', 'debug-suite')}
-                                </div>
-                                <div className="text-sm text-gray-600 dark:text-gray-300">
-                                    {__('Enable Debug & Logging', 'debug-suite')}
-                                </div>
-                            </div>
-                            <CheckCircle2
-                                className={classNames(
-                                    'ml-auto h-5 w-5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100',
-                                    settings.debug && 'text-primary opacity-100'
-                                )}
-                            />
-                        </button>
-
-                        <button
-                            onClick={() => updateEnv(false)}
-                            disabled={saving}
-                            className={classNames(
-                                'group flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 text-left transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-md disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700',
-                                !settings.debug && 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                            )}>
-                            <div className="bg-primary/20 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110">
-                                <Shield className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <div className="font-semibold text-gray-900 dark:text-white">
-                                    {__('Production Mode', 'debug-suite')}
-                                </div>
-                                <div className="text-sm text-gray-600 dark:text-gray-300">
-                                    {__('Disable All Debugging', 'debug-suite')}
-                                </div>
-                            </div>
-                            <CheckCircle2
-                                className={classNames(
-                                    'ml-auto h-5 w-5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100',
-                                    !settings.debug && 'text-primary opacity-100'
-                                )}
-                            />
-                        </button>
-                    </div>
-                </Card.Body>
-            </Card>
-
             {/* Settings List */}
             <Card>
                 <Card.Header>
@@ -150,6 +84,20 @@ const DebugConfig = () => {
                             <Card.Title>{__('Configuration', 'debug-suite')}</Card.Title>
                             <Card.Subtitle>{__('Manage your WordPress debug constants', 'debug-suite')}</Card.Subtitle>
                         </div>
+                    </div>
+                    {/* Toggle Env */}
+                    <div className="flex items-center gap-2">
+                        <CustomSwitch
+                            name="debug"
+                            checked={Boolean(settings.debug)}
+                            onChange={(e) => updateEnv(e.target.checked)}
+                            disabled={saving}
+                        />
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {settings.debug
+                                ? __('Debug Mode Enabled', 'debug-suite')
+                                : __('Debug Mode Disabled', 'debug-suite')}
+                        </span>
                     </div>
                 </Card.Header>
                 <Card.Body className="divide-y divide-gray-100 dark:divide-gray-700">
