@@ -5,8 +5,8 @@ import type { BulkAction, EmailEntry, EmailFilters } from '../types';ontrols - F
  *
  * @since 1.0.0
  */
-import { Button, SimpleSelect, TextInput } from '@/components/ui';
 import type { Option, PaginationInfo } from '@/components/ui';
+import { Button, SimpleSelect, Input as TextInput } from '@/components/ui';
 import { useConfirm } from '@/hooks/use-confirm';
 import { Fill } from '@wordpress/components';
 import { useState } from '@wordpress/element';

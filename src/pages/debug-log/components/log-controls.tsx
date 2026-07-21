@@ -3,8 +3,8 @@
  *
  * @since 1.0.0
  */
-import { Button, SimpleSelect, TextInput as InputField } from '@/components/ui';
 import type { Option } from '@/components/ui';
+import { Button, Input as InputField, SimpleSelect } from '@/components/ui';
 import { useConfirm } from '@/hooks/use-confirm';
 import { classNames } from '@/utils';
 import { Fill } from '@wordpress/components';
