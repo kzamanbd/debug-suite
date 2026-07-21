@@ -3,15 +3,15 @@
  *
  * @since 1.0.0
  */
-import { DateTimeHtml } from '@/components/base';
 import {
+    DateTimeHtml,
     Dialog,
     DialogContent,
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle
-} from '@/components/ui/dialog';
+} from '@/components/ui';
 import { __ } from '@wordpress/i18n';
 import { AlertCircle, Calendar, CheckCircle, FileText, Mail, MessageSquare, Paperclip } from 'lucide-react';
 import type { EmailLogEntry } from '../types';

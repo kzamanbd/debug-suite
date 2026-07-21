@@ -1,7 +1,7 @@
 import type { DialogOptions, DialogState } from '@/types';
 import { registerDialog, unregisterDialog } from '@/utils/dialog';
 import React, { useCallback, useEffect, useState } from 'react';
-import DialogModal from './base/dialog-modal';
+import { DialogModal } from '@/components/ui';
 
 // Confirm Dialog component (no context needed)
 const ConfirmDialog: React.FC = () => {

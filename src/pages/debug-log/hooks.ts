@@ -3,7 +3,7 @@
  *
  * @since 1.0.0
  */
-import type { Option } from '@/components/base/select';
+import type { Option } from '@/components/ui';
 import { useDebounce } from '@/hooks/use-debounce';
 import apiFetch from '@wordpress/api-fetch';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';

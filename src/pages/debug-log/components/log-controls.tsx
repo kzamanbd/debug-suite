@@ -3,10 +3,8 @@
  *
  * @since 1.0.0
  */
-import Button from '@/components/base/button';
-import type { Option } from '@/components/base/select';
-import SimpleSelect from '@/components/base/select';
-import InputField from '@/components/base/text-input';
+import { Button, SimpleSelect, TextInput as InputField } from '@/components/ui';
+import type { Option } from '@/components/ui';
 import { useConfirm } from '@/hooks/use-confirm';
 import { classNames } from '@/utils';
 import { Fill } from '@wordpress/components';
@@ -136,6 +134,7 @@ const LogControls = ({
 
             <div className="flex items-center rounded-md border">
                 <Button
+                    variant="outline"
                     onClick={onRefresh}
                     disabled={loading}
                     className="group relative rounded-none rounded-l-md border-0 border-r p-1.5"
@@ -144,6 +143,7 @@ const LogControls = ({
                 </Button>
 
                 <Button
+                    variant="outline"
                     onClick={() => setShowFilters(!showFilters)}
                     className={classNames(
                         'group relative rounded-none border-0 border-r p-1.5',
@@ -154,12 +154,14 @@ const LogControls = ({
                     <Filter className="size-4 shrink-0" />
                 </Button>
                 <Button
+                    variant="outline"
                     onClick={handleDownload}
                     className="group relative rounded-none border-0 border-r p-1.5"
                     title="Download logs">
                     <Download className="size-4 shrink-0" />
                 </Button>
                 <Button
+                    variant="outline"
                     onClick={handleClear}
                     disabled={clearing}
                     className="group relative rounded-none rounded-r-md border-0 p-1.5"

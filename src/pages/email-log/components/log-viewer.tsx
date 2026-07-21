@@ -3,9 +3,8 @@
  *
  * @since 1.0.0
  */
-import type { PaginationInfo } from '@/components/base';
-import { DateTimeHtml, Pagination } from '@/components/base';
-import Checkbox from '@/components/base/checkbox';
+import type { PaginationInfo } from '@/components/ui';
+import { Checkbox, DateTimeHtml, Pagination } from '@/components/ui';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Eye, RotateCcw, Trash2 } from 'lucide-react';

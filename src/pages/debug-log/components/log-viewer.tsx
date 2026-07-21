@@ -3,8 +3,7 @@
  *
  * @since 1.0.0
  */
-import Button from '@/components/base/button';
-import DateTimeHtml from '@/components/base/date-time';
+import { Button, DateTimeHtml } from '@/components/ui';
 import { classNames } from '@/utils';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { useRef, useState } from '@wordpress/element';
@@ -16,6 +15,7 @@ import {
     ChevronUpIcon,
     ClipboardIcon,
     Info,
+    LoaderCircle,
     OctagonAlert,
     RefreshCwIcon,
     TriangleAlert
@@ -213,7 +213,8 @@ const LogViewer = ({ logs, filters, loading, infiniteState, onFiltersChange, onL
                 <div className="border-t border-gray-200 bg-white p-2">
                     {infiniteState.hasMore ? (
                         <div className="flex items-center justify-center gap-4">
-                            <Button onClick={onLoadMore} loading={infiniteState.isLoadingMore}>
+                            <Button variant="outline" disabled={infiniteState.isLoadingMore} onClick={onLoadMore}>
+                                {infiniteState.isLoadingMore && <LoaderCircle className="size-4 animate-spin" />}
                                 <span>{__('Load More Entries', 'debug-suite')}</span>
                             </Button>
                             <span className="text-xs text-gray-400">

@@ -1,5 +1,4 @@
-import { Card } from '@/components/base';
-import CustomSwitch from '@/components/base/switch';
+import { Card, Switch as CustomSwitch } from '@/components/ui';
 import type { DebugState } from '@/types';
 import { classNames } from '@/utils';
 import apiFetch from '@wordpress/api-fetch';

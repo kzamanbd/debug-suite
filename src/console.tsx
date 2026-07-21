@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button, Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/components/ui';
 import DebugLog from '@/pages/debug-log';
 import { Slot, SlotFillProvider } from '@wordpress/components';
 import domReady from '@wordpress/dom-ready';

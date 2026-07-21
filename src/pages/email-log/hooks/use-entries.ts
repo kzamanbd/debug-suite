@@ -3,7 +3,7 @@
  *
  * @since 1.0.0
  */
-import type { PaginationInfo } from '@/components/base';
+import type { PaginationInfo } from '@/components/ui';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { EmailLogEntry, EmailLogFilters, EmailLogStats } from '../types';
