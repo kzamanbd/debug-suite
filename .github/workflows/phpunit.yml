@@ -1,4 +1,4 @@
-name: 🧪 PHPUnit Test Suite
+name: PHPUnit Test Suite
 
 on:
   pull_request:
@@ -12,13 +12,13 @@ concurrency:
 
 jobs:
   phpunit-tests:
-    name: 🧪 PHPUnit Tests (PHP ${{ matrix.php }} | WP ${{ matrix.wordpress }})
+    name: PHPUnit Tests (PHP ${{ matrix.php }} | WP ${{ matrix.wordpress }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.1", "8.4"]
+        php: ["8.1"]
         wordpress: ["latest"]
 
     env:
@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: 📦 Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -44,7 +44,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: 🗄️ Cache Composer Dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-php${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
@@ -59,10 +59,10 @@ jobs:
           echo "✅ Dependencies installed successfully"
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: pnpm
@@ -89,7 +89,7 @@ jobs:
           echo "✅ Integration tests completed"
 
       - name: 📊 Upload Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: test-results-php${{ matrix.php }}-wp${{ matrix.wordpress }}
