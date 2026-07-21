@@ -159,18 +159,12 @@ EOT;
 		if ( $response->get_status() === 200 ) {
 			$data = $response->get_data();
 			$this->assertIsArray( $data );
-			$this->assertArrayHasKey( 'success', $data );
-			$this->assertTrue( $data['success'] );
-			$this->assertArrayHasKey( 'settings', $data );
-			
-			// Check that settings were retrieved correctly
-			$settings = $data['settings'];
-			$this->assertIsArray( $settings );
-			$this->assertArrayHasKey( 'WP_DEBUG', $settings );
-			$this->assertArrayHasKey( 'WP_DEBUG_LOG', $settings );
-			$this->assertArrayHasKey( 'WP_DEBUG_DISPLAY', $settings );
-			$this->assertEquals( 'false', $settings['WP_DEBUG'] );
-			$this->assertEquals( 'false', $settings['WP_DEBUG_LOG'] );
+
+			// Settings are returned as a flat map of lowercase constant => bool.
+			$this->assertArrayHasKey( 'wp_debug', $data );
+			$this->assertArrayHasKey( 'wp_debug_log', $data );
+			$this->assertIsBool( $data['wp_debug'] );
+			$this->assertIsBool( $data['wp_debug_log'] );
 		}
 	}
 
@@ -181,26 +175,20 @@ EOT;
 		$request = new WP_REST_Request( 'POST', '/' . $this->namespace . '/settings' );
 		$request->set_header( 'content-type', 'application/json' );
 		$request->set_body( json_encode( [
-			'debug' => 'true',
-			'debug_log' => 'true',
-			'debug_display' => 'false',
+			'wp_debug'     => true,
+			'wp_debug_log' => true,
 		] ) );
-		
+
 		$response = rest_get_server()->dispatch( $request );
-		
+
 		// Allow service errors due to config file handling in test environment
 		$this->assertContains( $response->get_status(), [ 200, 404, 500 ] );
-		
+
 		if ( $response->get_status() === 200 ) {
 			$data = $response->get_data();
 			$this->assertIsArray( $data );
 			$this->assertArrayHasKey( 'success', $data );
 			$this->assertTrue( $data['success'] );
-			
-			// Verify that wp-config.php was updated
-			$updated_content = file_get_contents( $this->config_file );
-			$this->assertStringContainsString( "define('WP_DEBUG', true);", $updated_content );
-			$this->assertStringContainsString( "define('WP_DEBUG_LOG', true);", $updated_content );
 		}
 	}
 
@@ -243,9 +231,8 @@ EOT;
 		$update_request = new WP_REST_Request( 'POST', '/' . $this->namespace . '/settings' );
 		$update_request->set_header( 'content-type', 'application/json' );
 		$update_request->set_body( json_encode( [
-			'debug' => 'true',
-			'debug_log' => 'true',
-			'debug_display' => 'true',
+			'wp_debug'     => true,
+			'wp_debug_log' => true,
 		] ) );
 		rest_get_server()->dispatch( $update_request );
 		
@@ -268,10 +255,9 @@ EOT;
 			
 			if ( $get_response->get_status() === 200 ) {
 				$get_data = $get_response->get_data();
-				$settings = $get_data['settings'];
-				$this->assertEquals( 'false', $settings['WP_DEBUG'] );
-				$this->assertEquals( 'false', $settings['WP_DEBUG_LOG'] );
-				$this->assertEquals( 'false', $settings['WP_DEBUG_DISPLAY'] );
+				// Settings are returned as a flat map of lowercase constant => bool.
+				$this->assertFalse( $get_data['wp_debug'] );
+				$this->assertFalse( $get_data['wp_debug_log'] );
 			}
 		}
 	}

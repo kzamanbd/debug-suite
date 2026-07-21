@@ -17,7 +17,8 @@ if( ! defined( 'DEBUG_SUITE_TEST_DIR' ) ) {
 	define( 'DEBUG_SUITE_TEST_DIR', __DIR__ );
 }
 if ( ! defined( 'DEBUG_SUITE_PLUGIN_DIR' ) ) {
-	define( 'DEBUG_SUITE_PLUGIN_DIR', dirname( __DIR__ ) );
+	// Trailing slash to match plugin_dir_path() used in production.
+	define( 'DEBUG_SUITE_PLUGIN_DIR', dirname( __DIR__ ) . '/' );
 }
 
 // WordPress test configuration
