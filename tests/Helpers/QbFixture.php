@@ -66,4 +66,45 @@ class QbFixture extends BaseModel {
 		'value' => 'integer',
 		'score' => 'float',
 	];
+
+	/**
+	 * Create the throwaway fixture table.
+	 *
+	 * @return void
+	 */
+	public static function create_table(): void {
+		global $wpdb;
+
+		$table           = ( new static() )->get_table_name();
+		$charset_collate = $wpdb->get_charset_collate();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query(
+			"CREATE TABLE IF NOT EXISTS {$table} (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				name varchar(191) NOT NULL DEFAULT '',
+				category varchar(50) NOT NULL DEFAULT '',
+				value int(11) NOT NULL DEFAULT 0,
+				score float NOT NULL DEFAULT 0,
+				label varchar(191) NOT NULL DEFAULT '',
+				created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+				updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY (id)
+			) {$charset_collate};"
+		);
+	}
+
+	/**
+	 * Drop the throwaway fixture table.
+	 *
+	 * @return void
+	 */
+	public static function drop_table(): void {
+		global $wpdb;
+
+		$table = ( new static() )->get_table_name();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+	}
 }

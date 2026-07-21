@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Static query methods are handled by BaseModel's __callStatic magic:
  *
  *     EmailLog::find( 1 );
- *     EmailLog::where( [ 'status' => 'success' ] );
+ *     EmailLog::where( 'status', 'success' )->get();
  *     EmailLog::create( [ ... ] );
  *     EmailLog::destroy( [ 1, 2, 3 ] );
  *

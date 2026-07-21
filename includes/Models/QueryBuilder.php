@@ -27,6 +27,8 @@
 
 namespace DebugSuite\Models;
 
+use RuntimeException;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -466,6 +468,54 @@ class QueryBuilder {
 			: $wpdb->get_results( $wpdb->prepare( $query, $values ), ARRAY_A );
 
 		return is_array( $results ) ? $results : [];
+	}
+
+	/**
+	 * Execute a DELETE for the current WHERE constraints.
+	 *
+	 * Requires at least one WHERE clause; call truncate() to intentionally
+	 * empty a table.
+	 *
+	 * @return int Number of rows deleted.
+	 *
+	 * @throws RuntimeException When no WHERE clause has been set.
+	 */
+	public function delete(): int {
+		if ( empty( $this->wheres ) ) {
+			throw new RuntimeException( 'Refusing to run an unbounded DELETE; use truncate() to empty the table.' );
+		}
+
+		$wpdb       = $this->model->get_wpdb();
+		$table_name = $this->model->get_table_name();
+
+		$clauses = [];
+		$values  = [];
+		foreach ( $this->wheres as $where ) {
+			$clauses[] = $where['clause'];
+			foreach ( $where['values'] as $val ) {
+				$values[] = $val;
+			}
+		}
+
+		$query = "DELETE FROM {$table_name} WHERE " . implode( ' AND ', $clauses );
+
+		$result = empty( $values )
+			? $wpdb->query( $query )
+			: $wpdb->query( $wpdb->prepare( $query, $values ) );
+
+		return $result !== false ? (int) $result : 0;
+	}
+
+	/**
+	 * Truncate the model's table.
+	 *
+	 * @return bool
+	 */
+	public function truncate(): bool {
+		$wpdb       = $this->model->get_wpdb();
+		$table_name = $this->model->get_table_name();
+
+		return false !== $wpdb->query( "TRUNCATE TABLE {$table_name}" );
 	}
 
 	// =========================================================================

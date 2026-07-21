@@ -38,25 +38,8 @@ class QueryBuilderTest extends DebugSuiteTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		global $wpdb;
 		$this->table_name = ( new QbFixture() )->get_table_name();
-
-		$charset_collate = $wpdb->get_charset_collate();
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query(
-			"CREATE TABLE IF NOT EXISTS {$this->table_name} (
-				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-				name varchar(191) NOT NULL DEFAULT '',
-				category varchar(50) NOT NULL DEFAULT '',
-				value int(11) NOT NULL DEFAULT 0,
-				score float NOT NULL DEFAULT 0,
-				label varchar(191) NOT NULL DEFAULT '',
-				created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				PRIMARY KEY (id)
-			) {$charset_collate};"
-		);
+		QbFixture::create_table();
 	}
 
 	/**
@@ -65,9 +48,7 @@ class QueryBuilderTest extends DebugSuiteTestCase {
 	 * @return void
 	 */
 	public function tear_down(): void {
-		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query( "DROP TABLE IF EXISTS {$this->table_name}" );
+		QbFixture::drop_table();
 
 		parent::tear_down();
 	}
@@ -534,5 +515,67 @@ class QueryBuilderTest extends DebugSuiteTestCase {
 	public function test_count_empty_table(): void {
 		$count = QbFixture::query()->count();
 		$this->assertEquals( 0, $count );
+	}
+
+	// =========================================================================
+	// delete() / truncate() tests
+	// =========================================================================
+
+	/**
+	 * Test delete() removes only rows matching the WHERE clause.
+	 */
+	public function test_delete_removes_matching_rows(): void {
+		$this->insert_fixture( [ 'category' => 'a' ] );
+		$this->insert_fixture( [ 'category' => 'b' ] );
+		$this->insert_fixture( [ 'category' => 'a' ] );
+
+		$deleted = QbFixture::query()
+			->where( 'category', 'a' )
+			->delete();
+
+		$this->assertEquals( 2, $deleted );
+		$this->assertEquals( 1, QbFixture::query()->count() );
+		$this->assertEquals( 'b', QbFixture::query()->first()->category );
+	}
+
+	/**
+	 * Test delete() with where_in returns affected count.
+	 */
+	public function test_delete_with_where_in(): void {
+		$id1 = $this->insert_fixture();
+		$id2 = $this->insert_fixture();
+		$this->insert_fixture();
+
+		$deleted = QbFixture::query()
+			->where_in( 'id', [ $id1, $id2 ] )
+			->delete();
+
+		$this->assertEquals( 2, $deleted );
+		$this->assertEquals( 1, QbFixture::query()->count() );
+	}
+
+	/**
+	 * Test delete() without a WHERE clause throws to prevent a full-table wipe.
+	 */
+	public function test_delete_without_where_throws(): void {
+		$this->insert_fixture();
+
+		$this->expectException( \RuntimeException::class );
+
+		QbFixture::query()->delete();
+	}
+
+	/**
+	 * Test truncate() empties the table.
+	 */
+	public function test_truncate_empties_table(): void {
+		$this->insert_fixture();
+		$this->insert_fixture();
+		$this->insert_fixture();
+
+		$result = QbFixture::query()->truncate();
+
+		$this->assertTrue( $result );
+		$this->assertEquals( 0, QbFixture::query()->count() );
 	}
 }

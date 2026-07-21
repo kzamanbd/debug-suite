@@ -3,19 +3,20 @@
  * Base Model class for Debug Suite.
  *
  * Provides common database operations and utilities for all models.
- * Supports Eloquent-style static calls via __callStatic proxy.
+ * QueryBuilder is the single query engine: terminal finders delegate to it,
+ * and any QueryBuilder method is reachable as a static "starter" that returns
+ * the builder for chaining (via the __call/__callStatic proxy).
  *
  * Usage:
- *     EmailLog::find( 1 );
- *     EmailLog::where( [ 'status' => 'success' ] );
- *     EmailLog::create( [ 'subject' => 'Test' ] );
- *     EmailLog::all();
- *     EmailLog::count();
- *     EmailLog::destroy( [ 1, 2, 3 ] );
- *     EmailLog::truncate();
- *     EmailLog::first( [ 'status' => 'success' ] );
- *     EmailLog::latest();
- *     EmailLog::first_or_create( [ 'status' => 'success' ], [ 'subject' => 'Test' ] );
+ *     EmailLog::find( 1 );                              // terminal → ?static
+ *     EmailLog::all();                                  // terminal → array
+ *     EmailLog::count();                                // terminal → int
+ *     EmailLog::create( [ 'subject' => 'Test' ] );      // terminal → ?static
+ *     EmailLog::destroy( [ 1, 2, 3 ] );                 // terminal → int
+ *     EmailLog::truncate();                             // terminal → bool
+ *     EmailLog::latest();                               // terminal → ?static
+ *     EmailLog::where( 'status', 'success' )->get();    // starter  → QueryBuilder
+ *     EmailLog::where_in( 'id', $ids )->delete();       // starter  → QueryBuilder
  *
  * @package DebugSuite
  */
@@ -31,26 +32,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Base model class with common database operations (ORM-style).
  *
- * Query methods are protected and accessed via __callStatic / __call.
+ * Terminal finders are explicit methods that delegate to QueryBuilder.
+ * Any other QueryBuilder method (where, where_in, order_by, ...) is forwarded
+ * as a static starter via __call and returns a QueryBuilder for chaining.
  *
  * @since 1.0.0
  *
- * @method static string      get_table_name()
- * @method static static|null find( mixed $id )
- * @method static array       find_many( array $ids )
- * @method static array       all( array $options = [] )
- * @method static array       where( array $conditions, array $options = [] )
- * @method static int         count( array $conditions = [] )
- * @method static int         destroy( array $ids )
- * @method static bool        truncate()
- * @method static static|null create( array $attributes )
- * @method static static      from_array( array $attributes )
- * @method static static|null first( array $conditions = [] )
- * @method static static|null latest( string $column = 'created_at' )
- * @method static static|null oldest( string $column = 'created_at' )
- * @method static static      first_or_create( array $conditions, array $attributes = [] )
- * @method static static      update_or_create( array $conditions, array $attributes )
+ * @method static string       get_table_name()
+ * @method static static|null  find( mixed $id )
+ * @method static array        find_many( array $ids )
+ * @method static array        all()
+ * @method static static|null  first()
+ * @method static int          count()
+ * @method static int          destroy( array $ids )
+ * @method static bool         truncate()
+ * @method static static|null  create( array $attributes )
+ * @method static static       from_array( array $attributes )
+ * @method static static|null  latest( string $column = 'created_at' )
+ * @method static static|null  oldest( string $column = 'created_at' )
+ * @method static static       first_or_create( array $conditions, array $attributes = [] )
+ * @method static static       update_or_create( array $conditions, array $attributes )
  * @method static QueryBuilder query()
+ * @method static QueryBuilder where( string $column, mixed $operator_or_value = null, mixed $value = null )
+ * @method static QueryBuilder where_any( array $columns, mixed $operator_or_value = null, mixed $value = null )
+ * @method static QueryBuilder where_in( string $column, array $values )
+ * @method static QueryBuilder where_raw( string $clause, array $values = [] )
+ * @method static QueryBuilder where_not_empty( string $column )
+ * @method static QueryBuilder order_by( string $column, string $direction = 'DESC' )
+ * @method static QueryBuilder select_raw( string $expression )
+ * @method static QueryBuilder distinct()
  */
 abstract class BaseModel implements Model {
 
@@ -153,7 +163,7 @@ abstract class BaseModel implements Model {
 	 *
 	 * This enables Eloquent-style static usage:
 	 *     EmailLog::find( 1 );
-	 *     EmailLog::where( [ 'status' => 'success' ] );
+	 *     EmailLog::where( 'status', 'success' )->get();
 	 *
 	 * @param string $method     Method name.
 	 * @param array  $parameters Method parameters.
@@ -164,20 +174,29 @@ abstract class BaseModel implements Model {
 	}
 
 	/**
-	 * Handle instance calls to protected query methods.
+	 * Handle instance calls to protected methods and QueryBuilder starters.
 	 *
-	 * Allows calling protected methods from outside via object instance:
-	 *     $model->find( 1 );
+	 * Resolution order:
+	 *   1. An explicit protected/public method on the model (terminal finders,
+	 *      services) is invoked directly.
+	 *   2. Otherwise, if a fresh QueryBuilder exposes the method, the call is
+	 *      forwarded to it — making every builder method a chainable starter
+	 *      (e.g. EmailLog::where( 'status', 'success' )->get()).
 	 *
 	 * @param string $method     Method name.
 	 * @param array  $parameters Method parameters.
 	 * @return mixed
 	 *
-	 * @throws \BadMethodCallException When method does not exist.
+	 * @throws \BadMethodCallException When neither the model nor the builder has the method.
 	 */
 	public function __call( string $method, array $parameters ): mixed {
 		if ( method_exists( $this, $method ) ) {
 			return $this->$method( ...$parameters );
+		}
+
+		$query = $this->query();
+		if ( method_exists( $query, $method ) ) {
+			return $query->$method( ...$parameters );
 		}
 
 		throw new \BadMethodCallException(
@@ -257,6 +276,13 @@ abstract class BaseModel implements Model {
 
 	/**
 	 * Create a new query builder instance for this model.
+	 *
+	 * The single query engine for the model. Terminal finders delegate here,
+	 * and unknown static/instance calls forward here as chainable starters.
+	 *
+	 * Kept protected so `Model::query()` / `$model->query()` resolve through the
+	 * __callStatic / __call proxy (a public non-static method would fatal when
+	 * called statically instead of triggering the proxy).
 	 *
 	 * @return QueryBuilder
 	 */
@@ -577,17 +603,7 @@ abstract class BaseModel implements Model {
 	 * @return static|null
 	 */
 	protected function find( $id ): ?static {
-		$wpdb        = $this->get_wpdb();
-		$table_name  = $this->get_table_name();
-		$primary_key = static::$primary_key;
-
-		$query  = "SELECT * FROM $table_name WHERE $primary_key = %s";
-		$result = $wpdb->get_row(
-			$wpdb->prepare( $query, $id ),
-			ARRAY_A
-		);
-
-		return $result ? $this->from_array( $result ) : null;
+		return $this->query()->where( static::$primary_key, $id )->first();
 	}
 
 	/**
@@ -601,171 +617,80 @@ abstract class BaseModel implements Model {
 			return [];
 		}
 
-		$wpdb        = $this->get_wpdb();
-		$table_name  = $this->get_table_name();
-		$primary_key = static::$primary_key;
-
-		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%s' ) );
-		$query        = "SELECT * FROM $table_name WHERE $primary_key IN ($placeholders)";
-
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $ids ), ARRAY_A );
-
-		return array_map( [ $this, 'from_array' ], $results );
+		return $this->query()->where_in( static::$primary_key, $ids )->get();
 	}
 
 	/**
-	 * Get all records.
+	 * Get all records, ordered by primary key descending.
 	 *
-	 * @param array $options Query options.
+	 * Use the builder for bounded reads: Model::query()->limit()->offset()->get().
+	 *
 	 * @return array
 	 */
-	protected function all( array $options = [] ): array {
-		$wpdb        = $this->get_wpdb();
-		$table_name  = $this->get_table_name();
-		$primary_key = static::$primary_key;
-
-		$limit  = isset( $options['limit'] ) ? (int) $options['limit'] : 100;
-		$offset = isset( $options['offset'] ) ? (int) $options['offset'] : 0;
-
-		$query   = "SELECT * FROM $table_name ORDER BY $primary_key DESC LIMIT %d OFFSET %d";
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $limit, $offset ), ARRAY_A );
-
-		return array_map( [ $this, 'from_array' ], $results );
+	protected function all(): array {
+		return $this->query()->order_by( static::$primary_key, 'DESC' )->get();
 	}
 
 	/**
-	 * Find records by simple conditions.
+	 * Get the first record.
 	 *
-	 * @param array $conditions Simple WHERE conditions (column => value).
-	 * @param array $options    Query options.
-	 * @return array
-	 */
-	protected function where( array $conditions, array $options = [] ): array {
-		if ( empty( $conditions ) ) {
-			return $this->all( $options );
-		}
-
-		$wpdb        = $this->get_wpdb();
-		$table_name  = $this->get_table_name();
-		$primary_key = static::$primary_key;
-
-		$limit  = isset( $options['limit'] ) ? (int) $options['limit'] : 100;
-		$offset = isset( $options['offset'] ) ? (int) $options['offset'] : 0;
-
-		// Build simple WHERE clause.
-		$where_parts = [];
-		$values      = [];
-		foreach ( $conditions as $column => $value ) {
-			$where_parts[] = "$column = %s";
-			$values[]      = $value;
-		}
-
-		$where_clause = implode( ' AND ', $where_parts );
-		$query        = "SELECT * FROM $table_name WHERE $where_clause ORDER BY $primary_key DESC LIMIT %d OFFSET %d";
-
-		$values[] = $limit;
-		$values[] = $offset;
-
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $values ), ARRAY_A );
-
-		return array_map( [ $this, 'from_array' ], $results );
-	}
-
-	/**
-	 * Get the first record matching the conditions.
+	 * Filter through the builder, e.g. Model::where( 'status', 'x' )->first().
 	 *
-	 * @param array $conditions Simple WHERE conditions (column => value).
 	 * @return static|null
 	 */
-	protected function first( array $conditions = [] ): ?static {
-		$results = $this->where( $conditions, [ 'limit' => 1 ] );
-
-		return ! empty( $results ) ? $results[0] : null;
+	protected function first(): ?static {
+		return $this->query()->first();
 	}
 
 	/**
 	 * Get the latest record by a given column.
 	 *
 	 * @param string $column Column to order by.
-	 * @return static|null
+	 * @return static|null Null when the column is not orderable.
 	 */
 	protected function latest( string $column = 'created_at' ): ?static {
-		$wpdb       = $this->get_wpdb();
-		$table_name = $this->get_table_name();
-
-		// Validate column name against fillable + primary key.
-		$allowed = array_merge( static::$fillable, [ static::$primary_key ] );
-		if ( ! in_array( $column, $allowed, true ) ) {
+		if ( ! $this->is_orderable_column( $column ) ) {
 			return null;
 		}
 
-		$query  = "SELECT * FROM $table_name ORDER BY `$column` DESC LIMIT 1";
-		$result = $wpdb->get_row( $query, ARRAY_A );
-
-		return $result ? $this->from_array( $result ) : null;
+		return $this->query()->order_by( $column, 'DESC' )->first();
 	}
 
 	/**
 	 * Get the oldest record by a given column.
 	 *
 	 * @param string $column Column to order by.
-	 * @return static|null
+	 * @return static|null Null when the column is not orderable.
 	 */
 	protected function oldest( string $column = 'created_at' ): ?static {
-		$wpdb       = $this->get_wpdb();
-		$table_name = $this->get_table_name();
-
-		// Validate column name against fillable + primary key.
-		$allowed = array_merge( static::$fillable, [ static::$primary_key ] );
-		if ( ! in_array( $column, $allowed, true ) ) {
+		if ( ! $this->is_orderable_column( $column ) ) {
 			return null;
 		}
 
-		$query  = "SELECT * FROM $table_name ORDER BY `$column` ASC LIMIT 1";
-		$result = $wpdb->get_row( $query, ARRAY_A );
-
-		return $result ? $this->from_array( $result ) : null;
+		return $this->query()->order_by( $column, 'ASC' )->first();
 	}
 
 	/**
-	 * Count records.
+	 * Count all records.
 	 *
-	 * @param array $conditions Simple WHERE conditions.
+	 * Filter through the builder, e.g. Model::where( 'status', 'x' )->count().
+	 *
 	 * @return int
 	 */
-	protected function count( array $conditions = [] ): int {
-		$wpdb       = $this->get_wpdb();
-		$table_name = $this->get_table_name();
-		$query      = "SELECT COUNT(*) FROM $table_name";
+	protected function count(): int {
+		return $this->query()->count();
+	}
 
-		if ( empty( $conditions ) ) {
-			// No dynamic values; run raw query safely.
-			return (int) $wpdb->get_var( $query );
-		}
-
-		// Validate column names to prevent SQL injection.
-		$allowed_columns = array_merge( static::$fillable, [ static::$primary_key ] );
-
-		// Build simple WHERE clause.
-		$where_parts = [];
-		$values      = [];
-		foreach ( $conditions as $column => $value ) {
-			// Validate column name.
-			if ( ! in_array( $column, $allowed_columns, true ) ) {
-				continue; // Skip invalid columns.
-			}
-			$where_parts[] = "`$column` = %s";
-			$values[]      = $value;
-		}
-
-		if ( empty( $where_parts ) ) {
-			return 0;
-		}
-
-		$where_clause = implode( ' AND ', $where_parts );
-		$query        = "SELECT COUNT(*) FROM $table_name WHERE $where_clause";
-
-		return (int) $wpdb->get_var( $wpdb->prepare( $query, $values ) );
+	/**
+	 * Whether a column is safe to order by (fillable column or primary key).
+	 *
+	 * Guards the dynamic-column finders against unvalidated identifiers.
+	 *
+	 * @param string $column Column name.
+	 * @return bool
+	 */
+	protected function is_orderable_column( string $column ): bool {
+		return in_array( $column, array_merge( static::$fillable, [ static::$primary_key ] ), true );
 	}
 
 	/**
@@ -783,12 +708,12 @@ abstract class BaseModel implements Model {
 	/**
 	 * Find the first record matching conditions or create it.
 	 *
-	 * @param array $conditions Conditions to search by.
+	 * @param array $conditions Equality conditions to search by.
 	 * @param array $attributes Additional attributes for creation.
 	 * @return static
 	 */
 	protected function first_or_create( array $conditions, array $attributes = [] ): static {
-		$existing = $this->first( $conditions );
+		$existing = $this->query_where( $conditions )->first();
 
 		if ( $existing ) {
 			return $existing;
@@ -800,12 +725,12 @@ abstract class BaseModel implements Model {
 	/**
 	 * Find a record matching conditions and update it, or create it.
 	 *
-	 * @param array $conditions Conditions to search by.
+	 * @param array $conditions Equality conditions to search by.
 	 * @param array $attributes Attributes to update or set on creation.
 	 * @return static
 	 */
 	protected function update_or_create( array $conditions, array $attributes ): static {
-		$existing = $this->first( $conditions );
+		$existing = $this->query_where( $conditions )->first();
 
 		if ( $existing ) {
 			$existing->fill( $attributes );
@@ -815,6 +740,22 @@ abstract class BaseModel implements Model {
 		}
 
 		return $this->create( array_merge( $conditions, $attributes ) );
+	}
+
+	/**
+	 * Build a query constrained by simple equality conditions.
+	 *
+	 * @param array $conditions Column => value equality conditions.
+	 * @return QueryBuilder
+	 */
+	private function query_where( array $conditions ): QueryBuilder {
+		$query = $this->query();
+
+		foreach ( $conditions as $column => $value ) {
+			$query->where( $column, $value );
+		}
+
+		return $query;
 	}
 
 	/**
@@ -929,8 +870,6 @@ abstract class BaseModel implements Model {
 	/**
 	 * Delete records by primary key IDs.
 	 *
-	 * Uses a single DELETE ... WHERE IN query for efficiency.
-	 *
 	 * @param array $ids Array of primary key values.
 	 * @return int Number of deleted records.
 	 */
@@ -939,16 +878,7 @@ abstract class BaseModel implements Model {
 			return 0;
 		}
 
-		$wpdb        = $this->get_wpdb();
-		$table_name  = $this->get_table_name();
-		$primary_key = static::$primary_key;
-
-		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-		$query        = "DELETE FROM $table_name WHERE `$primary_key` IN ($placeholders)";
-
-		$result = $wpdb->query( $wpdb->prepare( $query, $ids ) );
-
-		return $result !== false ? (int) $result : 0;
+		return $this->query()->where_in( static::$primary_key, $ids )->delete();
 	}
 
 	/**
@@ -957,12 +887,7 @@ abstract class BaseModel implements Model {
 	 * @return bool
 	 */
 	protected function truncate(): bool {
-		$wpdb       = $this->get_wpdb();
-		$table_name = $this->get_table_name();
-		$query      = "TRUNCATE TABLE $table_name";
-
-		// No placeholders; execute directly.
-		return false !== $wpdb->query( $query );
+		return $this->query()->truncate();
 	}
 
 	// =========================================================================
