@@ -38,6 +38,9 @@ class Activator {
 
 		// Install database tables
 		Install::do_install();
+
+		// Register OpenAPI rewrite rules and flush so the docs URL works immediately.
+		OpenApiPage::refresh_rewrite_rules();
 	}
 
 	/**
@@ -46,7 +49,6 @@ class Activator {
 	 * @return void
 	 */
 	public static function refresh_openapi_rewrite_rules(): void {
-		OpenApiPage::rewrite_routes();
-		flush_rewrite_rules( false );
+		OpenApiPage::refresh_rewrite_rules();
 	}
 }

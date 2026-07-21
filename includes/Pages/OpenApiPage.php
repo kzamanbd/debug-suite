@@ -6,9 +6,21 @@ use DebugSuite\Services\OpenApiService;
 
 class OpenApiPage extends AbstractPage {
 
+    /**
+     * Rewrite-rules version. Bump whenever rewrite_routes() changes to trigger a
+     * one-time flush on the next request.
+     */
+    private const REWRITE_VERSION = '1.0.0';
+
+    /**
+     * Option that stores the last-flushed rewrite version.
+     */
+    private const REWRITE_VERSION_OPTION = 'debug_suite_openapi_rewrite_version';
+
     public function register_hooks( $force = true ): void {
         parent::register_hooks( $force );
         add_action( 'init', [ $this, 'rewrite_routes' ] );
+        add_action( 'wp_loaded', [ $this, 'maybe_flush_rewrite_rules' ] );
         add_action( 'template_redirect', [ $this, 'render_template' ] );
         add_filter( 'redirect_canonical', [ $this, 'disable_canonical_redirect' ] );
     }
@@ -20,11 +32,45 @@ class OpenApiPage extends AbstractPage {
         return $redirect_url;
     }
 
-    public static function rewrite_routes() {
+    public static function rewrite_routes(): void {
         $base = preg_quote( OpenApiService::rewrite_base_api(), '/' );
         add_rewrite_tag( '%debug-suite-openapi%', '([^&]+)' );
         add_rewrite_rule( '^' . $base . '/docs(?:/.*)?$', 'index.php?debug-suite-openapi=docs', 'top' );
         add_rewrite_rule( '^' . $base . '/schema/?$', 'index.php?debug-suite-openapi=schema', 'top' );
+    }
+
+    /**
+     * Flush rewrite rules once whenever our rules change.
+     *
+     * Runs on wp_loaded (after rewrite_routes() has registered the rules on
+     * init) and flushes only when the stored version differs from
+     * REWRITE_VERSION. This makes the /docs and /schema URLs self-heal after an
+     * activation, plugin update, or rule change — without the intermittent 404
+     * that otherwise needs a manual "Save Permalinks" — and without paying for a
+     * flush on every request.
+     *
+     * @return void
+     */
+    public function maybe_flush_rewrite_rules(): void {
+        if ( get_option( self::REWRITE_VERSION_OPTION ) === self::REWRITE_VERSION ) {
+            return;
+        }
+
+        self::refresh_rewrite_rules();
+    }
+
+    /**
+     * Register the rewrite rules, flush, and record the current version.
+     *
+     * Safe to call outside the normal request lifecycle (e.g. on activation): it
+     * registers the rules before flushing.
+     *
+     * @return void
+     */
+    public static function refresh_rewrite_rules(): void {
+        self::rewrite_routes();
+        flush_rewrite_rules( false );
+        update_option( self::REWRITE_VERSION_OPTION, self::REWRITE_VERSION );
     }
 
     public function render_schema() {
