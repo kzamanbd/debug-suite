@@ -131,7 +131,8 @@ class Assets implements Hookable {
 			'version'          => DEBUG_SUITE_VERSION,
 		];
 		$options  = get_option( 'debug_suite_settings', [] );
-		$settings  = array_merge( $constants, $settings->get_data(), $options );
+		$saved_settings = is_wp_error( $settings ) ? [] : $settings;
+		$settings  = array_merge( $constants, $saved_settings, $options );
 
 		return apply_filters( 'debug_suite_localized_data', $settings );
 	}

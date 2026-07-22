@@ -137,7 +137,7 @@ vendor/bin/phpunit --testsuite=integration
 ### Run Specific Test File
 
 ```bash
-vendor/bin/phpunit tests/Unit/Core/ServiceResponseTest.php
+vendor/bin/phpunit tests/Unit/Services/SettingsServiceTest.php
 ```
 
 ### Run Tests Matching a Pattern
@@ -238,7 +238,7 @@ Base class for unit tests that provides:
 
 - Container management and reset
 - File and directory creation helpers
-- ServiceResponse assertion methods
+- Service result assertion methods (WP_Error aware)
 - Utility methods for testing
 
 ### DebugSuiteTestCase (Integration Tests)

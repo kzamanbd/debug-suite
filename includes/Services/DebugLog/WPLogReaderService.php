@@ -12,9 +12,9 @@ namespace DebugSuite\Services\DebugLog;
 
 use DateTime;
 use DebugSuite\Core\FileSystem;
-use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\ServiceInterface;
 use Exception;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -87,23 +87,23 @@ class WPLogReaderService implements ServiceInterface {
 	 *     @type int    $offset     Offset for pagination.
 	 *     @type string $log_file   Custom log file path.
 	 * }
-	 * @return ServiceResponse
+	 * @return array|WP_Error Log payload on success, WP_Error on failure.
 	 */
-	public function read_log_entries( array $options = [] ): ServiceResponse {
+	public function read_log_entries( array $options = [] ): array|WP_Error {
 		$log_file = $options['log_file'] ?? $this->log_file_path;
 
 		if ( ! FileSystem::exists( $log_file ) ) {
-			return ServiceResponse::failure(
-				__( 'Log file not found.', 'debug-suite' ),
+			return new WP_Error(
 				'file_not_found',
+				__( 'Log file not found.', 'debug-suite' ),
 				[ 'path' => $log_file ]
 			);
 		}
 
 		if ( ! FileSystem::is_readable( $log_file ) ) {
-			return ServiceResponse::failure(
-				__( 'Log file is not readable.', 'debug-suite' ),
+			return new WP_Error(
 				'file_not_readable',
+				__( 'Log file is not readable.', 'debug-suite' ),
 				[ 'path' => $log_file ]
 			);
 		}
@@ -111,9 +111,9 @@ class WPLogReaderService implements ServiceInterface {
 		try {
 			$content = FileSystem::get_contents( $log_file );
 			if ( false === $content ) {
-				return ServiceResponse::failure(
-					__( 'Failed to read log file.', 'debug-suite' ),
+				return new WP_Error(
 					'read_error',
+					__( 'Failed to read log file.', 'debug-suite' ),
 					[ 'path' => $log_file ]
 				);
 			}
@@ -138,22 +138,20 @@ class WPLogReaderService implements ServiceInterface {
 				'last_modified'    => $last_modified,
 			];
 
-			return ServiceResponse::success(
-				[
-					'entries' => $paginated_entries,
-					'total'   => count( $filtered_entries ),
-					'file_path'    => $log_file,
-					'size'    => $file_size,
-					'labels'  => $this->get_log_levels(),
-					'stats'   => $stats,
-				]
-			);
+			return [
+				'entries' => $paginated_entries,
+				'total'   => count( $filtered_entries ),
+				'file_path'    => $log_file,
+				'size'    => $file_size,
+				'labels'  => $this->get_log_levels(),
+				'stats'   => $stats,
+			];
 
 		} catch ( Exception $e ) {
-			return ServiceResponse::failure(
+			return new WP_Error(
+				'parse_error',
 				// translators: %s is the error message.
 				sprintf( __( 'Error reading log file: %s', 'debug-suite' ), $e->getMessage() ),
-				'parse_error',
 				[ 'error' => $e->getMessage() ]
 			);
 		}
@@ -607,25 +605,24 @@ class WPLogReaderService implements ServiceInterface {
 	 * Get log file statistics.
 	 *
 	 * @param string|null $log_file Optional log file path.
-	 * @return ServiceResponse
+	 * @return array|WP_Error Statistics payload on success, WP_Error on failure.
 	 */
-	public function get_log_statistics( ?string $log_file = null ): ServiceResponse {
+	public function get_log_statistics( ?string $log_file = null ): array|WP_Error {
 		$log_file = $log_file ?? $this->log_file_path;
 
 		if ( ! FileSystem::exists( $log_file ) ) {
-			return ServiceResponse::failure(
-				__( 'Log file not found.', 'debug-suite' ),
+			return new WP_Error(
 				'file_not_found',
+				__( 'Log file not found.', 'debug-suite' ),
 				[ 'path' => $log_file ]
 			);
 		}
 
-		$log_result = $this->read_log_entries( [ 'log_file' => $log_file ] );
-		if ( $log_result->is_failure() ) {
-			return $log_result;
+		$data = $this->read_log_entries( [ 'log_file' => $log_file ] );
+		if ( is_wp_error( $data ) ) {
+			return $data;
 		}
 
-		$data = $log_result->get_data();
 		$entries = $data['entries'];
 
 		$file_size = FileSystem::size( $log_file );
@@ -659,41 +656,37 @@ class WPLogReaderService implements ServiceInterface {
 			}
 		}
 
-		return ServiceResponse::success( $stats );
+		return $stats;
 	}
 
 	/**
 	 * Clear log file content.
 	 *
 	 * @param string|null $log_file Optional log file path.
-	 * @return ServiceResponse
+	 * @return array|WP_Error Result payload on success, WP_Error on failure.
 	 */
-	public function clear_log_file( ?string $log_file = null ): ServiceResponse {
+	public function clear_log_file( ?string $log_file = null ): array|WP_Error {
 		$log_file = $log_file ?? $this->log_file_path;
 
 		if ( ! FileSystem::exists( $log_file ) ) {
-			return ServiceResponse::success(
-				[
-					'message' => __( 'Log file does not exist.', 'debug-suite' ),
-					'path'    => $log_file,
-				]
-			);
+			return [
+				'message' => __( 'Log file does not exist.', 'debug-suite' ),
+				'path'    => $log_file,
+			];
 		}
 
 		$result = FileSystem::put_contents( $log_file, '' );
 		if ( ! $result ) {
-			return ServiceResponse::failure(
-				__( 'Failed to clear log file.', 'debug-suite' ),
-				'clear_failed'
+			return new WP_Error(
+				'clear_failed',
+				__( 'Failed to clear log file.', 'debug-suite' )
 			);
 		}
 
-		return ServiceResponse::success(
-			[
-				'message' => __( 'Log file cleared successfully.', 'debug-suite' ),
-				'path'    => $log_file,
-			]
-		);
+		return [
+			'message' => __( 'Log file cleared successfully.', 'debug-suite' ),
+			'path'    => $log_file,
+		];
 	}
 
 	/**
@@ -701,9 +694,9 @@ class WPLogReaderService implements ServiceInterface {
 	 * Delegates to read_log_entries.
 	 *
 	 * @param array $options Log reading options.
-	 * @return ServiceResponse
+	 * @return array|WP_Error Log payload on success, WP_Error on failure.
 	 */
-	public function get_log_entries( array $options = [] ): ServiceResponse {
+	public function get_log_entries( array $options = [] ): array|WP_Error {
 		return $this->read_log_entries( $options );
 	}
 
@@ -712,9 +705,9 @@ class WPLogReaderService implements ServiceInterface {
 	 * Delegates to get_log_statistics.
 	 *
 	 * @param string|null $log_file Optional log file path.
-	 * @return ServiceResponse
+	 * @return array|WP_Error Statistics payload on success, WP_Error on failure.
 	 */
-	public function get_log_file_stats( ?string $log_file = null ): ServiceResponse {
+	public function get_log_file_stats( ?string $log_file = null ): array|WP_Error {
 		return $this->get_log_statistics( $log_file );
 	}
 

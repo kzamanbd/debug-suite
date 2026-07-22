@@ -81,7 +81,7 @@ EOT;
 		$this->assert_service_result_success($result);
 		
 		// Check the extracted settings
-		$settings = $result->get_data();
+		$settings = $result;
 		$this->assertIsArray($settings);
 		$this->assertArrayHasKey('wp_debug', $settings);
 		$this->assertArrayHasKey('wp_debug_log', $settings);
@@ -213,7 +213,7 @@ EOT;
 		$this->assert_service_result_success($result);
 		
 		// Get the current settings after reset
-		$current_settings = $this->service->get_settings()->get_data();
+		$current_settings = $this->service->get_settings();
 		
 		// All settings should be set to 'false'
 		$this->assertFalse($current_settings['wp_debug']);

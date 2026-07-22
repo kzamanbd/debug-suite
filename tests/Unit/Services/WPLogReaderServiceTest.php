@@ -7,10 +7,10 @@
 
 namespace DebugSuite\Tests\Unit\Services;
 
-use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
 use DebugSuite\Tests\Helpers\TestCase;
 use ReflectionClass;
+use WP_Error;
 
 
 /**
@@ -112,8 +112,7 @@ class WPLogReaderServiceTest extends TestCase {
 		
 		$result = $service->read_log_entries();
 
-		$this->assertInstanceOf( ServiceResponse::class, $result );
-		$this->assertTrue( $result->is_failure() );
+		$this->assertInstanceOf( WP_Error::class, $result );
 		$this->assertEquals( 'file_not_found', $result->get_error_code() );
 		$this->assertStringContainsString( 'Log file not found', $result->get_error_message() );
 	}
@@ -129,8 +128,8 @@ class WPLogReaderServiceTest extends TestCase {
 
 		$result = $this->service->read_log_entries();
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertEmpty( $data['entries'] );
 		$this->assertEquals( 0, $data['total'] );
 	}
@@ -146,8 +145,8 @@ class WPLogReaderServiceTest extends TestCase {
 
 		$result = $this->service->read_log_entries();
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertCount( 1, $data['entries'] );
 
 		$entry = $data['entries'][0];
@@ -179,8 +178,8 @@ class WPLogReaderServiceTest extends TestCase {
 
 		$result = $this->service->read_log_entries();
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertCount( 1, $data['entries'] );
 
 		$entry = $data['entries'][0];
@@ -206,8 +205,8 @@ class WPLogReaderServiceTest extends TestCase {
 
 		$result = $this->service->read_log_entries();
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertCount( 3, $data['entries'] );
 
 		// Entries should be in reverse order (most recent first)
@@ -233,8 +232,8 @@ class WPLogReaderServiceTest extends TestCase {
 		// Filter by warning level (should include warning and error)
 		$result = $this->service->read_log_entries( [ 'level' => 'warning' ] );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertCount( 2, $data['entries'] );
 
 		$levels = array_column( $data['entries'], 'level' );
@@ -258,8 +257,8 @@ class WPLogReaderServiceTest extends TestCase {
 
 		$result = $this->service->read_log_entries( [ 'search' => 'database' ] );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertCount( 2, $data['entries'] );
 
 		foreach ( $data['entries'] as $entry ) {
@@ -286,8 +285,8 @@ class WPLogReaderServiceTest extends TestCase {
 			'date_to'   => '2025-06-19',
 		] );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertCount( 1, $data['entries'] );
 		$this->assertStringContainsString( 'Today notice', $data['entries'][0]['message'] );
 	}
@@ -311,8 +310,8 @@ class WPLogReaderServiceTest extends TestCase {
 			'offset' => 0,
 		] );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertCount( 2, $data['entries'] );
 		$this->assertEquals( 5, $data['total'] ); // Total should be 5
 
@@ -322,8 +321,8 @@ class WPLogReaderServiceTest extends TestCase {
 			'offset' => 2,
 		] );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertCount( 2, $data['entries'] );
 	}
 
@@ -343,8 +342,8 @@ class WPLogReaderServiceTest extends TestCase {
 
 		$result = $this->service->get_log_statistics();
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 
 		$this->assertArrayHasKey( 'total_entries', $data );
 		$this->assertArrayHasKey( 'levels', $data );
@@ -364,12 +363,12 @@ class WPLogReaderServiceTest extends TestCase {
 
 		$result = $this->service->clear_log_file();
 
-		$this->assertTrue( $result->is_success() );
+		$this->assertFalse( is_wp_error( $result ) );
 		
 		// Verify file is cleared
 		$cleared_result = $this->service->read_log_entries();
-		$this->assertTrue( $cleared_result->is_success() );
-		$data = $cleared_result->get_data();
+		$this->assertFalse( is_wp_error( $cleared_result ) );
+		$data = $cleared_result;
 		$this->assertEmpty( $data['entries'] );
 	}
 
@@ -384,13 +383,13 @@ class WPLogReaderServiceTest extends TestCase {
 
 		// Test get_log_entries wrapper
 		$result = $this->service->get_log_entries();
-		$this->assertTrue( $result->is_success() );
-		$this->assertArrayHasKey( 'entries', $result->get_data() );
+		$this->assertFalse( is_wp_error( $result ) );
+		$this->assertArrayHasKey( 'entries', $result );
 
 		// Test get_log_file_stats wrapper
 		$result = $this->service->get_log_file_stats();
-		$this->assertTrue( $result->is_success() );
-		$this->assertArrayHasKey( 'total_entries', $result->get_data() );
+		$this->assertFalse( is_wp_error( $result ) );
+		$this->assertArrayHasKey( 'total_entries', $result );
 	}
 
 	/**
@@ -414,8 +413,8 @@ class WPLogReaderServiceTest extends TestCase {
 			$this->create_log_file( $log_content );
 
 			$result = $this->service->read_log_entries();
-			$this->assertTrue( $result->is_success() );
-			$data = $result->get_data();
+			$this->assertFalse( is_wp_error( $result ) );
+			$data = $result;
 			$this->assertCount( 1, $data['entries'] );
 			$this->assertEquals( $expected_level, $data['entries'][0]['level'], "Failed for type: {$type}" );
 		}
@@ -442,8 +441,8 @@ class WPLogReaderServiceTest extends TestCase {
 
 		$result = $this->service->read_log_entries();
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertCount( 1, $data['entries'] );
 
 		$entry = $data['entries'][0];
@@ -476,9 +475,9 @@ class WPLogReaderServiceTest extends TestCase {
 
 		$result = $this->service->read_log_entries();
 
-		$this->assertTrue( $result->is_success() );
+		$this->assertFalse( is_wp_error( $result ) );
 
-		$data = $result->get_data();
+		$data = $result;
 		$this->assertCount( 3, $data['entries'] );
 
 		// Test first entry (simple deprecated warning)
@@ -555,9 +554,9 @@ true
 
 		$result = $this->service->read_log_entries();
 
-		$this->assertTrue( $result->is_success() );
+		$this->assertFalse( is_wp_error( $result ) );
 
-		$data = $result->get_data();
+		$data = $result;
 		$this->assertCount( 7, $data['entries'] );
 
 		// Test E_WARNING entry (standard format)

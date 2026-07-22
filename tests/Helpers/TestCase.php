@@ -200,21 +200,21 @@ class TestCase extends YoastTestCase {
 	}
 	
 	/**
-	 * Assert that a ServiceResponse is successful.
+	 * Assert that a service result is successful (not a WP_Error).
 	 *
 	 * @param mixed  $result  Service result to check.
 	 * @param string $message Optional failure message.
 	 * @return void
 	 */
 	protected function assert_service_result_success( $result, $message = '' ) {
-		$this->assertTrue(
-			$result->is_success(),
-			$message ?: 'Expected ServiceResponse to be successful, but it failed with: ' . $result->get_error_message()
+		$this->assertFalse(
+			is_wp_error( $result ),
+			$message ?: 'Expected a successful service result, but got WP_Error: ' . ( is_wp_error( $result ) ? $result->get_error_message() : '' )
 		);
 	}
 
 	/**
-	 * Assert that a ServiceResponse is a failure.
+	 * Assert that a service result is a failure (a WP_Error).
 	 *
 	 * @param mixed  $result  Service result to check.
 	 * @param string $message Optional failure message.
@@ -222,13 +222,13 @@ class TestCase extends YoastTestCase {
 	 */
 	protected function assert_service_result_failure( $result, $message = '' ) {
 		$this->assertTrue(
-			$result->is_failure(),
-			$message ?: 'Expected ServiceResponse to be a failure, but it was successful'
+			is_wp_error( $result ),
+			$message ?: 'Expected a WP_Error service result, but the operation succeeded'
 		);
 	}
-	
+
 	/**
-	 * Assert that a ServiceResponse has a specific error code.
+	 * Assert that a service result WP_Error has a specific error code.
 	 *
 	 * @param mixed  $result        Service result to check.
 	 * @param string $expected_code Expected error code.

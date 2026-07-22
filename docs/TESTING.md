@@ -226,7 +226,7 @@ class ExampleControllerTest extends DebugSuiteTestCase {
     public function test_process_request() {
         // Mock service response
         $this->service->method('process_data')
-            ->willReturn(ServiceResponse::success(['key' => 'value']));
+            ->willReturn(['key' => 'value']);
             
         // Create request
         $request = new WP_REST_Request('POST', '/debug-suite/v1/example');
