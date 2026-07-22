@@ -39,6 +39,10 @@
             "DebugSuite\\": "includes/",
             "DebugSuite\\Packages\\": "override/"
         },
+        "exclude-from-classmap": [
+            "/override/composer/",
+            "/override/Symfony/Polyfill/Intl/Normalizer/Resources/stubs/"
+        ],
         "files": [
             "includes/helpers.php",
             "includes/console-functions.php"
