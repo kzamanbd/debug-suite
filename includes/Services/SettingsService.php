@@ -8,7 +8,6 @@
 namespace DebugSuite\Services;
 
 use DebugSuite\Core\FileSystem;
-use DebugSuite\Interfaces\ServiceInterface;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class SettingsService implements ServiceInterface {
+class SettingsService {
 
 	/**
 	 * Path to the wp-config.php file.

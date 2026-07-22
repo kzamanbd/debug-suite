@@ -8,10 +8,9 @@
 
 namespace DebugSuite\Services;
 
-use DebugSuite\Interfaces\ServiceInterface;
 use Closure;
 
-class OpenApiService implements ServiceInterface {
+class OpenApiService {
 
     /**
      * Cached schema documents for the current request.

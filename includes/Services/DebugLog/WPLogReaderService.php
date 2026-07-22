@@ -12,7 +12,6 @@ namespace DebugSuite\Services\DebugLog;
 
 use DateTime;
 use DebugSuite\Core\FileSystem;
-use DebugSuite\Interfaces\ServiceInterface;
 use Exception;
 use WP_Error;
 
@@ -25,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class WPLogReaderService implements ServiceInterface {
+class WPLogReaderService {
 
 	/**
 	 * Log levels mapping.

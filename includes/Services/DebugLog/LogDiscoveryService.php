@@ -8,7 +8,6 @@
 namespace DebugSuite\Services\DebugLog;
 
 use DebugSuite\Core\FileSystem;
-use DebugSuite\Interfaces\ServiceInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -19,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class LogDiscoveryService implements ServiceInterface {
+class LogDiscoveryService {
 
 	/**
 	 * Get paths to supported log files.

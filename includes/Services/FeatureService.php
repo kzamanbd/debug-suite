@@ -7,8 +7,6 @@
 
 namespace DebugSuite\Services;
 
-use DebugSuite\Interfaces\ServiceInterface;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -18,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class FeatureService implements ServiceInterface {
+class FeatureService {
 
 	/**
 	 * Option name for storing feature states.

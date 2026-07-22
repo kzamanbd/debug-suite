@@ -8,7 +8,6 @@
 namespace DebugSuite\Services\DebugLog;
 
 use DebugSuite\Core\FileSystem;
-use DebugSuite\Interfaces\ServiceInterface;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class LogsService implements ServiceInterface {
+class LogsService {
 
 	/**
 	 * Constructor with dependency injection.

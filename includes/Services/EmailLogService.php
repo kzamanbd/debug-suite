@@ -11,7 +11,6 @@
 namespace DebugSuite\Services;
 
 use DebugSuite\Interfaces\Hookable;
-use DebugSuite\Interfaces\ServiceInterface;
 use DebugSuite\Models\EmailLog;
 use Exception;
 use WP_Error;
@@ -25,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class EmailLogService implements ServiceInterface, Hookable {
+class EmailLogService implements Hookable {
 
 	/**
 	 * Email data captured from wp_mail.
