@@ -125,11 +125,15 @@ Expected: PASS (both tests green).
 
 - [ ] **Step 5: Delete the smoke test and commit the scoping**
 
+`override/` and `vendor/` are gitignored — the scoped classes are build output, regenerated on `composer install` via the `post-install-cmd` hook. Commit **only** `composer.json` + `composer.lock`; never `git add override/` or `vendor/`.
+
 ```bash
 rm tests/Unit/Services/Console/PsyshScopingSmokeTest.php
-git add composer.json composer.lock override
+git add composer.json composer.lock
 git commit -m "build: scope PsySH into DebugSuite\\Packages via mozart"
 ```
+
+Verify nothing scoped was staged: `git ls-files override/` must stay empty.
 
 ---
 
