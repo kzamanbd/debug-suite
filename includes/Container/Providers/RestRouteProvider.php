@@ -35,15 +35,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 class RestRouteProvider extends BaseServiceProvider {
 
 	protected array $provides = [
-		LogsController::class      => LogsService::class,
-		SettingsController::class  => SettingsService::class,
-		FeatureController::class   => FeatureService::class,
+		LogsController::class     => LogsService::class,
+		SettingsController::class => SettingsService::class,
+		FeatureController::class  => FeatureService::class,
 	];
 
 	public function register(): void {
 		// Register REST API controllers with dependency injection
-		foreach ( $this->provides as $controller => $dependency ) {
-			$definition = $this->share_with_implements_tags( $controller )->addArgument( $this->container->get( $dependency ) );
+		foreach ( $this->provides as $controller => $dependencies ) {
+			$definition = $this->share_with_implements_tags( $controller );
+
+			foreach ( (array) $dependencies as $dependency ) {
+				$definition->addArgument( $this->container->get( $dependency ) );
+			}
+
 			$this->add_tags( $definition, [ 'rest-controller' ] );
 		}
 	}
