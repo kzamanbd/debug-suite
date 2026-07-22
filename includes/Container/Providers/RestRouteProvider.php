@@ -10,10 +10,13 @@
 
 namespace DebugSuite\Container\Providers;
 
+use DebugSuite\API\ConsoleController;
 use DebugSuite\API\FeatureController;
 use DebugSuite\API\LogsController;
 use DebugSuite\API\SettingsController;
 use DebugSuite\Container\BaseServiceProvider;
+use DebugSuite\Services\Console\ConsoleService;
+use DebugSuite\Services\Console\ConsoleSettingsService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\FeatureService;
 use DebugSuite\Services\SettingsService;
@@ -38,6 +41,7 @@ class RestRouteProvider extends BaseServiceProvider {
 		LogsController::class     => LogsService::class,
 		SettingsController::class => SettingsService::class,
 		FeatureController::class  => FeatureService::class,
+		ConsoleController::class  => [ ConsoleService::class, ConsoleSettingsService::class ],
 	];
 
 	public function register(): void {
