@@ -47,26 +47,31 @@ class ConsoleService implements Hookable {
 
 		$timer = microtime( true );
 
-		$config = new Configuration( [ 'configDir' => WP_CONTENT_DIR ] );
-		$output = new CapturingShellOutput();
-
-		$config->setOutput( $output );
-		$config->setColorMode( Configuration::COLOR_MODE_DISABLED );
-
-		$shell = new Shell( $config );
-		$shell->setOutput( $output );
-		$shell->addCode( $input );
-
-		extract( $shell->getScopeVariablesDiff( get_defined_vars() ) ); // phpcs:ignore WordPress.PHP.DontExtract
-
 		// Tracks whether our ob_start() call is still the active buffer, so
 		// `finally` only ever closes a buffer *we* opened - never an outer one.
 		$buffering = false;
 
+		// Tracks whether we installed our own error handler, so `finally`
+		// only ever restores a handler *we* installed - never a foreign one.
+		$handler_installed = false;
+
 		try {
+			$config = new Configuration( [ 'configDir' => WP_CONTENT_DIR ] );
+			$output = new CapturingShellOutput();
+
+			$config->setOutput( $output );
+			$config->setColorMode( Configuration::COLOR_MODE_DISABLED );
+
+			$shell = new Shell( $config );
+			$shell->setOutput( $output );
+			$shell->addCode( $input );
+
+			extract( $shell->getScopeVariablesDiff( get_defined_vars() ) ); // phpcs:ignore WordPress.PHP.DontExtract
+
 			ob_start( [ $shell, 'writeStdout' ], 1 );
 			$buffering = true;
 			set_error_handler( [ $shell, 'handleError' ] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			$handler_installed = true;
 
 			$code = $shell->flushCode();
 			$_    = eval( $shell->onExecute( $code ? $code : ExecutionClosure::NOOP_INPUT ) ); // phpcs:ignore Squiz.PHP.Eval.Discouraged
@@ -102,7 +107,9 @@ class ConsoleService implements Hookable {
 			// happy-path cleanup above - so a failing snippet never leaks
 			// PsySH's error handler or an open output buffer into the rest
 			// of the request/test run.
-			restore_error_handler();
+			if ( $handler_installed ) {
+				restore_error_handler();
+			}
 			if ( $buffering ) {
 				ob_end_clean();
 			}

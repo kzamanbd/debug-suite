@@ -48,7 +48,7 @@ class ConsoleServiceTest extends TestCase {
 	}
 
 	public function test_syntax_error_returns_wp_error(): void {
-		$result = $this->service->execute( 'if (' );
+		$result = $this->service->execute( 'echo 1 + ;' );
 		$this->assertInstanceOf( \WP_Error::class, $result );
 		$this->assertSame( 'debug_suite_console_error', $result->get_error_code() );
 		$this->assertSame( 422, $result->get_error_data()['status'] );
