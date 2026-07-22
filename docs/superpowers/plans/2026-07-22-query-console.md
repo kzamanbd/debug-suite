@@ -4,7 +4,7 @@
 
 **Goal:** Replace the `QueryConsole` stub with a working in-browser PHP REPL that evaluates arbitrary PHP in the WordPress runtime via PsySH, with run history, saved snippets, and a horizontal/vertical split layout.
 
-**Architecture:** PsySH is added with `composer require` and namespace-scoped into `DebugSuite\Packages\` by mozart. Output capture is done with plugin-owned subclasses of the *scoped* PsySH/Symfony classes (no vendor-file patching). A `ConsoleService` runs the eval flow and returns `{ output, dump, execution_time }` or a `WP_Error`; a `ConsoleSettingsService` persists per-user prefs in user meta. `ConsoleController` exposes `POST /console/execute` and `GET|POST /console/settings` under `debug-suite/v1`. The React page uses the existing Monaco `Editor`, an output pane, a snippets menu, and a split layout, wired through `apiFetch`.
+**Architecture:** PsySH is added with `composer require` and namespace-scoped into `DebugSuite\Packages\` by mozart. Output capture is done with plugin-owned subclasses of the _scoped_ PsySH/Symfony classes (no vendor-file patching). A `ConsoleService` runs the eval flow and returns `{ output, dump, execution_time }` or a `WP_Error`; a `ConsoleSettingsService` persists per-user prefs in user meta. `ConsoleController` exposes `POST /console/execute` and `GET|POST /console/settings` under `debug-suite/v1`. The React page uses the existing Monaco `Editor`, an output pane, a snippets menu, and a split layout, wired through `apiFetch`.
 
 **Tech Stack:** PHP 8.1+, PsySH (`psy/psysh`), mozart scoping, WordPress REST API, league/container DI, React + `@wordpress/element`, `@wordpress/api-fetch`, Monaco, Tailwind, `@wordpress/scripts` (webpack).
 
@@ -24,6 +24,7 @@
 ## File Structure
 
 **Backend (create):**
+
 - `includes/Services/Console/CapturingShellOutput.php` — subclass of scoped `Psy\Output\ShellOutput`; accumulates output.
 - `includes/Services/Console/CapturingHtmlDumper.php` — subclass of scoped `Symfony\…\VarDumper\Dumper\HtmlDumper`; captures `dump()` calls.
 - `includes/Services/Console/ConsoleService.php` — eval orchestration.
@@ -31,11 +32,13 @@
 - `includes/API/ConsoleController.php` — REST routes.
 
 **Backend (modify):**
+
 - `composer.json` — add `psy/psysh` to `require` and to `extra.mozart.packages`.
 - `includes/Container/Providers/AppServiceProvider.php` — register the two services.
 - `includes/Container/Providers/RestRouteProvider.php` — support multi-dependency controllers; register `ConsoleController`.
 
 **Backend (tests, create):**
+
 - `tests/Unit/Services/Console/CapturingShellOutputTest.php`
 - `tests/Unit/Services/Console/CapturingHtmlDumperTest.php`
 - `tests/Unit/Services/Console/ConsoleServiceTest.php`
@@ -43,6 +46,7 @@
 - `tests/Integration/API/ConsoleControllerTest.php`
 
 **Frontend (create):**
+
 - `src/pages/query-console/types.ts`
 - `src/pages/query-console/constants.ts`
 - `src/pages/query-console/hooks/use-console-api.ts`
@@ -52,6 +56,7 @@
 - `src/pages/query-console/components/snippets-menu.tsx`
 
 **Frontend (modify):**
+
 - `src/pages/query-console/index.tsx` — replace stub with full page.
 
 ---
@@ -59,10 +64,12 @@
 ## Task 1: Scope PsySH + smoke test (RISK GATE)
 
 **Files:**
+
 - Modify: `composer.json` (`require`, `extra.mozart.packages`)
 - Test: `tests/Unit/Services/Console/PsyshScopingSmokeTest.php` (throwaway — deleted at end of task)
 
 **Interfaces:**
+
 - Produces: the scoped class `DebugSuite\Packages\Psy\Shell` and the rest of the scoped PsySH tree, usable by all later backend tasks.
 
 **This is a decision gate.** If mozart cannot cleanly scope PsySH, stop and switch tooling (see Fallback) before continuing.
@@ -140,10 +147,12 @@ Verify nothing scoped was staged: `git ls-files override/` must stay empty.
 ## Task 2: CapturingShellOutput
 
 **Files:**
+
 - Create: `includes/Services/Console/CapturingShellOutput.php`
 - Test: `tests/Unit/Services/Console/CapturingShellOutputTest.php`
 
 **Interfaces:**
+
 - Consumes: scoped `DebugSuite\Packages\Psy\Output\ShellOutput` (from Task 1).
 - Produces: `class CapturingShellOutput` with public `string $outputMessage = ''`, public `?\Throwable $exception = null`, and `doWrite(string $message, bool $newline): void` that appends to `$outputMessage`.
 
@@ -198,7 +207,7 @@ namespace DebugSuite\Services\Console;
 use DebugSuite\Packages\Psy\Output\ShellOutput;
 use Throwable;
 
-if ( ! defined( 'ABSPATH' ) && ! defined( 'DEBUG_SUITE_TESTING' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -259,10 +268,12 @@ git commit -m "feat: add CapturingShellOutput for PsySH output capture"
 ## Task 3: CapturingHtmlDumper
 
 **Files:**
+
 - Create: `includes/Services/Console/CapturingHtmlDumper.php`
 - Test: `tests/Unit/Services/Console/CapturingHtmlDumperTest.php`
 
 **Interfaces:**
+
 - Consumes: scoped `DebugSuite\Packages\Symfony\Component\VarDumper\Dumper\HtmlDumper` and `…\Cloner\VarCloner`.
 - Produces: `class CapturingHtmlDumper` — `echoLine()` appends into `$GLOBALS['debug_suite_console_dump']`; `getDumpHeader()` returns `''`.
 
@@ -329,7 +340,7 @@ namespace DebugSuite\Services\Console;
 
 use DebugSuite\Packages\Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
-if ( ! defined( 'ABSPATH' ) && ! defined( 'DEBUG_SUITE_TESTING' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -383,10 +394,12 @@ git commit -m "feat: add CapturingHtmlDumper for dump() capture"
 ## Task 4: ConsoleService (eval orchestration)
 
 **Files:**
+
 - Create: `includes/Services/Console/ConsoleService.php`
 - Test: `tests/Unit/Services/Console/ConsoleServiceTest.php`
 
 **Interfaces:**
+
 - Consumes: `CapturingShellOutput` (Task 2), `CapturingHtmlDumper` (Task 3), scoped `DebugSuite\Packages\Psy\Configuration`, `…\Psy\Shell`, `…\Psy\ExecutionClosure`, `…\Symfony\Component\VarDumper\VarDumper`, `…\Symfony\Component\VarDumper\Cloner\VarCloner`.
 - Produces: `ConsoleService::execute( string $input ): array|\WP_Error`. Success array shape: `[ 'output' => string, 'dump' => string, 'execution_time' => string ]`. Failure: `WP_Error` code `debug_suite_console_error`, data `[ 'status' => 422, 'input' => string, 'trace' => string ]`.
 
@@ -474,7 +487,7 @@ use DebugSuite\Packages\Symfony\Component\VarDumper\VarDumper;
 use Throwable;
 use WP_Error;
 
-if ( ! defined( 'ABSPATH' ) && ! defined( 'DEBUG_SUITE_TESTING' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -574,7 +587,7 @@ class ConsoleService implements Hookable {
 }
 ```
 
-Note on `dump()` resolution: this sets the handler on the *scoped* `VarDumper`. If a console snippet calls the global `dump()` and the scoped Symfony global `dump()` function is not autoloaded after scoping (verify with the Task 4 test `test_captures_dump_calls`), add a guarded shim to `includes/helpers.php`:
+Note on `dump()` resolution: this sets the handler on the _scoped_ `VarDumper`. If a console snippet calls the global `dump()` and the scoped Symfony global `dump()` function is not autoloaded after scoping (verify with the Task 4 test `test_captures_dump_calls`), add a guarded shim to `includes/helpers.php`:
 
 ```php
 if ( ! function_exists( 'dump' ) ) {
@@ -606,13 +619,15 @@ git commit -m "feat: add ConsoleService PHP evaluation via scoped PsySH"
 ## Task 5: ConsoleSettingsService
 
 **Files:**
+
 - Create: `includes/Services/Console/ConsoleSettingsService.php`
 - Test: `tests/Unit/Services/Console/ConsoleSettingsServiceTest.php`
 
 **Interfaces:**
+
 - Produces:
-  - `ConsoleSettingsService::get( int $user_id ): array` → `[ 'window_split' => 'vertical'|'horizontal', 'snippets' => array<int, array{id:string,title:string,code:string}> ]`. Missing keys fall back to defaults.
-  - `ConsoleSettingsService::save( int $user_id, array $settings ): array` → merged, persisted settings. Only `window_split` (must be `horizontal`|`vertical`) and `snippets` (array) are accepted.
+    - `ConsoleSettingsService::get( int $user_id ): array` → `[ 'window_split' => 'vertical'|'horizontal', 'snippets' => array<int, array{id:string,title:string,code:string}> ]`. Missing keys fall back to defaults.
+    - `ConsoleSettingsService::save( int $user_id, array $settings ): array` → merged, persisted settings. Only `window_split` (must be `horizontal`|`vertical`) and `snippets` (array) are accepted.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -690,7 +705,7 @@ namespace DebugSuite\Services\Console;
 
 use DebugSuite\Interfaces\Hookable;
 
-if ( ! defined( 'ABSPATH' ) && ! defined( 'DEBUG_SUITE_TESTING' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -788,10 +803,12 @@ git commit -m "feat: add ConsoleSettingsService for per-user console prefs"
 ## Task 6: Container registration (multi-dependency controllers)
 
 **Files:**
+
 - Modify: `includes/Container/Providers/AppServiceProvider.php`
 - Modify: `includes/Container/Providers/RestRouteProvider.php`
 
 **Interfaces:**
+
 - Consumes: `ConsoleService`, `ConsoleSettingsService` (Tasks 4–5), and `ConsoleController` (Task 7 — its constructor signature is `__construct( ConsoleService $console, ConsoleSettingsService $settings )`).
 - Produces: `ConsoleService` and `ConsoleSettingsService` resolvable from the container and tagged `app-service`; `ConsoleController` resolvable, constructed with both dependencies, tagged `rest-controller`.
 
@@ -856,16 +873,18 @@ git commit -m "feat: register console services and support multi-dependency cont
 ## Task 7: ConsoleController (REST routes)
 
 **Files:**
+
 - Create: `includes/API/ConsoleController.php`
 - Modify: `includes/Container/Providers/RestRouteProvider.php` (activate the `ConsoleController` map entry)
 - Test: `tests/Integration/API/ConsoleControllerTest.php`
 
 **Interfaces:**
+
 - Consumes: `ConsoleService::execute()` (Task 4), `ConsoleSettingsService::get()/save()` (Task 5).
 - Produces: routes under `debug-suite/v1`:
-  - `POST /console/execute` — body `{ input: string }` → `{ output, dump, execution_time }` (200) or WP_Error 422.
-  - `GET /console/settings` → `{ window_split, snippets }`.
-  - `POST /console/settings` — body `{ window_split?, snippets? }` → merged settings.
+    - `POST /console/execute` — body `{ input: string }` → `{ output, dump, execution_time }` (200) or WP_Error 422.
+    - `GET /console/settings` → `{ window_split, snippets }`.
+    - `POST /console/settings` — body `{ window_split?, snippets? }` → merged settings.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1139,15 +1158,17 @@ git commit -m "feat: add ConsoleController REST endpoints for execute and settin
 ## Task 8: Frontend types + constants + API hook
 
 **Files:**
+
 - Create: `src/pages/query-console/types.ts`
 - Create: `src/pages/query-console/constants.ts`
 - Create: `src/pages/query-console/hooks/use-console-api.ts`
 
 **Interfaces:**
+
 - Produces:
-  - `types.ts`: `ExecuteResult { output: string; dump: string; execution_time: string }`; `ConsoleError { message: string; trace?: string; input?: string }`; `Snippet { id: string; title: string; code: string }`; `SplitOrientation = 'horizontal' | 'vertical'`; `ConsoleSettings { window_split: SplitOrientation; snippets: Snippet[] }`; `HistoryEntry { id: string; code: string; ranAt: number }`.
-  - `constants.ts`: `HISTORY_KEY`, `DEFAULT_CODE`, `MAX_HISTORY`.
-  - `use-console-api.ts`: `useConsoleApi()` → `{ execute(input: string): Promise<ExecuteResult>; getSettings(): Promise<ConsoleSettings>; saveSettings(patch: Partial<ConsoleSettings>): Promise<ConsoleSettings> }`.
+    - `types.ts`: `ExecuteResult { output: string; dump: string; execution_time: string }`; `ConsoleError { message: string; trace?: string; input?: string }`; `Snippet { id: string; title: string; code: string }`; `SplitOrientation = 'horizontal' | 'vertical'`; `ConsoleSettings { window_split: SplitOrientation; snippets: Snippet[] }`; `HistoryEntry { id: string; code: string; ranAt: number }`.
+    - `constants.ts`: `HISTORY_KEY`, `DEFAULT_CODE`, `MAX_HISTORY`.
+    - `use-console-api.ts`: `useConsoleApi()` → `{ execute(input: string): Promise<ExecuteResult>; getSettings(): Promise<ConsoleSettings>; saveSettings(patch: Partial<ConsoleSettings>): Promise<ConsoleSettings> }`.
 
 - [ ] **Step 1: Create types.ts**
 
@@ -1251,9 +1272,11 @@ git commit -m "feat: add console frontend types, constants, and API hook"
 ## Task 9: Run history hook
 
 **Files:**
+
 - Create: `src/pages/query-console/hooks/use-console-history.ts`
 
 **Interfaces:**
+
 - Consumes: `HistoryEntry` (Task 8), `HISTORY_KEY`, `MAX_HISTORY` (Task 8).
 - Produces: `useConsoleHistory()` → `{ history: HistoryEntry[]; push(code: string): void; clear(): void }`. `push` prepends, dedupes identical consecutive code, caps at `MAX_HISTORY`, persists to `localStorage`.
 
@@ -1281,24 +1304,21 @@ const useConsoleHistory = () => {
         localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
     }, []);
 
-    const push = useCallback(
-        (code: string) => {
-            const trimmed = code.trim();
-            if (!trimmed) return;
-            setHistory((prev) => {
-                if (prev[0]?.code === trimmed) return prev;
-                const entry: HistoryEntry = {
-                    id: `${prev.length}-${trimmed.length}-${trimmed.slice(0, 8)}`,
-                    code: trimmed,
-                    ranAt: Date.now()
-                };
-                const next = [entry, ...prev].slice(0, MAX_HISTORY);
-                localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
-                return next;
-            });
-        },
-        []
-    );
+    const push = useCallback((code: string) => {
+        const trimmed = code.trim();
+        if (!trimmed) return;
+        setHistory((prev) => {
+            if (prev[0]?.code === trimmed) return prev;
+            const entry: HistoryEntry = {
+                id: `${prev.length}-${trimmed.length}-${trimmed.slice(0, 8)}`,
+                code: trimmed,
+                ranAt: Date.now()
+            };
+            const next = [entry, ...prev].slice(0, MAX_HISTORY);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+            return next;
+        });
+    }, []);
 
     const clear = useCallback(() => persist([]), [persist]);
 
@@ -1325,9 +1345,11 @@ git commit -m "feat: add localStorage-backed console run history hook"
 ## Task 10: Output pane
 
 **Files:**
+
 - Create: `src/pages/query-console/components/output-pane.tsx`
 
 **Interfaces:**
+
 - Consumes: `ExecuteResult`, `ConsoleError` (Task 8).
 - Produces: `OutputPane` component. Props: `{ result: ExecuteResult | null; error: ConsoleError | null; loading: boolean }`. Renders `output` as escaped preformatted text, `dump` HTML via `dangerouslySetInnerHTML`, execution time, and errors (message + collapsible trace).
 
@@ -1354,9 +1376,7 @@ const OutputPane = ({ result, error, loading }: OutputPaneProps) => {
                     <div className="font-semibold">{error.message}</div>
                     {error.trace && (
                         <details className="mt-2">
-                            <summary className="cursor-pointer select-none">
-                                {__('Stack trace', 'debug-suite')}
-                            </summary>
+                            <summary className="cursor-pointer select-none">{__('Stack trace', 'debug-suite')}</summary>
                             <pre className="mt-1 whitespace-pre-wrap text-xs opacity-80">{error.trace}</pre>
                         </details>
                     )}
@@ -1406,9 +1426,11 @@ git commit -m "feat: add console output pane"
 ## Task 11: Split layout
 
 **Files:**
+
 - Create: `src/pages/query-console/components/split-layout.tsx`
 
 **Interfaces:**
+
 - Consumes: `SplitOrientation` (Task 8).
 - Produces: `SplitLayout` component. Props: `{ orientation: SplitOrientation; first: React.ReactNode; second: React.ReactNode; className?: string }`. Renders two equal panes side-by-side (`vertical`) or stacked (`horizontal`) using flex; no drag-resize in the MVP (equal 50/50 with a divider border).
 
@@ -1429,13 +1451,9 @@ interface SplitLayoutProps {
 const SplitLayout = ({ orientation, first, second, className }: SplitLayoutProps) => {
     const isVertical = orientation === 'vertical';
     return (
-        <div
-            className={classNames(
-                'flex min-h-0 flex-1',
-                isVertical ? 'flex-row' : 'flex-col',
-                className
-            )}>
-            <div className={classNames('min-h-0 min-w-0 flex-1', isVertical ? 'border-r' : 'border-b', 'border-border')}>
+        <div className={classNames('flex min-h-0 flex-1', isVertical ? 'flex-row' : 'flex-col', className)}>
+            <div
+                className={classNames('min-h-0 min-w-0 flex-1', isVertical ? 'border-r' : 'border-b', 'border-border')}>
                 {first}
             </div>
             <div className="min-h-0 min-w-0 flex-1">{second}</div>
@@ -1463,9 +1481,11 @@ git commit -m "feat: add console split layout component"
 ## Task 12: Snippets menu
 
 **Files:**
+
 - Create: `src/pages/query-console/components/snippets-menu.tsx`
 
 **Interfaces:**
+
 - Consumes: `Snippet` (Task 8), and the UI `Button` from `@/components/ui`.
 - Produces: `SnippetsMenu` component. Props: `{ snippets: Snippet[]; onInsert(code: string): void; onSave(title: string): void; onDelete(id: string): void }`. Renders a list of saved snippets (click → insert), a "Save current" control (prompts for a title via a controlled input), and per-row delete.
 
@@ -1504,7 +1524,11 @@ const SnippetsMenu = ({ snippets, onInsert, onSave, onDelete }: SnippetsMenuProp
                     placeholder={__('Snippet title…', 'debug-suite')}
                     className="border-border w-full rounded border px-2 py-1 text-sm"
                 />
-                <Button size="icon-sm" variant="secondary" onClick={handleSave} title={__('Save current code', 'debug-suite')}>
+                <Button
+                    size="icon-sm"
+                    variant="secondary"
+                    onClick={handleSave}
+                    title={__('Save current code', 'debug-suite')}>
                     <Plus size={16} />
                 </Button>
             </div>
@@ -1557,9 +1581,11 @@ git commit -m "feat: add console snippets menu"
 ## Task 13: Assemble the QueryConsole page
 
 **Files:**
+
 - Modify: `src/pages/query-console/index.tsx` (replace stub)
 
 **Interfaces:**
+
 - Consumes: `Editor` (`@/components/editor`), `Fill` (`@wordpress/components`), `Button` (`@/components/ui`), `useConsoleApi` (Task 8), `useConsoleHistory` (Task 9), `OutputPane` (Task 10), `SplitLayout` (Task 11), `SnippetsMenu` (Task 12), types + constants (Task 8).
 - Produces: default-exported `QueryConsole` component that renders the full console, filling the `console-logs-actions` Slot with a Run button + split toggle.
 

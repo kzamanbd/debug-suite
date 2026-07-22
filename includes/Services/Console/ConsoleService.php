@@ -16,7 +16,7 @@ use DebugSuite\Packages\Symfony\Component\VarDumper\VarDumper;
 use Throwable;
 use WP_Error;
 
-if ( ! defined( 'ABSPATH' ) && ! defined( 'DEBUG_SUITE_TESTING' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 

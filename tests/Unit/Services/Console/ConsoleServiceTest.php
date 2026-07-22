@@ -46,4 +46,11 @@ class ConsoleServiceTest extends TestCase {
 		$this->assertSame( 422, $data['status'] );
 		$this->assertArrayHasKey( 'trace', $data );
 	}
+
+	public function test_syntax_error_returns_wp_error(): void {
+		$result = $this->service->execute( 'if (' );
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'debug_suite_console_error', $result->get_error_code() );
+		$this->assertSame( 422, $result->get_error_data()['status'] );
+	}
 }

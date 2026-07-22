@@ -9,7 +9,7 @@ namespace DebugSuite\Services\Console;
 
 use DebugSuite\Packages\Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
-if ( ! defined( 'ABSPATH' ) && ! defined( 'DEBUG_SUITE_TESTING' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 

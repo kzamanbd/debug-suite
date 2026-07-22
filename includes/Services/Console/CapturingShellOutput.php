@@ -10,7 +10,7 @@ namespace DebugSuite\Services\Console;
 use DebugSuite\Packages\Psy\Output\ShellOutput;
 use Throwable;
 
-if ( ! defined( 'ABSPATH' ) && ! defined( 'DEBUG_SUITE_TESTING' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
