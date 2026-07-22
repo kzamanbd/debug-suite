@@ -2,17 +2,27 @@ import { Button, Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle }
 import DebugLog from '@/pages/debug-log';
 import { Slot, SlotFillProvider } from '@wordpress/components';
 import domReady from '@wordpress/dom-ready';
-import { createRoot, useState } from '@wordpress/element';
+import { createRoot, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Bug, SquareTerminal, X as XIcon } from 'lucide-react';
 import QueryConsole from './pages/query-console';
 
+const LocalStorageKey = 'debug-suite-console-open';
+
 const ConsoleApp = () => {
-    const [openModal, setOpenModal] = useState(false);
-    const [activeTab, setActiveTab] = useState<'query-console' | 'logs'>('logs');
+    const [openModal, setOpenModal] = useState(localStorage.getItem(LocalStorageKey) === 'true');
+    const [activeTab, setActiveTab] = useState<'query-console' | 'logs'>('query-console');
     const barClickHandler = () => {
         setOpenModal(true);
     };
+
+    useEffect(() => {
+        if (openModal) {
+            localStorage.setItem(LocalStorageKey, 'true');
+        } else {
+            localStorage.setItem(LocalStorageKey, 'false');
+        }
+    }, [openModal]);
 
     const ContentRenderer = () => {
         if (activeTab === 'query-console') {
@@ -29,19 +39,21 @@ const ConsoleApp = () => {
 
             <Dialog open={openModal} onOpenChange={setOpenModal}>
                 <DialogContent fullScreen showCloseButton={false} className="bg-background overflow-hidden">
-                    <DialogHeader className="border-border flex shrink-0 flex-row items-center justify-between gap-4 border-b bg-white p-4">
-                        <DialogTitle className="flex items-center gap-4">
+                    <DialogHeader className="border-border flex shrink-0 flex-row items-center justify-between gap-4 border-b bg-white p-2">
+                        <DialogTitle className="flex items-center gap-2">
                             <Button
-                                variant={activeTab === 'logs' ? 'secondary' : 'ghost'}
-                                onClick={() => setActiveTab('logs')}>
-                                <Bug size={20} />
-                                <span>Debug Log</span>
-                            </Button>
-                            <Button
+                                size="sm"
                                 variant={activeTab === 'query-console' ? 'secondary' : 'ghost'}
                                 onClick={() => setActiveTab('query-console')}>
                                 <SquareTerminal size={20} />
                                 <span>Console</span>
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant={activeTab === 'logs' ? 'secondary' : 'ghost'}
+                                onClick={() => setActiveTab('logs')}>
+                                <Bug size={20} />
+                                <span>Debug Log</span>
                             </Button>
                         </DialogTitle>
                         <div className="flex items-center gap-4">
