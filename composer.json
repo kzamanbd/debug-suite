@@ -41,7 +41,7 @@
         },
         "files": [
             "includes/helpers.php",
-            "override/Psy/functions.php"
+            "includes/console-functions.php"
         ]
     },
     "autoload-dev": {
