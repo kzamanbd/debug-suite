@@ -2,10 +2,23 @@ import { useCallback, useState } from '@wordpress/element';
 import { HISTORY_KEY, MAX_HISTORY } from '../constants';
 import type { HistoryEntry } from '../types';
 
+const isHistoryEntry = (value: unknown): value is HistoryEntry => {
+    if (typeof value !== 'object' || value === null) return false;
+    const entry = value as Record<string, unknown>;
+    return (
+        typeof entry.id === 'string' &&
+        typeof entry.code === 'string' &&
+        typeof entry.ranAt === 'number'
+    );
+};
+
 const read = (): HistoryEntry[] => {
     try {
         const raw = localStorage.getItem(HISTORY_KEY);
-        return raw ? (JSON.parse(raw) as HistoryEntry[]) : [];
+        if (!raw) return [];
+        const parsed: unknown = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(isHistoryEntry);
     } catch {
         return [];
     }
@@ -16,7 +29,11 @@ const useConsoleHistory = () => {
 
     const persist = useCallback((entries: HistoryEntry[]) => {
         setHistory(entries);
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+        try {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+        } catch {
+            /* storage unavailable / quota exceeded — history is best-effort */
+        }
     }, []);
 
     const push = useCallback((code: string) => {
@@ -30,7 +47,11 @@ const useConsoleHistory = () => {
                 ranAt: Date.now()
             };
             const next = [entry, ...prev].slice(0, MAX_HISTORY);
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+            try {
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+            } catch {
+                /* storage unavailable / quota exceeded — history is best-effort */
+            }
             return next;
         });
     }, []);
