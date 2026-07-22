@@ -17,7 +17,8 @@
         }
     ],
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.1",
+        "psy/psysh": "^0.12"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
@@ -39,7 +40,8 @@
             "DebugSuite\\Packages\\": "override/"
         },
         "files": [
-            "includes/helpers.php"
+            "includes/helpers.php",
+            "override/Psy/functions.php"
         ]
     },
     "autoload-dev": {
@@ -103,9 +105,10 @@
             "dep_namespace": "DebugSuite\\Packages\\",
             "dep_directory": "/override/",
             "classmap_directory": "/override/",
-            "classmap_prefix": "DebugSuite_",
+            "classmap_prefix": "DebugSuite",
             "packages": [
-                "league/container"
+                "league/container",
+                "psy/psysh"
             ],
             "delete_vendor_directories": true
         }
