@@ -64,7 +64,7 @@ The remaining documentation files focus on specialized WordPress integration pat
 
 - Service layer architecture for business logic separation
 - REST API controllers with dependency injection
-- ServiceResponse pattern for consistent error handling
+- WP_Error return pattern for consistent error handling
 - Testing patterns with mock dependencies
 - Environment-specific configuration management
 

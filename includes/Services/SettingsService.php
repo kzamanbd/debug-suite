@@ -8,8 +8,7 @@
 namespace DebugSuite\Services;
 
 use DebugSuite\Core\FileSystem;
-use DebugSuite\Core\ServiceResponse;
-use DebugSuite\Interfaces\ServiceInterface;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -20,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class SettingsService implements ServiceInterface {
+class SettingsService {
 
 	/**
 	 * Path to the wp-config.php file.
@@ -55,33 +54,33 @@ class SettingsService implements ServiceInterface {
 	 * Update debug settings in wp-config.php.
 	 *
 	 * @param array $settings The settings to update.
-	 * @return ServiceResponse
+	 * @return bool|WP_Error True on success, WP_Error on failure.
 	 */
-	public function update_settings( array $settings ): ServiceResponse {
+	public function update_settings( array $settings ): bool|WP_Error {
 		// Validate input
 		if ( empty( $settings ) ) {
-			return ServiceResponse::failure( __( 'No settings provided to update.', 'debug-suite' ), 'empty_settings' );
+			return new WP_Error( 'empty_settings', __( 'No settings provided to update.', 'debug-suite' ) );
 		}
 
 		if ( ! FileSystem::is_writable( $this->config_file_path ) ) {
-			return ServiceResponse::failure( __( 'wp-config.php file is not writable.', 'debug-suite' ), 'config_file_not_writable' );
+			return new WP_Error( 'config_file_not_writable', __( 'wp-config.php file is not writable.', 'debug-suite' ) );
 		}
 
 		// Validate settings
 		foreach ( $settings as $key => $value ) {
 			if ( ! array_key_exists( $key, $this->supported_constants ) ) {
-				return ServiceResponse::failure(
+				return new WP_Error(
+					'invalid_setting',
 					// translators: %s is the unsupported setting key.
-					sprintf( __( 'Unsupported setting: %s', 'debug-suite' ), $key ),
-					'invalid_setting'
+					sprintf( __( 'Unsupported setting: %s', 'debug-suite' ), $key )
 				);
 			}
 
 			if ( ! in_array( $value, [ 'true', 'false' ], true ) ) {
-				return ServiceResponse::failure(
+				return new WP_Error(
+					'invalid_value',
 					// translators: %s is the setting key that has an invalid value.
-					sprintf( __( 'Invalid value for %s. Must be "true" or "false".', 'debug-suite' ), $key ),
-					'invalid_value'
+					sprintf( __( 'Invalid value for %s. Must be "true" or "false".', 'debug-suite' ), $key )
 				);
 			}
 		}
@@ -89,32 +88,32 @@ class SettingsService implements ServiceInterface {
 		// Read and update file
 		$content = FileSystem::get_contents( $this->config_file_path );
 		if ( $content === false ) {
-			return ServiceResponse::failure( __( 'Failed to read wp-config.php file.', 'debug-suite' ), 'file_read_error' );
+			return new WP_Error( 'file_read_error', __( 'Failed to read wp-config.php file.', 'debug-suite' ) );
 		}
 
 		$updated_content = $this->update_constants( $content, $settings );
 
 		$result = FileSystem::put_contents( $this->config_file_path, $updated_content );
 		if ( ! $result ) {
-			return ServiceResponse::failure( __( 'Failed to write wp-config.php file.', 'debug-suite' ), 'file_write_error' );
+			return new WP_Error( 'file_write_error', __( 'Failed to write wp-config.php file.', 'debug-suite' ) );
 		}
 
-		return ServiceResponse::success( true );
+		return true;
 	}
 
 	/**
 	 * Get current debug settings from wp-config.php.
 	 *
-	 * @return ServiceResponse
+	 * @return array|WP_Error Settings array on success, WP_Error on failure.
 	 */
-	public function get_settings(): ServiceResponse {
+	public function get_settings(): array|WP_Error {
 		if ( ! FileSystem::exists( $this->config_file_path ) ) {
-			return ServiceResponse::failure( __( 'wp-config.php file not found.', 'debug-suite' ), 'config_file_not_found' );
+			return new WP_Error( 'config_file_not_found', __( 'wp-config.php file not found.', 'debug-suite' ) );
 		}
 
 		$content = FileSystem::get_contents( $this->config_file_path );
 		if ( $content === false ) {
-			return ServiceResponse::failure( __( 'Failed to read wp-config.php file.', 'debug-suite' ), 'file_read_error' );
+			return new WP_Error( 'file_read_error', __( 'Failed to read wp-config.php file.', 'debug-suite' ) );
 		}
 
 		$settings = [
@@ -125,15 +124,15 @@ class SettingsService implements ServiceInterface {
 			$settings[ strtolower( $constant ) ] = $value === 'true'; // Convert to boolean
 		}
 
-		return ServiceResponse::success( $settings );
+		return $settings;
 	}
 
 	/**
 	 * Reset debug settings to default values.
 	 *
-	 * @return ServiceResponse
+	 * @return bool|WP_Error True on success, WP_Error on failure.
 	 */
-	public function reset_debug_settings(): ServiceResponse {
+	public function reset_debug_settings(): bool|WP_Error {
 		return $this->update_settings( $this->supported_constants );
 	}
 

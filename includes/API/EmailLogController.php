@@ -140,7 +140,7 @@ class EmailLogController extends RestController {
 		$filters_result = $this->service->get_filter_options();
 		$stats_result   = $this->service->get_email_statistics();
 
-		if ( $logs_result->is_failure() ) {
+		if ( is_wp_error( $logs_result ) ) {
 			$status_code = match ( $logs_result->get_error_code() ) {
 				'database_error'    => 500,
 				'validation_error'  => 400,
@@ -154,17 +154,13 @@ class EmailLogController extends RestController {
 			);
 		}
 
-		if ( $filters_result->is_failure() ) {
+		if ( is_wp_error( $filters_result ) ) {
 			return new WP_Error( 'filters_error', $filters_result->get_error_message(), [ 'status' => 500 ] );
 		}
 
-		if ( $stats_result->is_failure() ) {
-			return new WP_Error( 'stats_error', $stats_result->get_error_message(), [ 'status' => 500 ] );
-		}
-
-		$data = $logs_result->get_data();
-		$data['filter_options'] = $filters_result->get_data();
-		$data['stats']          = $stats_result->get_data();
+		$data = $logs_result;
+		$data['filter_options'] = $filters_result;
+		$data['stats']          = $stats_result;
 
 		return rest_ensure_response( $data );
 	}
@@ -178,11 +174,11 @@ class EmailLogController extends RestController {
 	public function get_filter_options( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$result = $this->service->get_filter_options();
 
-		if ( $result->is_failure() ) {
+		if ( is_wp_error( $result ) ) {
 			return new WP_Error( 'error', $result->get_error_message(), [ 'status' => 500 ] );
 		}
 
-		return rest_ensure_response( $result->get_data() );
+		return rest_ensure_response( $result );
 	}
 
 
@@ -205,11 +201,11 @@ class EmailLogController extends RestController {
 
 		$result = $this->service->bulk_delete_emails( $ids );
 
-		if ( $result->is_failure() ) {
+		if ( is_wp_error( $result ) ) {
 			return new WP_Error( 'error', $result->get_error_message(), [ 'status' => 500 ] );
 		}
 
-		return rest_ensure_response( $result->get_data() );
+		return rest_ensure_response( $result );
 	}
 
 	/**
@@ -220,7 +216,7 @@ class EmailLogController extends RestController {
 	 */
 	public function clear_all_emails( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$result = $this->service->clear_all_emails();
-		return rest_ensure_response( $result->get_data() );
+		return rest_ensure_response( $result );
 	}
 
 	/**
@@ -233,7 +229,7 @@ class EmailLogController extends RestController {
 		$email_id = (int) $request->get_param( 'id' );
 		$result = $this->service->resend_email( $email_id );
 
-		if ( $result->is_failure() ) {
+		if ( is_wp_error( $result ) ) {
 			$status_code = match ( $result->get_error_code() ) {
 				'email_not_found'   => 404,
 				'send_failed'       => 500,
@@ -247,7 +243,7 @@ class EmailLogController extends RestController {
 			);
 		}
 
-		return rest_ensure_response( $result->get_data() );
+		return rest_ensure_response( $result );
 	}
 
 	/**

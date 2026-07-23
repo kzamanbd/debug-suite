@@ -8,7 +8,6 @@
 namespace DebugSuite\Tests\Unit\Services;
 
 use DebugSuite\Core\DatabaseManager;
-use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Services\EmailLogService;
 use DebugSuite\Tests\Helpers\DebugSuiteTestCase;
 
@@ -83,7 +82,7 @@ class EmailLogServiceTest extends DebugSuiteTestCase {
     public function test_get_email_log_entries(): void {
         $result = $this->service->get_email_log_entries();
 
-        $this->assertInstanceOf( ServiceResponse::class, $result );
+        $this->assertIsArray( $result );
     }
 
     /**
@@ -93,9 +92,9 @@ class EmailLogServiceTest extends DebugSuiteTestCase {
         $result = $this->service->get_email_log_entries( [ 'limit' => 50 ] );
 
         $this->assert_service_result_success( $result );
-        $this->assertArrayHasKey( 'entries', $result->get_data() );
-        $this->assertArrayHasKey( 'total_count', $result->get_data() );
-        $this->assertArrayHasKey( 'pagination', $result->get_data() );
+        $this->assertArrayHasKey( 'entries', $result );
+        $this->assertArrayHasKey( 'total_count', $result );
+        $this->assertArrayHasKey( 'pagination', $result );
     }
 
     /**

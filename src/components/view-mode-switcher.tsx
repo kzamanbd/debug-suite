@@ -1,4 +1,4 @@
-import Button from '@/components/base/button';
+import { Button } from '@/components/ui';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { Maximize, Minimize } from 'lucide-react';
@@ -22,7 +22,7 @@ const ViewModeSwitcher = () => {
     };
 
     return (
-        <Button onClick={toggleFullScreen} className="p-2">
+        <Button variant="outline" size="icon" onClick={toggleFullScreen}>
             {isMaximize ? (
                 <div title={__('Minimize', 'debug-suite')}>
                     <Minimize className="size-4" />

@@ -41,9 +41,9 @@ class BasicTest extends TestCase {
 	 * Verifies that Composer's autoloader can find the plugin classes.
 	 */
 	public function test_autoloader() {
-		$this->assertTrue( 
-			class_exists( 'DebugSuite\Core\ServiceResponse' ), 
-			'ServiceResponse class should be autoloadable'
+		$this->assertTrue(
+			class_exists( 'DebugSuite\Core\FileSystem' ),
+			'Core classes should be autoloadable'
 		);
 	}
 }

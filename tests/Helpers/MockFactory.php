@@ -9,7 +9,7 @@ namespace DebugSuite\Tests\Helpers;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use DebugSuite\Core\ServiceResponse;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -39,29 +39,27 @@ class MockFactory {
 	}
 
 	/**
-	 * Create a ServiceResponse that returns success.
+	 * Create a successful service result payload.
 	 *
 	 * @param array $data Optional data to return.
-	 * @return ServiceResponse
+	 * @return array
 	 */
-	public function create_successful_service_result( array $data = [] ): ServiceResponse {
-		return ServiceResponse::success( $data );
+	public function create_successful_service_result( array $data = [] ): array {
+		return $data;
 	}
 
 	/**
-	 * Create a ServiceResponse that returns failure.
+	 * Create a failed service result (WP_Error).
 	 *
 	 * @param string $error_message Error message.
 	 * @param string $error_code    Error code.
-	 * @param array  $context       Additional context.
-	 * @return ServiceResponse
+	 * @return WP_Error
 	 */
-	public function create_failed_service_result( 
-		string $error_message = 'Test error', 
-		string $error_code = 'test_error',
-		array $context = []
-	): ServiceResponse {
-		return ServiceResponse::failure( $error_message, $error_code, $context );
+	public function create_failed_service_result(
+		string $error_message = 'Test error',
+		string $error_code = 'test_error'
+	): WP_Error {
+		return new WP_Error( $error_code, $error_message );
 	}
 
 	/**
@@ -73,22 +71,22 @@ class MockFactory {
 		// Create a minimal implementation using anonymous class
 		return new class {
 			public function get_log_entries( array $options = [] ) {
-				return ServiceResponse::success([
+				return [
 					'entries' => [],
 					'total' => 0,
-				]);
+				];
 			}
-			
+
 			public function get_log_file_stats() {
-				return ServiceResponse::success([
+				return [
 					'size' => 0,
 					'modified' => current_time('mysql'),
 					'exists' => true,
-				]);
+				];
 			}
-			
+
 			public function clear_log_file() {
-				return ServiceResponse::success();
+				return [];
 			}
 		};
 	}
@@ -102,19 +100,19 @@ class MockFactory {
 		// Create a minimal implementation using anonymous class
 		return new class {
 			public function get_debug_settings() {
-				return ServiceResponse::success([
+				return [
 					'WP_DEBUG' => true,
 					'WP_DEBUG_LOG' => true,
 					'WP_DEBUG_DISPLAY' => false,
-				]);
+				];
 			}
-			
+
 			public function update_settings( array $settings ) {
-				return ServiceResponse::success();
+				return true;
 			}
-			
+
 			public function reset_debug_settings() {
-				return ServiceResponse::success();
+				return true;
 			}
 		};
 	}

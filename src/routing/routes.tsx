@@ -1,10 +1,6 @@
-import ManageLogs from '@/pages/manage-logs';
-import Feature from '@/pages/feature';
 import NotFound from '@/pages/not-found';
-import Overview from '@/pages/overview';
-import SetupGuide from '@/pages/settings';
+import Settings from '@/pages/settings';
 import { applyFilters } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
 
 export interface DebugSuiteRoute {
@@ -18,30 +14,9 @@ export interface DebugSuiteRoute {
 }
 const routes: DebugSuiteRoute[] = [
     {
-        id: 'setup-guide',
-        path: '/settings',
-        element: <SetupGuide />
-    },
-    {
-        id: 'overview',
-        title: __('Overview', 'debug-suite'),
-        description: __('Monitor your WordPress debug activity and system performance.', 'debug-suite'),
+        id: 'home',
         path: '/',
-        element: <Overview />
-    },
-    {
-        id: 'file-logs-manage',
-        title: __('Manage File Logs', 'debug-suite'),
-        description: __("Manage your application's log files - clear, download, or archive them.", 'debug-suite'),
-        path: '/file-logs/manage',
-        element: <ManageLogs />
-    },
-    {
-        id: 'feature',
-        title: __('Features', 'debug-suite'),
-        description: __('Manage your application features.', 'debug-suite'),
-        path: '/feature',
-        element: <Feature />
+        element: <Settings />
     }
 ];
 

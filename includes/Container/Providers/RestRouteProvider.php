@@ -12,12 +12,10 @@ namespace DebugSuite\Container\Providers;
 
 use DebugSuite\API\FeatureController;
 use DebugSuite\API\LogsController;
-use DebugSuite\API\OverviewController;
 use DebugSuite\API\SettingsController;
 use DebugSuite\Container\BaseServiceProvider;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\FeatureService;
-use DebugSuite\Services\OverviewService;
 use DebugSuite\Services\SettingsService;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -39,7 +37,6 @@ class RestRouteProvider extends BaseServiceProvider {
 	protected array $provides = [
 		LogsController::class      => LogsService::class,
 		SettingsController::class  => SettingsService::class,
-		OverviewController::class  => OverviewService::class,
 		FeatureController::class   => FeatureService::class,
 	];
 

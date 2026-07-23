@@ -5,8 +5,8 @@
  *
  * @example
  * ```tsx
- * import { Pagination } from '@/components/base';
- * import type { PaginationInfo } from '@/components/base';
+ * import { Pagination } from '@/components/ui';
+ * import type { PaginationInfo } from '@/components/ui';
  *
  * const paginationInfo: PaginationInfo = {
  *     current_page: 1,

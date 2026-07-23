@@ -97,11 +97,11 @@ class SettingsController extends RestController {
 
 		$params = $request->get_params();
 
-		if ( $result->is_failure() ) {
+		if ( is_wp_error( $result ) ) {
 			return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] );
 		}
 
-		$response = rest_ensure_response( $result->get_data() );
+		$response = rest_ensure_response( $result );
 		if ( isset( $params['check_onboarding'] ) ) {
 			$response->data['completed'] = get_option( 'debug_suite_onboarding_completed', false );
 		}
@@ -118,9 +118,8 @@ class SettingsController extends RestController {
 		$settings = [];
 		// Map request parameters to settings
 		$values = [
-			'debug'          => 'WP_DEBUG',
-			'debug_log'      => 'WP_DEBUG_LOG',
-			'debug_display'  => 'WP_DEBUG_DISPLAY',
+			'wp_debug'          => 'WP_DEBUG',
+			'wp_debug_log'      => 'WP_DEBUG_LOG',
 		];
 
 		foreach ( $values as $key => $value ) {
@@ -143,7 +142,7 @@ class SettingsController extends RestController {
 		if ( ! empty( $settings ) ) {
 			$result = $this->service->update_settings( $settings );
 
-			if ( $result->is_failure() ) {
+			if ( is_wp_error( $result ) ) {
 				return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] );
 			}
 		}
@@ -164,7 +163,7 @@ class SettingsController extends RestController {
 	public function reset_settings( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$result = $this->service->reset_debug_settings();
 
-		return $result->is_failure()
+		return is_wp_error( $result )
 			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
 			: rest_ensure_response(
 				[

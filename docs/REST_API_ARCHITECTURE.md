@@ -18,7 +18,7 @@
 
 - **Controllers are thin**: Handle only HTTP request/response concerns
 - **Business logic in services**: All domain logic implemented in dedicated service classes
-- **Consistent error handling**: Services return `ServiceResponse` objects, controllers transform to HTTP responses
+- **Consistent error handling**: Services return their data on success or a `WP_Error` on failure; controllers transform to HTTP responses
 - **Required dependency injection**: Controllers receive service instances via required constructor parameters
 - **Strong typing**: All service dependencies are strongly typed and non-nullable
 
@@ -79,7 +79,7 @@ class FileLogsControllerTest extends DebugSuiteTestCase {
     public function test_get_logs_endpoint() {
         // Mock service response
         $this->service->method('get_log_entries')
-            ->willReturn(ServiceResponse::success(['logs' => []]));
+            ->willReturn(['logs' => []]);
         
         // Create and execute request
         $request = new WP_REST_Request('GET', '/debug-suite/v1/logs');
@@ -114,22 +114,22 @@ When testing controllers, the service layer is typically mocked to isolate contr
 ```php
 // Mock service response for success case
 $this->service->method('get_log_entries')
-    ->willReturn(ServiceResponse::success(['data' => 'value']));
+    ->willReturn(['data' => 'value']);
 
 // Mock service response for error case
 $this->service->method('clear_logs')
-    ->willReturn(ServiceResponse::failure('Error message', 'error_code'));
+    ->willReturn(new WP_Error('error_code', 'Error message'));
 ```
 
 ### Testing Response Transformation
 
-Controllers should transform `ServiceResponse` objects into appropriate WordPress responses:
+Controllers should transform service results (data or `WP_Error`) into appropriate WordPress responses:
 
 ```php
 public function test_error_transformation() {
     // Mock service error
     $this->service->method('get_log_entries')
-        ->willReturn(ServiceResponse::failure('Not found', 'not_found'));
+        ->willReturn(new WP_Error('not_found', 'Not found'));
     
     // Execute request
     $request = new WP_REST_Request('GET', '/debug-suite/v1/logs');

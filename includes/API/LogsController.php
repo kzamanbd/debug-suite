@@ -135,11 +135,11 @@ class LogsController extends RestController {
 
 		$result = $this->service->get_log_entries( $options );
 
-		if ( $result->is_failure() ) {
+		if ( is_wp_error( $result ) ) {
 			return new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] );
 		}
 
-		$data = $result->get_data();
+		$data = $result;
 		$total = $data['total'] ?? 0;
 		$total_pages = ceil( $total / $per_page );
 
@@ -159,7 +159,7 @@ class LogsController extends RestController {
 		$file_path = $request->get_param( 'file' );
 		$result = $this->service->clear_log_file( $file_path );
 
-		return $result->is_failure()
+		return is_wp_error( $result )
 			? new WP_Error( $result->get_error_code(), $result->get_error_message(), [ 'status' => 500 ] )
 			: rest_ensure_response(
 				[
@@ -182,7 +182,7 @@ class LogsController extends RestController {
 		$result = $this->service->get_raw_file_content( $file_path );
 
 		// Transform service result to HTTP response
-		if ( $result->is_failure() ) {
+		if ( is_wp_error( $result ) ) {
 			$status_code = match ( $result->get_error_code() ) {
 				'file_access_denied' => 403,
 				'file_not_found'     => 404,
@@ -197,6 +197,6 @@ class LogsController extends RestController {
 			);
 		}
 
-		return rest_ensure_response( $result->get_data() );
+		return rest_ensure_response( $result );
 	}
 }

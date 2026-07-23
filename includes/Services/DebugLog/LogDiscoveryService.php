@@ -8,7 +8,6 @@
 namespace DebugSuite\Services\DebugLog;
 
 use DebugSuite\Core\FileSystem;
-use DebugSuite\Interfaces\ServiceInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -19,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class LogDiscoveryService implements ServiceInterface {
+class LogDiscoveryService {
 
 	/**
 	 * Get paths to supported log files.
@@ -130,10 +129,8 @@ class LogDiscoveryService implements ServiceInterface {
 	 */
 	private function find_php_fpm_error_log(): ?string {
 		$candidates = [
-			sys_get_temp_dir() . '/php-fpm.log',  // For testing
 			'/var/log/php-fpm.log',
 			'/var/log/php/php-fpm.log',
-			'/opt/bitnami/php/var/log/php-fpm.log',
 		];
 
 		// Check common PHP-FPM log locations
@@ -156,7 +153,6 @@ class LogDiscoveryService implements ServiceInterface {
 	 */
 	private function find_apache_log_file(): ?string {
 		$candidates = [
-			sys_get_temp_dir() . '/apache2/error.log',  // For testing
 			'/var/log/apache2/error.log',
 			'/var/log/httpd/error_log',
 			'/usr/local/apache/logs/error_log',
@@ -177,7 +173,6 @@ class LogDiscoveryService implements ServiceInterface {
 	 */
 	private function find_nginx_log_file(): ?string {
 		$candidates = [
-			sys_get_temp_dir() . '/nginx/error.log',  // For testing
 			'/var/log/nginx/error.log',
 			'/usr/local/nginx/logs/error.log',
 			'/opt/bitnami/nginx/logs/error.log',
@@ -197,7 +192,6 @@ class LogDiscoveryService implements ServiceInterface {
 	 */
 	private function find_redis_log_file(): ?string {
 		$candidates = [
-			sys_get_temp_dir() . '/redis/redis-server.log',  // For testing
 			'/var/log/redis/redis-server.log',
 			'/var/log/redis.log',
 		];

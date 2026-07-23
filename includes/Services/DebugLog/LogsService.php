@@ -8,8 +8,7 @@
 namespace DebugSuite\Services\DebugLog;
 
 use DebugSuite\Core\FileSystem;
-use DebugSuite\Core\ServiceResponse;
-use DebugSuite\Interfaces\ServiceInterface;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -20,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class LogsService implements ServiceInterface {
+class LogsService {
 
 	/**
 	 * Constructor with dependency injection.
@@ -44,9 +43,9 @@ class LogsService implements ServiceInterface {
 	 *     @type string $date_from    Start date filter (Y-m-d format).
 	 *     @type string $date_to      End date filter (Y-m-d format).
 	 * }
-	 * @return ServiceResponse
+	 * @return array|WP_Error Log payload on success, WP_Error on failure.
 	 */
-	public function get_log_entries( array $options = [] ): ServiceResponse {
+	public function get_log_entries( array $options = [] ): array|WP_Error {
 		return $this->log_reader->get_log_entries( $options );
 	}
 
@@ -55,18 +54,18 @@ class LogsService implements ServiceInterface {
 	 *
 	 * @param string $file_path Path to the log file to clear. If not provided, uses the default debug log.
 	 *
-	 * @return ServiceResponse
+	 * @return array|WP_Error Result payload on success, WP_Error on failure.
 	 */
-	public function clear_log_file( string $file_path = '' ): ServiceResponse {
+	public function clear_log_file( string $file_path = '' ): array|WP_Error {
 		return $this->log_reader->clear_log_file( $file_path );
 	}
 
 	/**
 	 * Get log file statistics.
 	 *
-	 * @return ServiceResponse
+	 * @return array|WP_Error Statistics payload on success, WP_Error on failure.
 	 */
-	public function get_log_file_stats(): ServiceResponse {
+	public function get_log_file_stats(): array|WP_Error {
 		return $this->log_reader->get_log_file_stats();
 	}
 
@@ -83,9 +82,9 @@ class LogsService implements ServiceInterface {
 	 * Get raw file content for viewing.
 	 *
 	 * @param string|null $file_path Optional file path. If null, uses current debug log.
-	 * @return ServiceResponse
+	 * @return array|WP_Error File payload on success, WP_Error on failure.
 	 */
-	public function get_raw_file_content( ?string $file_path = null ): ServiceResponse {
+	public function get_raw_file_content( ?string $file_path = null ): array|WP_Error {
 		// Default to main debug log if no file specified
 		if ( empty( $file_path ) ) {
 			$file_path = ini_get( 'error_log' );
@@ -93,26 +92,26 @@ class LogsService implements ServiceInterface {
 
 		// Validate file path
 		if ( empty( $file_path ) ) {
-			return ServiceResponse::failure(
-				__( 'No log file path provided or configured.', 'debug-suite' ),
-				'no_file_path'
+			return new WP_Error(
+				'no_file_path',
+				__( 'No log file path provided or configured.', 'debug-suite' )
 			);
 		}
 
 		// Check if file exists first
 		if ( ! FileSystem::exists( $file_path ) ) {
-			return ServiceResponse::failure(
-				__( 'The requested log file was not found.', 'debug-suite' ),
+			return new WP_Error(
 				'file_not_found',
+				__( 'The requested log file was not found.', 'debug-suite' ),
 				[ 'path' => $file_path ]
 			);
 		}
 
 		// Check if file is readable
 		if ( ! FileSystem::is_readable( $file_path ) ) {
-			return ServiceResponse::failure(
-				__( 'Access to this file is not allowed.', 'debug-suite' ),
+			return new WP_Error(
 				'file_access_denied',
+				__( 'Access to this file is not allowed.', 'debug-suite' ),
 				[ 'path' => $file_path ]
 			);
 		}
@@ -132,24 +131,22 @@ class LogsService implements ServiceInterface {
 		}
 
 		if ( $content === false ) {
-			return ServiceResponse::failure(
-				__( 'Failed to read the log file.', 'debug-suite' ),
+			return new WP_Error(
 				'file_read_error',
+				__( 'Failed to read the log file.', 'debug-suite' ),
 				[ 'path' => $file_path ]
 			);
 		}
 
-		return ServiceResponse::success(
-			[
-				'content'           => $content,
-				'filename'          => basename( $file_path ),
-				'size'              => FileSystem::format_size( $file_size ),
-				'size_bytes'        => $file_size,
-				'last_modified'     => gmdate( 'Y-m-d H:i:s', FileSystem::mtime( $file_path ) ),
-				'truncated'         => $truncated,
-				'max_size_reached'  => $file_size > $max_size,
-				'max_size_limit'    => $max_size,
-			]
-		);
+		return [
+			'content'           => $content,
+			'filename'          => basename( $file_path ),
+			'size'              => FileSystem::format_size( $file_size ),
+			'size_bytes'        => $file_size,
+			'last_modified'     => gmdate( 'Y-m-d H:i:s', FileSystem::mtime( $file_path ) ),
+			'truncated'         => $truncated,
+			'max_size_reached'  => $file_size > $max_size,
+			'max_size_limit'    => $max_size,
+		];
 	}
 }

@@ -3,12 +3,12 @@
  *
  * @since 1.0.0
  */
-import Button from '@/components/base/button';
-import type { Option } from '@/components/base/select';
+import { Button } from '@/components/ui';
+import type { Option } from '@/components/ui';
 import Editor from '@/components/editor';
 import { classNames } from '@/utils';
 import { __ } from '@wordpress/i18n';
-import { RefreshCwIcon } from 'lucide-react';
+import { LoaderCircle, RefreshCwIcon } from 'lucide-react';
 import type { RawFileContent } from '../types';
 
 interface RawFileViewerProps {
@@ -32,11 +32,12 @@ const RawFileViewer = ({ content, loading, onRefresh, selectedFile }: RawFileVie
             <div className="flex flex-1 items-center justify-center bg-white">
                 <div className="text-center">
                     <p className="text-sm text-gray-500">{__('No file content available.', 'debug-suite')}</p>
-                    <Button
-                        onClick={onRefresh}
-                        className="mt-4"
-                        loading={loading}
-                        icon={<RefreshCwIcon className="size-4" />}>
+                    <Button variant="outline" className="mt-4" disabled={loading} onClick={onRefresh}>
+                        {loading ? (
+                            <LoaderCircle className="size-4 animate-spin" />
+                        ) : (
+                            <RefreshCwIcon className="size-4" />
+                        )}
                         {__('Retry', 'debug-suite')}
                     </Button>
                 </div>

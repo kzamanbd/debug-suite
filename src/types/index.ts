@@ -77,9 +77,11 @@ declare global {
             content_url: string;
             wp_version: string;
             php_version: string;
-            favicon: string;
             site_name: string;
             logs: LogFile[];
+            openapi_docs_url: string;
+            logo_url: string;
+            version: string;
         } & DebugState;
     }
 }

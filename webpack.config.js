@@ -11,8 +11,7 @@ const rtlcss = require(
 const entries = {
     'debug-suite': './src/index.tsx',
     'debug-console': './src/console.tsx',
-    'email-log': './src/pages/email-log/index.tsx',
-    'api-logger': './src/pages/api-log/index.tsx'
+    'email-log': './src/pages/email-log/index.tsx'
 };
 
 // RTL CSS plugin using modern webpack 5 processAssets hook

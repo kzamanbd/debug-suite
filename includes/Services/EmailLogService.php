@@ -10,11 +10,10 @@
 
 namespace DebugSuite\Services;
 
-use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Interfaces\Hookable;
-use DebugSuite\Interfaces\ServiceInterface;
 use DebugSuite\Models\EmailLog;
 use Exception;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -25,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class EmailLogService implements ServiceInterface, Hookable {
+class EmailLogService implements Hookable {
 
 	/**
 	 * Email data captured from wp_mail.
@@ -112,9 +111,9 @@ class EmailLogService implements ServiceInterface, Hookable {
 	 * Get email log entries with filtering and pagination.
 	 *
 	 * @param array $options Query options.
-	 * @return ServiceResponse
+	 * @return array|WP_Error Entries payload on success, WP_Error on failure.
 	 */
-	public function get_email_log_entries( array $options = [] ): ServiceResponse {
+	public function get_email_log_entries( array $options = [] ): array|WP_Error {
 		$defaults = [
 			'search'     => '',
 			'status'     => 'all',
@@ -163,26 +162,24 @@ class EmailLogService implements ServiceInterface, Hookable {
 			$total_pages = ceil( $total_count / $options['per_page'] );
 			$current_page = $options['page'];
 
-			return ServiceResponse::success(
-				[
-					'entries'      => $formatted_entries,
-					'pagination'   => [
-						'current_page' => $current_page,
-						'total_pages'  => $total_pages,
-						'total_items'  => $total_count,
-						'per_page'     => $options['per_page'],
-						'from'         => $total_count > 0 ? $offset + 1 : 0,
-						'to'           => min( $offset + $options['per_page'], $total_count ),
-						'has_more'     => $current_page < $total_pages,
-					],
-					'total_count'  => $total_count,
-				]
-			);
+			return [
+				'entries'      => $formatted_entries,
+				'pagination'   => [
+					'current_page' => $current_page,
+					'total_pages'  => $total_pages,
+					'total_items'  => $total_count,
+					'per_page'     => $options['per_page'],
+					'from'         => $total_count > 0 ? $offset + 1 : 0,
+					'to'           => min( $offset + $options['per_page'], $total_count ),
+					'has_more'     => $current_page < $total_pages,
+				],
+				'total_count'  => $total_count,
+			];
 
 		} catch ( Exception $e ) {
-			return ServiceResponse::failure(
-				__( 'Failed to retrieve email logs.', 'debug-suite' ),
+			return new WP_Error(
 				'database_error',
+				__( 'Failed to retrieve email logs.', 'debug-suite' ),
 				[ 'error' => $e->getMessage() ]
 			);
 		}
@@ -191,44 +188,42 @@ class EmailLogService implements ServiceInterface, Hookable {
 	/**
 	 * Get filter options for dropdowns.
 	 *
-	 * @return ServiceResponse
+	 * @return array|WP_Error Filter options on success, WP_Error on failure.
 	 */
-	public function get_filter_options(): ServiceResponse {
+	public function get_filter_options(): array|WP_Error {
 		try {
 			$receivers = EmailLog::get_unique_receivers();
 
-			return ServiceResponse::success(
-				[
-					'receivers' => array_map(
-						static function ( $receiver ) {
-							return [
-								'value' => $receiver,
-								'label' => $receiver,
-							];
-						},
-						$receivers
-					),
-					'statuses'  => [
-						[
-							'value' => 'all',
-							'label' => __( 'All Statuses', 'debug-suite' ),
-						],
-						[
-							'value' => 'success',
-							'label' => __( 'Successful', 'debug-suite' ),
-						],
-						[
-							'value' => 'failed',
-							'label' => __( 'Failed', 'debug-suite' ),
-						],
+			return [
+				'receivers' => array_map(
+					static function ( $receiver ) {
+						return [
+							'value' => $receiver,
+							'label' => $receiver,
+						];
+					},
+					$receivers
+				),
+				'statuses'  => [
+					[
+						'value' => 'all',
+						'label' => __( 'All Statuses', 'debug-suite' ),
 					],
-				]
-			);
+					[
+						'value' => 'success',
+						'label' => __( 'Successful', 'debug-suite' ),
+					],
+					[
+						'value' => 'failed',
+						'label' => __( 'Failed', 'debug-suite' ),
+					],
+				],
+			];
 
 		} catch ( Exception $e ) {
-			return ServiceResponse::failure(
-				__( 'Failed to retrieve filter options.', 'debug-suite' ),
+			return new WP_Error(
 				'database_error',
+				__( 'Failed to retrieve filter options.', 'debug-suite' ),
 				[ 'error' => $e->getMessage() ]
 			);
 		}
@@ -237,58 +232,55 @@ class EmailLogService implements ServiceInterface, Hookable {
 	/**
 	 * Get email statistics.
 	 *
-	 * @return ServiceResponse
+	 * @return array Statistics payload.
 	 */
-	public function get_email_statistics(): ServiceResponse {
-		$stats = EmailLog::get_statistics();
-		return ServiceResponse::success( $stats );
+	public function get_email_statistics(): array {
+		return EmailLog::get_statistics();
 	}
 
 	/**
 	 * Delete multiple email logs.
 	 *
 	 * @param array $email_ids Array of email log IDs.
-	 * @return ServiceResponse
+	 * @return array|WP_Error Result payload on success, WP_Error on failure.
 	 */
-	public function bulk_delete_emails( array $email_ids ): ServiceResponse {
+	public function bulk_delete_emails( array $email_ids ): array|WP_Error {
 		if ( empty( $email_ids ) ) {
-			return ServiceResponse::failure( __( 'No email IDs provided.', 'debug-suite' ) );
+			return new WP_Error( 'no_email_ids', __( 'No email IDs provided.', 'debug-suite' ) );
 		}
 
 		$deleted_count = EmailLog::delete_by_ids( $email_ids );
 
-		return ServiceResponse::success(
-			[
-				'deleted_count' => $deleted_count,
-				// translators: %d is the number of deleted emails.
-				'message'       => sprintf( __( '%d emails deleted.', 'debug-suite' ), $deleted_count ),
-			]
-		);
+		return [
+			'deleted_count' => $deleted_count,
+			// translators: %d is the number of deleted emails.
+			'message'       => sprintf( __( '%d emails deleted.', 'debug-suite' ), $deleted_count ),
+		];
 	}
 
 	/**
 	 * Clear all email logs.
 	 *
-	 * @return ServiceResponse
+	 * @return array Result payload.
 	 */
-	public function clear_all_emails(): ServiceResponse {
+	public function clear_all_emails(): array {
 		EmailLog::truncate();
-		return ServiceResponse::success( [ 'message' => __( 'All emails cleared.', 'debug-suite' ) ] );
+		return [ 'message' => __( 'All emails cleared.', 'debug-suite' ) ];
 	}
 
 	/**
 	 * Resend email by ID.
 	 *
 	 * @param int $email_id Email log ID.
-	 * @return ServiceResponse
+	 * @return array|WP_Error Result payload on success, WP_Error on failure.
 	 */
-	public function resend_email( int $email_id ): ServiceResponse {
+	public function resend_email( int $email_id ): array|WP_Error {
 		$email = EmailLog::find( $email_id );
 
 		if ( ! $email ) {
-			return ServiceResponse::failure(
-				__( 'Email not found.', 'debug-suite' ),
-				'email_not_found'
+			return new WP_Error(
+				'email_not_found',
+				__( 'Email not found.', 'debug-suite' )
 			);
 		}
 
@@ -301,12 +293,12 @@ class EmailLogService implements ServiceInterface, Hookable {
 		);
 
 		if ( $sent ) {
-			return ServiceResponse::success( [ 'message' => __( 'Email resent.', 'debug-suite' ) ] );
+			return [ 'message' => __( 'Email resent.', 'debug-suite' ) ];
 		}
 
-		return ServiceResponse::failure(
-			__( 'Failed to resend email.', 'debug-suite' ),
-			'send_failed'
+		return new WP_Error(
+			'send_failed',
+			__( 'Failed to resend email.', 'debug-suite' )
 		);
 	}
 

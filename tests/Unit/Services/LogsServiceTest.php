@@ -9,7 +9,6 @@
 
 namespace DebugSuite\Tests\Unit\Services;
 
-use DebugSuite\Core\ServiceResponse;
 use DebugSuite\Services\DebugLog\LogDiscoveryService;
 use DebugSuite\Services\DebugLog\LogsService;
 use DebugSuite\Services\DebugLog\WPLogReaderService;
@@ -72,7 +71,7 @@ class LogsServiceTest extends TestCase {
 	 */
 	public function test_get_log_entries_delegates_to_reader(): void {
 		$options = [ 'limit' => 10 ];
-		$expected_response = ServiceResponse::success( [ 'entries' => [] ] );
+		$expected_response = [ 'entries' => [] ];
 
 		$this->log_reader->expects( $this->once() )
 			->method( 'get_log_entries' )
@@ -87,7 +86,7 @@ class LogsServiceTest extends TestCase {
 	 * Test clear_log_file delegates to WPLogReaderService.
 	 */
 	public function test_clear_log_file_delegates_to_reader(): void {
-		$expected_response = ServiceResponse::success( [ 'message' => 'Cleared' ] );
+		$expected_response = [ 'message' => 'Cleared' ];
 
 		$this->log_reader->expects( $this->once() )
 			->method( 'clear_log_file' )
@@ -101,7 +100,7 @@ class LogsServiceTest extends TestCase {
 	 * Test get_log_file_stats delegates to WPLogReaderService.
 	 */
 	public function test_get_log_file_stats_delegates_to_reader(): void {
-		$expected_response = ServiceResponse::success( [ 'stats' => [] ] );
+		$expected_response = [ 'stats' => [] ];
 
 		$this->log_reader->expects( $this->once() )
 			->method( 'get_log_file_stats' )
@@ -163,8 +162,8 @@ class LogsServiceTest extends TestCase {
 
 		$result = $this->service->get_raw_file_content( $this->test_log_file );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertArrayHasKey( 'content', $data );
 		$this->assertArrayHasKey( 'filename', $data );
 		$this->assertArrayHasKey( 'size', $data );
@@ -189,23 +188,31 @@ class LogsServiceTest extends TestCase {
 
 		$result = $this->service->get_raw_file_content( $non_existent_file );
 
-		$this->assertTrue( $result->is_failure() );
+		$this->assertTrue( is_wp_error( $result ) );
 		$this->assertEquals( 'file_not_found', $result->get_error_code() );
 		$this->assertStringContainsString( 'not found', $result->get_error_message() );
-		$this->assertEquals( $non_existent_file, $result->get_context()['path'] );
+		$this->assertEquals( $non_existent_file, $result->get_error_data()['path'] );
 	}
 
 	/**
 	 * Test get_raw_file_content with empty file path.
 	 */
 	public function test_get_raw_file_content_no_file_path(): void {
-		// We can't easily mock ini_get in a unit test without runkit or similar extensions
-		// Instead, we'll test with an empty string directly
-		$result = $this->service->get_raw_file_content( '' );
+		// When no path is given the service falls back to ini_get( 'error_log' ).
+		// Force that empty so the "no path configured" branch is reachable
+		// regardless of the runtime environment (e.g. wp-env sets error_log).
+		$original_error_log = ini_get( 'error_log' );
+		ini_set( 'error_log', '' );
 
-		$this->assertTrue( $result->is_failure() );
-		$this->assertEquals( 'no_file_path', $result->get_error_code() );
-		$this->assertStringContainsString( 'No log file path provided', $result->get_error_message() );
+		try {
+			$result = $this->service->get_raw_file_content( '' );
+
+			$this->assertTrue( is_wp_error( $result ) );
+			$this->assertEquals( 'no_file_path', $result->get_error_code() );
+			$this->assertStringContainsString( 'No log file path provided', $result->get_error_message() );
+		} finally {
+			ini_set( 'error_log', $original_error_log );
+		}
 	}
 
 	/**
@@ -218,8 +225,8 @@ class LogsServiceTest extends TestCase {
 		// Since we can't easily mock ini_get, let's test with a valid file path instead
 		$result = $this->service->get_raw_file_content( $this->test_log_file );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertEquals( $test_content, $data['content'] );
 	}
 
@@ -233,8 +240,8 @@ class LogsServiceTest extends TestCase {
 
 		$result = $this->service->get_raw_file_content( $this->test_log_file );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertTrue( $data['truncated'] );
 		$this->assertTrue( $data['max_size_reached'] );
 		$this->assertLessThan( strlen( $large_content ), strlen( $data['content'] ) );
@@ -258,8 +265,8 @@ class LogsServiceTest extends TestCase {
 
 		$result = $this->service->get_raw_file_content( $this->test_log_file );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertTrue( $data['truncated'] );
 		$this->assertNotEmpty( $data['content'] );
 		// Verify the content is from the end of the file
@@ -275,8 +282,8 @@ class LogsServiceTest extends TestCase {
 
 		$result = $this->service->get_raw_file_content( $this->test_log_file );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 		$this->assertEquals( $small_content, $data['content'] );
 		$this->assertFalse( $data['truncated'] );
 		$this->assertFalse( $data['max_size_reached'] );
@@ -292,8 +299,8 @@ class LogsServiceTest extends TestCase {
 
 		$result = $this->service->get_raw_file_content( $this->test_log_file );
 
-		$this->assertTrue( $result->is_success() );
-		$data = $result->get_data();
+		$this->assertFalse( is_wp_error( $result ) );
+		$data = $result;
 
 		// Verify all expected keys are present
 		$expected_keys = [

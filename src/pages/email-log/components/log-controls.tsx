@@ -5,16 +5,13 @@ import type { BulkAction, EmailEntry, EmailFilters } from '../types';ontrols - F
  *
  * @since 1.0.0
  */
-import type { PaginationInfo } from '@/components/base';
-import Button from '@/components/base/button';
-import type { Option } from '@/components/base/select';
-import SimpleSelect from '@/components/base/select';
-import TextInput from '@/components/base/text-input';
+import type { Option, PaginationInfo } from '@/components/ui';
+import { Button, SimpleSelect, Input as TextInput } from '@/components/ui';
 import { useConfirm } from '@/hooks/use-confirm';
 import { Fill } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { RefreshCw, Search } from 'lucide-react';
+import { LoaderCircle, RefreshCw, Search } from 'lucide-react';
 import useEmailLogAPI from '../hooks/use-api';
 import type { BulkAction, EmailLogFilters, EmailLogStats } from '../types';
 
@@ -174,7 +171,7 @@ const EmailLogControls = ({
                         className="w-40"
                         isDisabled={selectedItems.length === 0}
                     />
-                    <Button variant="default" size="md" disabled={selectedItems.length === 0} onClick={applyChanges}>
+                    <Button variant="outline" disabled={selectedItems.length === 0} onClick={applyChanges}>
                         {__('Apply', 'debug-suite')}
                     </Button>
                 </div>
@@ -215,14 +212,15 @@ const EmailLogControls = ({
                 {/* Refresh Button */}
                 <Fill name="debug-suite-layout-header-right">
                     <div className="flex items-center space-x-2">
-                        <Button size="md" onClick={clearEmail}>
+                        <Button variant="outline" onClick={clearEmail}>
                             {__('Clear All', 'debug-suite')}
                         </Button>
-                        <Button
-                            variant="default"
-                            loading={loading}
-                            onClick={onRefresh}
-                            icon={<RefreshCw className="h-4 w-4" />}>
+                        <Button variant="outline" disabled={loading} onClick={onRefresh}>
+                            {loading ? (
+                                <LoaderCircle className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <RefreshCw className="h-4 w-4" />
+                            )}
                             {__('Refresh', 'debug-suite')}
                         </Button>
                     </div>

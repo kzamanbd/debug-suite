@@ -1,21 +1,24 @@
 /**
- * Base Components Barrel Exports
+ * UI Components Barrel Exports
  *
  * @since 1.0.0
  */
 export { default as Alert } from './alert';
 export { default as Badge } from './badge';
-export { default as Button } from './button';
 export { default as Card } from './card';
 export { default as Checkbox } from './checkbox';
 export { default as ContentTabs } from './content-tabs';
 export { default as DateTimeHtml } from './date-time';
 export { default as DialogModal } from './dialog-modal';
+export { Input } from './input';
 export { default as Pagination } from './pagination';
 export { default as RadioButton } from './radio-button';
-export { default as SimpleSelect } from './select';
+export { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValue, default as SimpleSelect } from './select';
 export { default as Switch } from './switch';
-export { default as TextInput } from './text-input';
+
+export { Button, buttonVariants } from './button';
+export * from './dialog';
 
 // Export types
 export type { PaginationInfo } from './pagination';
+export type { Option } from './select';

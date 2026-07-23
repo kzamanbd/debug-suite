@@ -1,9 +1,6 @@
-@import 'simplebar-react/dist/simplebar.min.css';
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme) important;
 @import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
-@import '@fontsource-variable/inter';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -145,11 +142,11 @@
 
 @layer components {
     .debug-suite-layout {
-        @apply flex min-h-screen flex-col gap-4 rounded-md bg-white p-4;
+        @apply mx-6 flex min-h-screen flex-col gap-4 rounded p-4;
     }
 }
-body:not(.debug-suite-full-view) .debug-suite-layout {
-    @apply mt-5;
+#wpcontent:has(.debug-suite-root-app) {
+    padding-left: 0 !important;
 }
 .debug-suite-root-app input {
     height: auto !important;
@@ -160,10 +157,6 @@ body:not(.debug-suite-full-view) .debug-suite-layout {
 }
 div[data-headlessui-state='open'][role='dialog'] {
     z-index: 99999 !important;
-}
-.simplebar-scrollbar:before {
-    width: 4px;
-    background: #e2e8f0;
 }
 /* Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
@@ -227,6 +220,7 @@ div[data-headlessui-state='open'][role='dialog'] {
 .debug-suite-root-app h4,
 .debug-suite-root-app h5,
 .debug-suite-root-app h6,
+.debug-suite-root-app.wrap,
 .debug-suite-full-view .wrap,
 .debug-suite-full-view #wpbody,
 .debug-suite-full-view #wpwrap,
