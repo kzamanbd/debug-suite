@@ -111,4 +111,4 @@ The admin-bar "Debug" node (`Admin::add_admin_bar_menu`) mounts a **separate** R
 - New public APIs use `@since PLUGIN_SINCE`; `bin/version.js` (run by `pnpm release:org`) replaces the placeholder with the `package.json` version.
 - Bumping a release means updating the version in `debug-suite.php` (header + `$version` property) and `package.json`.
 - Tests: unit tests extend `Tests\Helpers\TestCase` (no WP), integration tests extend `Tests\Helpers\DebugSuiteTestCase` (full WP + REST). Files must end in `Test.php`. `phpunit.xml` is strict — output during tests, risky tests, and warnings all fail the run.
-- Further docs in `docs/` (`TESTING.md`, `REST_API_ARCHITECTURE.md`, `HOOKABLE_INTERFACE.md`, `DOCBLOCK.md`). They point to a `.github/copilot-instructions.md` that no longer exists, and some endpoint lists there are stale — trust the code in `includes/API/`.
+- Further docs in `docs/` (`TESTING.md`, `REST_API_ARCHITECTURE.md`, `HOOKABLE_INTERFACE.md`), and some endpoint lists there are stale — trust the code in `includes/API/`.
