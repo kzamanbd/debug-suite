@@ -4,18 +4,36 @@ on:
   push:
     tags:
       - "v*.*.*"
+  # Manual re-run, so a failed deploy can be retried without moving the tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (e.g. v2.0.0)"
+        required: true
 
 concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: true
+  group: release-${{ inputs.tag || github.ref }}
+  cancel-in-progress: false
 
 jobs:
   release-to-wp-org:
     name: Release to WordPress.org
     runs-on: ubuntu-latest
     steps:
+      # `tag` keeps the leading v (git ref), `version` drops it (WP.org uses the
+      # bare number for tags/ and readme's Stable tag).
+      - name: Resolve release version
+        id: v
+        run: |
+          set -euo pipefail
+          TAG="${{ inputs.tag || github.ref_name }}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          echo "Releasing ${TAG} as WP.org version ${TAG#v}"
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.v.outputs.tag }}
       - name: Setup PHP 8.1
         uses: shivammathur/setup-php@v2
         with:
@@ -30,18 +48,96 @@ jobs:
           npm install -g pnpm
           pnpm install
           pnpm run build
-      - name: WordPress Plugin Deploy
+      # Prepares ~/svn-debug-suite (checkout, .distignore rsync, svn add, asset
+      # mime-types) and builds the release zip, but does not commit. The commit
+      # is done by the next step instead, in batches — a single transaction
+      # carrying the whole payload exceeds WordPress.org's 600s commit window.
+      - name: Prepare WordPress.org deploy
         id: deploy
         uses: 10up/action-wordpress-plugin-deploy@stable
         with:
           generate-zip: true
+          dry-run: true
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: debug-suite
+          # The action only strips a leading "v" when it derives VERSION itself,
+          # and GITHUB_REF is a branch ref on workflow_dispatch. Pass it directly.
+          VERSION: ${{ steps.v.outputs.version }}
+      - name: Commit to WordPress.org SVN
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: debug-suite
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          SVN_URL="https://plugins.svn.wordpress.org/${SLUG}/"
+          SVN_DIR="${HOME}/svn-${SLUG}"
+          SVN_AUTH=(--no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD")
+
+          cd "$SVN_DIR"
+
+          if svn info "${SVN_URL}tags/${VERSION}" "${SVN_AUTH[@]}" > /dev/null 2>&1; then
+            echo "ℹ︎ Version ${VERSION} is already published; nothing to commit."
+            exit 0
+          fi
+
+          # Drop the action's local trunk→tag copy. It doubles the transaction by
+          # re-adding every file; the tag is created server-side further down.
+          if [[ -d "tags/${VERSION}" ]]; then
+            svn revert -R "tags/${VERSION}"
+            rm -rf "tags/${VERSION}"
+          fi
+
+          # Commit one target, retrying on WP.org connection timeouts (E175012).
+          commit_batch() {
+            local target="$1" attempt
+            if [[ -z "$(svn status "$target")" ]]; then
+              echo "ℹ︎ ${target}: nothing to commit"
+              return 0
+            fi
+            for attempt in 1 2 3; do
+              echo "➤ Committing ${target} (attempt ${attempt})..."
+              if svn commit "$target" -m "Update to version ${VERSION} from GitHub" "${SVN_AUTH[@]}"; then
+                return 0
+              fi
+              echo "⚠︎ ${target} failed on attempt ${attempt}; cleaning up and retrying..."
+              svn cleanup || true
+              svn update --accept mine-full "${SVN_AUTH[@]}" || true
+              sleep $(( attempt * 30 ))
+            done
+            echo "✗ ${target} failed after 3 attempts"
+            return 1
+          }
+
+          # Heaviest directories first, each as its own transaction. Their parents
+          # are already versioned, so these commit independently.
+          for batch in trunk/override/Psy trunk/override/Symfony trunk/override/PhpParser trunk/assets; do
+            if [[ -e "$batch" ]]; then
+              commit_batch "$batch"
+            fi
+          done
+
+          # Everything remaining: the rest of trunk (including deletions) and the
+          # .org listing assets.
+          commit_batch trunk
+          if [[ -d assets ]]; then
+            commit_batch assets
+          fi
+
+          # Server-side tag copy — a constant-time commit with no file transfer.
+          echo "➤ Tagging ${VERSION}..."
+          svn cp "${SVN_URL}trunk" "${SVN_URL}tags/${VERSION}" \
+            -m "Tagging version ${VERSION}" "${SVN_AUTH[@]}"
+
+          echo "✓ Plugin deployed to WordPress.org"
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{steps.deploy.outputs.zip-path}}
+          tag_name: ${{ steps.v.outputs.tag }}
+          files: ${{ steps.deploy.outputs.zip-path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

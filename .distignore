@@ -13,6 +13,10 @@
 .idea
 .vscode
 *.code-workspace
+.claude
+.superpowers
+.husky
+CLAUDE.md
 
 # Package Managers
 node_modules
@@ -27,6 +31,9 @@ yarn.lock
 webpack.config.js
 tsconfig.json
 postcss.config.js
+postcss.config.mjs
+components.json
+.wp-env.json
 tailwind.config.js
 vite.config.js
 babel.config.js
