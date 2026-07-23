@@ -17,10 +17,34 @@ class OpenApiPage extends AbstractPage {
      */
     private const REWRITE_VERSION_OPTION = 'debug_suite_openapi_rewrite_version';
 
+    /**
+     * Feature ID that gates this page (must match the frontend feature list).
+     *
+     * @since PLUGIN_SINCE
+     */
+    public const FEATURE_ID = 'api-docs';
+
+    /**
+     * Register the hooks.
+     *
+     * The docs and schema routes only exist while the api-docs feature is
+     * enabled. The rewrite-state listeners are registered either way so the
+     * rules are flushed in and out as the feature is toggled.
+     *
+     * @param bool $force Whether to register outside the admin.
+     *
+     * @return void
+     */
     public function register_hooks( $force = true ): void {
+        add_action( 'wp_loaded', [ $this, 'maybe_flush_rewrite_rules' ] );
+        add_action( 'debug_suite_' . self::FEATURE_ID . '_activated', [ __CLASS__, 'refresh_rewrite_rules' ], 10, 0 );
+
+        if ( ! debug_suite_is_feature_enabled( self::FEATURE_ID ) ) {
+            return;
+        }
+
         parent::register_hooks( $force );
         add_action( 'init', [ $this, 'rewrite_routes' ] );
-        add_action( 'wp_loaded', [ $this, 'maybe_flush_rewrite_rules' ] );
         add_action( 'template_redirect', [ $this, 'render_template' ] );
         add_filter( 'redirect_canonical', [ $this, 'disable_canonical_redirect' ] );
     }
@@ -40,19 +64,34 @@ class OpenApiPage extends AbstractPage {
     }
 
     /**
+     * The rewrite state the stored option is compared against.
+     *
+     * Combines the rule version with whether the feature is currently enabled,
+     * so toggling api-docs off flushes the rules away and toggling it back on
+     * restores them — same mechanism that handles a rule-version bump.
+     *
+     * @since PLUGIN_SINCE
+     *
+     * @return string
+     */
+    private static function get_rewrite_state(): string {
+        return self::REWRITE_VERSION . ':' . ( debug_suite_is_feature_enabled( self::FEATURE_ID ) ? 'on' : 'off' );
+    }
+
+    /**
      * Flush rewrite rules once whenever our rules change.
      *
      * Runs on wp_loaded (after rewrite_routes() has registered the rules on
-     * init) and flushes only when the stored version differs from
-     * REWRITE_VERSION. This makes the /docs and /schema URLs self-heal after an
-     * activation, plugin update, or rule change — without the intermittent 404
-     * that otherwise needs a manual "Save Permalinks" — and without paying for a
-     * flush on every request.
+     * init) and flushes only when the stored state differs from the current
+     * one. This makes the /docs and /schema URLs self-heal after an activation,
+     * plugin update, rule change, or feature toggle — without the intermittent
+     * 404 that otherwise needs a manual "Save Permalinks" — and without paying
+     * for a flush on every request.
      *
      * @return void
      */
     public function maybe_flush_rewrite_rules(): void {
-        if ( get_option( self::REWRITE_VERSION_OPTION ) === self::REWRITE_VERSION ) {
+        if ( get_option( self::REWRITE_VERSION_OPTION ) === self::get_rewrite_state() ) {
             return;
         }
 
@@ -60,17 +99,22 @@ class OpenApiPage extends AbstractPage {
     }
 
     /**
-     * Register the rewrite rules, flush, and record the current version.
+     * Register the rewrite rules, flush, and record the current state.
      *
-     * Safe to call outside the normal request lifecycle (e.g. on activation): it
-     * registers the rules before flushing.
+     * Safe to call outside the normal request lifecycle (e.g. on activation or
+     * when the feature is switched on): it registers the rules before flushing.
+     * With the feature disabled it flushes without registering, which drops the
+     * docs and schema rules from the rewrite table.
      *
      * @return void
      */
     public static function refresh_rewrite_rules(): void {
-        self::rewrite_routes();
+        if ( debug_suite_is_feature_enabled( self::FEATURE_ID ) ) {
+            self::rewrite_routes();
+        }
+
         flush_rewrite_rules( false );
-        update_option( self::REWRITE_VERSION_OPTION, self::REWRITE_VERSION );
+        update_option( self::REWRITE_VERSION_OPTION, self::get_rewrite_state() );
     }
 
     public function render_schema() {

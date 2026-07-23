@@ -33,11 +33,14 @@ class FeatureService {
 	 */
 	public static function get_default_features(): array {
 		return [
-			'email-log'       => false,
-			'system-info'     => true,
-			'file-manager'    => false,
-			'query-monitor'   => false,
-			'asset-manager'   => false,
+			'email-log'      => false,
+			'system-info'    => true,
+			'file-manager'   => false,
+			'query-monitor'  => false,
+			'cron-manager'   => false,
+			'api-docs'       => true,
+			'options-viewer' => false,
+			'asset-manager'  => false,
 		];
 	}
 
