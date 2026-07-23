@@ -1,4 +1,5 @@
 import Editor from '@/components/editor';
+import { PHP_CONSOLE_LANGUAGE } from '@/components/editor/languages';
 import { Button } from '@/components/ui';
 import { classNames } from '@/utils';
 import { Fill } from '@wordpress/components';
@@ -117,7 +118,7 @@ const QueryConsole = ({ className }: { className?: string }) => {
                     <div className="h-full min-h-0 [&>*]:h-full">
                         <Editor
                             value={code}
-                            filename="console.php"
+                            language={PHP_CONSOLE_LANGUAGE}
                             height="100%"
                             onChange={(value) => setCode(value ?? '')}
                         />

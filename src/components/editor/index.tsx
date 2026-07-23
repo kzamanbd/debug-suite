@@ -1,6 +1,6 @@
 import type { EditorOptions, IStandaloneCodeEditor } from '@/types';
 import { classNames } from '@/utils';
-import MonacoEditor, { type Monaco, type OnMount } from '@monaco-editor/react';
+import MonacoEditor, { type BeforeMount, type Monaco, type OnMount } from '@monaco-editor/react';
 import { __ } from '@wordpress/i18n';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { getLanguage, registerLanguages } from './languages';
@@ -11,6 +11,8 @@ interface EditorProps {
     value: string;
     /** Optional filename to infer language from extension */
     filename?: string;
+    /** Explicit Monaco language id. Takes precedence over `filename` detection. */
+    language?: string;
     /** Whether the editor is read-only */
     readOnly?: boolean;
     /** Height of the editor */
@@ -32,6 +34,7 @@ interface EditorProps {
 const Editor: React.FC<EditorProps> = ({
     value,
     filename,
+    language: languageProp,
     readOnly = false,
     height = '80vh',
     loading = false,
@@ -65,11 +68,20 @@ const Editor: React.FC<EditorProps> = ({
     }, [options, readOnly]);
 
     const language = useMemo(() => {
+        if (languageProp) {
+            return languageProp;
+        }
         if (filename) {
             return getLanguage(filename);
         }
         return 'plaintext';
-    }, [filename]);
+    }, [languageProp, filename]);
+
+    // Register custom languages before Monaco creates the model, so the model
+    // resolves to the right language id instead of falling back to plaintext.
+    const handleBeforeMount: BeforeMount = (monaco) => {
+        registerLanguages(language, monaco);
+    };
 
     const handleEditorDidMount: OnMount = (editor, monaco) => {
         editorRef.current = editor;
@@ -81,7 +93,7 @@ const Editor: React.FC<EditorProps> = ({
         if (language === 'log') {
             monaco.editor.setTheme('logTheme');
         } else {
-            monaco.editor.setTheme('vs-light');
+            monaco.editor.setTheme('vs');
         }
         const model = editor.getModel();
         // Attach listener for content changes
@@ -107,7 +119,7 @@ const Editor: React.FC<EditorProps> = ({
             if (language === 'log') {
                 monacoRef.current.editor.setTheme('logTheme');
             } else {
-                monacoRef.current.editor.setTheme('vs-light');
+                monacoRef.current.editor.setTheme('vs');
             }
         }
     }, [language]);
@@ -127,6 +139,7 @@ const Editor: React.FC<EditorProps> = ({
                 height={height}
                 language={language}
                 onChange={handleOnChange}
+                beforeMount={handleBeforeMount}
                 onMount={handleEditorDidMount}
                 options={defaultOptions}
             />
