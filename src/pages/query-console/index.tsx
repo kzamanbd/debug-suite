@@ -115,7 +115,7 @@ const QueryConsole = ({ className }: { className?: string }) => {
                             onSave={saveSnippet}
                             onDelete={deleteSnippet}
                         />
-                        <div className="min-w-0 flex-1">
+                        <div className="min-w-0 flex-1 [&>*]:h-full">
                             <Editor
                                 value={code}
                                 filename="console.php"
