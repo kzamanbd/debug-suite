@@ -37,3 +37,9 @@ eslint.config.mjs
 .vscode
 composer.json
 composer.lock
+.claude
+postcss.config.mjs
+components.json
+LICENSE.txt
+CLAUDE.md
+.wp-env.json

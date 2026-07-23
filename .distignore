@@ -1,4 +1,5 @@
 # Development Files
+
 .git
 .github
 .gitignore
@@ -15,6 +16,7 @@
 *.code-workspace
 
 # Package Managers
+
 node_modules
 composer.lock
 composer.json
@@ -24,6 +26,7 @@ pnpm-lock.yaml
 yarn.lock
 
 # Build Tools
+
 webpack.config.js
 tsconfig.json
 postcss.config.js
@@ -36,23 +39,26 @@ phpstan.neon
 phpunit.xml
 
 # Development Assets
+
 src
 tests
 documentation
 .wordpress-org
 assets/src
-*.map
+\*.map
 
 # Development Scripts
+
 bin
 scripts
 install-wp-tests.sh
 
 # Misc Development Files
-*.log
-*.sql
-*.tar.gz
-*.zip
+
+_.log
+_.sql
+_.tar.gz
+_.zip
 .phpunit.result.cache
 coverage
 phpunit.xml
@@ -63,13 +69,15 @@ LICENSE.md
 pnpm-workspace.yaml
 
 # IDE/Editor Files
-*.sublime-project
-*.sublime-workspace
-*.komodoproject
+
+_.sublime-project
+_.sublime-workspace
+_.komodoproject
 .komodotools
-*.code-workspace
+_.code-workspace
 
 # Testing
+
 tests
 phpunit.xml.dist
 .phpunit.result.cache
@@ -78,11 +86,13 @@ phpunit.xml.dist
 .php_cs.dist
 
 # Documentation
+
 docs
-*.md
+\*.md
 !README.txt
 
 # Build Process
+
 build
 dist
 release
@@ -90,25 +100,33 @@ temp
 tmp
 
 # Version Control
+
 .svn
 .git
 .gitignore
 .gitattributes
 
 # Logs and Databases
-*.log
-*.sql
-*.sqlite
+
+_.log
+_.sql
+\*.sqlite
 
 # OS Generated Files
-.DS_Store
+
+.DS\*Store
 .DS_Store?
-._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
 eslint.config.mjs
 .prettierignore
 .cursorrules
 .svnignore
+.claude
+postcss.config.mjs
+components.json
+LICENSE.txt
+CLAUDE.md
+.wp-env.json
