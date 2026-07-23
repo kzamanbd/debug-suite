@@ -42,6 +42,9 @@ class RestRouteProvider extends BaseServiceProvider {
 		SettingsController::class => SettingsService::class,
 		FeatureController::class  => FeatureService::class,
 		ConsoleController::class  => [ ConsoleService::class, ConsoleSettingsService::class ],
+		LogsController::class      => LogsService::class,
+		SettingsController::class  => SettingsService::class,
+		FeatureController::class   => FeatureService::class,
 	];
 
 	public function register(): void {
