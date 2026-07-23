@@ -1,0 +1,971 @@
+# Copyright (c) 2026 Kamruzzaman. All Rights Reserved.
+msgid ""
+msgstr ""
+"Project-Id-Version: Debug Suite 2.0.1\n"
+"Report-Msgid-Bugs-To: https://kzaman.me/contact/\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-23T14:32:49+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: debug-suite\n"
+
+#. Plugin Name of the plugin
+#: debug-suite.php
+#: includes/Pages/PageManager.php:139
+#: includes/Pages/PageManager.php:140
+#: assets/js/debug-suite.js:4
+msgid "Debug Suite"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: debug-suite.php
+msgid "https://kzaman.me/plugins/debug-suite?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash"
+msgstr ""
+
+#. Description of the plugin
+#: debug-suite.php
+msgid "WP Debug Suite is a powerful, all-in-one development toolkit designed to make WordPress debugging and inspection faster, safer, and more intuitive. Whether you're building, maintaining, or debugging WordPress sites, this suite equips you with the tools you need — all in one place."
+msgstr ""
+
+#. Author of the plugin
+#: debug-suite.php
+msgid "Kamruzzaman"
+msgstr ""
+
+#. Author URI of the plugin
+#: debug-suite.php
+msgid "https://kzaman.me/plugins/debug-suite/"
+msgstr ""
+
+#: debug-suite.php:29
+msgid "Missing Dependencies Detected [Debug Suite Plugin]"
+msgstr ""
+
+#: includes/Admin.php:131
+#: assets/js/debug-console.js:4
+msgid "Debug"
+msgstr ""
+
+#: includes/API/ConsoleController.php:50
+msgid "PHP code to evaluate."
+msgstr ""
+
+#: includes/API/ConsoleController.php:86
+msgid "Input is empty."
+msgstr ""
+
+#: includes/API/EmailLogController.php:197
+msgid "Invalid or missing email IDs."
+msgstr ""
+
+#: includes/API/EmailLogController.php:257
+msgid "Current page of the collection."
+msgstr ""
+
+#: includes/API/EmailLogController.php:264
+msgid "Maximum number of items to be returned in result set."
+msgstr ""
+
+#: includes/API/EmailLogController.php:272
+msgid "Limit results to those matching a string."
+msgstr ""
+
+#: includes/API/EmailLogController.php:277
+msgid "Limit results to emails with a specific status."
+msgstr ""
+
+#: includes/API/EmailLogController.php:283
+msgid "Limit results to a specific receiver email."
+msgstr ""
+
+#: includes/API/EmailLogController.php:289
+msgid "Sort collection by email attribute."
+msgstr ""
+
+#: includes/API/EmailLogController.php:295
+msgid "Order sort attribute ascending or descending."
+msgstr ""
+
+#: includes/API/FeatureController.php:68
+msgid "Map of feature_id to enabled (boolean)."
+msgstr ""
+
+#: includes/API/FeatureController.php:73
+msgid "Single feature ID to update (use with enabled)."
+msgstr ""
+
+#: includes/API/FeatureController.php:78
+msgid "Enabled state for the feature (use with feature_id)."
+msgstr ""
+
+#: includes/API/FeatureController.php:122
+msgid "Provide feature_id and enabled, or features object."
+msgstr ""
+
+#: includes/API/FeatureController.php:130
+msgid "Failed to update feature(s)."
+msgstr ""
+
+#: includes/API/FeatureController.php:139
+msgid "Features saved."
+msgstr ""
+
+#: includes/API/LogsController.php:113
+msgid "Log file path. If not provided, uses the current debug log file."
+msgstr ""
+
+#: includes/API/LogsController.php:167
+#: includes/Services/DebugLog/WPLogReaderService.php:686
+msgid "Log file cleared successfully."
+msgstr ""
+
+#: includes/API/RestController.php:41
+msgid "You are not currently logged in."
+msgstr ""
+
+#: includes/API/RestController.php:46
+msgid "You do not have permission to access this endpoint."
+msgstr ""
+
+#: includes/API/SettingsController.php:52
+msgid "Enable or disable WP_DEBUG."
+msgstr ""
+
+#: includes/API/SettingsController.php:57
+msgid "Enable or disable WP_DEBUG_LOG."
+msgstr ""
+
+#: includes/API/SettingsController.php:62
+msgid "Enable or disable WP_DEBUG_DISPLAY."
+msgstr ""
+
+#: includes/API/SettingsController.php:67
+msgid "Mark onboarding as completed."
+msgstr ""
+
+#: includes/API/SettingsController.php:115
+msgid "Invalid parameters provided."
+msgstr ""
+
+#. translators: %s is the setting name, e.g. 'debug'
+#: includes/API/SettingsController.php:130
+msgid "Invalid value for %s. Expected boolean."
+msgstr ""
+
+#: includes/API/SettingsController.php:138
+msgid "No valid settings provided to update."
+msgstr ""
+
+#: includes/API/SettingsController.php:158
+msgid "Settings updated successfully."
+msgstr ""
+
+#: includes/API/SettingsController.php:171
+msgid "Settings reset to defaults successfully."
+msgstr ""
+
+#: includes/API/SettingsController.php:184
+msgid "Full view request processed successfully."
+msgstr ""
+
+#: includes/Core/HookManager.php:14
+#: assets/js/debug-suite.js:4
+msgid "Settings"
+msgstr ""
+
+#: includes/Core/Upgrader.php:92
+msgid "Security check failed."
+msgstr ""
+
+#: includes/Core/Upgrader.php:97
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/Core/Upgrader.php:101
+msgid "No update is required."
+msgstr ""
+
+#: includes/Core/Upgrader.php:128
+msgid "Data updated successfully!"
+msgstr ""
+
+#. translators: %s: error message
+#: includes/Core/Upgrader.php:136
+msgid "Update failed: %s"
+msgstr ""
+
+#: includes/Pages/EmailLogPage.php:23
+msgid "Debug Suite Email Log"
+msgstr ""
+
+#: includes/Pages/EmailLogPage.php:24
+#: assets/js/debug-suite.js:4
+#: assets/js/email-log.js:4
+msgid "Email Log"
+msgstr ""
+
+#: includes/Pages/OpenApiPage.php:192
+msgid "Debug Suite OpenAPI Docs"
+msgstr ""
+
+#: includes/Pages/OpenApiPage.php:193
+#: assets/js/debug-suite.js:4
+msgid "API Docs"
+msgstr ""
+
+#: includes/Pages/PageManager.php:161
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#. translators: 1: GitHub URL, 2: Buy Me a Coffee URL
+#: includes/Pages/PageManager.php:208
+msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">View on GitHub</a> &nbsp;|&nbsp; <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">Buy Me a Coffee</a>"
+msgstr ""
+
+#: includes/Services/DebugLog/LogsService.php:97
+msgid "No log file path provided or configured."
+msgstr ""
+
+#: includes/Services/DebugLog/LogsService.php:105
+msgid "The requested log file was not found."
+msgstr ""
+
+#: includes/Services/DebugLog/LogsService.php:114
+msgid "Access to this file is not allowed."
+msgstr ""
+
+#: includes/Services/DebugLog/LogsService.php:136
+msgid "Failed to read the log file."
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:97
+#: includes/Services/DebugLog/WPLogReaderService.php:615
+msgid "Log file not found."
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:105
+msgid "Log file is not readable."
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:115
+msgid "Failed to read log file."
+msgstr ""
+
+#. translators: %s is the error message.
+#: includes/Services/DebugLog/WPLogReaderService.php:153
+msgid "Error reading log file: %s"
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:672
+msgid "Log file does not exist."
+msgstr ""
+
+#: includes/Services/DebugLog/WPLogReaderService.php:681
+msgid "Failed to clear log file."
+msgstr ""
+
+#: includes/Services/EmailLogService.php:182
+msgid "Failed to retrieve email logs."
+msgstr ""
+
+#: includes/Services/EmailLogService.php:210
+msgid "All Statuses"
+msgstr ""
+
+#: includes/Services/EmailLogService.php:214
+#: assets/js/email-log.js:4
+msgid "Successful"
+msgstr ""
+
+#: includes/Services/EmailLogService.php:218
+#: assets/js/email-log.js:4
+msgid "Failed"
+msgstr ""
+
+#: includes/Services/EmailLogService.php:226
+msgid "Failed to retrieve filter options."
+msgstr ""
+
+#: includes/Services/EmailLogService.php:249
+msgid "No email IDs provided."
+msgstr ""
+
+#. translators: %d is the number of deleted emails.
+#: includes/Services/EmailLogService.php:257
+msgid "%d emails deleted."
+msgstr ""
+
+#: includes/Services/EmailLogService.php:268
+msgid "All emails cleared."
+msgstr ""
+
+#: includes/Services/EmailLogService.php:283
+msgid "Email not found."
+msgstr ""
+
+#: includes/Services/EmailLogService.php:296
+msgid "Email resent."
+msgstr ""
+
+#: includes/Services/EmailLogService.php:301
+msgid "Failed to resend email."
+msgstr ""
+
+#: includes/Services/SettingsService.php:62
+msgid "No settings provided to update."
+msgstr ""
+
+#: includes/Services/SettingsService.php:66
+msgid "wp-config.php file is not writable."
+msgstr ""
+
+#. translators: %s is the unsupported setting key.
+#: includes/Services/SettingsService.php:75
+msgid "Unsupported setting: %s"
+msgstr ""
+
+#. translators: %s is the setting key that has an invalid value.
+#: includes/Services/SettingsService.php:83
+msgid "Invalid value for %s. Must be \"true\" or \"false\"."
+msgstr ""
+
+#: includes/Services/SettingsService.php:91
+#: includes/Services/SettingsService.php:116
+msgid "Failed to read wp-config.php file."
+msgstr ""
+
+#: includes/Services/SettingsService.php:98
+msgid "Failed to write wp-config.php file."
+msgstr ""
+
+#: includes/Services/SettingsService.php:111
+msgid "wp-config.php file not found."
+msgstr ""
+
+#: templates/upgrade-notice.php:17
+msgid "Debug Suite Data Update Required"
+msgstr ""
+
+#. translators: %1$s: current database version, %2$s: latest version
+#: templates/upgrade-notice.php:23
+msgid "We need to update your data to version %2$s. Please click the button below to complete the update process."
+msgstr ""
+
+#: templates/upgrade-notice.php:31
+msgid "Run the Updater"
+msgstr ""
+
+#: templates/upgrade-notice.php:69
+msgid "Update completed successfully."
+msgstr ""
+
+#: templates/upgrade-notice.php:72
+msgid "Upgrade failed."
+msgstr ""
+
+#: templates/upgrade-notice.php:76
+msgid "Failed to complete update."
+msgstr ""
+
+#. translators: %1$s: date, %2$s: time
+#: assets/js/debug-console.js:4
+#: assets/js/debug-suite.js:4
+#: assets/js/email-log.js:4
+msgid "%1$s at %2$s"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+#: assets/js/email-log.js:4
+msgid "Select Option"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "All Levels"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Critical"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+#: assets/js/email-log.js:4
+msgid "Error"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Warning"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Notice"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Info"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "50 items"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "100 items"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "500 items"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "1000 items"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Sort by Date"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Sort by Level"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Are you sure you want to clear all log entries? This action cannot be undone."
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Select a log file"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Parsed"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Raw"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Showing:"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "filtered"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Total entries:"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Search in log..."
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Clear search"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Date/Time"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Severity"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Message"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "#"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Loading logs..."
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "No log entries found matching your criteria."
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Show Dump"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Show Trace"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Hide Dump"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Hide Trace"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Copy message"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Load More Entries"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+#: assets/js/email-log.js:4
+msgid "Showing"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "entries"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "All entries loaded"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Loading editor…"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Loading..."
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Last Modified:"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "No file content available."
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Retry"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Running…"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Stack trace"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Executed in"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Output will appear here."
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Snippets"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Search or name a new snippet…"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "No snippets saved."
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "No matches."
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Delete snippet"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Create"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Toggle split"
+msgstr ""
+
+#: assets/js/debug-console.js:4
+msgid "Run"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Continue"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Cancel"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "404 – Page Not Found"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Sorry, the page you are looking for does not exist or has been moved."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Go to Dashboard"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Log all outgoing emails sent by WordPress for debugging."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "System Info"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "View detailed server, PHP, and WordPress environment information."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "File Manager"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Browse and manage your WordPress file system directly from the dashboard."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Query Monitor"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Analyze database queries and identify performance bottlenecks."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Cron Manager"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "View and control WordPress cron jobs and scheduled events."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "View and inspect REST API documentation."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Options Viewer"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Inspect and manage WordPress options in the database."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Asset Manager"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Manage enqueued scripts and styles to optimize performance."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Applying setting..."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Setting applied successfully!"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Failed to apply setting."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Failed to load features. Please try again."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Failed to save. Please try again."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "WP_DEBUG"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Enable the built-in WordPress debug mode to track PHP errors, notices, and warnings."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "WP_DEBUG_LOG"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Save all errors to a debug.log file for later analysis. Recommended for production sites."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+#: assets/js/email-log.js:4
+msgid "All"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Core"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Logging"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Performance"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Tools"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Debug Constants"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Features"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "WordPress Debug Constants"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Control wp-config.php debug flags"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Applying configuration..."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Configuration applied successfully!"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Failed to apply configuration."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Debug Mode Enabled"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Debug Mode Disabled"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Unsafe in production"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Active"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Off"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Debug Suite Features"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Toggle modules on or off — page reloads on change"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Search features..."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "No features found"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Try adjusting your search or category filter."
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Clear filters"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Inactive"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Minimize"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Maximize"
+msgstr ""
+
+#: assets/js/debug-suite.js:4
+msgid "Help"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Previous"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Next"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "to"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "of"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "results"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Email Details"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Loading email details..."
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Sent:"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Success"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Email Information"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "To:"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Subject:"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Message:"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Attachments"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Email Headers"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Error Information"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Close"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "All Receivers"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Bulk actions"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Delete"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Resend"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "items"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Are you sure you want to apply the selected bulk action?"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Apply"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Receiver"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Status"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Search..."
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Are you sure you want to clear all email logs? This action cannot be undone."
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Clear All"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Refresh"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Sent Date"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Subject"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Actions"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Loading emails..."
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "No email entries found matching your criteria."
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "View"
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "Failed to load email logs."
+msgstr ""
+
+#: assets/js/email-log.js:4
+msgid "View and manage your email logs."
+msgstr ""
