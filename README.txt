@@ -3,9 +3,9 @@ Contributors: kzamanbd
 Donate link: https://kzaman.me/plugins/debug-suite/
 Tags: debug, development, debugging, error-log, developer-tools
 Requires at least: 6.8
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.1.3
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,6 +112,20 @@ Yes! Debug Suite is designed to work alongside other development tools like Quer
 4. Error Tracking - Detailed error reports and analysis
 
 == Changelog ==
+
+= 2.0.0 =
+* feat: Query Console — an in-browser PHP REPL powered by a scoped PsySH, with Monaco editor, saved snippets, output/dump capture and execution timing.
+* feat: Debug Console overlay available from the admin bar on every admin screen.
+* refactor: BREAKING — removed the Overview dashboard and the Features admin page; Settings is now the default screen (feature flags still available as toggles in Settings).
+* refactor: BREAKING — removed the API Log module and the `wp_debug_display` setting; debug settings keys renamed.
+* refactor: BREAKING — Debug Suite now lives under Tools → Debug Suite instead of a top-level menu; the nested WP submenu and the `debug_suite_menu_items` filter were removed in favour of in-app navigation.
+* refactor: BREAKING — `ServiceResponse` and the empty `ServiceInterface` marker removed; services now return their data or a native `WP_Error`.
+* refactor: unified BaseModel on QueryBuilder as the single query engine; added `delete()` / `truncate()` and chainable static starters (e.g. `EmailLog::where('status','success')->get()`).
+* refactor: modernized admin UI — consolidated components into a single `ui/` library, Base UI Select/Tabs, new Navigation and Input components.
+* refactor: renamed Swagger to OpenApi across services, pages and templates; added bearer-token auth and better schema/request-body handling to the API docs.
+* fix: OpenAPI docs URL no longer 404s — rewrite rules now self-heal on activation and version change instead of needing a manual permalink save.
+* fix: Query Console syntax highlighting and editor height on the bare-PHP buffer.
+* chore: CI now runs PHPUnit on wp-env; composer platform pinned to PHP 8.1.
 
 = 1.1.3 =
 * feat: added an interactive database upgrader using WP Admin Notices and jQuery AJAX.
