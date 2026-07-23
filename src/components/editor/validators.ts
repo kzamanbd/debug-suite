@@ -33,7 +33,9 @@ export const phpValidator = (code: string): ValidationError | null => {
 
 // Simple object lookup - no switch needed!
 const validators = {
-    php: phpValidator
+    php: phpValidator,
+    // Query Console buffers are bare PHP under a dedicated language id.
+    'php-console': phpValidator
     // Add new validators here: python: validatePython,
 };
 

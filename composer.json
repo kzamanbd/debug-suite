@@ -26,6 +26,7 @@
         "phpcompatibility/php-compatibility": "^9.3",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.5",
+        "psy/psysh": "^0.12",
         "squizlabs/php_codesniffer": "^3.7",
         "wp-coding-standards/wpcs": "^3.1",
         "wp-phpunit/wp-phpunit": "^6.4",
@@ -38,8 +39,13 @@
             "DebugSuite\\": "includes/",
             "DebugSuite\\Packages\\": "override/"
         },
+        "exclude-from-classmap": [
+            "/override/composer/",
+            "/override/Symfony/Polyfill/Intl/Normalizer/Resources/stubs/"
+        ],
         "files": [
-            "includes/helpers.php"
+            "includes/helpers.php",
+            "includes/console-functions.php"
         ]
     },
     "autoload-dev": {
@@ -87,6 +93,9 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
+        "platform": {
+            "php": "8.1"
+        },
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
         },
@@ -103,9 +112,10 @@
             "dep_namespace": "DebugSuite\\Packages\\",
             "dep_directory": "/override/",
             "classmap_directory": "/override/",
-            "classmap_prefix": "DebugSuite_",
+            "classmap_prefix": "DebugSuite",
             "packages": [
-                "league/container"
+                "league/container",
+                "psy/psysh"
             ],
             "delete_vendor_directories": true
         }

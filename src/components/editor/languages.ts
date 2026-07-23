@@ -49,9 +49,56 @@ export const registerLogLanguage = (monaco: Monaco) => {
     });
 };
 
+/**
+ * Language id for bare PHP typed into the Query Console.
+ *
+ * Monaco's stock `php` grammar starts in HTML mode and only switches to PHP
+ * when it sees a `<?php` tag — so a console buffer of bare PHP gets no
+ * tokens at all. This id gets Monaco's real PHP grammar with its tokenizer
+ * entry point moved straight to the PHP state.
+ */
+export const PHP_CONSOLE_LANGUAGE = 'php-console';
+
+// PHP console language registration function
+export const registerPhpConsoleLanguage = (monaco: Monaco) => {
+    if (monaco.languages.getLanguages().some((lang) => lang.id === PHP_CONSOLE_LANGUAGE)) {
+        return;
+    }
+
+    // The stock grammar is lazily loaded; grab its loader before registering ours.
+    const php = monaco.languages
+        .getLanguages()
+        .find((lang) => lang.id === 'php') as { loader?: () => Promise<{ conf: unknown; language: unknown }> } | undefined;
+
+    if (typeof php?.loader !== 'function') return;
+
+    // Register the id synchronously so models created with it resolve correctly;
+    // the grammar is attached as soon as it resolves and Monaco re-tokenizes.
+    monaco.languages.register({ id: PHP_CONSOLE_LANGUAGE });
+
+    void php.loader().then(({ conf, language }) => {
+        const grammar = language as { tokenizer: Record<string, unknown> };
+
+        monaco.languages.setLanguageConfiguration(
+            PHP_CONSOLE_LANGUAGE,
+            conf as Parameters<typeof monaco.languages.setLanguageConfiguration>[1]
+        );
+
+        monaco.languages.setMonarchTokensProvider(PHP_CONSOLE_LANGUAGE, {
+            ...(grammar as object),
+            tokenizer: {
+                ...grammar.tokenizer,
+                // Enter the PHP state immediately instead of waiting for `<?php`.
+                root: [[/(?=.)/, { token: '@rematch', switchTo: '@phpRoot' }]]
+            }
+        } as Parameters<typeof monaco.languages.setMonarchTokensProvider>[1]);
+    });
+};
+
 // Simple object lookup - no switch needed!
 const languageRegistrations = {
-    log: registerLogLanguage
+    log: registerLogLanguage,
+    [PHP_CONSOLE_LANGUAGE]: registerPhpConsoleLanguage
     // Add new language registrations here: python: registerPythonLanguage,
 };
 
