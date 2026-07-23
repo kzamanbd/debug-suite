@@ -96,6 +96,12 @@ const QueryConsole = ({ className }: { className?: string }) => {
     return (
         <div className={classNames('flex h-full min-h-0 flex-col', className)}>
             <Fill name="console-logs-actions">
+                <SnippetsMenu
+                    snippets={settings.snippets}
+                    onInsert={insertSnippet}
+                    onSave={saveSnippet}
+                    onDelete={deleteSnippet}
+                />
                 <Button size="sm" variant="ghost" onClick={toggleSplit} title={__('Toggle split', 'debug-suite')}>
                     {settings.window_split === 'vertical' ? <Rows2 size={18} /> : <Columns2 size={18} />}
                 </Button>
@@ -108,21 +114,13 @@ const QueryConsole = ({ className }: { className?: string }) => {
             <SplitLayout
                 orientation={settings.window_split}
                 first={
-                    <div className="flex h-full min-h-0">
-                        <SnippetsMenu
-                            snippets={settings.snippets}
-                            onInsert={insertSnippet}
-                            onSave={saveSnippet}
-                            onDelete={deleteSnippet}
+                    <div className="h-full min-h-0 [&>*]:h-full">
+                        <Editor
+                            value={code}
+                            filename="console.php"
+                            height="100%"
+                            onChange={(value) => setCode(value ?? '')}
                         />
-                        <div className="min-w-0 flex-1 [&>*]:h-full">
-                            <Editor
-                                value={code}
-                                filename="console.php"
-                                height="100%"
-                                onChange={(value) => setCode(value ?? '')}
-                            />
-                        </div>
                     </div>
                 }
                 second={<OutputPane result={result} error={error} loading={loading} />}
