@@ -5,7 +5,7 @@ Tags: debug, debug-log, error-log, developer-tools, php-console
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -137,6 +137,11 @@ Yes. Register a page through the `debugSuite.routes` JavaScript filter, add UI i
 6. API Documentation - Generated OpenAPI docs for the site's REST namespaces
 
 == Changelog ==
+
+= 2.0.1 =
+* fix: the API Docs toggle in Settings now saves — the `api-docs` feature ID was missing from the backend feature list, so the switch silently reverted.
+* fix: the API Docs routes now follow that toggle — disabling the feature removes the /debug-suite/api/docs and /schema rewrite rules, enabling it restores them without a manual permalink save.
+* docs: rewrote the plugin description, installation steps and FAQ for the 2.0.0 feature set (Query Console, Debug Console overlay, debug constant management).
 
 = 2.0.0 =
 * feat: Query Console — an in-browser PHP REPL powered by a scoped PsySH, with Monaco editor, saved snippets, output/dump capture and execution timing.

@@ -20,7 +20,7 @@ class OpenApiPage extends AbstractPage {
     /**
      * Feature ID that gates this page (must match the frontend feature list).
      *
-     * @since PLUGIN_SINCE
+     * @since 2.0.1
      */
     public const FEATURE_ID = 'api-docs';
 
@@ -70,7 +70,7 @@ class OpenApiPage extends AbstractPage {
      * so toggling api-docs off flushes the rules away and toggling it back on
      * restores them — same mechanism that handles a rule-version bump.
      *
-     * @since PLUGIN_SINCE
+     * @since 2.0.1
      *
      * @return string
      */
