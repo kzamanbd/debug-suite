@@ -138,6 +138,9 @@ Yes. Register a page through the `debugSuite.routes` JavaScript filter, add UI i
 
 == Changelog ==
 
+= 2.0.4 =
+* chore: sync the plugin header, `$version` property and stable tag with the packaged version — 2.0.2 and 2.0.3 were tagged but never shipped, so this release carries their changes.
+
 = 2.0.2 =
 * i18n: ship the `debug-suite.pot` translation template with the plugin, so translators no longer need to generate it themselves.
 * chore: tested against WordPress 7.1.
