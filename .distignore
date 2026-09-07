@@ -14,6 +14,8 @@
 .idea
 .vscode
 *.code-workspace
+appsero.json
+requirement.json
 
 # Package Managers
 
