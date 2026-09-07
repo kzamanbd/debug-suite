@@ -5,7 +5,7 @@ Tags: debug, debug-log, error-log, developer-tools, php-console
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -137,6 +137,9 @@ Yes. Register a page through the `debugSuite.routes` JavaScript filter, add UI i
 6. API Documentation - Generated OpenAPI docs for the site's REST namespaces
 
 == Changelog ==
+
+= 2.0.5 =
+* chore: maintenance release — no functional changes; refreshes the packaged build and translation template.
 
 = 2.0.4 =
 * chore: maintenance release — sync the plugin header, `$version` property and stable tag with the packaged version.
