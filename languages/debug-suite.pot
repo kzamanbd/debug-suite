@@ -1,16 +1,16 @@
 # Copyright (c) 2026 Kamruzzaman. All Rights Reserved.
 msgid ""
 msgstr ""
-"Project-Id-Version: Debug Suite 2.0.6\n"
+"Project-Id-Version: Debug Suite 2.0.7\n"
 "Report-Msgid-Bugs-To: https://kzaman.me/contact/\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-07T11:28:12+00:00\n"
+"POT-Creation-Date: 2026-10-16T17:06:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.11.0\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: debug-suite\n"
 
 #. Plugin Name of the plugin
@@ -153,6 +153,7 @@ msgstr ""
 
 #. translators: %s is the setting name, e.g. 'debug'
 #: includes/API/SettingsController.php:130
+#, php-format
 msgid "Invalid value for %s. Expected boolean."
 msgstr ""
 
@@ -195,6 +196,7 @@ msgstr ""
 
 #. translators: %s: error message
 #: includes/Core/Upgrader.php:136
+#, php-format
 msgid "Update failed: %s"
 msgstr ""
 
@@ -223,6 +225,7 @@ msgstr ""
 
 #. translators: 1: GitHub URL, 2: Buy Me a Coffee URL
 #: includes/Pages/PageManager.php:208
+#, php-format
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">View on GitHub</a> &nbsp;|&nbsp; <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">Buy Me a Coffee</a>"
 msgstr ""
 
@@ -257,6 +260,7 @@ msgstr ""
 
 #. translators: %s is the error message.
 #: includes/Services/DebugLog/WPLogReaderService.php:153
+#, php-format
 msgid "Error reading log file: %s"
 msgstr ""
 
@@ -296,6 +300,7 @@ msgstr ""
 
 #. translators: %d is the number of deleted emails.
 #: includes/Services/EmailLogService.php:257
+#, php-format
 msgid "%d emails deleted."
 msgstr ""
 
@@ -325,11 +330,13 @@ msgstr ""
 
 #. translators: %s is the unsupported setting key.
 #: includes/Services/SettingsService.php:75
+#, php-format
 msgid "Unsupported setting: %s"
 msgstr ""
 
 #. translators: %s is the setting key that has an invalid value.
 #: includes/Services/SettingsService.php:83
+#, php-format
 msgid "Invalid value for %s. Must be \"true\" or \"false\"."
 msgstr ""
 
@@ -352,6 +359,7 @@ msgstr ""
 
 #. translators: %1$s: current database version, %2$s: latest version
 #: templates/upgrade-notice.php:23
+#, php-format
 msgid "We need to update your data to version %2$s. Please click the button below to complete the update process."
 msgstr ""
 
@@ -375,6 +383,7 @@ msgstr ""
 #: assets/js/debug-console.js:4
 #: assets/js/debug-suite.js:4
 #: assets/js/email-log.js:4
+#, js-format
 msgid "%1$s at %2$s"
 msgstr ""
 
